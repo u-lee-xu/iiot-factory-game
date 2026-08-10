@@ -3689,6 +3689,33 @@
                 ]
               },
               {
+                "title": "modpoll 命令格式",
+                "narrative": "厂长：光记住寄存器类型还不够，得会用工具读。命令行工具叫 modpoll，通用格式：modpoll [选项] 从站IP。常用选项：-m tcp 用 ModbusTCP 协议；-t 4 读保持寄存器（4=保持设定值、3=输入测量值、0=线圈）；-r 1 从 1 号地址开始读；-1 只读一次就停；-p 8502 指定从站端口。写法口诀：modpoll 打头，选项在中间，IP 放最后。",
+                "question": "读保持寄存器（温度设定值），modpoll 里 -t 后面该填几？",
+                "options": [
+                  {
+                    "text": "4（保持寄存器）",
+                    "correct": true,
+                    "hint": "-t 4 = 保持寄存器，16位可读写，存设定值"
+                  },
+                  {
+                    "text": "3（输入寄存器）",
+                    "correct": false,
+                    "hint": "-t 3 = 输入寄存器，只读测量值"
+                  },
+                  {
+                    "text": "0（线圈）",
+                    "correct": false,
+                    "hint": "-t 0 = 线圈，开关量"
+                  },
+                  {
+                    "text": "1（地址号）",
+                    "correct": false,
+                    "hint": "-r 1 才是地址号，-t 是类型"
+                  }
+                ]
+              },
+              {
                 "title": "动手敲命令：读保持寄存器",
                 "narrative": "厂长：动手。用 modpoll 读从站（192.168.1.100:8502）的保持寄存器，看温度设定值。",
                 "question": "在终端输入命令，读取保持寄存器：",
@@ -3725,7 +3752,7 @@
                   }
                 ],
                 "successText": "✅ 保持寄存器读取成功！",
-                "errorHint": "用 modpoll 读取从站（192.168.1.100:8502）的保持寄存器"
+                "errorHint": "格式: modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100（-m tcp 协议 -t 4 保持寄存器 -r 1 地址 -p 8502 端口，IP 放最后）"
               }
             ]
           }
@@ -4015,7 +4042,7 @@
                 "aliases": [
                   "modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100"
                 ],
-                "errorHint": "用 modpoll 读从站保持寄存器（-m tcp -p 8502 IP）",
+                "errorHint": "格式: modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100（-m tcp 协议 -t 4 保持寄存器 -r 1 地址 -p 8502 端口）",
                 "outputLines": [
                   {
                     "text": "Protocol configuration: MODBUS/TCP",
