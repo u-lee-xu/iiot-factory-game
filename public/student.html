@@ -971,7 +971,7 @@ function toggleSound() {
   document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
 }
 
-function playSound(type) {
+function playSound(type, opt) {
   if (!soundEnabled) return;
   try {
     const ctx = getAudioCtx();
@@ -1051,6 +1051,81 @@ function playSound(type) {
           g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.05 + 0.04);
           o.start(now + i * 0.05); o.stop(now + i * 0.05 + 0.04);
         }
+        break;
+      }
+      case 'fanfare': {
+        [523, 659, 784, 1047, 1319].forEach((freq, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, now + i * 0.1);
+          g.gain.setValueAtTime(0.22, now + i * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.35);
+          o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.35);
+        });
+        break;
+      }
+      case 'fail': {
+        [392, 330, 262, 196].forEach((freq, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine';
+          o.frequency.setValueAtTime(freq, now + i * 0.15);
+          g.gain.setValueAtTime(0.18, now + i * 0.15);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.3);
+          o.start(now + i * 0.15); o.stop(now + i * 0.15 + 0.3);
+        });
+        break;
+      }
+      case 'alarm': {
+        for (let i = 0; i < 6; i++) {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'square';
+          o.frequency.setValueAtTime((i % 2 === 0) ? 660 : 550, now + i * 0.12);
+          g.gain.setValueAtTime(0.07, now + i * 0.12);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.1);
+          o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.11);
+        }
+        break;
+      }
+      case 'tick': {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'square';
+        o.frequency.setValueAtTime(1200, now);
+        g.gain.setValueAtTime(0.06, now);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        o.start(now); o.stop(now + 0.05);
+        break;
+      }
+      case 'combo': {
+        const lv = Math.min(Math.max(parseInt(opt) || 1, 1), 20);
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(500 + lv * 40, now);
+        g.gain.setValueAtTime(0.12, now);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        o.start(now); o.stop(now + 0.12);
+        break;
+      }
+      case 'toggle': {
+        [440, 660].forEach((freq, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine';
+          o.frequency.setValueAtTime(freq, now + i * 0.05);
+          g.gain.setValueAtTime(0.1, now + i * 0.05);
+          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.05 + 0.08);
+          o.start(now + i * 0.05); o.stop(now + i * 0.05 + 0.08);
+        });
         break;
       }
     }
@@ -3866,9 +3941,12 @@ function openMemoryMatch(cfg, onComplete) {
 
   if (cfg.timed) {
     const mmTimeTotal = Math.max(cfg.timeLimit || 0, 1);
+    let mmLastTick = 99;
     timer = setInterval(() => {
       timeLeft -= 0.1;
       if (timerEl) timerEl.textContent = Math.max(Math.ceil(timeLeft), 0);
+      const mmSec = Math.ceil(timeLeft);
+      if (mmSec <= 5 && mmSec > 0 && mmSec !== mmLastTick) { playSound('tick'); mmLastTick = mmSec; }
       const bar = overlay.querySelector('.mm-timerbar-fill');
       if (bar) {
         const pct = Math.max(0, Math.min(100, (timeLeft / mmTimeTotal) * 100));
@@ -3955,7 +4033,7 @@ function openMemoryMatch(cfg, onComplete) {
       grid.querySelectorAll('.mm-card').forEach((c, i) => {
         setTimeout(() => c.classList.add('celebrate'), i * 45);
       });
-      playSound('levelup');
+      playSound('fanfare');
       setTimeout(() => {
         grid.style.display = 'none';
         const foot = overlay.querySelector('.mm-foot');
@@ -3978,6 +4056,7 @@ function openMemoryMatch(cfg, onComplete) {
         overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
       }, 700);
     } else {
+      playSound('fail');
       // 超时/未完成
       const res = document.createElement('div');
       res.className = 'mm-result';
@@ -4122,9 +4201,12 @@ function openStackedMatch(cfg, onComplete) {
   }
 
   const mmTimeTotal = Math.max(timeLeft, 1);
+  let mmLastTick = 99;
   timer = setInterval(() => {
     timeLeft -= 0.1;
     if (timerEl) timerEl.textContent = Math.max(Math.ceil(timeLeft), 0);
+    const mmSec = Math.ceil(timeLeft);
+    if (mmSec <= 5 && mmSec > 0 && mmSec !== mmLastTick) { playSound('tick'); mmLastTick = mmSec; }
     const bar = overlay.querySelector('.mm-timerbar-fill');
     if (bar) {
       const pct = Math.max(0, Math.min(100, (timeLeft / mmTimeTotal) * 100));
@@ -4148,7 +4230,7 @@ function openStackedMatch(cfg, onComplete) {
     finished = true;
     clearInterval(timer);
     if (win) {
-      playSound('levelup');
+      playSound('fanfare');
       const res = document.createElement('div');
       res.className = 'mm-result';
       res.innerHTML = `
@@ -4163,6 +4245,7 @@ function openStackedMatch(cfg, onComplete) {
       overlay.appendChild(res);
       overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
     } else {
+      playSound('fail');
       const res = document.createElement('div');
       res.className = 'mm-result';
       res.innerHTML = `
@@ -4262,7 +4345,7 @@ function openMatchGame(cfg, onComplete) {
   function finish(win) {
     finished = true;
     if (win) {
-      playSound('levelup');
+      playSound('fanfare');
       const res = document.createElement('div');
       res.className = 'mm-result';
       res.innerHTML = `<div class="big">🔗</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:6px">${escHtml(cfg.name)} 完成！</div><div class="xp">+${cfg.xp || 0} XP</div><div style="font-size:14px;color:var(--dim)">${cfg.size} 组全部配对成功</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" data-act="again">🔁 再玩一次</button><button class="mm-btn primary" data-act="done">收下奖励</button></div>`;
@@ -4314,6 +4397,8 @@ function openQuickMatch(cfg, onComplete) {
   document.body.appendChild(overlay);
 
   function renderQ() {
+    if (finished) return;
+    if (cur >= questions.length) { clearInterval(timer); finish(true); return; }
     const q = questions[cur];
     overlay.querySelector('#qkCur').textContent = cur + 1;
     overlay.querySelector('#qkBody').innerHTML = '<div class="qk-q">' + escHtml(q.q || q.hint) + '</div>';
@@ -4339,7 +4424,7 @@ function openQuickMatch(cfg, onComplete) {
           score += 10 + combo * 2;
           overlay.querySelector('#qkScore').textContent = score;
           overlay.querySelector('#qkCombo').textContent = combo;
-          playSound('success');
+          if (combo >= 2) playSound('combo', combo); else playSound('success');
           overlay.querySelector('#qkMsg').innerHTML = '<span class="qk-ok">✓ 正确！' + (q.cmd ? ' 示例：' + escHtml(q.cmd) : '') + '</span>';
           if (q.id) unlockPedia(currentLevelId, [q.id]);
           cur++;
@@ -4359,10 +4444,13 @@ function openQuickMatch(cfg, onComplete) {
   }
 
   const qkTimeTotal = Math.max(timeLeft, 1);
+  let qkLastTick = 99;
   timer = setInterval(() => {
     timeLeft -= 0.1;
     const t = overlay.querySelector('.qk-timer');
     if (t) t.textContent = Math.max(Math.ceil(timeLeft), 0);
+    const qkSec = Math.ceil(timeLeft);
+    if (qkSec <= 5 && qkSec > 0 && qkSec !== qkLastTick) { playSound('tick'); qkLastTick = qkSec; }
     const bar = overlay.querySelector('#qkTimerBar');
     if (bar) {
       const pct = Math.max(0, Math.min(100, (timeLeft / qkTimeTotal) * 100));
@@ -4385,7 +4473,7 @@ function openQuickMatch(cfg, onComplete) {
     finished = true;
     clearInterval(timer);
     if (win) {
-      playSound('levelup');
+      playSound('fanfare');
       const stars = bestCombo >= cfg.size ? 3 : bestCombo >= Math.ceil(cfg.size / 2) ? 2 : 1;
       const res = document.createElement('div');
       res.className = 'mm-result';
@@ -4403,6 +4491,7 @@ function openQuickMatch(cfg, onComplete) {
       overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openQuickMatch(cfg, onComplete); };
       overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('qk'); if (onComplete) onComplete(true); };
     } else {
+      playSound('fail');
       const res = document.createElement('div');
       res.className = 'mm-result';
       res.innerHTML = `
@@ -4525,6 +4614,7 @@ function openStormDefense(cfg, onComplete) {
 
   function toggleFilter(id) {
     if (finished) return;
+    playSound('toggle');
     if (filterSet.has(id)) { filterSet.delete(id); }
     else {
       const f = FILTERS.find(x => x.id === id);
@@ -4641,7 +4731,7 @@ function openStormDefense(cfg, onComplete) {
     if (win) {
       const ids = (cfg.pairs || []).map(pr => pr.id).filter(Boolean);
       if (ids.length) unlockPedia(currentLevelId, ids);
-      playSound('levelup');
+      playSound('fanfare');
       const savedRate = totalCrit ? savedCrit / totalCrit : 1;
       const stars = (peakPressure <= 60 && savedRate >= 0.9) ? 3 : (peakPressure <= 85 && savedRate >= 0.6) ? 2 : 1;
       const res = document.createElement('div');
@@ -4660,6 +4750,7 @@ function openStormDefense(cfg, onComplete) {
       overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openStormDefense(cfg, onComplete); };
       overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('storm'); if (onComplete) onComplete(true); };
     } else {
+      playSound('fail');
       const res = document.createElement('div');
       res.className = 'mm-result';
       res.innerHTML = `
@@ -4767,7 +4858,7 @@ function openAlarmRush(cfg, onComplete) {
       const gain = 20 + (combo - 1) * 5;
       score += gain;
       flash('✅ 处理成功 +' + gain, 'ok');
-      playSound('success');
+      if (combo >= 2) playSound('combo', combo); else playSound('success');
       d.el.className = 'ar-card saved';
       d.statusEl.textContent = '已处理';
       d.temp = 46 + Math.random() * 8;
@@ -4818,7 +4909,7 @@ function openAlarmRush(cfg, onComplete) {
           d.el.className = 'ar-card overheat';
           d.statusEl.textContent = '🔥 过热！快处理！';
           flash('🔥 边缘盒子 0' + (d.i + 1) + ' 爆表了！快点点它！', 'err');
-          playSound('error');
+          playSound('alarm');
         }
       } else if (d.state === 'overheat') {
         d.crashTimer -= dt;
@@ -4857,7 +4948,7 @@ function openAlarmRush(cfg, onComplete) {
     if (win) {
       const ids = (cfg.pairs || []).map(pr => pr.id).filter(Boolean);
       if (ids.length) unlockPedia(currentLevelId, ids);
-      playSound('levelup');
+      playSound('fanfare');
       const totalEvents = events.length;
       const stars = (crashes === 0 && saves >= Math.ceil(totalEvents * 0.9)) ? 3 : (crashes <= 1) ? 2 : 1;
       const res = document.createElement('div');
@@ -4876,6 +4967,7 @@ function openAlarmRush(cfg, onComplete) {
       overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openAlarmRush(cfg, onComplete); };
       overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('alarm'); if (onComplete) onComplete(true); };
     } else {
+      playSound('fail');
       const res = document.createElement('div');
       res.className = 'mm-result';
       res.innerHTML = `
