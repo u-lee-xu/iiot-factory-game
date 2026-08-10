@@ -294,17 +294,23 @@ body {
 
 /* ===== Interaction: Scenario Match ===== */
 .match-area { display: flex; gap: 20px; align-items: flex-start; }
-.match-col { flex: 1; }
+.match-col { flex: 1 1 0; min-width: 0; }
 .match-col h4 { font-size: 16px; color: var(--dim); margin-bottom: 6px; }
 .match-item {
   padding: 6px 10px; border: 1px solid var(--border); margin-bottom: 4px;
   font-size: 16px; cursor: pointer; transition: all .2s; text-align: center;
+  word-break: break-word; line-height: 1.4;
 }
 .match-item:hover { border-color: var(--cyan); }
 .match-item.selected { border-color: var(--amber); }
 .match-item.matched { border-color: var(--green); opacity: .6; cursor: default; }
 .match-item.wrong { border-color: var(--red); animation: shake .3s; }
 @keyframes shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)} }
+@media (max-width: 560px) {
+  .match-area { gap: 8px; }
+  .match-item { font-size: 13px; padding: 5px 6px; }
+  .match-col h4 { font-size: 14px; }
+}
 
 /* ===== Interaction: Code Review ===== */
 .code-block {
@@ -636,6 +642,11 @@ body {
 .review-inline .ri-meta { font-size: 12px; color: var(--dim); }
 .review-inline.review-bonus { border-color: rgba(255,176,0,.35); background: rgba(255,176,0,.05); }
 .review-inline.review-bonus.unlocked { border-color: var(--amber); }
+.task-ops { display: flex; gap: 4px; margin-left: auto; flex-shrink: 0; }
+.task-redo, .task-undo { cursor: pointer; font-size: 15px; padding: 2px 5px; border: 1px solid var(--border); border-radius: 4px; color: var(--dim); }
+.task-redo:hover { color: var(--green); border-color: var(--green); }
+.task-undo:hover { color: var(--red); border-color: var(--red); }
+.task-half { color: var(--amber); cursor: default; margin-left: 4px; flex-shrink: 0; }
 /* ===== Quick Match (产线快打) ===== */
 .qk-box { width: min(680px, 94vw); }
 .qk-stats { display: flex; gap: 18px; font-size: 15px; color: var(--text); margin-bottom: 14px; }
@@ -1090,7 +1101,7 @@ function generateTeach(task) {
     '2-10': 'SSH 端口转发是高级功能：-L 本地转发（把本地端口映射到远程）、-R 远程转发（把远程端口映射到本地）、-D 动态转发（SOCKS 代理）。',
     '2-11': 'SSH 安全加固有三板斧：不要用默认端口、不要用 root 登、不要只用密码。其中有一项直接把安全风险最大的账号关了，最立竿见影。',
     '2-hidden-2': 'SSH 入侵取证三步走：查 /var/log/auth.log 看登录记录、查 authorized_keys 有没有陌生公钥、查 last 看异常登录时间。',
-    '3-0': '车间里七种设备至少用着四种协议，各说各话就像工地上的「巴别塔」。要解决语言不通，得有个统一的理解框架——ISA-95 就是把工厂从设备到管理层分成五层的「地图」。',
+    '3-0': '先讲个故事：远古时人类语言统一，想合力建一座通天塔，上帝变乱了他们的语言，工人各说各话、建不成塔——这就是「巴别塔」，从此成了"语言不通、沟通混乱"的代名词。咱们车间也一样：七种设备至少用着四种协议（FANUC 私有、西门子 ProfiNet、ABB、倍福 EtherCAT、Modbus），各说各话。要解决设备"语言不通"，得靠协议转换网关（配翻译）或通用中间层（OPC UA）。理解了这个，再看 ISA-95 五层地图就更清楚了。',
     '3-1': 'ISA-95 五层从下到上：L0 现场设备层（传感器/执行器，采集数据）、L1 控制层（PLC 做逻辑控制）、L2 监控层（SCADA 看整条产线）、L3 制造运营层（MES 管订单进度）、L4 业务层（ERP 管财务采购）。一句话：设备采集→控制指挥→监控全局→运营订单→业务公司。',
     '3-2': 'Node-RED 是低代码「翻译台」——把设备数据用拖拽节点连成数据流。装它用官方一键脚本（来源要正），Web 界面跑在 1880 端口，要连 Modbus 设备就装 node-red-contrib-modbus 节点包。',
     '3-3': 'ProfiNet 是西门子的工业以太网协议，毫秒级实时。记得那句：紫色线 Profibus 是老款、绿色工业网线 ProfiNet 是新款，都是西门子家的。',
@@ -1342,7 +1353,8 @@ function calcTotalXP() {
   let xp = 0;
   content.levels.forEach(lv => {
     lv.tasks.forEach(t => {
-      if (gameState.check[taskKey(t.id)]) xp += taskXP(t);
+      const c = gameState.check[taskKey(t.id)];
+      if (c) xp += (c && c.half) ? Math.floor(taskXP(t) / 2) : taskXP(t);
     });
   });
   return xp;
@@ -1493,16 +1505,23 @@ function renderMission() {
   const reviewAfter = {};
   if (tl) tl.warmups.forEach(w => {
     const last = w.blockTasks[w.blockTasks.length - 1];
-    if (last) reviewAfter[last] = w;
+    if (last) {
+      if (!reviewAfter[last]) reviewAfter[last] = [];
+      reviewAfter[last].push(w);
+    }
   });
   lv.tasks.forEach(t => {
     const done = isTaskDone(t.id);
+    const _ck = gameState.check[taskKey(t.id)];
+    const isHalf = done && _ck && _ck.half;
     const li = document.createElement('li');
     li.className = 'task-item' + (done ? ' done' : '') + (t.auto ? ' auto' : '') + (t.hidden ? ' hidden' : '');
     li.innerHTML = `
       <span class="cb">${done ? '✓' : ''}</span>
       <span class="task-title">${t.title}</span>
       <span class="task-xp">${taskXP(t) > 0 ? '+' + taskXP(t) + 'XP' : ''}</span>
+      ${isHalf ? '<span class="task-half" title="经验减半，点任务可重刷拿满分">⚡</span>' : ''}
+      ${done ? '<span class="task-ops"><span class="task-redo" title="重做本关拿满分">↻</span><span class="task-undo" title="撤销完成">✕</span></span>' : ''}
       <div class="task-tags">${(t.tags || []).map(tagId => {
         const tag = window.KNOWLEDGE_TAGS?.[tagId];
         return tag ? `<span class="task-tag category-${tag.category}">${tag.label}</span>` : '';
@@ -1516,31 +1535,33 @@ function renderMission() {
           const allDone = nonHidden.every(x => isTaskDone(x.id));
           if (!allDone) { showToast('先完成所有普通任务再挑战隐藏', 'info'); return; }
         }
-        if (done) {
-          // if already done, just toggle off
-          toggleTask(t.id);
-        } else {
-      errors++;
-      streak = 0;
-          openTaskModal(currentLevelId, t.id);
-        }
+        // 已完成的任务点击 = 重做（重刷拿满分），未完成 = 直接做
+        openTaskModal(currentLevelId, t.id);
       };
+      const redo = li.querySelector('.task-redo');
+      if (redo) redo.onclick = (e) => { e.stopPropagation(); openTaskModal(currentLevelId, t.id); };
+      const undo = li.querySelector('.task-undo');
+      if (undo) undo.onclick = (e) => { e.stopPropagation(); toggleTask(t.id); };
     }
     list.appendChild(li);
     // 块最后一个任务后，紧跟一行对应的复习翻牌
     if (reviewAfter[t.id]) {
-      const w = reviewAfter[t.id];
+      reviewAfter[t.id].forEach(w => {
       const unlocked = w.blockTasks.every(tid => isTaskDone(tid));
-      const isQuick = w.type === 'quick';
+      const wType = w.type || 'memory';
+      const isQuick = wType === 'quick';
+      const isMatch = wType === 'match';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked');
-      row.innerHTML = '<span class="ri-emoji">' + (unlocked ? (isQuick ? '⚡' : '🃏') : '🔒') + '</span><span class="ri-name">' + (isQuick ? escHtml(w.name) : '复习翻牌 · ' + escHtml(w.name)) + '</span><span class="ri-meta">' + (isQuick ? w.size + ' 题' : (w.size * 2) + ' 张') + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
+      row.innerHTML = '<span class="ri-emoji">' + (unlocked ? (isQuick ? '⚡' : isMatch ? '🔗' : '🃏') : '🔒') + '</span><span class="ri-name">' + ((isQuick || isMatch) ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name)) + '</span><span class="ri-meta">' + (isQuick ? w.size + ' 题' : isMatch ? w.size + ' 组' : (w.size * 2) + ' 张') + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
       row.onclick = () => {
         if (!unlocked) { showToast('还没有解锁，先完成对应任务', 'error'); return; }
         if (isQuick) openQuickMatch(w, (win) => { if (win) showToast('⚡ 快打完成', 'success'); });
-        else openMemoryMatch(w, (win) => { if (win) showToast('🧠 复习完成', 'success'); });
+        else if (isMatch) openMatchGame(w, (win) => { if (win) showToast('🔗 连线完成', 'success'); });
+        else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
+      });
     }
   });
   // 番外：记忆大师挑战（本关通关后解锁，放在列表最后）
@@ -1609,7 +1630,11 @@ function closeModal() {
 
 function completeTask(taskId, xp) {
   try {
-    gameState.check[taskId] = true;
+    // 经验减半：命令猜错多次时 xp 低于满值，存 half 标记（影响实际总分，可重刷拿满分）
+    const tFull = (content.levels.find(l => l.tasks.some(t => t.id === taskId)) || {}).tasks;
+    const tFullXp = tFull ? taskXP(tFull.find(t => t.id === taskId)) : xp;
+    if (xp < tFullXp) gameState.check[taskId] = { half: true };
+    else gameState.check[taskId] = true;
     closeModal();
     renderFactory();
     renderMission();
@@ -2165,6 +2190,8 @@ registerInteraction('install_wizard', {
     const steps = cfg.steps || [];
     let current = 0;
     let multiSelected = new Set();
+    let cmdErrorCount = 0;   // 命令被"给答案"的次数（>0 表示曾连续猜错）
+    let cmdHintGiven = {};   // 每个命令步骤是否已给过功能提示
 
     container.innerHTML = `
       <div id="wizardBar">
@@ -2188,8 +2215,12 @@ registerInteraction('install_wizard', {
 
     function renderStep() {
       if (current >= steps.length) {
-        document.getElementById('wizardStage').innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:28px;margin-bottom:8px">\ud83d\udda5\ufe0f</div><div style="color:var(--green);font-size:14px">\u2705 工位搭建完成！</div><div style="font-size: 14px;color:var(--dim);margin-top:4px">VMware + Ubuntu Server 已就绪</div></div>';
-        document.getElementById('modalFoot').innerHTML = '<button class="btn btn-success" onclick="completeTask(\'' + task.id + '\', ' + taskXP(task) + ')">\u2713 领取 XP</button>';
+        var finalXP = cmdErrorCount > 0 ? Math.floor(taskXP(task) / 2) : taskXP(task);
+        var halfNote = cmdErrorCount > 0
+          ? '<div style="font-size: 13px;color:var(--amber);margin-top:6px">经验减半 · 实得 +'+ finalXP +' XP</div>'
+          : '<div style="font-size: 13px;color:var(--dim);margin-top:6px">全对完成 · 经验满额</div>';
+        document.getElementById('wizardStage').innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:28px;margin-bottom:8px">\ud83d\udda5\ufe0f</div><div style="color:var(--green);font-size:14px">\u2705 工位搭建完成！</div>' + halfNote + '</div>';
+        document.getElementById('modalFoot').innerHTML = '<button class="btn btn-success" onclick="completeTask(\'' + task.id + '\', ' + finalXP + ')">\u2713 领取 XP</button>';
         updateProgress();
         playSound('success');
         return;
@@ -2309,34 +2340,45 @@ registerInteraction('install_wizard', {
       
       var stage = document.getElementById('wizardStage');
       var termRoot = stage.querySelector('.term-root');
+      document.getElementById('modalFoot').innerHTML = '';
+
+      if (!ok) {
+        // 两步提示：第一次给功能提示，第二次（连续猜错）直接给答案并标记经验减半
+        var already = !!cmdHintGiven[current];
+        var hintText;
+        if (!already) {
+          hintText = '💡 提示: ' + String(step.errorHint || '再看看厂长刚才教的，命令格式要对').replace(/</g,'&lt;');
+          cmdHintGiven[current] = true;
+        } else {
+          hintText = '📖 答案是: ' + String(step.correctCommand).replace(/</g,'&lt;');
+          cmdErrorCount++;
+        }
+        if (termRoot) {
+          var termBody = termRoot.querySelector('.term-body');
+          var input = document.getElementById('wizCmd');
+          if (termBody && input) {
+            var box = document.createElement('div');
+            box.style.cssText = 'padding:4px 0';
+            box.innerHTML = '<div style="color:var(--cyan)">$ ' + String(cmd).replace(/</g,'&lt;') + '</div>' +
+              '<div style="color:var(--red)">bash: ' + String(cmd).split(' ')[0].replace(/</g,'&lt;') + ': 命令未找到，或参数不正确</div>' +
+              '<div style="color:var(--amber);margin-top:4px">' + hintText + '</div>';
+            termBody.insertBefore(box, input);
+            input.onkeydown = function(e) { if (e.key === 'Enter') { var v = input.value.trim(); if (v) submitWizard(v); } };
+            input.focus();
+          }
+        }
+        playSound('error');
+        shakeScreen();
+        document.getElementById('modalFoot').innerHTML = '<button class="btn btn-wiz-cancel" onclick="closeModal()">取消</button>';
+        return;
+      }
+
+      // 正确命令 → 替换为输出区并播放动画
       if (termRoot) {
         termRoot.innerHTML = '<div class="term-header"><span class="term-dots"><span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span></span><span>\u7aef</span></div><div class="term-body" id="wizTermOut" style="padding:8px;font-size: 14px;font-family:inherit;max-height:180px;overflow-y:auto;color:var(--dim)"></div>';
       }
       var out = document.getElementById('wizTermOut');
       if (!out) return;
-      document.getElementById('modalFoot').innerHTML = '';
-      
-      if (!ok) {
-        // 错误命令 → 直接显示真实报错，不跑动画
-        var cmdEcho = document.createElement('div');
-        cmdEcho.textContent = '$ ' + cmd;
-        cmdEcho.style.color = 'var(--cyan)';
-        out.appendChild(cmdEcho);
-        var errDiv = document.createElement('div');
-        errDiv.textContent = 'bash: ' + cmd.split(' ')[0] + ': 命令未找到，或参数不正确';
-        errDiv.style.color = 'var(--red)';
-        errDiv.style.marginTop = '4px';
-        out.appendChild(errDiv);
-        var hintDiv = document.createElement('div');
-        hintDiv.textContent = '💡 试试: ' + step.correctCommand;
-        hintDiv.style.color = 'var(--amber)';
-        hintDiv.style.marginTop = '6px';
-        out.appendChild(hintDiv);
-        playSound('error');
-        shakeScreen();
-        document.getElementById('modalFoot').innerHTML = '<button class="btn btn-wiz-cancel" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="window.wizRetry()">🔄 重试</button>';
-        return;
-      }
       
       var lines = step.outputLines
         ? [{text: '$ ' + cmd, color: 'cyan', delay: 200}].concat(step.outputLines)
@@ -2451,9 +2493,8 @@ registerInteraction('install_wizard', {
     }
 
     window.wizRetry = function() {
-      var lv = content.levels.find(function(l) { return l.id === currentLevelId; });
-      var t = lv.tasks.find(function(x) { return x.id === currentTaskId; });
-      if (t) openTaskModal(currentLevelId, currentTaskId);
+      // 只重做当前这一步（命令输错就重新输入，选择题答错就重新选），不重头再来
+      renderStep();
     };
 
     renderStep();
@@ -2831,6 +2872,17 @@ registerInteraction('drag_classify', {
     const pool = document.getElementById('classifyPool');
     const cats = document.getElementById('classifyCats');
 
+    // 待分类区支持拖回：已放置的项可拖回此处取消放置，重新分类
+    pool.addEventListener('dragover', e => e.preventDefault());
+    pool.addEventListener('drop', e => {
+      e.preventDefault();
+      const name = e.dataTransfer.getData('text/plain');
+      if (name && placed[name]) {
+        delete placed[name];
+        renderClassify();
+      }
+    });
+
     cfg.categories.forEach(catName => {
       const catDiv = document.createElement('div');
       catDiv.className = 'classify-cat';
@@ -2871,6 +2923,13 @@ registerInteraction('drag_classify', {
             const span = document.createElement('span');
             span.className = 'placed-item';
             span.textContent = name;
+            span.draggable = true;
+            span.addEventListener('dragstart', e => {
+              e.dataTransfer.setData('text/plain', name);
+              e.dataTransfer.effectAllowed = 'move';
+              span.style.opacity = '0.4';
+            });
+            span.addEventListener('dragend', () => { span.style.opacity = ''; });
             catDiv.appendChild(span);
           }
         });
@@ -3356,14 +3415,81 @@ const ACHIEVEMENTS = [
   { id: 'xp_2500', name: '技工出师', desc: '累计获得 2500 XP', emoji: '⚒️', test: c => c.xp >= 2500 },
   { id: 'xp_4500', name: '高级工程师', desc: '累计获得 4500 XP', emoji: '🛠️', test: c => c.xp >= 4500 },
   { id: 'star_3', name: '三星好评', desc: '某一关综合星数达到 3 星', emoji: '⭐', test: c => c.anyLevel3Star },
-  { id: 'star_5', name: '满星传说', desc: '某一关综合星数达到 5 星', emoji: '🌟', test: c => c.anyLevel5Star }
+  { id: 'star_5', name: '满星传说', desc: '某一关综合星数达到 5 星', emoji: '🌟', test: c => c.anyLevel5Star },
+  { id: 'mm_streak', name: '翻牌连对王', desc: '某次翻牌连续配对成功 5 次（不失误）', emoji: '🃏', test: c => c.mmStreak >= 5 },
+  { id: 'qk_combo', name: '快打连击王', desc: '快打最高连击达到 5', emoji: '⚡', test: c => c.qkCombo >= 5 },
+  { id: 'game_win1', name: '小游戏初体验', desc: '完成 1 个小游戏', emoji: '🎮', test: c => c.gamesWin >= 1 },
+  { id: 'game_win3', name: '小游戏新兵', desc: '完成 3 个小游戏', emoji: '🎯', test: c => c.gamesWin >= 3 },
+  { id: 'game_win8', name: '小游戏达人', desc: '完成 8 个小游戏', emoji: '🏆', test: c => c.gamesWin >= 8 },
+  { id: 'mm_matched', name: '翻牌收藏家', desc: '累计配对成功 30 次', emoji: '🗂️', test: c => c.mmMatched >= 30 },
+  // —— 小游戏·分类累计 ——
+  { id: 'mm_win3', name: '翻牌新生', desc: '累计完成 3 次翻牌游戏', emoji: '🃏', test: c => c.mmWins >= 3 },
+  { id: 'mm_win8', name: '翻牌熟练工', desc: '累计完成 8 次翻牌游戏', emoji: '🃏', test: c => c.mmWins >= 8 },
+  { id: 'qk_win5', name: '快打熟练工', desc: '累计完成 5 次快打', emoji: '⚡', test: c => c.qkWins >= 5 },
+  { id: 'qk_win12', name: '快打大师', desc: '累计完成 12 次快打', emoji: '⚡', test: c => c.qkWins >= 12 },
+  { id: 'match_win3', name: '连线小能手', desc: '累计完成 3 次连线配对', emoji: '🔗', test: c => c.matchWins >= 3 },
+  { id: 'all_types', name: '全能选手', desc: '翻牌、快打、连线三类小游戏都完成过', emoji: '🎖️', test: c => c.mmWins >= 1 && c.qkWins >= 1 && c.matchWins >= 1 },
+  // —— 小游戏·单关重复（鼓励反复玩、加深记忆）——
+  { id: 'l1_flip3', name: '首关翻牌·三顾', desc: '第 1 关翻牌游戏累计完成 3 次', emoji: '🧠', test: c => (c.lvlWins['1'] || 0) >= 3 },
+  { id: 'l1_flip5', name: '首关翻牌·常客', desc: '第 1 关翻牌游戏累计完成 5 次', emoji: '🎩', test: c => (c.lvlWins['1'] || 0) >= 5 },
+  { id: 'l2_quick5', name: '二关快打·老手', desc: '第 2 关快打游戏累计完成 5 次', emoji: '⌨️', test: c => (c.lvlWins['2'] || 0) >= 5 },
+  { id: 'l3_flip3', name: '三关翻牌·熟客', desc: '第 3 关翻牌游戏累计完成 3 次', emoji: '🔬', test: c => (c.lvlWins['3'] || 0) >= 3 },
+  // —— 小游戏·累计 ——
+  { id: 'game_20', name: '游戏厅常客', desc: '累计完成 20 个小游戏', emoji: '🕹️', test: c => c.gamesWin >= 20 },
+  // —— 图鉴收藏 ——
+  { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
+  { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
+  { id: 'pedia_70', name: '图鉴收藏家', desc: '术语图鉴收集 70 个', emoji: '🏛️', test: c => c.pediaCount >= 70 },
+  // —— 技术流（零失误 / 满贯）——
+  { id: 'mm_streak6', name: '翻牌零失误', desc: '某次翻牌连续配对成功 6 次（一次不失误）', emoji: '🎯', test: c => c.mmStreak >= 6 },
+  { id: 'qk_full', name: '快打满贯', desc: '快打最高连击达到 6（一次不错）', emoji: '🔥', test: c => c.qkCombo >= 6 }
 ];
+
+// 小游戏表现统计（localStorage，本地记录）
+function getGameStats() {
+  try { return JSON.parse(localStorage.getItem('game_stats') || '{}'); } catch (e) { return {}; }
+}
+function saveGameStats(s) { localStorage.setItem('game_stats', JSON.stringify(s)); }
+function bumpGameStats(patch) {
+  const s = getGameStats();
+  Object.assign(s, patch);
+  saveGameStats(s);
+}
+// 小游戏完成：+1 完成数（按类型/关卡累计）并触发成就判定
+// type: 'mm'(翻牌) | 'qk'(快打) | 'match'(连线) | 'other'
+function recordGameWin(type) {
+  const t = type || 'mm';
+  const gs = getGameStats();
+  gs.gamesWin = (gs.gamesWin || 0) + 1;
+  if (t === 'mm') gs.mmWins = (gs.mmWins || 0) + 1;
+  else if (t === 'qk') gs.qkWins = (gs.qkWins || 0) + 1;
+  else if (t === 'match') gs.matchWins = (gs.matchWins || 0) + 1;
+  const lv = currentLevelId;
+  if (lv) {
+    gs.lvlWins = gs.lvlWins || {};
+    const k = '' + lv;
+    gs.lvlWins[k] = (gs.lvlWins[k] || 0) + 1;
+  }
+  saveGameStats(gs);
+  evaluateAchievements(true);
+}
 
 function achievementContext() {
   const ctx = {
     doneCount: 0, total: 0, levelDone: {}, allLevels: true,
     xp: calcTotalXP(), isPioneer: false, anyLevel3Star: false, anyLevel5Star: false
   };
+  // 小游戏表现统计
+  const gs = getGameStats();
+  ctx.mmStreak = gs.mmStreak || 0;
+  ctx.qkCombo = gs.qkCombo || 0;
+  ctx.gamesWin = gs.gamesWin || 0;
+  ctx.mmMatched = gs.mmMatched || 0;
+  ctx.mmWins = gs.mmWins || 0;
+  ctx.qkWins = gs.qkWins || 0;
+  ctx.matchWins = gs.matchWins || 0;
+  ctx.lvlWins = gs.lvlWins || {};
+  ctx.pediaCount = getPediaCount();
   content.levels.forEach(lv => {
     const prog = levelProgress(lv.id);
     ctx.doneCount += prog.done;
@@ -3619,6 +3745,8 @@ function openMemoryMatch(cfg, onComplete) {
   // 堆叠式（cfg.levels 存在时）
   if (cfg.levels) { openStackedMatch(cfg, onComplete); return; }
   const pairs = cfg.pairs.slice(0, cfg.size);
+  let streak = 0;
+  let bestStreak = 0;
   const cards = [];
   pairs.forEach((p, i) => {
     cards.push({ pairId: i, kind: 'term', text: p.term, emoji: p.emoji });
@@ -3692,6 +3820,9 @@ function openMemoryMatch(cfg, onComplete) {
           matched++;
           matchedEl.textContent = matched;
           playSound('success');
+          streak++;
+          bestStreak = Math.max(bestStreak, streak);
+          bumpGameStats({ mmStreak: bestStreak, mmMatched: (getGameStats().mmMatched || 0) + 1 });
           flipped = [];
           lock = false;
           if (matched === cfg.size) { clearInterval(timer); finish(true); }
@@ -3700,6 +3831,7 @@ function openMemoryMatch(cfg, onComplete) {
         setTimeout(() => {
           a.classList.add('wrong');
           b.classList.add('wrong');
+          streak = 0;
           playSound('error');
           setTimeout(() => {
             a.classList.remove('flipped', 'wrong');
@@ -3764,7 +3896,7 @@ function openMemoryMatch(cfg, onComplete) {
           </div>`;
         overlay.appendChild(res);
         overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openMemoryMatch(cfg, onComplete); };
-        overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(true); };
+        overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
       }, 700);
     } else {
       // 超时/未完成
@@ -3942,7 +4074,7 @@ function openStackedMatch(cfg, onComplete) {
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
     } else {
       const res = document.createElement('div');
       res.className = 'mm-result';
@@ -3959,6 +4091,100 @@ function openStackedMatch(cfg, onComplete) {
       overlay.querySelector('[data-act="skip"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(false); };
     }
   }
+}
+
+// 连线匹配小游戏：左项↔右项配对
+function openMatchGame(cfg, onComplete) {
+  const pairs = (cfg.pairs || []).slice(0, cfg.size);
+  const rights = pairs.map((p, i) => ({ text: p.right, pairIdx: i }));
+  for (let i = rights.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rights[i], rights[j]] = [rights[j], rights[i]];
+  }
+  let selected = null;
+  let matchedCount = 0;
+  const matched = new Set();
+  let finished = false;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="mm-box">
+      <div class="mm-head">
+        <div>
+          <div class="mm-title">🔗 ${escHtml(cfg.name)}</div>
+          <div class="mm-sub">${escHtml(cfg.subtitle || '')}</div>
+        </div>
+        <div class="mm-close">✕</div>
+      </div>
+      <div class="mm-stats"><span>配对 <b id="mmMatchCount">0</b>/${cfg.size}</span></div>
+      <div class="match-area">
+        <div class="match-col"><h4>${escHtml(cfg.leftTitle || '概念 / 场景')}</h4><div id="mmLeft"></div></div>
+        <div class="match-col"><h4>${escHtml(cfg.rightTitle || '匹配项')}</h4><div id="mmRight"></div></div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const leftEl = overlay.querySelector('#mmLeft');
+  const rightEl = overlay.querySelector('#mmRight');
+  const countEl = overlay.querySelector('#mmMatchCount');
+
+  function render() {
+    leftEl.innerHTML = '';
+    rightEl.innerHTML = '';
+    pairs.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.className = 'match-item' + (matched.has(i) ? ' matched' : '') + (selected === i ? ' selected' : '');
+      div.textContent = p.left;
+      if (!matched.has(i)) div.onclick = () => { selected = i; render(); };
+      leftEl.appendChild(div);
+    });
+    rights.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'match-item' + (matched.has(r.pairIdx) ? ' matched' : '');
+      div.textContent = r.text;
+      if (!matched.has(r.pairIdx) && selected !== null) {
+        div.onclick = () => {
+          if (selected === r.pairIdx) {
+            matched.add(r.pairIdx);
+            matchedCount++;
+            selected = null;
+            countEl.textContent = matchedCount;
+            playSound('success');
+            if (pairs[r.pairIdx].id) unlockPedia(currentLevelId, [pairs[r.pairIdx].id]);
+            bumpGameStats({ mmMatched: (getGameStats().mmMatched || 0) + 1 });
+            render();
+            if (matchedCount >= cfg.size) finish(true);
+          } else {
+            div.classList.add('wrong');
+            playSound('error');
+            shakeScreen();
+            setTimeout(() => div.classList.remove('wrong'), 300);
+          }
+        };
+      }
+      rightEl.appendChild(div);
+    });
+  }
+
+  overlay.querySelector('.mm-close').onclick = () => {
+    if (finished) return;
+    overlay.remove();
+    if (onComplete) onComplete(false);
+  };
+  function finish(win) {
+    finished = true;
+    if (win) {
+      playSound('levelup');
+      const res = document.createElement('div');
+      res.className = 'mm-result';
+      res.innerHTML = `<div class="big">🔗</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:6px">${escHtml(cfg.name)} 完成！</div><div class="xp">+${cfg.xp || 0} XP</div><div style="font-size:14px;color:var(--dim)">${cfg.size} 组全部配对成功</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" data-act="again">🔁 再玩一次</button><button class="mm-btn primary" data-act="done">收下奖励</button></div>`;
+      overlay.appendChild(res);
+      overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openMatchGame(cfg, onComplete); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('match'); if (onComplete) onComplete(true); };
+    }
+  }
+  render();
 }
 
 // 产线快打（命令快反）：看提示点对命令，计时+连击
@@ -4004,7 +4230,8 @@ function openQuickMatch(cfg, onComplete) {
     overlay.querySelector('#qkCur').textContent = cur + 1;
     overlay.querySelector('#qkBody').innerHTML = '<div class="qk-q">' + escHtml(q.q || q.hint) + '</div>';
     overlay.querySelector('#qkMsg').textContent = '';
-    const opts = [q.term].concat(distractors);
+    const localD = (q.distractors || []).filter(function(d){ return d !== q.term; });
+    const opts = [q.term].concat(localD.length ? localD : distractors);
     for (let i = opts.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [opts[i], opts[j]] = [opts[j], opts[i]];
@@ -4020,6 +4247,7 @@ function openQuickMatch(cfg, onComplete) {
         if (o === q.term) {
           combo++;
           bestCombo = Math.max(bestCombo, combo);
+          bumpGameStats({ qkCombo: Math.max(getGameStats().qkCombo || 0, bestCombo) });
           score += 10 + combo * 2;
           overlay.querySelector('#qkScore').textContent = score;
           overlay.querySelector('#qkCombo').textContent = combo;
@@ -4078,7 +4306,7 @@ function openQuickMatch(cfg, onComplete) {
         </div>`;
       overlay.appendChild(res);
       overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openQuickMatch(cfg, onComplete); };
-      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('qk'); if (onComplete) onComplete(true); };
     } else {
       const res = document.createElement('div');
       res.className = 'mm-result';
@@ -4103,6 +4331,10 @@ function getPedia() {
   try { return JSON.parse(localStorage.getItem('term_pedia') || '{}'); } catch (e) { return {}; }
 }
 function savePedia(p) { localStorage.setItem('term_pedia', JSON.stringify(p)); }
+function getPediaCount() {
+  const p = getPedia();
+  return Object.values(p).reduce((s, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0);
+}
 function unlockPedia(levelId, ids) {
   const p = getPedia();
   const key = '' + levelId;

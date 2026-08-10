@@ -61,7 +61,8 @@ router.get('/leaderboard', requireAuth, (req, res) => {
       (lv.tasks || []).forEach(t => {
         if (t.auto) return;
         total++;
-        if (check['' + t.id]) { done++; xp += taskXP(t); }
+        const c = check['' + t.id];
+        if (c) { done++; xp += (c && c.half) ? Math.floor(taskXP(t) / 2) : taskXP(t); }
       });
     });
     return {
