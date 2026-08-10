@@ -1,0 +1,103 @@
+{
+  "tags": [
+    {
+      "id": "mqtt_qos",
+      "label": "MQTT QoS 0/1/2",
+      "category": "通讯协议"
+    },
+    {
+      "id": "mqtt_retain",
+      "label": "MQTT Retain/Last Will",
+      "category": "通讯协议"
+    },
+    {
+      "id": "opcua_ns",
+      "label": "OPC UA 命名空间/节点",
+      "category": "工业协议"
+    },
+    {
+      "id": "opcua_sub",
+      "label": "OPC UA 订阅/监控项",
+      "category": "工业协议"
+    },
+    {
+      "id": "modbus_reg",
+      "label": "Modbus 寄存器映射",
+      "category": "工业协议"
+    },
+    {
+      "id": "edge_arch",
+      "label": "边缘计算分层架构",
+      "category": "架构设计"
+    },
+    {
+      "id": "edge_gateway",
+      "label": "边缘网关选型与配置",
+      "category": "架构设计"
+    },
+    {
+      "id": "data_model",
+      "label": "设备数据建模/标签化",
+      "category": "数据建模"
+    },
+    {
+      "id": "timeseries_db",
+      "label": "时序数据库选型与写入",
+      "category": "数据存储"
+    },
+    {
+      "id": "node_red_flow",
+      "label": "Node-RED 流程编排",
+      "category": "低代码开发"
+    },
+    {
+      "id": "docker_deploy",
+      "label": "容器化部署/Compose 编排",
+      "category": "部署运维"
+    },
+    {
+      "id": "device_onboard",
+      "label": "设备接入/注册/认证流程",
+      "category": "设备管理"
+    },
+    {
+      "id": "firmware_ota",
+      "label": "固件 OTA 升级策略",
+      "category": "设备管理"
+    },
+    {
+      "id": "security_tls",
+      "label": "TLS/证书/加密通讯",
+      "category": "工业安全"
+    },
+    {
+      "id": "fault_diag",
+      "label": "故障诊断/日志溯源方法",
+      "category": "运维排障"
+    },
+    {
+      "id": "software_source",
+      "label": "软件源与获取安全",
+      "category": "基础设施",
+      "description": "了解正规软件获取渠道，识别恶意镜像源和破解版风险"
+    },
+    {
+      "id": "vm_config",
+      "label": "虚拟机资源配置",
+      "category": "基础设施",
+      "description": "理解CPU、内存、网络模式等虚拟化资源配置"
+    },
+    {
+      "id": "minimal_install",
+      "label": "最小安装原则",
+      "category": "基础设施",
+      "description": "服务器系统选型与最小化安装，减少攻击面"
+    },
+    {
+      "id": "apt_basic",
+      "label": "APT 包管理",
+      "category": "基础设施",
+      "description": "使用 apt 进行软件包更新与管理"
+    }
+  ]
+}

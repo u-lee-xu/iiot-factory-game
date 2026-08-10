@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>锐智工厂 · 工业互联网实训</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Courier New', monospace;
+    background: #0f0f14; color: #c8c8d0;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  }
+  .card {
+    background: #181820; border: 1px solid #2a2a3a; padding: 40px;
+    width: 380px; max-width: 90vw;
+  }
+  .logo { color: #00bcd4; font-size: 32px; text-align: center; margin-bottom: 8px; }
+  h1 { text-align: center; font-size: 19px; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: #606070; font-size: 19px; margin-bottom: 28px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 19px; color: #606070; margin-bottom: 4px; }
+  .field input {
+    width: 100%; padding: 10px 12px; background: #000; border: 1px solid #2a2a3a;
+    color: #00e676; font-family: inherit; font-size: 19px; outline: none;
+  }
+  .field input:focus { border-color: #ffb000; }
+  .field input::placeholder { color: #3a3a48; }
+  .btn {
+    width: 100%; padding: 10px; background: #2a2a3a; border: none;
+    color: #c8c8d0; font-family: inherit; font-size: 19px; cursor: pointer;
+    transition: all .2s; margin-bottom: 8px;
+  }
+  .btn:hover { background: #3a3a4a; }
+  .btn.primary { background: #ffb000; color: #000; font-weight: bold; }
+  .btn.primary:hover { background: #ffc030; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-link {
+    background: none; border: 1px solid #2a2a3a; width: 100%; padding: 10px;
+    color: #606070; font-family: inherit; font-size: 17px; cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-link:hover { border-color: #00bcd4; color: #00bcd4; }
+  .error { color: #ff5555; font-size: 19px; margin-top: 8px; min-height: 18px; }
+  .sep { text-align: center; color: #2a2a3a; font-size: 19px; margin: 12px 0; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">⚙</div>
+  <h1>锐智工厂 · 工业互联网实训</h1>
+  <div class="subtitle">工业互联网技能实训</div>
+  <div class="field">
+    <label>姓名</label>
+    <input id="nameInput" type="text" placeholder="输入你的姓名" maxlength="20" autofocus>
+  </div>
+  <div class="field" id="studentPwField" style="display:none">
+    <label>密码 <span style="color:#3a3a48;font-size:15px">(已暂停，暂无需填写)</span></label>
+    <input id="studentPw" type="password" placeholder="选填" maxlength="30">
+  </div>
+  <div class="field" id="pwField" style="display:none">
+    <label>教师密码</label>
+    <input id="pwInput" type="password" placeholder="教师密码">
+  </div>
+    <button id="studentBtn" class="btn primary" onclick="loginStudent()">进入实训</button>
+  <div class="sep">——</div>
+  <button id="teacherBtn" class="btn-link" onclick="showTeacherLogin()">我是教师</button>
+  <div class="error" id="errorMsg"></div>
+</div>
+
+<script>
+const API = window.location.origin;
+
+// 学生登录密码开关（临时暂停，先测翻牌）
+const PASSWORD_ENABLED = false;
+
+function $(id) { return document.getElementById(id); }
+
+async function loginStudent() {
+  const name = $('nameInput').value.trim();
+  if (!name) { showError('请输入姓名'); return; }
+  setLoading(true);
+  try {
+    const res = await fetch(API + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password: PASSWORD_ENABLED ? $('studentPw').value : '' })
+    });
+    const data = await res.json();
+    if (!data.ok) { showError(data.error); setLoading(false); return; }
+    sessionStorage.setItem('token', data.token);
+    sessionStorage.setItem('role', 'student');
+    sessionStorage.setItem('name', name);
+    window.location.href = 'student.html';
+  } catch (e) {
+    showError('网络错误，请检查服务是否启动');
+    setLoading(false);
+  }
+}
+
+async function loginTeacher() {
+  const name = $('nameInput').value.trim();
+  const pw = $('pwInput').value;
+  if (!name) { showError('请输入姓名'); return; }
+  setLoading(true);
+  try {
+    const res = await fetch(API + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password: pw })
+    });
+    const data = await res.json();
+    if (!data.ok) { showError(data.error); setLoading(false); return; }
+    sessionStorage.setItem('token', data.token);
+    sessionStorage.setItem('role', 'teacher');
+    sessionStorage.setItem('name', 'teacher');
+    window.location.href = 'teacher.html';
+  } catch (e) {
+    showError('网络错误，请检查服务是否启动');
+    setLoading(false);
+  }
+}
+
+function showTeacherLogin() {
+  $('pwField').style.display = 'block';
+  $('studentPwField').style.display = 'none';
+  $('studentBtn').textContent = '教师登录';
+  $('studentBtn').onclick = loginTeacher;
+  $('teacherBtn').textContent = '← 返回学生登录';
+  $('teacherBtn').onclick = () => location.reload();
+}
+
+function showError(msg) {
+  $('errorMsg').textContent = msg;
+}
+
+function setLoading(v) {
+  $('studentBtn').disabled = v;
+  $('studentBtn').textContent = v ? '登录中…' : ($('pwField').style.display === 'block' ? '教师登录' : '进入实训');
+}
+
+$('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') loginStudent(); });
+$('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') loginTeacher(); });
+
+const savedName = sessionStorage.getItem('name');
+if (savedName) $('nameInput').value = savedName;
+</script>
+</body>
+</html>

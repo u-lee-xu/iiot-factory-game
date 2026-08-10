@@ -1,0 +1,742 @@
+{
+  "levels": [
+    {
+      "levelId": 1,
+      "name": "中控室",
+      "emoji": "🖥️",
+      "warmups": [
+        {
+          "id": "a",
+          "name": "开箱装系统",
+          "afterTask": "1-2",
+          "blockTasks": [
+            "1-0",
+            "1-1",
+            "1-2"
+          ],
+          "subtitle": "厂长：系统装起来了，把刚认识的那几个\"家伙\"认牢。",
+          "tip": "刚学完就考，记不住也没关系，混个脸熟。",
+          "size": 4,
+          "timed": false,
+          "xp": 60,
+          "pairs": [
+            {
+              "id": "vm",
+              "term": "虚拟机",
+              "hint": "在一台电脑里\"装\"出的另一台电脑",
+              "emoji": "🖥️",
+              "cmd": "VMware Workstation",
+              "cat": "基础"
+            },
+            {
+              "id": "os",
+              "term": "操作系统",
+              "hint": "管硬件、跑程序的\"大管家\"（如 Ubuntu）",
+              "emoji": "🧠",
+              "cmd": "Ubuntu Server",
+              "cat": "基础"
+            },
+            {
+              "id": "shell",
+              "term": "Shell",
+              "hint": "黑底白字的命令行窗口，Linux 的操作台",
+              "emoji": "💻",
+              "cmd": "bash",
+              "cat": "基础"
+            },
+            {
+              "id": "apt",
+              "term": "apt",
+              "hint": "Ubuntu 的包管理命令，装软件靠它",
+              "emoji": "📦",
+              "cmd": "apt install openssh-server",
+              "cat": "命令"
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "name": "看清你的网卡",
+          "afterTask": "1-4",
+          "blockTasks": [
+            "1-3",
+            "1-4"
+          ],
+          "subtitle": "厂长：ip addr 敲过了吧？这些数字和名字都得认住。",
+          "tip": "都是 ip 命令里能看到的东西，认个脸熟。",
+          "size": 5,
+          "timed": false,
+          "xp": 70,
+          "pairs": [
+            {
+              "id": "nic",
+              "term": "网卡",
+              "hint": "设备上网的接口",
+              "emoji": "🔌",
+              "cmd": "ip a",
+              "cat": "硬件"
+            },
+            {
+              "id": "ip",
+              "term": "IP 地址",
+              "hint": "设备的门牌号",
+              "emoji": "🏠",
+              "cmd": "ip addr",
+              "cat": "网络"
+            },
+            {
+              "id": "mac",
+              "term": "MAC 地址",
+              "hint": "设备出厂身份证",
+              "emoji": "🪪",
+              "cmd": "ip link",
+              "cat": "网络"
+            },
+            {
+              "id": "subnet",
+              "term": "子网掩码",
+              "hint": "划清\"自己人\"和\"外人\"",
+              "emoji": "🎭",
+              "cmd": "255.255.255.0",
+              "cat": "网络"
+            },
+            {
+              "id": "cidr",
+              "term": "CIDR 前缀",
+              "hint": "用 /24 简写子网掩码",
+              "emoji": "📐",
+              "cmd": "192.168.1.100/24",
+              "cat": "网络"
+            }
+          ]
+        },
+        {
+          "id": "c",
+          "name": "网络互联三件套",
+          "afterTask": "1-8",
+          "blockTasks": [
+            "1-5",
+            "1-6",
+            "1-7",
+            "1-8"
+          ],
+          "subtitle": "厂长：连不通、排障、找出口，这套流程里的词都得刻脑子里。",
+          "tip": "排障流程里全用得上，记住位置就赢了。",
+          "size": 6,
+          "timed": true,
+          "timeLimit": 60,
+          "xp": 90,
+          "pairs": [
+            {
+              "id": "osi",
+              "term": "OSI 七层模型",
+              "hint": "网络世界的分工手册",
+              "emoji": "📚",
+              "cat": "概念"
+            },
+            {
+              "id": "ping",
+              "term": "ping",
+              "hint": "喊一声，看对方应不应",
+              "emoji": "📡",
+              "cmd": "ping 8.8.8.8",
+              "cat": "命令"
+            },
+            {
+              "id": "gateway",
+              "term": "网关",
+              "hint": "通往别的网络的城门",
+              "emoji": "🚪",
+              "cmd": "ip route",
+              "cat": "网络"
+            },
+            {
+              "id": "ipv4",
+              "term": "IPv4",
+              "hint": "32 位的门牌号",
+              "emoji": "📇",
+              "cat": "网络"
+            },
+            {
+              "id": "loopback",
+              "term": "回环地址",
+              "hint": "127.0.0.1，自己跟自己通信",
+              "emoji": "🔁",
+              "cmd": "ping 127.0.0.1",
+              "cat": "网络"
+            },
+            {
+              "id": "routetab",
+              "term": "路由表",
+              "hint": "设备里\"去哪走哪条路\"的说明书",
+              "emoji": "🧭",
+              "cmd": "ip route",
+              "cat": "网络"
+            }
+          ]
+        },
+        {
+          "id": "d",
+          "name": "上网寻路",
+          "afterTask": "1-11",
+          "blockTasks": [
+            "1-9",
+            "1-10",
+            "1-11"
+          ],
+          "subtitle": "厂长：数据怎么走、网址怎么变 IP，这条链路你得门儿清。",
+          "tip": "traceroute 看路、nslookup 查号，都是刚练过的。",
+          "size": 6,
+          "timed": true,
+          "timeLimit": 70,
+          "xp": 90,
+          "pairs": [
+            {
+              "id": "tracert",
+              "term": "tracert",
+              "hint": "沿数据走的路，一站一站报数",
+              "emoji": "🧭",
+              "cmd": "tracert baidu.com",
+              "cat": "命令"
+            },
+            {
+              "id": "route",
+              "term": "路由",
+              "hint": "给数据选路的路牌",
+              "emoji": "🛣️",
+              "cmd": "ip route",
+              "cat": "网络"
+            },
+            {
+              "id": "dns",
+              "term": "DNS",
+              "hint": "把网址翻译成 IP 的电话簿",
+              "emoji": "📖",
+              "cmd": "nslookup baidu.com",
+              "cat": "网络"
+            },
+            {
+              "id": "domain",
+              "term": "域名",
+              "hint": "好记的名字，如 baidu.com",
+              "emoji": "🌐",
+              "cat": "网络"
+            },
+            {
+              "id": "nslookup",
+              "term": "nslookup",
+              "hint": "查域名对应 IP 的命令",
+              "emoji": "🔍",
+              "cmd": "nslookup www.baidu.com",
+              "cat": "命令"
+            },
+            {
+              "id": "reverse",
+              "term": "反向解析",
+              "hint": "从 IP 反查域名",
+              "emoji": "🔄",
+              "cat": "网络"
+            }
+          ]
+        },
+        {
+          "id": "e",
+          "name": "守住大门",
+          "afterTask": "1-14",
+          "blockTasks": [
+            "1-12",
+            "1-13",
+            "1-14"
+          ],
+          "subtitle": "厂长：门卫和门牌号守好了，再把地址那些老伙计复习下。",
+          "tip": "防火墙管进出、端口认服务，都是安全第一课。",
+          "size": 6,
+          "timed": true,
+          "timeLimit": 70,
+          "xp": 90,
+          "pairs": [
+            {
+              "id": "firewall",
+              "term": "防火墙",
+              "hint": "门卫，决定放行还是拦截",
+              "emoji": "🛡️",
+              "cmd": "ufw enable",
+              "cat": "安全"
+            },
+            {
+              "id": "port",
+              "term": "端口",
+              "hint": "设备里每个服务的\"窗口\"",
+              "emoji": "🚪",
+              "cmd": "ss -tln",
+              "cat": "网络"
+            },
+            {
+              "id": "iptables",
+              "term": "iptables",
+              "hint": "Linux 的防火墙规则工具",
+              "emoji": "⛓️",
+              "cmd": "iptables -L",
+              "cat": "安全"
+            },
+            {
+              "id": "ipv6",
+              "term": "IPv6",
+              "hint": "更长门牌号，地址用不完",
+              "emoji": "🆕",
+              "cat": "网络"
+            },
+            {
+              "id": "nat",
+              "term": "NAT",
+              "hint": "一个公网 IP 供多台设备共用",
+              "emoji": "🔀",
+              "cat": "网络"
+            },
+            {
+              "id": "ddos",
+              "term": "DDoS 攻击",
+              "hint": "海量请求把服务器塞瘫",
+              "emoji": "💥",
+              "cat": "安全"
+            }
+          ]
+        }
+      ],
+      "bonus": {
+        "id": "bonus-1",
+        "name": "记忆大师挑战",
+        "subtitle": "厂长：前面学的都在这了，一层层掀开，全对才配叫记忆大师。",
+        "tip": "三层的牌堆，一层层揭开，冲全对！",
+        "xp": 400,
+        "levels": [
+          {
+            "name": "第一层 · 装机上手",
+            "subtitle": "刚开箱的那些家伙",
+            "pairs": [
+              {
+                "id": "vm",
+                "term": "虚拟机",
+                "hint": "在一台电脑里\"装\"出的另一台电脑",
+                "emoji": "🖥️",
+                "cmd": "VMware Workstation",
+                "cat": "基础"
+              },
+              {
+                "id": "os",
+                "term": "操作系统",
+                "hint": "管硬件、跑程序的\"大管家\"（如 Ubuntu）",
+                "emoji": "🧠",
+                "cmd": "Ubuntu Server",
+                "cat": "基础"
+              },
+              {
+                "id": "shell",
+                "term": "Shell",
+                "hint": "黑底白字的命令行窗口，Linux 的操作台",
+                "emoji": "💻",
+                "cmd": "bash",
+                "cat": "基础"
+              },
+              {
+                "id": "apt",
+                "term": "apt",
+                "hint": "Ubuntu 的包管理命令，装软件靠它",
+                "emoji": "📦",
+                "cmd": "apt install openssh-server",
+                "cat": "命令"
+              }
+            ]
+          },
+          {
+            "name": "第二层 · 网络基础",
+            "subtitle": "ip 命令里的那些名字",
+            "pairs": [
+              {
+                "id": "nic",
+                "term": "网卡",
+                "hint": "设备上网的接口",
+                "emoji": "🔌",
+                "cmd": "ip a",
+                "cat": "硬件"
+              },
+              {
+                "id": "ip",
+                "term": "IP 地址",
+                "hint": "设备的门牌号",
+                "emoji": "🏠",
+                "cmd": "ip addr",
+                "cat": "网络"
+              },
+              {
+                "id": "mac",
+                "term": "MAC 地址",
+                "hint": "设备出厂身份证",
+                "emoji": "🪪",
+                "cmd": "ip link",
+                "cat": "网络"
+              },
+              {
+                "id": "ping",
+                "term": "ping",
+                "hint": "喊一声，看对方应不应",
+                "emoji": "📡",
+                "cmd": "ping 8.8.8.8",
+                "cat": "命令"
+              },
+              {
+                "id": "gateway",
+                "term": "网关",
+                "hint": "通往别的网络的城门",
+                "emoji": "🚪",
+                "cmd": "ip route",
+                "cat": "网络"
+              },
+              {
+                "id": "dns",
+                "term": "DNS",
+                "hint": "把网址翻译成 IP 的电话簿",
+                "emoji": "📖",
+                "cmd": "nslookup baidu.com",
+                "cat": "网络"
+              }
+            ]
+          },
+          {
+            "name": "第三层 · 核心实战",
+            "subtitle": "最常用的几个，终极考验",
+            "pairs": [
+              {
+                "id": "domain",
+                "term": "域名",
+                "hint": "好记的名字，如 baidu.com",
+                "emoji": "🌐",
+                "cat": "网络"
+              },
+              {
+                "id": "firewall",
+                "term": "防火墙",
+                "hint": "门卫，决定放行还是拦截",
+                "emoji": "🛡️",
+                "cmd": "ufw enable",
+                "cat": "安全"
+              },
+              {
+                "id": "port",
+                "term": "端口",
+                "hint": "设备里每个服务的\"窗口\"",
+                "emoji": "🚪",
+                "cmd": "ss -tln",
+                "cat": "网络"
+              },
+              {
+                "id": "tracert",
+                "term": "tracert",
+                "hint": "沿数据走的路，一站一站报数",
+                "emoji": "🧭",
+                "cmd": "tracert baidu.com",
+                "cat": "命令"
+              },
+              {
+                "id": "route",
+                "term": "路由",
+                "hint": "给数据选路的路牌",
+                "emoji": "🛣️",
+                "cmd": "ip route",
+                "cat": "网络"
+              },
+              {
+                "id": "ipv4",
+                "term": "IPv4",
+                "hint": "32 位的门牌号",
+                "emoji": "📇",
+                "cat": "网络"
+              },
+              {
+                "id": "tcp",
+                "term": "TCP",
+                "hint": "先握手再传数据，可靠",
+                "emoji": "🤝",
+                "cat": "协议"
+              },
+              {
+                "id": "udp",
+                "term": "UDP",
+                "hint": "发出就走，不管收没收到",
+                "emoji": "✉️",
+                "cat": "协议"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "levelId": 2,
+      "name": "操作台",
+      "emoji": "🎛️",
+      "warmups": [
+        {
+          "id": "a",
+          "name": "SSH 入门快打",
+          "afterTask": "2-1",
+          "blockTasks": [
+            "2-0",
+            "2-1"
+          ],
+          "type": "quick",
+          "subtitle": "厂长：先把远程登录的几把\"钥匙\"认熟，反应要快。",
+          "tip": "看提示点对的命令，点错了会告诉你怎么连。",
+          "size": 5,
+          "xp": 60,
+          "pairs": [
+            {
+              "id": "ssh",
+              "term": "ssh",
+              "hint": "远程登录另一台服务器",
+              "emoji": "🔑",
+              "q": "厂长：远程连进五号车间的服务器，敲哪个命令？",
+              "cat": "命令"
+            },
+            {
+              "id": "apt",
+              "term": "apt install",
+              "hint": "装软件（如 SSH 服务）",
+              "emoji": "📦",
+              "q": "厂长：服务器上还没有 SSH 服务，用什么命令安装它？",
+              "cat": "命令"
+            },
+            {
+              "id": "sysctl",
+              "term": "systemctl start",
+              "hint": "启动系统服务",
+              "emoji": "🚀",
+              "q": "SSH 服务装好了，用什么命令启动它？",
+              "cat": "命令"
+            },
+            {
+              "id": "p22",
+              "term": "22",
+              "hint": "SSH 默认端口",
+              "emoji": "🚪",
+              "q": "SSH 远程连接默认走哪个端口？",
+              "cat": "网络"
+            },
+            {
+              "id": "pkgssh",
+              "term": "openssh-server",
+              "hint": "SSH 服务的软件包名",
+              "emoji": "📦",
+              "q": "厂长：服务器上还没有 SSH 服务，先装什么软件包？",
+              "cat": "命令"
+            }
+          ],
+          "distractors": [
+            "ls",
+            "cat",
+            "curl",
+            "pwd"
+          ]
+        }
+      ],
+      "bonus": null
+    },
+    {
+      "levelId": 3,
+      "name": "车间",
+      "emoji": "⚙️",
+      "warmups": [
+        {
+          "id": "a",
+          "name": "华山论剑·协议鉴别",
+          "afterTask": "3-4",
+          "blockTasks": [
+            "3-3",
+            "3-4"
+          ],
+          "type": "quick",
+          "subtitle": "厂长：八大协议各显神通，看你能不能认准。",
+          "tip": "记住每个协议的那句「一句话」，就能认出来。",
+          "size": 6,
+          "xp": 80,
+          "timeLimit": 60,
+          "pairs": [
+            {
+              "id": "profinet",
+              "term": "ProfiNet",
+              "hint": "西门子 · 毫秒级实时控制",
+              "emoji": "🔵",
+              "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
+              "cat": "协议"
+            },
+            {
+              "id": "ethercat",
+              "term": "EtherCAT",
+              "hint": "倍福 · 快到极致的「飞读飞写」",
+              "emoji": "⚡",
+              "q": "厂长：倍福的伺服运动控制快到极致，是哪种协议？",
+              "cat": "协议"
+            },
+            {
+              "id": "cclink",
+              "term": "CC-Link IE",
+              "hint": "三菱 · 环形冗余断线不中断",
+              "emoji": "🔗",
+              "q": "厂长：三菱厂区断了线网络也不中断，靠哪种协议？",
+              "cat": "协议"
+            },
+            {
+              "id": "modbus",
+              "term": "Modbus",
+              "hint": "最老最开放 · 变频仪表都支持",
+              "emoji": "📡",
+              "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
+              "cat": "协议"
+            },
+            {
+              "id": "powerlink",
+              "term": "Powerlink",
+              "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
+              "emoji": "🖧",
+              "q": "厂长：贝加莱用标准硬件跑的工业以太网协议是？",
+              "cat": "协议"
+            },
+            {
+              "id": "ethernetip",
+              "term": "EtherNet/IP",
+              "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+              "emoji": "🌐",
+              "q": "厂长：罗克韦尔主推、基于标准以太网的协议是？",
+              "cat": "协议"
+            }
+          ],
+          "distractors": [
+            "TCP/IP",
+            "HTTP",
+            "OPC UA",
+            "MQTT"
+          ]
+        },
+        {
+          "id": "b",
+          "name": "ISA-95 分层鉴别",
+          "afterTask": "3-1",
+          "blockTasks": [
+            "3-0",
+            "3-1"
+          ],
+          "type": "quick",
+          "subtitle": "厂长：五层金字塔，每层管一摊，认准设备该站哪层。",
+          "tip": "记住：设备层采集、控制层指挥、监控层看全局、运营层管订单、业务层管公司。",
+          "size": 5,
+          "xp": 70,
+          "timeLimit": 45,
+          "pairs": [
+            {
+              "id": "l0",
+              "term": "L0 现场设备层",
+              "hint": "传感器/执行器，采集现场数据",
+              "emoji": "📡",
+              "q": "厂长：装在设备上测温度、压力的传感器，属于哪一层？",
+              "cat": "ISA-95"
+            },
+            {
+              "id": "l1",
+              "term": "L1 控制层",
+              "hint": "PLC/DCS，做逻辑控制",
+              "emoji": "🎛️",
+              "q": "厂长：做逻辑控制、给设备下指令的 PLC，属于哪一层？",
+              "cat": "ISA-95"
+            },
+            {
+              "id": "l2",
+              "term": "L2 监控层",
+              "hint": "SCADA/HMI，看整条产线状态",
+              "emoji": "🖥️",
+              "q": "厂长：监控整条产线状态的 SCADA 大屏，属于哪一层？",
+              "cat": "ISA-95"
+            },
+            {
+              "id": "l3",
+              "term": "L3 制造运营层",
+              "hint": "MES，管生产订单执行",
+              "emoji": "📋",
+              "q": "厂长：管生产订单做到哪一步的 MES，属于哪一层？",
+              "cat": "ISA-95"
+            },
+            {
+              "id": "l4",
+              "term": "L4 业务层",
+              "hint": "ERP，管财务采购销售",
+              "emoji": "🏢",
+              "q": "厂长：管公司财务、采购、销售的 ERP，属于哪一层？",
+              "cat": "ISA-95"
+            }
+          ],
+          "distractors": [
+            "L5 业务层",
+            "边缘层",
+            "云端层",
+            "网络层"
+          ]
+        },
+        {
+          "id": "c",
+          "name": "Modbus 寄存器鉴别",
+          "afterTask": "3-6",
+          "blockTasks": [
+            "3-5",
+            "3-6"
+          ],
+          "type": "quick",
+          "subtitle": "厂长：Modbus 靠四种寄存器组织数据，认准哪个装什么。",
+          "tip": "口诀：保持=设定值可写、输入=测量值只读、线圈=开关可写、离散=开关只读。",
+          "size": 4,
+          "xp": 70,
+          "timeLimit": 45,
+          "pairs": [
+            {
+              "id": "holding",
+              "term": "保持寄存器",
+              "hint": "16 位可读可写，存设定值",
+              "emoji": "📝",
+              "q": "厂长：要存温度上限这个「设定值」，用哪种寄存器？",
+              "cat": "Modbus"
+            },
+            {
+              "id": "inputreg",
+              "term": "输入寄存器",
+              "hint": "16 位只读，存测量值",
+              "emoji": "📊",
+              "q": "厂长：要读传感器当前温度这个「测量值」，用哪种寄存器？",
+              "cat": "Modbus"
+            },
+            {
+              "id": "coil",
+              "term": "线圈",
+              "hint": "1 位可读可写，开关状态",
+              "emoji": "🔘",
+              "q": "厂长：控制电机启动/停止的「开关状态」，用哪种？",
+              "cat": "Modbus"
+            },
+            {
+              "id": "discrete",
+              "term": "离散输入",
+              "hint": "1 位只读，限位开关",
+              "emoji": "🚧",
+              "q": "厂长：限位开关这种「只读的开关信号」，用哪种？",
+              "cat": "Modbus"
+            }
+          ],
+          "distractors": [
+            "数据帧",
+            "功能码",
+            "波特率",
+            "报文"
+          ]
+        }
+      ],
+      "bonus": null
+    }
+  ]
+}

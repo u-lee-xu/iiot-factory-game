@@ -1,0 +1,6321 @@
+{
+  "version": "1.0",
+  "factory": {
+    "name": "锐智工厂",
+    "rows": [
+      {
+        "areas": [
+          "control_room",
+          "console",
+          "workshop",
+          "edge_cabinet"
+        ]
+      },
+      {
+        "areas": [
+          "cloud_platform",
+          "big_screen",
+          "data_pipe",
+          "ai_lab"
+        ]
+      }
+    ]
+  },
+  "levels": [
+    {
+      "id": 1,
+      "name": "你的第一间数字工位",
+      "factoryArea": "control_room",
+      "areaName": "中控室",
+      "areaIcon": "🖥️",
+      "color": "#00bcd4",
+      "narrative": {
+        "intro": "入职第一天。厂长推开中控室的门，指着满地未拆封的机箱说：「这是你的工位——从零开始。装好系统、调通网络，产线的数据要通过你这里。三号车间还等着联调，快动手。」",
+        "complete": "屏幕全部亮起，网络通了，厂长的声音从中控室广播传出：「好——现在整个厂区的数据都经过你这间屋子。你是它们的门卫。」"
+      },
+      "tasks": [
+        {
+          "id": "1-0",
+          "title": "安装VMware + Ubuntu Server",
+          "type": "install_wizard",
+          "xp": 50,
+          "tags": [
+            "software_source",
+            "vm_config",
+            "minimal_install",
+            "apt_basic"
+          ],
+          "config": {
+            "steps": [
+              {
+                "title": "下载 VMware Workstation",
+                "narrative": "厂长递给你一台 Windows 笔记本，指着桌面说：「先在浏览器里搜 VMware Workstation 下载。记住——工厂里装的每一样软件都要来源干净，官网下载最可靠。别碰破解版，里面的木马能让整条产线瘫掉。现在告诉我，你打算去哪下载？」",
+                "question": "从哪里下载 VMware Workstation？",
+                "options": [
+                  {
+                    "text": "VMware 官网 (vmware.com) 下载正版",
+                    "correct": true,
+                    "hint": "官网是唯一的可信来源，工厂环境不能碰来历不明的软件"
+                  },
+                  {
+                    "text": "某论坛的「破解版+注册机」一键安装包",
+                    "correct": false,
+                    "hint": "破解版常被植入木马或挖矿程序，产线网络经不起这个风险"
+                  }
+                ]
+              },
+              {
+                "title": "下载 Ubuntu Server 镜像",
+                "narrative": "厂长说：有了虚拟机软件，接下来搞 Ubuntu Server 的系统盘。记住，有两种办法搞到镜像：一是有桌面时用浏览器去官网下载，二是将来在没桌面的服务器上，一条 wget 命令就能拉下来。你选一下，从哪些渠道可以获取镜像？",
+                "question": "Ubuntu Server 镜像可以从哪获取？选所有正确的：",
+                "multiSelect": true,
+                "options": [
+                  {
+                    "text": "浏览器打开 ubuntu.com/download/server 下载 ISO",
+                    "correct": true,
+                    "label": "官方渠道"
+                  },
+                  {
+                    "text": "百度网盘上别人分享的 .iso 文件",
+                    "correct": false,
+                    "label": "来源不明"
+                  },
+                  {
+                    "text": "终端执行 wget https://releases.ubuntu.com/24.04/ubuntu-24.04-live-server-amd64.iso",
+                    "correct": true,
+                    "label": "命令行下载"
+                  }
+                ]
+              },
+              {
+                "title": "创建虚拟机-分配内存",
+                "narrative": "镜像下好了。厂长凑过来：接下来给虚拟机分资源。这台 Ubuntu 后面要跑产线监控程序和一个数据库，记着——给太少跑不动，给太多你自己的 Windows 就卡死了。2 到 4GB 的内存差不多刚好。你看填多少合适？直接在框里输入数字然后点确认。",
+                "question": "给 Ubuntu 虚拟机分多少内存（GB）？请输入 2~4 之间的数字：",
+                "inputType": "number",
+                "correctNumber": [
+                  2,
+                  3,
+                  4
+                ]
+              },
+              {
+                "title": "选择网络模式",
+                "narrative": "厂长站起身，指着墙上的交换机拓扑图：接下来是网络配置，是最容易踩坑的地方。你看——你的笔记本插着一根网线连到车间交换机，交换机的另一边挂着 PLC、传感器和摄像头。默认情况下交换机只知道你笔记本这一个设备。你笔记本里跑的 Ubuntu 虚拟机，交换机是不知道的。想让车间里的设备能访问到 Ubuntu，你得让 Ubuntu 从虚拟机里走出来，像一台独立的物理主机一样站在车间交换机上。三个选项各是什么意思你先想清楚，然后选。",
+                "question": "哪种模式能让 Ubuntu 直接暴露在车间交换机上，拥有独立 IP，像一台独立的物理主机一样被其他设备访问？",
+                "options": [
+                  {
+                    "text": "桥接模式 (Bridged)：VM 借笔记本物理网卡直接连交换机。Ubuntu 和 Windows 各有一个独立 IP，车间设备能直接 ping 通 Ubuntu。适用于虚拟机需要作为独立服务器对外提供服务的场景。",
+                    "correct": true,
+                    "hint": "桥接就是给虚拟机在交换机上分配独立地址，和其他设备地位平等"
+                  },
+                  {
+                    "text": "NAT 模式：宿主机充当路由器做网络地址转换。Ubuntu 能通过 Windows 上网、下载软件包，但外部所有设备只能看到 Windows 的 IP——车间里的 PLC 没办法主动找到 Ubuntu。适用于只需要虚拟机自己上网、不对外提供服务的场景。",
+                    "correct": false,
+                    "hint": "NAT 是躲在宿主机后面上网，能出去但外人找不到它"
+                  },
+                  {
+                    "text": "仅主机模式：完全隔离，只有宿主机 Windows 能和 Ubuntu 相互通信，外界网络一概不通。适用于本地开发测试、不需要联网的沙箱环境。",
+                    "correct": false,
+                    "hint": "仅主机模式下 Ubuntu 和车间完全隔离，除了你谁都连不上"
+                  }
+                ]
+              },
+              {
+                "title": "选择安装模式",
+                "narrative": "网络调好了，Ubuntu 安装到一半弹出一个选项——装不装桌面 GUI？厂长说：这是作为服务器跑产线监控的你要想清楚的。别装图形界面，组件越多漏洞越多，内存开销还翻倍。你说你选哪种？",
+                "question": "作为一台 7x24 小时跑产线监控的服务器，该选哪种安装模式？",
+                "options": [
+                  {
+                    "text": "Ubuntu Server (minimized)——仅安装命令行环境和基础系统工具，不包含桌面、浏览器、办公软件。内存占用约 256MB 起步，无图形界面意味着更少的软件包、更少的漏洞入口、更低的 CPU 负担。服务器的主流选择。",
+                    "correct": true,
+                    "hint": "服务器不需要桌面，少一个组件就少一个攻击面"
+                  },
+                  {
+                    "text": "Ubuntu Server with GUI——带 GNOME 桌面环境，有窗口管理器、文件浏览器、终端模拟器等。用户体验接近 Windows 桌面版，内存占用约 1GB 起步。额外安装了数百个图形栈软件包，增加系统复杂度和安全风险，适合本地桌面操作场景（开发机、教学环境），不适合工业服务器。",
+                    "correct": false,
+                    "hint": "图形界面给服务器增加了不必要的资源负担和安全风险"
+                  }
+                ]
+              },
+              {
+                "title": "首次更新系统",
+                "narrative": "系统装好了，重启登录，黑底白字的终端等着你。厂长说：第一件事不是开工——先把系统软件包升到最新版。两条命令连在一起用，先拉最新软件包列表、再统一升级。照着我下面写的敲，敲完按回车：apt update && apt upgrade",
+                "question": "在终端中照着输入命令，然后按回车：",
+                "inputType": "command",
+                "correctCommand": "apt update && apt upgrade",
+                "aliases": [
+                  "apt-get update && apt-get upgrade",
+                  "sudo apt update && sudo apt upgrade",
+                  "sudo apt-get update && sudo apt-get upgrade"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "1-1",
+          "title": "认识你的操作系统",
+          "type": "chain_quiz",
+          "config": {
+            "questions": [
+              {
+                "question": "厂长问：Ubuntu Server 没有图形桌面，你打算怎么操作它？",
+                "options": [
+                  "不用操作，服务器自己会跑",
+                  "在机器本地接显示器和键盘，用终端命令行操作",
+                  "从另一台电脑通过 SSH 远程登录操作（电脑或手机 APP 都行）",
+                  "以上两种都可以，本地终端和远程 SSH 是运维的基本方式"
+                ],
+                "answer": 3,
+                "hint": "服务器没有 GUI，但不限操作方式——可以在本地敲键盘，也可以用手机/电脑远程 SSH 上去，两种都行"
+              },
+              {
+                "question": "你输入了第一行命令。厂长说：记住，这个黑底白字的窗口叫 Shell，你后面所有的操作都通过它完成。那 Ubuntu 默认用的 Shell 是哪个？",
+                "options": [
+                  "cmd",
+                  "zsh",
+                  "PowerShell",
+                  "bash（Bourne Again Shell）"
+                ],
+                "answer": 3,
+                "hint": "Ubuntu 预装的默认 Shell 是 bash，大多数 Linux 发行版的标配"
+              },
+              {
+                "question": "厂长递给你一张纸条：装软件、打补丁、卸包，都得靠包管理。你知道 Ubuntu 的包管理命令叫什么吗？",
+                "options": [
+                  "yum（Yellowdog Updater Modified）",
+                  "brew（macOS 上的包管理，Linux 也可以装但不是默认的）",
+                  "pacman（Arch Linux 的包管理器）",
+                  "apt（Advanced Package Tool）"
+                ],
+                "answer": 3,
+                "hint": "Ubuntu 是 Debian 家族，包管理用 apt。yum 是 RHEL/CentOS 的，pacman 是 Arch 的，brew 是 macOS 的"
+              },
+              {
+                "question": "厂长最后问：你要往这台 Ubuntu Server 上装 OpenSSH 服务，apt 命令怎么写？",
+                "options": [
+                  "apt get openssh",
+                  "apt download sshd",
+                  "apt install openssh-server",
+                  "ssh install"
+                ],
+                "answer": 2,
+                "hint": "安装包用 apt install <包名>。OpenSSH 服务器的包名是 openssh-server"
+              }
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-2",
+          "title": "输入人生第一条终端命令",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "命令的通用格式",
+                "narrative": "厂长：Linux 命令有个通用格式：命令名 [选项] [参数]，各部分用空格隔开。比如 uname -a 里 uname 是命令名，-a 是选项。",
+                "question": "uname 在命令 uname -a 里是什么？",
+                "options": [
+                  {
+                    "text": "命令名",
+                    "correct": true,
+                    "hint": "uname 是命令名，-a 是选项"
+                  },
+                  {
+                    "text": "参数",
+                    "correct": false,
+                    "hint": "参数是操作对象，这里没有"
+                  },
+                  {
+                    "text": "选项",
+                    "correct": false,
+                    "hint": "-a 才是选项"
+                  },
+                  {
+                    "text": "路径",
+                    "correct": false,
+                    "hint": "不是路径"
+                  }
+                ]
+              },
+              {
+                "title": "uname 显示什么",
+                "narrative": "厂长：uname -a 会显示系统完整信息——内核版本、主机名、处理器架构，一行全出来。",
+                "question": "uname -a 显示的是什么？",
+                "options": [
+                  {
+                    "text": "系统完整信息（内核/主机名/架构）",
+                    "correct": true,
+                    "hint": "uname -a 一行打印系统指纹"
+                  },
+                  {
+                    "text": "当前目录文件",
+                    "correct": false,
+                    "hint": "看文件用 ls"
+                  },
+                  {
+                    "text": "网络配置",
+                    "correct": false,
+                    "hint": "看网络用 ip addr"
+                  },
+                  {
+                    "text": "内存占用",
+                    "correct": false,
+                    "hint": "看内存用 free"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：uname -a",
+                "narrative": "厂长：现在动手。输入 uname -a 查看系统完整信息。",
+                "question": "在终端输入命令，查看系统完整信息：",
+                "inputType": "command",
+                "correctCommand": "uname -a",
+                "aliases": [
+                  "uname -a",
+                  "uname -r"
+                ],
+                "outputLines": [
+                  {
+                    "text": "Linux ubuntu-server 5.15.0-generic #1 SMP x86_64 GNU/Linux",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：看到内核版本了吗？5.15，够新！",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 系统信息已显示——这就是 Linux 的系统指纹！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-3",
+          "title": "查看本机网络配置",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "ip addr 看什么",
+                "narrative": "厂长：想知道这台机器在网络里的身份，用 ip addr。它会列出网卡、IP 地址、MAC 地址。",
+                "question": "ip addr 命令能查看什么？",
+                "options": [
+                  {
+                    "text": "网卡、IP 地址、MAC 地址",
+                    "correct": true,
+                    "hint": "ip addr 列出网络接口的完整身份"
+                  },
+                  {
+                    "text": "CPU 使用率",
+                    "correct": false,
+                    "hint": "看 CPU 用 top"
+                  },
+                  {
+                    "text": "磁盘空间",
+                    "correct": false,
+                    "hint": "看磁盘用 df"
+                  },
+                  {
+                    "text": "系统日志",
+                    "correct": false,
+                    "hint": "看日志用 journalctl"
+                  }
+                ]
+              },
+              {
+                "title": "哪个是 IP 地址",
+                "narrative": "厂长：输出里 ens33 是网卡名，192.168.1.100 是它的 IP 地址（门牌号），00:0c:29... 是 MAC 地址（出厂身份证）。",
+                "question": "192.168.1.100 在输出里是什么？",
+                "options": [
+                  {
+                    "text": "IP 地址（设备的门牌号）",
+                    "correct": true,
+                    "hint": "192.168.1.100 就是这台机器的 IP"
+                  },
+                  {
+                    "text": "MAC 地址",
+                    "correct": false,
+                    "hint": "MAC 是 00:0c:29 那种格式"
+                  },
+                  {
+                    "text": "网卡名",
+                    "correct": false,
+                    "hint": "网卡名是 ens33"
+                  },
+                  {
+                    "text": "网关",
+                    "correct": false,
+                    "hint": "网关在路由表里"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：ip addr",
+                "narrative": "厂长：动手。输入 ip addr 查看本机网络配置。",
+                "question": "在终端输入命令，查看本机网络配置：",
+                "inputType": "command",
+                "correctCommand": "ip addr",
+                "aliases": [
+                  "ip addr",
+                  "ip a",
+                  "ip address",
+                  "ip addr show"
+                ],
+                "outputLines": [
+                  {
+                    "text": "1: lo: <LOOPBACK,UP> inet 127.0.0.1/8",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "    link/loopback 00:00:00:00:00:00",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "2: ens33: <BROADCAST,MULTICAST,UP> inet 192.168.1.100/24",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "    link/ether 00:0c:29:a1:b2:c3",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：看清这几行——ens33 是你的网卡（设备上网的接口），192.168.1.100 是它的 IP 地址（门牌号），/24 是子网掩码简写，00:0c:29:a1:b2:c3 是 MAC 地址（出厂身份证）。lo 是回环口，127.0.0.1 永远代表\"自己\"。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 看到了网卡、IP、MAC——你的网络身份一目了然！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-4",
+          "title": "理解IP地址结构",
+          "type": "chain_quiz",
+          "config": {
+            "questions": [
+              {
+                "question": "厂长先补个最基础的概念：计算机里所有信息都是 0 和 1 组成，一个 0 或 1 就叫一个\"比特（bit）\"。那 8 个比特合在一起，叫什么？",
+                "options": [
+                  "字节（Byte）",
+                  "字长",
+                  "比特组",
+                  "字符"
+                ],
+                "answer": 0,
+                "hint": "8 比特 = 1 字节（Byte），文件大小里的 KB、MB 就是这么来的。"
+              },
+              {
+                "question": "一个 IPv4 地址（比如 192.168.1.100）一共有多少个比特组成？（提示：4 组数字，每组 8 个比特）",
+                "options": [
+                  "8 位",
+                  "16 位",
+                  "32 位",
+                  "64 位"
+                ],
+                "answer": 2,
+                "hint": "IPv4 是 32 比特，分成 4 组，每组 8 比特（1 字节），写成我们熟悉的四组十进制数字。"
+              },
+              {
+                "question": "同一个网段里 IP 哪几位是\"大家共有的\"、哪几位是\"区分每个人的\"，靠什么来划分？",
+                "options": [
+                  "加密密钥",
+                  "子网掩码",
+                  "防火墙规则",
+                  "MAC 地址"
+                ],
+                "answer": 1,
+                "hint": "子网掩码前面连续是 1 的位表示网络号（一个网段共有的部分），后面是 0 的位表示主机号（区分网段内不同设备）。"
+              },
+              {
+                "question": "255.255.255.0 写成二进制是 24 个 1 接 8 个 0，所以简写为 /24。那么 /24 代表子网掩码前面有____个 1？",
+                "options": [
+                  "8",
+                  "16",
+                  "24",
+                  "32"
+                ],
+                "answer": 2,
+                "hint": "这就是 CIDR 记法：斜杠后面的数字 = 子网掩码里 1 的个数。/24 就相当于 255.255.255.0。"
+              },
+              {
+                "question": "一个 /24 的子网一共有 256 个地址，去掉网络地址和广播地址，实际能给设备用的主机有多少台？",
+                "options": [
+                  "254 台",
+                  "256 台",
+                  "128 台",
+                  "24 台"
+                ],
+                "answer": 0,
+                "hint": "256 个地址里，第一个是网络地址、最后一个是广播地址，都不能给设备用，所以是 256 - 2 = 254 台。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-5",
+          "title": "OSI七层模型排序",
+          "type": "sort",
+          "config": {
+            "items": [
+              "物理层",
+              "数据链路层",
+              "网络层",
+              "传输层",
+              "会话层",
+              "表示层",
+              "应用层"
+            ],
+            "answer": [
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-6",
+          "title": "设备出厂IP检测",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "0.0.0.0 是什么",
+                "narrative": "厂长：新设备出厂时，网卡还没领到有效的 IP 地址，会显示一个占位状态 0.0.0.0——相当于新员工还没领工牌。",
+                "question": "设备显示 0.0.0.0 表示什么？",
+                "options": [
+                  {
+                    "text": "IP 地址尚未分配（出厂占位状态）",
+                    "correct": true,
+                    "hint": "0.0.0.0 = 还没领到有效 IP"
+                  },
+                  {
+                    "text": "设备已正常联网",
+                    "correct": false,
+                    "hint": "联网会有正常 IP"
+                  },
+                  {
+                    "text": "设备故障",
+                    "correct": false,
+                    "hint": "不是故障，是没分配"
+                  },
+                  {
+                    "text": "IP 是合法的",
+                    "correct": false,
+                    "hint": "0.0.0.0 不是合法可用地址"
+                  }
+                ]
+              },
+              {
+                "title": "有 IP 和没 IP",
+                "narrative": "厂长：拿到有效 IP 之前，设备对外通信全靠这个占位状态；配置好 DHCP 或手动 IP 后，才有真正的门牌号。",
+                "question": "给设备配好 IP 后，0.0.0.0 会变成什么？",
+                "options": [
+                  {
+                    "text": "一个有效的 IP 地址（如 192.168.1.50）",
+                    "correct": true,
+                    "hint": "配置后就有正常 IP"
+                  },
+                  {
+                    "text": "还是 0.0.0.0",
+                    "correct": false,
+                    "hint": "配好就变了"
+                  },
+                  {
+                    "text": "变成 MAC",
+                    "correct": false,
+                    "hint": "MAC 是固定的身份证"
+                  },
+                  {
+                    "text": "消失",
+                    "correct": false,
+                    "hint": "会有正常 IP 替代"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-7",
+          "title": "网络连通性诊断——ping",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "ping 是干什么的",
+                "narrative": "厂长：ping 就像喊一声看对方应不应——测试两台设备之间通不通、延迟多少。",
+                "question": "ping 命令用来做什么？",
+                "options": [
+                  {
+                    "text": "测试网络连通性和延迟",
+                    "correct": true,
+                    "hint": "ping 发包看对方回不回，0 丢包说明通"
+                  },
+                  {
+                    "text": "查看网页",
+                    "hint": "看网页用 curl"
+                  },
+                  {
+                    "text": "查域名",
+                    "hint": "查域名用 nslookup"
+                  },
+                  {
+                    "text": "追踪路由",
+                    "hint": "看每一跳用 traceroute"
+                  }
+                ]
+              },
+              {
+                "title": "-c 4 是什么意思",
+                "narrative": "厂长：ping -c 4 192.168.1.1 里的 -c 4 是只发 4 个测试包。不加 -c 会一直发。",
+                "question": "ping -c 4 里的 -c 4 表示？",
+                "options": [
+                  {
+                    "text": "只发 4 个测试包",
+                    "correct": true,
+                    "hint": "-c count 控制发包数量"
+                  },
+                  {
+                    "text": "发到第 4 台设备",
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "每次间隔 4 秒",
+                    "hint": "间隔用 -i"
+                  },
+                  {
+                    "text": "包大小 4 字节",
+                    "hint": "大小用 -s"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：ping 网关（在线）",
+                "narrative": "厂长：先 ping 网关 192.168.1.1——它是应该通的设备。",
+                "question": "在终端输入命令，ping 网关 192.168.1.1（发 4 个包）：",
+                "inputType": "command",
+                "correctCommand": "ping -c 4 192.168.1.1",
+                "aliases": [
+                  "ping 192.168.1.1 -c 4",
+                  "ping -c4 192.168.1.1"
+                ],
+                "outputLines": [
+                  {
+                    "text": "PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=1.23 ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=1.45 ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "--- 192.168.1.1 ping statistics ---",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "4 packets transmitted, 4 received, 0% packet loss",
+                    "color": "green",
+                    "delay": 300
+                  },
+                  {
+                    "text": "厂长：通了！0 丢包，链路没问题。",
+                    "color": "green",
+                    "delay": 300
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 0% 丢包——这台设备在线、链路通！"
+              },
+              {
+                "title": "动手敲命令：ping 离线设备",
+                "narrative": "厂长：再 ping 一台车间里「应该不在线」的设备 192.168.1.99，对比结果。",
+                "question": "在终端输入命令，ping 设备 192.168.1.99（发 4 个包）：",
+                "inputType": "command",
+                "correctCommand": "ping -c 4 192.168.1.99",
+                "aliases": [
+                  "ping 192.168.1.99 -c 4",
+                  "ping -c4 192.168.1.99"
+                ],
+                "outputLines": [
+                  {
+                    "text": "PING 192.168.1.99 (192.168.1.99) 56(84) bytes of data.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "From 192.168.1.100 icmp_seq=1 Destination Host Unreachable",
+                    "color": "",
+                    "delay": 300
+                  },
+                  {
+                    "text": "From 192.168.1.100 icmp_seq=2 Destination Host Unreachable",
+                    "color": "",
+                    "delay": 300
+                  },
+                  {
+                    "text": "--- 192.168.1.99 ping statistics ---",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "4 packets transmitted, 0 received, 100% packet loss",
+                    "color": "red",
+                    "delay": 300
+                  },
+                  {
+                    "text": "厂长：100% 丢包——这台设备不在线或断网了！",
+                    "color": "red",
+                    "delay": 300
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 100% 丢包——这台设备离线！和刚才在线的那台对比，你就理解 ping 的诊断意义了。"
+              },
+              {
+                "title": "怎么判断通不通",
+                "narrative": "厂长：ping 的结果就看丢包率——0% 丢包 = 在线通；100% 丢包 = 断网/不在线；中间有丢包 = 网络不稳定。",
+                "question": "ping 显示 100% packet loss 说明什么？",
+                "options": [
+                  {
+                    "text": "目标设备不在线或断网",
+                    "correct": true,
+                    "hint": "100% 丢包 = 完全不通"
+                  },
+                  {
+                    "text": "设备在线但慢",
+                    "hint": "慢但通会收到回复"
+                  },
+                  {
+                    "text": "网络特别快",
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "命令打错了",
+                    "hint": "命令对，是设备不通"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard",
+            "fault_diag"
+          ]
+        },
+        {
+          "id": "1-8",
+          "title": "综合排障：ping不通网关",
+          "type": "diagnosis_tree",
+          "config": {
+            "scenario": "突然你ping 192.168.1.1 发现不通了，厂长走过来：「别慌，按照诊断流程来。」",
+            "steps": [
+              {
+                "question": "第一步该检查什么？",
+                "options": [
+                  "检查网线是否插好 (ip link)",
+                  "重装操作系统",
+                  "打电话给电信",
+                  "直接重启电脑"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "网线指示灯亮着，网卡没问题。接下来检查？",
+                "options": [
+                  "重新插拔网线",
+                  "格式化硬盘",
+                  "ping 127.0.0.1 检查本地协议栈",
+                  "关闭防火墙"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "127.0.0.1 通了，说明本地协议栈正常。下一步？",
+                "options": [
+                  "换一根网线",
+                  "重装网卡驱动",
+                  "检查路由表（ip route）",
+                  "更换路由器"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "发现路由表里没有默认网关。用什么命令添加？",
+                "options": [
+                  "ip route add default via 192.168.1.1",
+                  "ifconfig eth0 up",
+                  "ping -f 192.168.1.1",
+                  "systemctl restart network"
+                ],
+                "correct": 0
+              }
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "fault_diag",
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-9",
+          "title": "追踪到百度的路由路径",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "traceroute 干什么",
+                "narrative": "厂长：traceroute 会列出数据从你电脑到目标之间经过的每一个路由器（跳），能看出数据走了哪条路、哪一跳慢。",
+                "question": "traceroute 命令用来做什么？",
+                "options": [
+                  {
+                    "text": "列出数据经过的每一跳（路由器）",
+                    "correct": true,
+                    "hint": "每跳显示 IP 和延迟，定位瓶颈"
+                  },
+                  {
+                    "text": "测试单台设备通不通",
+                    "correct": false,
+                    "hint": "测单台用 ping"
+                  },
+                  {
+                    "text": "查域名对应 IP",
+                    "correct": false,
+                    "hint": "查域名用 nslookup"
+                  },
+                  {
+                    "text": "下载文件",
+                    "correct": false,
+                    "hint": "下载用 curl/wget"
+                  }
+                ]
+              },
+              {
+                "title": "tracert 和 traceroute",
+                "narrative": "厂长：注意——Linux 里叫 traceroute，Windows 里叫 tracert，是同一个命令，只是平台叫法不同。",
+                "question": "tracert 和 traceroute 是什么关系？",
+                "options": [
+                  {
+                    "text": "同一个命令（Windows 叫 tracert，Linux 叫 traceroute）",
+                    "correct": true,
+                    "hint": "两者本质相同，平台叫法不同"
+                  },
+                  {
+                    "text": "完全不同的命令",
+                    "correct": false,
+                    "hint": "其实是一个东西"
+                  },
+                  {
+                    "text": "traceroute 更快",
+                    "correct": false,
+                    "hint": "速度一样"
+                  },
+                  {
+                    "text": "tracert 是旧版",
+                    "correct": false,
+                    "hint": "不是新旧关系"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：traceroute",
+                "narrative": "厂长：动手。用 traceroute 追踪到百度的路由路径。",
+                "question": "在终端输入命令，追踪到百度 www.baidu.com 的路径：",
+                "inputType": "command",
+                "correctCommand": "traceroute www.baidu.com",
+                "aliases": [
+                  "traceroute baidu.com",
+                  "traceroute http://www.baidu.com"
+                ],
+                "outputLines": [
+                  {
+                    "text": "traceroute to www.baidu.com (39.156.66.18)",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 1  192.168.1.1  1.23ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 2  10.0.0.1    5.67ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 3  58.42.24.1 12.30ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 4  202.97.89.1 25.60ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 5  39.156.66.18 30.10ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：5 跳到了百度，还行。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 5 跳到了百度，数据走了 5 个路由器！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "fault_diag",
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-10",
+          "title": "DNS域名解析查询",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "nslookup 干什么",
+                "narrative": "厂长：nslookup 用来查域名对应的 IP 地址——就像翻电话本，把网址翻译成 IP。",
+                "question": "nslookup www.baidu.com 会返回什么？",
+                "options": [
+                  {
+                    "text": "百度服务器的 IP 地址",
+                    "correct": true,
+                    "hint": "DNS 查询，域名→IP"
+                  },
+                  {
+                    "text": "百度首页内容",
+                    "correct": false,
+                    "hint": "看网页用 curl/浏览器"
+                  },
+                  {
+                    "text": "路由路径",
+                    "correct": false,
+                    "hint": "看路径用 traceroute"
+                  },
+                  {
+                    "text": "ping 结果",
+                    "correct": false,
+                    "hint": "测连通用 ping"
+                  }
+                ]
+              },
+              {
+                "title": "DNS 是什么",
+                "narrative": "厂长：DNS 就是互联网电话本——把好记的域名（www.baidu.com）翻译成机器用的 IP（39.156.66.18）。",
+                "question": "DNS 的作用是？",
+                "options": [
+                  {
+                    "text": "把域名翻译成 IP 地址",
+                    "correct": true,
+                    "hint": "DNS = 互联网电话本"
+                  },
+                  {
+                    "text": "加密数据",
+                    "correct": false,
+                    "hint": "加密是 TLS"
+                  },
+                  {
+                    "text": "加速网速",
+                    "correct": false,
+                    "hint": "不是这个"
+                  },
+                  {
+                    "text": "分配 MAC 地址",
+                    "correct": false,
+                    "hint": "MAC 是网卡出厂就有"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：nslookup",
+                "narrative": "厂长：动手。用 nslookup 查出 www.baidu.com 对应的 IP。",
+                "question": "在终端输入命令，查询 www.baidu.com 的 IP：",
+                "inputType": "command",
+                "correctCommand": "nslookup www.baidu.com",
+                "aliases": [
+                  "nslookup baidu.com",
+                  "nslookup http://www.baidu.com"
+                ],
+                "outputLines": [
+                  {
+                    "text": "Server: 192.168.1.1",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Address: 192.168.1.1#53",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Name: www.baidu.com",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Address: 39.156.66.18",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：百度这台服务器在 39.156.66.18。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 百度服务器在 39.156.66.18——域名解析成功！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-11",
+          "title": "域名解析原理",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "正向解析",
+                "narrative": "厂长：你敲 www.baidu.com，DNS 服务器返回一个 IP（如 39.156.66.18）——域名变 IP 这个过程叫「正向解析」（也叫域名解析）。",
+                "question": "域名变 IP 的过程叫什么？",
+                "options": [
+                  {
+                    "text": "正向解析（域名解析）",
+                    "correct": true,
+                    "hint": "域名→IP 是正向解析"
+                  },
+                  {
+                    "text": "反向解析",
+                    "correct": false,
+                    "hint": "IP→域名才是反向"
+                  },
+                  {
+                    "text": "路由寻址",
+                    "correct": false,
+                    "hint": "路由是选路"
+                  },
+                  {
+                    "text": "端口映射",
+                    "correct": false,
+                    "hint": "端口映射是转发端口"
+                  }
+                ]
+              },
+              {
+                "title": "反向解析",
+                "narrative": "厂长：反过来，给你一个 IP 地址查它对应什么域名，叫「反向解析」。两个方向别搞混。",
+                "question": "从 IP 地址反查域名叫什么？",
+                "options": [
+                  {
+                    "text": "反向解析",
+                    "correct": true,
+                    "hint": "IP→域名是反向解析"
+                  },
+                  {
+                    "text": "正向解析",
+                    "correct": false,
+                    "hint": "正向是域名→IP"
+                  },
+                  {
+                    "text": "DNS 缓存",
+                    "correct": false,
+                    "hint": "缓存是提速"
+                  },
+                  {
+                    "text": "域名注册",
+                    "correct": false,
+                    "hint": "注册是买域名"
+                  }
+                ]
+              },
+              {
+                "title": "DNS 是什么",
+                "narrative": "厂长：DNS 就是互联网电话本——域名和 IP 之间的翻译。",
+                "question": "DNS 的作用是？",
+                "options": [
+                  {
+                    "text": "把域名翻译成 IP（互联网电话本）",
+                    "correct": true,
+                    "hint": "DNS = 电话本"
+                  },
+                  {
+                    "text": "加密数据",
+                    "correct": false,
+                    "hint": "加密是 TLS"
+                  },
+                  {
+                    "text": "分配端口",
+                    "correct": false,
+                    "hint": "端口是服务窗口"
+                  },
+                  {
+                    "text": "缓存网页",
+                    "correct": false,
+                    "hint": "缓存是 CDN"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-12",
+          "title": "配置防火墙规则",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "防火墙/iptables",
+                "narrative": "厂长：iptables 是 Linux 防火墙，通过规则控制数据进出。入站 = 外部到本机，出站 = 本机到外部。",
+                "question": "iptables 里「入站」指什么？",
+                "options": [
+                  {
+                    "text": "从外面进来的数据（外部到本机）",
+                    "correct": true,
+                    "hint": "INPUT 链管入站"
+                  },
+                  {
+                    "text": "本机发出去的数据",
+                    "correct": false,
+                    "hint": "那叫出站 OUTPUT"
+                  },
+                  {
+                    "text": "转发数据",
+                    "correct": false,
+                    "hint": "那叫 FORWARD"
+                  },
+                  {
+                    "text": "所有数据",
+                    "correct": false,
+                    "hint": "分入站/出站/转发"
+                  }
+                ]
+              },
+              {
+                "title": "禁止 ping",
+                "narrative": "厂长：要禁止别的主机 ping 自己，就是丢弃「入站」的 ICMP 请求包。ICMP 就是 ping 用的协议。",
+                "question": "禁止别的主机 ping 自己，要在哪个方向丢弃 ICMP？",
+                "options": [
+                  {
+                    "text": "入站（INPUT）",
+                    "correct": true,
+                    "hint": "ping 是外面发来的 ICMP 请求，从 INPUT 进"
+                  },
+                  {
+                    "text": "出站（OUTPUT）",
+                    "correct": false,
+                    "hint": "ping 是外部发来的，不是本机发出"
+                  },
+                  {
+                    "text": "转发（FORWARD）",
+                    "correct": false,
+                    "hint": "不是转发"
+                  },
+                  {
+                    "text": "全部方向",
+                    "correct": false,
+                    "hint": "只需入站"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：禁 ping",
+                "narrative": "厂长：动手。在终端输入 iptables 命令，丢弃入站 ICMP 请求（禁 ping）。",
+                "question": "在终端输入命令，禁止外部 ping 本机：",
+                "inputType": "command",
+                "correctCommand": "iptables -A INPUT -p icmp --icmp-type echo-request -j DROP",
+                "aliases": [
+                  "sudo iptables -A INPUT -p icmp --icmp-type echo-request -j DROP"
+                ],
+                "outputLines": [
+                  {
+                    "text": "（无输出，规则已添加）",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "厂长：入站 ICMP 已丢弃，现在别人 ping 不到你了。",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 禁 ping 规则已添加！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "security_tls",
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-13",
+          "title": "常见端口分类",
+          "type": "drag_classify",
+          "config": {
+            "categories": [
+              "SSH远程管理",
+              "Web服务",
+              "域名解析"
+            ],
+            "items": [
+              "22",
+              "80",
+              "443",
+              "53"
+            ],
+            "answer": [
+              0,
+              1,
+              1,
+              2
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-14",
+          "title": "常见网络攻击识别",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "DDoS攻击",
+                "match": "大量虚假请求占满服务器带宽"
+              },
+              {
+                "item": "ARP欺骗",
+                "match": "伪造MAC地址截获局域网通信"
+              },
+              {
+                "item": "端口扫描",
+                "match": "逐一试探开放端口寻找入口"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "security_tls"
+          ]
+        },
+        {
+          "id": "1-hidden-0",
+          "title": "🌶 tracert全路由跟踪 + IP定位",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "-n 参数干什么",
+                "narrative": "厂长：traceroute 加 -n 参数会跳过域名解析，直接显示 IP，更快更干净。",
+                "question": "traceroute -n 8.8.8.8 里的 -n 表示？",
+                "options": [
+                  {
+                    "text": "跳过域名解析，直接显示 IP",
+                    "correct": true,
+                    "hint": "-n = no DNS 解析"
+                  },
+                  {
+                    "text": "发 n 个包",
+                    "correct": false,
+                    "hint": "发包数用 -c"
+                  },
+                  {
+                    "text": "每跳间隔 n 秒",
+                    "correct": false,
+                    "hint": "不是这个"
+                  },
+                  {
+                    "text": "显示数字序号",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "追踪 IP 还能干嘛",
+                "narrative": "厂长：追踪完每一跳的 IP，还能反查地理定位——知道数据都经过了哪些城市的节点。",
+                "question": "用每一跳的 IP 可以做什么？",
+                "options": [
+                  {
+                    "text": "反查地理定位，知道数据经过哪些城市",
+                    "correct": true,
+                    "hint": "IP 定位能看到数据路径经过的城市"
+                  },
+                  {
+                    "text": "直接删除数据",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "加密数据",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "加速网络",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：tracert 全路由",
+                "narrative": "厂长：动手。追踪到 Google DNS 8.8.8.8 的完整路由路径。",
+                "question": "在终端输入命令，追踪到 8.8.8.8 的路径：",
+                "inputType": "command",
+                "correctCommand": "traceroute 8.8.8.8",
+                "aliases": [
+                  "traceroute -n 8.8.8.8"
+                ],
+                "outputLines": [
+                  {
+                    "text": "traceroute to 8.8.8.8 (8.8.8.8)",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 1  192.168.1.1    1.5ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 2  10.0.0.1      4.2ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 3  58.42.24.1   11.8ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 4  72.14.237.1  22.3ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 5  8.8.8.8      28.7ms",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：5跳到了谷歌，你查一下每个 IP 在哪个城市。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 5 跳到了谷歌——完整路由路径拿到了！"
+              }
+            ]
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "fault_diag",
+            "device_onboard"
+          ]
+        },
+        {
+          "id": "1-hidden-1",
+          "title": "🌶 读懂iptables规则",
+          "type": "code_review",
+          "config": {
+            "code": "iptables -A INPUT -p icmp --icmp-type echo-request -j DROP\niptables -A INPUT -p tcp --dport 22 -j ACCEPT\niptables -A INPUT -j DROP",
+            "question": "这三条规则实现了什么效果？",
+            "options": [
+              "只允许ICMP协议",
+              "允许所有流量通过",
+              "阻止所有TCP连接",
+              "禁ping、开SSH、其余全关"
+            ],
+            "answer": 3,
+            "hint": "逐条看，-j 后面的参数是关键"
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "security_tls",
+            "fault_diag"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "入职第一天",
+      "factoryArea": "console",
+      "areaName": "操作台",
+      "areaIcon": "🎛️",
+      "color": "#ffb000",
+      "narrative": {
+        "intro": "中控室刚通网不到一小时。对讲机响了：「五号车间的机械臂突然停了，但我在家里带娃！你能不能远程进去看看？」你得马上学会 SSH，十分钟内必须连进五号车间的服务器——否则整条产线停机。",
+        "complete": "屏幕上跳出了五号车间服务器的终端提示符。你切断了故障进程，机械臂重新启动。厂长在对讲机里喊：「干得好，远程运维——这是工厂数字化的第一步。」"
+      },
+      "tasks": [
+        {
+          "id": "2-0",
+          "title": "安装并启动SSH服务",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "装哪个包？",
+                "narrative": "厂长：要远程管这台 Ubuntu，先得装上 SSH 服务端。SSH 服务端的软件包名叫 openssh-server——在 Ubuntu 里用 apt 来装。",
+                "question": "安装 SSH 服务端，要装哪个软件包？",
+                "options": [
+                  {
+                    "text": "openssh-server（SSH 服务端）",
+                    "correct": true,
+                    "hint": "server 是服务端，装在要被远程登录的机器上"
+                  },
+                  {
+                    "text": "openssh-client",
+                    "correct": false,
+                    "hint": "client 是客户端，是发起连接的机器用的"
+                  },
+                  {
+                    "text": "nginx",
+                    "correct": false,
+                    "hint": "nginx 是网页服务器，不是 SSH"
+                  },
+                  {
+                    "text": "docker",
+                    "correct": false,
+                    "hint": "docker 是容器工具"
+                  }
+                ]
+              },
+              {
+                "title": "用什么命令装？",
+                "narrative": "Ubuntu 的包管理用 apt。装软件的命令是 sudo apt install 包名。",
+                "question": "用 apt 安装 openssh-server 的命令是？",
+                "options": [
+                  {
+                    "text": "sudo apt install openssh-server",
+                    "correct": true,
+                    "hint": "apt install + 包名，sudo 提权"
+                  },
+                  {
+                    "text": "sudo apt remove openssh-server",
+                    "correct": false,
+                    "hint": "remove 是卸载，不是安装"
+                  },
+                  {
+                    "text": "pip install ssh",
+                    "correct": false,
+                    "hint": "pip 是 Python 的包管理，不是系统服务"
+                  },
+                  {
+                    "text": "docker pull ssh",
+                    "correct": false,
+                    "hint": "这不是装系统服务的方式"
+                  }
+                ]
+              },
+              {
+                "title": "配置系统服务：开机自启",
+                "narrative": "装好后用 systemctl 管系统服务：status 看状态、start 手动启动、enable 设为开机自启（重启后自动运行）。工控服务器重启后服务必须自己起来，enable 很关键。",
+                "question": "让 SSH 服务在系统重启后自动运行，用哪个命令？",
+                "options": [
+                  {
+                    "text": "systemctl enable ssh",
+                    "correct": true,
+                    "hint": "enable = 开机自启"
+                  },
+                  {
+                    "text": "systemctl stop ssh",
+                    "correct": false,
+                    "hint": "stop 是停止服务"
+                  },
+                  {
+                    "text": "systemctl disable ssh",
+                    "correct": false,
+                    "hint": "disable 是取消开机自启"
+                  },
+                  {
+                    "text": "systemctl restart ssh",
+                    "correct": false,
+                    "hint": "restart 是重启一次，不设自启"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：安装 SSH 服务端",
+                "narrative": "厂长：现在动手。在终端里输入命令安装 openssh-server。",
+                "question": "在终端输入命令，安装 SSH 服务端：",
+                "inputType": "command",
+                "correctCommand": "sudo apt install openssh-server",
+                "aliases": [
+                  "apt install openssh-server"
+                ],
+                "outputLines": [
+                  {
+                    "text": "Reading package lists... Done",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "Building dependency tree... Done",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "Setting up openssh-server (1:9.6p1-3) ...",
+                    "color": "",
+                    "delay": 400
+                  },
+                  {
+                    "text": "Created symlink /etc/systemd/system/sshd.service",
+                    "color": "",
+                    "delay": 400
+                  },
+                  {
+                    "text": "SSH 服务已启动。",
+                    "color": "green",
+                    "delay": 500
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ SSH 服务端安装完成并已启动！"
+              },
+              {
+                "title": "动手敲命令：设为开机自启",
+                "narrative": "装好了。现在用 systemctl enable 把 SSH 设为开机自启，服务器重启后服务自动运行。",
+                "question": "在终端输入命令，把 SSH 设为开机自启：",
+                "inputType": "command",
+                "correctCommand": "sudo systemctl enable ssh",
+                "aliases": [
+                  "systemctl enable ssh",
+                  "sudo systemctl enable sshd",
+                  "systemctl enable sshd"
+                ],
+                "outputLines": [
+                  {
+                    "text": "Synchronizing state of ssh.service with SysV service script...",
+                    "color": "dim",
+                    "delay": 400
+                  },
+                  {
+                    "text": "Executing: /lib/systemd/systemd-sysv-install enable ssh",
+                    "color": "dim",
+                    "delay": 400
+                  },
+                  {
+                    "text": "Created symlink /etc/systemd/system/multi-user.target.wants/ssh.service",
+                    "color": "",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ SSH 已设为开机自启，重启后自动运行！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "ssh",
+            "apt_basic",
+            "remote_access"
+          ]
+        },
+        {
+          "id": "2-1",
+          "title": "从Windows SSH远程登录",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "登录命令格式",
+                "narrative": "厂长：服务端装好自启了，现在从 Windows 远程登录它。SSH 登录命令的通用格式：ssh 用户名@IP地址。",
+                "question": "SSH 远程登录的命令格式是？",
+                "options": [
+                  {
+                    "text": "ssh 用户名@IP",
+                    "correct": true,
+                    "hint": "格式就是 ssh 用户名@IP，比如 ssh student@192.168.1.100"
+                  },
+                  {
+                    "text": "telnet 用户名@IP",
+                    "correct": false,
+                    "hint": "telnet 是另一个不加密的协议，不是 SSH"
+                  },
+                  {
+                    "text": "ssh IP@用户名",
+                    "correct": false,
+                    "hint": "用户名在@前面，IP 在@后面"
+                  },
+                  {
+                    "text": "ssh 密码@IP",
+                    "correct": false,
+                    "hint": "@前面是用户名，不是密码"
+                  }
+                ]
+              },
+              {
+                "title": "第一次连接确认指纹",
+                "narrative": "第一次 SSH 连接，终端会提示确认服务器指纹（防止中间人攻击）——这正常，输入 yes 回车继续。",
+                "question": "第一次连接提示确认主机指纹，输入什么？",
+                "options": [
+                  {
+                    "text": "yes",
+                    "correct": true,
+                    "hint": "确认指纹后继续连接"
+                  },
+                  {
+                    "text": "no",
+                    "correct": false,
+                    "hint": "no 会取消连接"
+                  },
+                  {
+                    "text": "密码",
+                    "correct": false,
+                    "hint": "指纹确认用 yes，密码在后面才输入"
+                  },
+                  {
+                    "text": "quit",
+                    "correct": false,
+                    "hint": "quit 是退出"
+                  }
+                ]
+              },
+              {
+                "title": "登录成功看什么",
+                "narrative": "输入 yes 回车后，提示输入密码（输入时不显示，正常），输对就登上了——看到 shell 提示符（如 student@ubuntu:~$）就说明成功。",
+                "question": "SSH 登录成功后，你会看到什么？",
+                "options": [
+                  {
+                    "text": "shell 命令提示符（如 student@ubuntu:~$）",
+                    "correct": true,
+                    "hint": "看到这个提示符就说明登进去了"
+                  },
+                  {
+                    "text": "图形桌面",
+                    "correct": false,
+                    "hint": "服务器一般是命令行，没有桌面"
+                  },
+                  {
+                    "text": "一个错误页面",
+                    "correct": false,
+                    "hint": "登录成功不会报错"
+                  },
+                  {
+                    "text": "空白什么都看不到",
+                    "correct": false,
+                    "hint": "会有 shell 提示符"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：远程登录",
+                "narrative": "厂长：现在动手。从这台 Windows 上用 SSH 登录工位服务器，用户名 student，地址 192.168.1.100。",
+                "question": "在终端输入命令，SSH 登录 student@192.168.1.100：",
+                "inputType": "command",
+                "correctCommand": "ssh student@192.168.1.100",
+                "aliases": [
+                  "ssh student@ 192.168.1.100"
+                ],
+                "outputLines": [
+                  {
+                    "text": "The authenticity of host '192.168.1.100' can't be established.",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "Are you sure you want to continue connecting (yes/no)? yes",
+                    "color": "",
+                    "delay": 400
+                  },
+                  {
+                    "text": "student@192.168.1.100's password:",
+                    "color": "",
+                    "delay": 500
+                  },
+                  {
+                    "text": "Welcome to Ubuntu Server!",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "student@ubuntu:~$",
+                    "color": "green",
+                    "delay": 300
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 远程登录成功！看到 shell 提示符，你现在控制了这台服务器。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "ssh",
+            "remote_access"
+          ]
+        },
+        {
+          "id": "2-2",
+          "title": "Linux常用命令练习",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "ls -la 看什么",
+                "narrative": "厂长：ls 列出目录内容。加 -l 显示权限和大小（长格式），加 -a 显示隐藏文件，两个合并写 -la。",
+                "question": "ls -la /home 会看到什么？",
+                "options": [
+                  {
+                    "text": "目录里的所有文件（含隐藏）+ 权限大小",
+                    "correct": true,
+                    "hint": "-l 长格式、-a 隐藏文件，-la = -l -a"
+                  },
+                  {
+                    "text": "只有文件名",
+                    "correct": false,
+                    "hint": "ls 不加参数才只有名字"
+                  },
+                  {
+                    "text": "系统内存",
+                    "correct": false,
+                    "hint": "看内存用 free"
+                  },
+                  {
+                    "text": "网络配置",
+                    "correct": false,
+                    "hint": "看网络用 ip addr"
+                  }
+                ]
+              },
+              {
+                "title": "权限 rwx",
+                "narrative": "厂长：权限如 drwxr-xr-x：d=目录、r=读、w=写、x=执行。第一个是所有者，接着是组、其他人。",
+                "question": "权限里的 r 表示什么？",
+                "options": [
+                  {
+                    "text": "读（read）",
+                    "correct": true,
+                    "hint": "r=read 读权限"
+                  },
+                  {
+                    "text": "写（write）",
+                    "correct": false,
+                    "hint": "w 才是写"
+                  },
+                  {
+                    "text": "执行（execute）",
+                    "correct": false,
+                    "hint": "x 才是执行"
+                  },
+                  {
+                    "text": "删除",
+                    "correct": false,
+                    "hint": "删除没有单独的权限字母"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：ls -la",
+                "narrative": "厂长：动手。查看 /home 目录下都住了哪些人。",
+                "question": "在终端输入命令，查看 /home 目录详情：",
+                "inputType": "command",
+                "correctCommand": "ls -la /home",
+                "aliases": [
+                  "ls -al /home",
+                  "ls /home"
+                ],
+                "outputLines": [
+                  {
+                    "text": "total 8",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "drwxr-xr-x  2 root    root    4096 Jan 15 14:32 .",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "drwxr-xr-x 20 root    root    4096 Jan 15 14:32 ..",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "drwxr-xr-x 18 student student 4096 Jan 15 15:10 student",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "drwxr-xr-x 15 root    root    4096 Jan 15 14:35 ops",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：两个家目录。student 是你，ops 是运维组的——记住别动别人的文件。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 看到两个家目录——student 是你，ops 是运维组。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "terminal_basic",
+            "file_system"
+          ]
+        },
+        {
+          "id": "2-3",
+          "title": "用curl获取公网IP",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "用浏览器认识这个网站",
+                "narrative": "厂长：现在去你电脑的**浏览器**，地址栏输入 ip.sb 回车——它会显示你这台机器当前上网用的公网 IP（一串数字）。ip.sb 是国内能直接访问的「公网 IP 查询网站」。在浏览器里看清楚后，回来确认一下。",
+                "question": "你已经在浏览器里访问 ip.sb，看到自己的公网 IP 了吗？",
+                "options": [
+                  {
+                    "text": "看到了，是一串数字（我的公网 IP）",
+                    "correct": true,
+                    "hint": "对，ip.sb 就是返回你公网 IP 的网站"
+                  },
+                  {
+                    "text": "网页打不开 / 没显示数字",
+                    "correct": false,
+                    "hint": "可能是网络问题，试试 myip.ipip.net 或换网络再试"
+                  },
+                  {
+                    "text": "显示的不是数字",
+                    "correct": false,
+                    "hint": "再刷新看看，应该是一串 IP 数字"
+                  },
+                  {
+                    "text": "我还没去浏览器看",
+                    "correct": false,
+                    "hint": "先打开浏览器访问 ip.sb 再看哦"
+                  }
+                ]
+              },
+              {
+                "title": "认识 curl：命令行的浏览器",
+                "narrative": "浏览器能访问，命令行也能。curl 就是命令行里的「浏览器」——它不显示花花绿绿的页面，而是直接把服务器返回的内容打在屏幕上。用 curl 访问 ifconfig.me，它就返回你的公网 IP。",
+                "question": "curl 在命令行里扮演什么角色？",
+                "options": [
+                  {
+                    "text": "浏览器（访问网站、把内容打出来）",
+                    "correct": true,
+                    "hint": "curl 后面跟网站名就能访问，相当于文字版浏览器"
+                  },
+                  {
+                    "text": "文件管理器",
+                    "correct": false,
+                    "hint": "管理文件的是 ls/cd，不是 curl"
+                  },
+                  {
+                    "text": "文本编辑器",
+                    "correct": false,
+                    "hint": "编辑文件用 vi/nano"
+                  },
+                  {
+                    "text": "压缩工具",
+                    "correct": false,
+                    "hint": "curl 是访问网络的工具"
+                  }
+                ]
+              },
+              {
+                "title": "http:// 和 www 写不写都行",
+                "narrative": "厂长：注意了——curl ip.sb、curl http://ip.sb、curl https://www.ip.sb 效果都一样。curl 会自动补全协议（http/https）和 www，所以怎么顺手怎么写都行。",
+                "question": "下面哪种写法能正确访问 ip.sb？",
+                "options": [
+                  {
+                    "text": "curl ip.sb",
+                    "correct": false,
+                    "hint": "这个当然可以，但不止这一个"
+                  },
+                  {
+                    "text": "curl http://www.ip.sb",
+                    "correct": false,
+                    "hint": "这个也可以"
+                  },
+                  {
+                    "text": "curl https://ip.sb",
+                    "correct": false,
+                    "hint": "这个也可以"
+                  },
+                  {
+                    "text": "以上都可以（curl 自动补全协议和 www）",
+                    "correct": true,
+                    "hint": "http:// 和 www 写不写都行，curl 会自动补全"
+                  }
+                ]
+              },
+              {
+                "title": "这类网站不止一个",
+                "narrative": "厂长：查公网 IP 的网站不止一个。国内常用：ip.sb、myip.ipip.net（还能显示归属地）；国外有 ifconfig.me、ifconfig.co、ipinfo.io/ip 等。教学我们优先用国内的，访问快又稳。",
+                "question": "下面哪个是国内可直接访问、还能显示归属地的查 IP 网站？",
+                "options": [
+                  {
+                    "text": "myip.ipip.net",
+                    "correct": true,
+                    "hint": "myip.ipip.net 是国内 IPIP 的服务，返回公网 IP 和归属地"
+                  },
+                  {
+                    "text": "ifconfig.me",
+                    "correct": false,
+                    "hint": "这个是国外服务，国内访问可能不稳定"
+                  },
+                  {
+                    "text": "ifconfig.co",
+                    "correct": false,
+                    "hint": "国外服务，国内可能不通"
+                  },
+                  {
+                    "text": "ipinfo.io",
+                    "correct": false,
+                    "hint": "国外服务"
+                  }
+                ]
+              },
+              {
+                "title": "内网 vs 公网：工控设备的常态",
+                "narrative": "查到了公网 IP 是好事，但记住：工控设备平时大多在内网，没有公网 IP 才是常态。工控网络追求的不是「能从外面进来」，而是「内部稳定可靠」——外网访问往往还要靠 VPN、专线。",
+                "question": "为什么工控设备大多没有公网 IP？",
+                "options": [
+                  {
+                    "text": "内网更稳定、更安全，不需要直接暴露到公网",
+                    "correct": true,
+                    "hint": "工控追求内部稳定可靠，不让外部随便访问，所以大多留在内网"
+                  },
+                  {
+                    "text": "公网 IP 太贵买不起",
+                    "correct": false,
+                    "hint": "不是成本问题，是安全与可靠性考虑"
+                  },
+                  {
+                    "text": "工控设备不能上网",
+                    "correct": false,
+                    "hint": "能上网，只是大多在内网"
+                  },
+                  {
+                    "text": "没有这个需求",
+                    "correct": false,
+                    "hint": "有需求，但通过内网/VPN/专线满足"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：curl 查公网 IP",
+                "narrative": "厂长：理论和浏览器都看过了，现在动手。在终端里输入 curl 访问 ip.sb，它会返回你的公网 IP。记住命令格式：curl 后面跟网站名。",
+                "question": "在终端里输入命令，用 curl 访问 ip.sb 获取公网 IP：",
+                "inputType": "command",
+                "correctCommand": "curl ip.sb",
+                "aliases": [
+                  "curl http://ip.sb",
+                  "curl https://ip.sb",
+                  "curl www.ip.sb",
+                  "curl http://www.ip.sb",
+                  "curl https://www.ip.sb",
+                  "curl myip.ipip.net"
+                ],
+                "outputLines": [
+                  {
+                    "text": "118.178.235.189",
+                    "color": "",
+                    "delay": 500
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 返回了你的公网 IP——用 curl 查公网 IP 成功！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "network_diag"
+          ]
+        },
+        {
+          "id": "2-4",
+          "title": "注册并创建云服务器",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "注册云平台账号",
+                "narrative": "厂长：要创建云服务器，先得有个云平台账号。去云服务商官网注册——国内平台需要手机号/邮箱 + 实名认证。密码设强一点，这是你云资源的「门锁」。",
+                "question": "注册云平台账号，通常需要什么？",
+                "options": [
+                  {
+                    "text": "手机号/邮箱 + 实名认证",
+                    "correct": true,
+                    "hint": "国内云平台基本都要实名，密码设强一点"
+                  },
+                  {
+                    "text": "随便一个用户名就行",
+                    "correct": false,
+                    "hint": "没有实名和安全设置，账号会被盗用"
+                  },
+                  {
+                    "text": "只要邮箱，不用认证",
+                    "correct": false,
+                    "hint": "国内平台要求实名认证"
+                  },
+                  {
+                    "text": "不需要账号",
+                    "correct": false,
+                    "hint": "没有账号无法创建云资源"
+                  }
+                ]
+              },
+              {
+                "title": "选择镜像（操作系统）",
+                "narrative": "注册好了，开始创建实例。第一步选镜像（操作系统）——工控学习用 Ubuntu Server 最合适，和我们虚拟机里的一模一样，学的东西能直接迁移。",
+                "question": "创建云服务器，镜像应该选哪个系统？",
+                "options": [
+                  {
+                    "text": "Ubuntu Server（和虚拟机一致）",
+                    "correct": true,
+                    "hint": "和本地虚拟机环境一致，学习最顺"
+                  },
+                  {
+                    "text": "Windows 11 桌面版",
+                    "correct": false,
+                    "hint": "云服务器一般不用桌面版，还占资源"
+                  },
+                  {
+                    "text": "macOS",
+                    "correct": false,
+                    "hint": "macOS 一般不提供云服务器镜像"
+                  },
+                  {
+                    "text": "安卓系统",
+                    "correct": false,
+                    "hint": "这是手机系统，不是服务器"
+                  }
+                ]
+              },
+              {
+                "title": "选择规格（CPU/内存/带宽）",
+                "narrative": "然后选配置规格：CPU/内存、系统盘、带宽。学习用 2 核 4G 就够——选太贵浪费钱，选太少跑不动服务。带宽按需选，按量计费更灵活。",
+                "question": "工控学习用的云服务器，合理的配置是？",
+                "options": [
+                  {
+                    "text": "2核4G + 适量带宽（够用不浪费）",
+                    "correct": true,
+                    "hint": "学习场景 2核4G 足够，成本也低"
+                  },
+                  {
+                    "text": "64核512G（顶配堆料）",
+                    "correct": false,
+                    "hint": "学习用不上这么高，纯浪费"
+                  },
+                  {
+                    "text": "最低配 1核0.5G",
+                    "correct": false,
+                    "hint": "太低了跑不动 Node-RED 等服务"
+                  },
+                  {
+                    "text": "只选最大带宽",
+                    "correct": false,
+                    "hint": "带宽越大越贵，按需选就行"
+                  }
+                ]
+              },
+              {
+                "title": "设置登录方式",
+                "narrative": "接下来设登录方式：密码 或 密钥。密钥更安全（一对公钥私钥，没有密码可猜），密码简单但容易被爆破。工控环境建议用密钥。",
+                "question": "云服务器登录方式，工控环境更推荐哪个？",
+                "options": [
+                  {
+                    "text": "密钥（更安全，没有密码可猜）",
+                    "correct": true,
+                    "hint": "密钥对登录是云服务器推荐做法，防爆破"
+                  },
+                  {
+                    "text": "纯密码（简单）",
+                    "correct": false,
+                    "hint": "密码容易被暴力破解，工控环境不推荐"
+                  },
+                  {
+                    "text": "不设置登录方式",
+                    "correct": false,
+                    "hint": "没有登录方式就登不上服务器了"
+                  },
+                  {
+                    "text": "随便选一个",
+                    "correct": false,
+                    "hint": "登录方式影响安全，要认真选"
+                  }
+                ]
+              },
+              {
+                "title": "启动实例，拿到公网 IP",
+                "narrative": "配置完成，点「创建/启动」实例。启动后云平台会给服务器分配一个**公网 IP**——这就是云服务器和本地虚拟机最大的区别：云服务器天生有公网 IP，从哪都能访问。",
+                "question": "云服务器启动后，平台会分配什么？",
+                "options": [
+                  {
+                    "text": "一个公网 IP（能外网访问）",
+                    "correct": true,
+                    "hint": "云服务器自带公网 IP，外网可直接访问"
+                  },
+                  {
+                    "text": "没有 IP",
+                    "correct": false,
+                    "hint": "每个云服务器都有 IP"
+                  },
+                  {
+                    "text": "只有内网 IP",
+                    "correct": false,
+                    "hint": "云服务器有公网 IP，只是可能还需要配置"
+                  },
+                  {
+                    "text": "随机 MAC 地址",
+                    "correct": false,
+                    "hint": "分配的是 IP 地址，不是 MAC"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "mqtt_retain"
+          ]
+        },
+        {
+          "id": "2-5",
+          "title": "配置安全组开放SSH端口",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "安全组是什么",
+                "narrative": "厂长：安全组是云服务器的防火墙，控制哪些端口对外部开放。只放行需要的，其他全关，最安全。",
+                "question": "安全组的作用是？",
+                "options": [
+                  {
+                    "text": "控制云服务器哪些端口对外开放",
+                    "correct": true,
+                    "hint": "安全组 = 云防火墙"
+                  },
+                  {
+                    "text": "给服务器加内存",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "加速网络",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "备份数据",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "SSH 用哪个端口",
+                "narrative": "厂长：要从外部 SSH 登录云服务器，得在安全组放行 SSH 的端口——SSH 默认用 22 端口。",
+                "question": "SSH 远程登录默认用哪个端口？",
+                "options": [
+                  {
+                    "text": "22",
+                    "correct": true,
+                    "hint": "SSH 默认 22 端口"
+                  },
+                  {
+                    "text": "80",
+                    "correct": false,
+                    "hint": "80 是 HTTP"
+                  },
+                  {
+                    "text": "443",
+                    "correct": false,
+                    "hint": "443 是 HTTPS"
+                  },
+                  {
+                    "text": "3389",
+                    "correct": false,
+                    "hint": "3389 是远程桌面"
+                  }
+                ]
+              },
+              {
+                "title": "放行方向",
+                "narrative": "厂长：外部 SSH 连进来是「入站」，所以在安全组加一条入站规则，放行 TCP 22。",
+                "question": "要允许外部 SSH 连接，安全组应？",
+                "options": [
+                  {
+                    "text": "添加入站规则放行 TCP 22",
+                    "correct": true,
+                    "hint": "入站 + 22 端口"
+                  },
+                  {
+                    "text": "添加入站规则放行 TCP 80",
+                    "correct": false,
+                    "hint": "80 是网页不是 SSH"
+                  },
+                  {
+                    "text": "出站规则放行 22",
+                    "correct": false,
+                    "hint": "外部连进来是入站"
+                  },
+                  {
+                    "text": "关闭所有端口",
+                    "correct": false,
+                    "hint": "全关就连不上了"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "ssh",
+            "security_group",
+            "firewall"
+          ]
+        },
+        {
+          "id": "2-6",
+          "title": "回顾反思：工业互联网 vs 消费互联网",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "本质区别",
+                "narrative": "厂长：工业互联网和消费互联网最本质的区别是连接对象——工业连的是机器设备，消费连的是人拿手机上网。",
+                "question": "两者最本质的区别是什么？",
+                "options": [
+                  {
+                    "text": "连接对象不同（机器 vs 人）",
+                    "correct": true,
+                    "hint": "工业连机器，消费连人"
+                  },
+                  {
+                    "text": "网络规模不同",
+                    "correct": false,
+                    "hint": "不是本质"
+                  },
+                  {
+                    "text": "协议不同",
+                    "correct": false,
+                    "hint": "协议是表象"
+                  },
+                  {
+                    "text": "速度不同",
+                    "correct": false,
+                    "hint": "不是本质"
+                  }
+                ]
+              },
+              {
+                "title": "要求不同",
+                "narrative": "厂长：因为连的是设备，工业要求毫秒级时延、极高可靠性——一个字节出错可能产线停转、设备损毁。",
+                "question": "为什么工业网络要求比消费网络严格？",
+                "options": [
+                  {
+                    "text": "设备出错可能导致停产、损毁、事故",
+                    "correct": true,
+                    "hint": "工业的代价远高于网页打不开"
+                  },
+                  {
+                    "text": "设备运行更快",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "用户更多",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "没有原因",
+                    "correct": false,
+                    "hint": "有明确原因"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "iiot_intro"
+          ]
+        },
+        {
+          "id": "2-hidden",
+          "title": "🌶 配置SSH免密登录",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "密钥对",
+                "narrative": "厂长：SSH 免密登录用密钥对——本机生成一对：私钥自己留（保密），公钥发到服务器。",
+                "question": "免密登录要把哪个复制到服务器？",
+                "options": [
+                  {
+                    "text": "公钥",
+                    "correct": true,
+                    "hint": "公钥放服务器 authorized_keys"
+                  },
+                  {
+                    "text": "私钥",
+                    "correct": false,
+                    "hint": "私钥绝对不能外传"
+                  },
+                  {
+                    "text": "密码",
+                    "correct": false,
+                    "hint": "免密不用密码"
+                  },
+                  {
+                    "text": "证书文件",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "复制公钥",
+                "narrative": "厂长：把本机公钥追加到服务器的 ~/.ssh/authorized_keys，之后 SSH 登录就免密了。",
+                "question": "公钥追加到服务器的哪个文件？",
+                "options": [
+                  {
+                    "text": "~/.ssh/authorized_keys",
+                    "correct": true,
+                    "hint": "authorized_keys 存白名单公钥"
+                  },
+                  {
+                    "text": "~/.ssh/id_rsa",
+                    "correct": false,
+                    "hint": "id_rsa 是私钥"
+                  },
+                  {
+                    "text": "/etc/passwd",
+                    "correct": false,
+                    "hint": "那是用户表"
+                  },
+                  {
+                    "text": "~/.bashrc",
+                    "correct": false,
+                    "hint": "那是 shell 配置"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：拷贝公钥",
+                "narrative": "厂长：动手。用 ssh-copy-id 把你的公钥拷到服务器，实现免密登录。",
+                "question": "在终端输入命令，拷贝公钥到服务器：",
+                "inputType": "command",
+                "correctCommand": "ssh-copy-id student@192.168.1.100",
+                "aliases": [
+                  "ssh-copy-id student@192.168.1.100"
+                ],
+                "outputLines": [
+                  {
+                    "text": "/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "Number of key(s) added: 1",
+                    "color": "green",
+                    "delay": 300
+                  },
+                  {
+                    "text": "厂长：公钥已安装，下次 SSH 登录不用输密码了！",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 公钥已安装，SSH 免密登录生效！"
+              }
+            ]
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "ssh",
+            "key_auth",
+            "security_tls"
+          ]
+        },
+        {
+          "id": "2-7",
+          "title": "SSH远程登录实操",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "SSH 登录格式",
+                "narrative": "厂长：SSH 登录命令格式：ssh 用户名@IP。比如 ssh student@192.168.1.100。",
+                "question": "SSH 登录 student 用户的正确命令是？",
+                "options": [
+                  {
+                    "text": "ssh student@192.168.1.100",
+                    "correct": true,
+                    "hint": "格式：ssh 用户名@IP"
+                  },
+                  {
+                    "text": "ssh 192.168.1.100@student",
+                    "correct": false,
+                    "hint": "用户名在@前面"
+                  },
+                  {
+                    "text": "telnet student@192.168.1.100",
+                    "correct": false,
+                    "hint": "telnet 不加密，不是 SSH"
+                  },
+                  {
+                    "text": "ssh student 192.168.1.100",
+                    "correct": false,
+                    "hint": "用@连接用户名和IP"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：SSH 登录",
+                "narrative": "厂长：动手。用 SSH 登录工位电脑，用户名 student，地址 192.168.1.100。",
+                "question": "在终端输入命令，SSH 登录 192.168.1.100：",
+                "inputType": "command",
+                "correctCommand": "ssh student@192.168.1.100",
+                "aliases": [],
+                "outputLines": [
+                  {
+                    "text": "The authenticity of host '192.168.1.100 (192.168.1.100)' can't be established.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "ECDSA key fingerprint is SHA256:xxxx...",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Are you sure you want to continue connecting (yes/no)? yes",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Warning: Permanently added '192.168.1.100' (ECDSA) to the list of known hosts.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "student@192.168.1.100's password: ",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Welcome to Ubuntu Server!",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：登上了！现在你远程控制了这台机器。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 登上了！你现在远程控制了这台机器。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "node_red_flow",
+            "mqtt_qos"
+          ]
+        },
+        {
+          "id": "2-8",
+          "title": "理解密钥认证原理",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "公钥和私钥",
+                "narrative": "厂长：SSH 免密登录用非对称加密——一对密钥：私钥存自己电脑（保密），公钥放到服务器。",
+                "question": "SSH 密钥对里，哪个存自己电脑且要保密？",
+                "options": [
+                  {
+                    "text": "私钥",
+                    "correct": true,
+                    "hint": "私钥自己留着，绝不外泄"
+                  },
+                  {
+                    "text": "公钥",
+                    "correct": false,
+                    "hint": "公钥放服务器"
+                  },
+                  {
+                    "text": "密码",
+                    "correct": false,
+                    "hint": "密钥不是密码"
+                  },
+                  {
+                    "text": "证书",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "公钥放哪",
+                "narrative": "厂长：客户端的公钥要追加到服务器的 ~/.ssh/authorized_keys 文件（一行一个公钥）。",
+                "question": "服务器的 authorized_keys 文件存放什么？",
+                "options": [
+                  {
+                    "text": "允许免密登录的客户端的公钥",
+                    "correct": true,
+                    "hint": "authorized_keys = 白名单公钥"
+                  },
+                  {
+                    "text": "服务器私钥",
+                    "correct": false,
+                    "hint": "服务器私钥在别处"
+                  },
+                  {
+                    "text": "密码记录",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "连接日志",
+                    "correct": false,
+                    "hint": "日志在 auth.log"
+                  }
+                ]
+              },
+              {
+                "title": "免密原理",
+                "narrative": "厂长：连接时服务器用 authorized_keys 里的公钥验证你的身份，匹配就放行——不用输密码。",
+                "question": "免密登录时，服务器拿什么验证你？",
+                "options": [
+                  {
+                    "text": "authorized_keys 里的公钥",
+                    "correct": true,
+                    "hint": "公钥验证身份，匹配即放行"
+                  },
+                  {
+                    "text": "你输入的密码",
+                    "correct": false,
+                    "hint": "免密就是不用密码"
+                  },
+                  {
+                    "text": "你的 MAC 地址",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "IP 地址",
+                    "correct": false,
+                    "hint": "IP 不验证身份"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "ssh",
+            "security_tls",
+            "key_auth"
+          ]
+        },
+        {
+          "id": "2-9",
+          "title": "⚔️ Boss战：SSH连接超时",
+          "type": "boss_fight",
+          "config": {
+            "bossName": "SSH 连接超时",
+            "bossEmoji": "👾",
+            "phases": [
+              {
+                "name": "诊断",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "SSH 连不上 192.168.1.100，第一步查什么？",
+                    "options": [
+                      "ping 192.168.1.100 测连通性",
+                      "直接格式化硬盘",
+                      "重启交换机",
+                      "打电话给电信"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "排查",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "ping 通了但 SSH 超时，下一步查什么？",
+                    "options": [
+                      "检查 22 端口是否开放",
+                      "检查网线水晶头",
+                      "换一台路由器",
+                      "重新插拔电源"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "22 端口没开，怎么确认 SSH 服务状态？",
+                    "options": [
+                      "systemctl status ssh",
+                      "ps aux | grep nginx",
+                      "netstat -an | grep 80",
+                      "curl localhost:22"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "修复",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "SSH 服务没运行，怎么启动？",
+                    "options": [
+                      "systemctl start ssh",
+                      "apt install openssh-server",
+                      "service network restart",
+                      "shutdown -r now"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "端口改成了 2222，SSH 命令要加什么参数？",
+                    "options": [
+                      "ssh -p 2222 user@host",
+                      "ssh 2222 user@host",
+                      "ssh --port 2222 user@host",
+                      "ssh :2222 user@host"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "ssh",
+            "fault_diag"
+          ]
+        },
+        {
+          "id": "2-10",
+          "title": "SSH端口转发实战",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "端口转发干什么",
+                "narrative": "厂长：SSH 端口转发把本地的某个端口「隧道」到远程服务器——比如把本地 8080 转发到远程的 80，访问本地 8080 就等于访问远程 80。",
+                "question": "SSH 端口转发的作用是？",
+                "options": [
+                  {
+                    "text": "通过 SSH 隧道把端口映射到远程",
+                    "correct": true,
+                    "hint": "隧道转发，本地端口连到远程服务"
+                  },
+                  {
+                    "text": "加速网络",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "加密硬盘",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "备份文件",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "-L 参数",
+                "narrative": "厂长：-L 是本地转发（本地端口→远程）；-R 是远程转发；-D 是动态转发（SOCKS）。",
+                "question": "本地端口转发用哪个参数？",
+                "options": [
+                  {
+                    "text": "-L",
+                    "correct": true,
+                    "hint": "-L local 本地转发"
+                  },
+                  {
+                    "text": "-R",
+                    "correct": false,
+                    "hint": "-R 是远程转发"
+                  },
+                  {
+                    "text": "-D",
+                    "correct": false,
+                    "hint": "-D 是动态转发"
+                  },
+                  {
+                    "text": "-p",
+                    "correct": false,
+                    "hint": "-p 是端口"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：端口转发",
+                "narrative": "厂长：动手。把本地 8080 端口转发到远程服务器的 80 端口（通过 SSH 隧道）。",
+                "question": "在终端输入命令，本地 8080 转发到远程 80：",
+                "inputType": "command",
+                "correctCommand": "ssh -L 8080:localhost:80 student@192.168.1.100",
+                "aliases": [
+                  "ssh -L 8080:localhost:80 user@192.168.1.100"
+                ],
+                "outputLines": [
+                  {
+                    "text": "（连接建立后，访问 localhost:8080 等于访问远程 80）",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "厂长：隧道建好了，本地 8080 → 远程 80。",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 端口转发隧道已建立！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "ssh",
+            "network_tunnel"
+          ]
+        },
+        {
+          "id": "2-11",
+          "title": "理解SSH安全配置",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "SSH 安全三板斧",
+                "narrative": "厂长：SSH 安全加固三板斧：不要用 root 直接登录、不要只用密码（用密钥）、不要用默认端口。",
+                "question": "下面哪个能最有效提升 SSH 安全？",
+                "options": [
+                  {
+                    "text": "禁止 root 直接登录",
+                    "correct": true,
+                    "hint": "关掉最高权限账号的远程登录，风险大减"
+                  },
+                  {
+                    "text": "使用简单密码",
+                    "correct": false,
+                    "hint": "简单密码更不安全"
+                  },
+                  {
+                    "text": "关闭防火墙",
+                    "correct": false,
+                    "hint": "关防火墙更危险"
+                  },
+                  {
+                    "text": "用默认端口",
+                    "correct": false,
+                    "hint": "默认端口易被扫描"
+                  }
+                ]
+              },
+              {
+                "title": "为什么禁 root",
+                "narrative": "厂长：root 是最高权限，攻击者最喜欢爆破 root。禁掉 root 远程登录，让它只能本地登录，攻击面大大缩小。",
+                "question": "为什么禁止 root 直接登录？",
+                "options": [
+                  {
+                    "text": "root 权限最高，被爆破后果最严重",
+                    "correct": true,
+                    "hint": "禁 root 远程登录，降攻击面"
+                  },
+                  {
+                    "text": "root 太慢",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "root 会卡机",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "root 不能用 SSH",
+                    "correct": false,
+                    "hint": "可以但危险"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "ssh",
+            "security_tls"
+          ]
+        },
+        {
+          "id": "2-hidden-2",
+          "title": "🌶 SSH入侵溯源分析",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "/var/log/auth.log 有大量 Failed password",
+                "match": "暴力破解攻击"
+              },
+              {
+                "item": "/root/.ssh/authorized_keys 多了一条陌生公钥",
+                "match": "密钥被植入后门"
+              },
+              {
+                "item": "last 显示凌晨3点有 root 登录",
+                "match": "账号已被入侵"
+              }
+            ]
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "ssh",
+            "fault_diag",
+            "security_tls"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "设备联网攻坚战",
+      "factoryArea": "workshop",
+      "areaName": "车间",
+      "areaIcon": "⚙️",
+      "color": "#00e676",
+      "narrative": {
+        "intro": "车间里七种设备各说各话——西门子的 PLC 讲 ProfiNet，倍福的伺服讲 EtherCAT，变频器讲 Modbus。厂长站在中控室：「让它们开口说话，把数据汇到我这。先装个'翻译台' Node-RED，再让 Modbus 先通起来。」",
+        "complete": "Modbus 通了，Node-RED 上数据开始流动，设备终于「开口说话」。厂长拍拍你：「翻译台搭好了，这是设备联网的第一步。」"
+      },
+      "tasks": [
+        {
+          "id": "3-0",
+          "type": "install_wizard",
+          "title": "车间里的「巴别塔」",
+          "xp": 50,
+          "config": {
+            "steps": [
+              {
+                "title": "巴别塔",
+                "narrative": "厂长：车间里七种设备至少用着四种协议，各说各话——这就是「巴别塔」问题，设备语言不通。",
+                "question": "车间设备「巴别塔」指的是？",
+                "options": [
+                  {
+                    "text": "设备各用各的协议，语言不通",
+                    "correct": true,
+                    "hint": "协议多样，需要翻译"
+                  },
+                  {
+                    "text": "设备都坏了",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "网络太快",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "设备太多",
+                    "correct": false,
+                    "hint": "重点在语言不通"
+                  }
+                ]
+              },
+              {
+                "title": "解决思路",
+                "narrative": "厂长：解决语言不通有三种思路：统一协议（成本极高）、协议转换网关（配翻译）、通用中间层（OPC UA）。",
+                "question": "下面哪个是解决设备语言不通的思路？",
+                "options": [
+                  {
+                    "text": "协议转换网关（配翻译）",
+                    "correct": true,
+                    "hint": "网关做协议翻译"
+                  },
+                  {
+                    "text": "拔掉设备电源",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "换所有设备",
+                    "correct": false,
+                    "hint": "统一协议成本极高"
+                  },
+                  {
+                    "text": "用更粗的网线",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "3-1",
+          "type": "drag_classify",
+          "title": "ISA-95 五层地图",
+          "xp": 100,
+          "config": {
+            "categories": [
+              "L0 现场设备层",
+              "L1 控制层",
+              "L2 监控层",
+              "L3 运营层",
+              "L4 业务层"
+            ],
+            "items": [
+              "传感器",
+              "PLC",
+              "SCADA 监控屏",
+              "MES 生产执行",
+              "ERP 企业资源"
+            ],
+            "answer": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "id": "3-2",
+          "type": "install_wizard",
+          "title": "搭台唱戏：安装 Node-RED",
+          "xp": 100,
+          "config": {
+            "steps": [
+              {
+                "title": "下载官方安装脚本",
+                "narrative": "厂长说：装 Node-RED 用官方一键脚本，来源要正——和装 VMware 一样，别碰来历不明的安装包。官方脚本会帮你装好 Node.js 和 Node-RED。你打算怎么获取？",
+                "question": "Node-RED 官方安装脚本从哪里来？",
+                "options": [
+                  {
+                    "text": "从 node-red 官网/官方 GitHub 拉取安装脚本",
+                    "correct": true,
+                    "hint": "官方渠道，脚本里每一步都检查过"
+                  },
+                  {
+                    "text": "某论坛转发的「一键全家桶」",
+                    "correct": false,
+                    "hint": "来源不明的脚本可能带后门，工厂环境是大忌"
+                  }
+                ]
+              },
+              {
+                "title": "执行安装脚本",
+                "narrative": "脚本拿到了。在 Ubuntu 上执行官方安装脚本（它会自动装 Node.js + Node-RED，约 3-5 分钟）。哪条命令是执行 shell 脚本？",
+                "question": "执行下载好的 install-node-red.sh 用什么命令？",
+                "options": [
+                  {
+                    "text": "bash install-node-red.sh",
+                    "correct": true,
+                    "hint": "用 bash 执行 shell 脚本"
+                  },
+                  {
+                    "text": "python install-node-red.sh",
+                    "correct": false,
+                    "hint": "这是 shell 脚本不是 Python"
+                  },
+                  {
+                    "text": "chmod install-node-red.sh",
+                    "correct": false,
+                    "hint": "chmod 是改权限，不是执行"
+                  }
+                ]
+              },
+              {
+                "title": "启动并访问 Web 界面",
+                "narrative": "装好了。Node-RED 跑起来后，浏览器访问它默认的 Web 端口——以后你就在这个可视化界面里拖节点、连数据流。记住这个端口号。",
+                "question": "Node-RED 的 Web 界面默认跑在哪个端口？",
+                "options": [
+                  {
+                    "text": "1880",
+                    "correct": true,
+                    "hint": "http://虚拟机IP:1880 就是 Node-RED 的编辑界面"
+                  },
+                  {
+                    "text": "3000",
+                    "correct": false,
+                    "hint": "3000 是别的服务的端口"
+                  },
+                  {
+                    "text": "8080",
+                    "correct": false,
+                    "hint": "8080 常见但不是 Node-RED 默认"
+                  }
+                ]
+              },
+              {
+                "title": "安装 Modbus 节点",
+                "narrative": "要让 Node-RED 能跟 Modbus 设备对话，得装 Modbus 节点包。在 Node-RED 的「管理面板 → 安装」里搜安装这个包。",
+                "question": "让 Node-RED 支持 Modbus，要安装哪个节点包？",
+                "options": [
+                  {
+                    "text": "node-red-contrib-modbus",
+                    "correct": true,
+                    "hint": "contrib-modbus 就是 Node-RED 的 Modbus 节点包"
+                  },
+                  {
+                    "text": "node-red-dashboard",
+                    "correct": false,
+                    "hint": "这是仪表盘插件，不是 Modbus"
+                  },
+                  {
+                    "text": "node-red-node-mqtt",
+                    "correct": false,
+                    "hint": "这是 MQTT 节点，不是 Modbus"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "3-3",
+          "type": "install_wizard",
+          "title": "华山论剑：协议归属",
+          "xp": 50,
+          "config": {
+            "steps": [
+              {
+                "title": "ProfiNet 是谁家的",
+                "narrative": "厂长：ProfiNet 是西门子的工业以太网协议，毫秒级实时。紫色线 Profibus 是老款、绿色工业网线 ProfiNet 是新款。",
+                "question": "ProfiNet 是哪个厂家的？",
+                "options": [
+                  {
+                    "text": "西门子（SIEMENS）",
+                    "correct": true,
+                    "hint": "西门子家的工业以太网"
+                  },
+                  {
+                    "text": "倍福",
+                    "correct": false,
+                    "hint": "倍福是 EtherCAT"
+                  },
+                  {
+                    "text": "三菱",
+                    "correct": false,
+                    "hint": "三菱是 CC-Link"
+                  },
+                  {
+                    "text": "施耐德",
+                    "correct": false,
+                    "hint": "施耐德是 Modbus 相关"
+                  }
+                ]
+              },
+              {
+                "title": "一句话记住",
+                "narrative": "厂长：记住每家的协议：西门子 ProfiNet、倍福 EtherCAT、三菱 CC-Link、最老最开放 Modbus。",
+                "question": "EtherCAT 是哪家、特点是什么？",
+                "options": [
+                  {
+                    "text": "倍福，快到极致（飞读飞写）",
+                    "correct": true,
+                    "hint": "EtherCAT = 倍福 = 极快运动控制"
+                  },
+                  {
+                    "text": "西门子，毫秒实时",
+                    "correct": false,
+                    "hint": "那是 ProfiNet"
+                  },
+                  {
+                    "text": "三菱，环形冗余",
+                    "correct": false,
+                    "hint": "那是 CC-Link IE"
+                  },
+                  {
+                    "text": "施耐德，最老最开放",
+                    "correct": false,
+                    "hint": "那是 Modbus"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "3-4",
+          "type": "scenario_match",
+          "title": "华山论剑：协议特征匹配",
+          "xp": 100,
+          "config": {
+            "pairs": [
+              {
+                "item": "ProfiNet",
+                "match": "西门子 · 毫秒级实时控制"
+              },
+              {
+                "item": "EtherCAT",
+                "match": "倍福 · 快到极致的「飞读飞写」"
+              },
+              {
+                "item": "CC-Link IE",
+                "match": "三菱 · 环形冗余，断线不中断"
+              },
+              {
+                "item": "Modbus",
+                "match": "最老最开放 · 变频器和仪表几乎都支持"
+              }
+            ]
+          }
+        },
+        {
+          "id": "3-5",
+          "type": "install_wizard",
+          "title": "Modbus 四种寄存器",
+          "xp": 50,
+          "config": {
+            "steps": [
+              {
+                "title": "四种寄存器",
+                "narrative": "厂长：Modbus 用寄存器组织数据，四种：线圈（1位可读写，开关）、离散输入（1位只读，限位）、保持寄存器（16位可读写，设定值）、输入寄存器（16位只读，测量值）。",
+                "question": "存「设定值」（如温度上限，可读可写）用哪种？",
+                "options": [
+                  {
+                    "text": "保持寄存器",
+                    "correct": true,
+                    "hint": "保持 = 设定值，16位可读写"
+                  },
+                  {
+                    "text": "输入寄存器",
+                    "correct": false,
+                    "hint": "输入 = 测量值只读"
+                  },
+                  {
+                    "text": "线圈",
+                    "correct": false,
+                    "hint": "线圈 = 开关可读写"
+                  },
+                  {
+                    "text": "离散输入",
+                    "correct": false,
+                    "hint": "离散 = 开关只读"
+                  }
+                ]
+              },
+              {
+                "title": "口诀",
+                "narrative": "厂长：口诀：保持=设定值、输入=测量值、线圈=开关可写、离散=开关只读。",
+                "question": "读传感器当前温度（测量值，只读）用哪种？",
+                "options": [
+                  {
+                    "text": "输入寄存器",
+                    "correct": true,
+                    "hint": "输入 = 测量值只读"
+                  },
+                  {
+                    "text": "保持寄存器",
+                    "correct": false,
+                    "hint": "保持 = 设定值可写"
+                  },
+                  {
+                    "text": "线圈",
+                    "correct": false,
+                    "hint": "线圈 = 开关"
+                  },
+                  {
+                    "text": "离散输入",
+                    "correct": false,
+                    "hint": "离散 = 限位开关"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "3-6",
+          "type": "diagnosis_tree",
+          "title": "排查 Modbus 通信故障",
+          "xp": 200,
+          "config": {
+            "scenario": "ModbusTCP 从站（端口 8502）突然连不上了，厂长走过来：「别乱，按顺序排查。」",
+            "steps": [
+              {
+                "question": "第一步先查什么？",
+                "options": [
+                  "查网线/网卡（ip link）",
+                  "重装 Node-RED",
+                  "换一台设备",
+                  "直接改端口"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "网线没问题，网卡也正常。下一步？",
+                "options": [
+                  "ping 从站 IP 测连通",
+                  "改波特率",
+                  "换协议",
+                  "重启电脑"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "ping 从站通了，说明网络通。下一步查什么？",
+                "options": [
+                  "查端口 8502 是否开放（ss -tln）",
+                  "重新插网线",
+                  "换路由器",
+                  "调波特率"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "端口也通了，但连不上。下一步？",
+                "options": [
+                  "查从站 ID / 寄存器地址是否匹配",
+                  "换一根网线",
+                  "重启交换机",
+                  "打电话"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "从站 ID 也对，还是连不上。最后一步？",
+                "options": [
+                  "查防火墙是否拦截",
+                  "重装系统",
+                  "换设备",
+                  "放弃排查"
+                ],
+                "correct": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "3-7",
+          "type": "boss_fight",
+          "title": "⚔️ Boss战：Modbus 通信故障",
+          "xp": 300,
+          "config": {
+            "bossName": "Modbus 通信故障",
+            "bossEmoji": "👾",
+            "phases": [
+              {
+                "name": "现象识别",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "Node-RED 读不到从站数据，最先应该做什么？",
+                    "options": [
+                      "按排查顺序：网线→IP→端口→从站ID→防火墙",
+                      "直接重启所有服务",
+                      "重装 Node-RED",
+                      "换一批传感器"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "ModbusTCP 从站默认示例端口是多少？",
+                    "options": [
+                      "8502",
+                      "1880",
+                      "8080",
+                      "3000"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "根因定位",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "ping 从站 IP 通、端口也通，但读取超时，最可能是？",
+                    "options": [
+                      "从站 ID 或寄存器地址不匹配",
+                      "网线没插好",
+                      "IP 地址写错",
+                      "防火墙全关"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "排查故障时，什么时候查防火墙？",
+                    "options": [
+                      "网络、IP、端口、从站ID都排查过之后",
+                      "第一步就查",
+                      "永远不用查",
+                      "先查再说"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "修复验证",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "确认从站 ID 应改为 3 后，正确做法是？",
+                    "options": [
+                      "修改配置并重启读取节点验证",
+                      "改完不测试直接提交",
+                      "只改内存不改配置",
+                      "换一台从站"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "修复后怎么确认真的通了？",
+                    "options": [
+                      "用 QModMaster 直连从站验证 + 看 Node-RED 是否有数据",
+                      "凭感觉",
+                      "重启电脑",
+                      "问同学"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "3-hidden",
+          "type": "install_wizard",
+          "title": "🌶 用 QModMaster 直连从站",
+          "xp": 300,
+          "hidden": true,
+          "config": {
+            "steps": [
+              {
+                "title": "QModMaster 干什么",
+                "narrative": "厂长：QModMaster 是外部调试工具，直连 Modbus 从站读写寄存器，用来验证从站和配置对不对。",
+                "question": "QModMaster 用来？",
+                "options": [
+                  {
+                    "text": "直连 Modbus 从站验证读写",
+                    "correct": true,
+                    "hint": "跨工具验证从站和配置"
+                  },
+                  {
+                    "text": "编辑 Node-RED 流程",
+                    "correct": false,
+                    "hint": "Node-RED 用浏览器编辑"
+                  },
+                  {
+                    "text": "管理 Docker",
+                    "correct": false,
+                    "hint": "Docker 用命令行"
+                  },
+                  {
+                    "text": "配置防火墙",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "连接填什么",
+                "narrative": "厂长：连接时要在配置里填从站的 IP 地址和端口，能读到数据就说明从站和配置都对。",
+                "question": "QModMaster 连接从站需要填什么？",
+                "options": [
+                  {
+                    "text": "从站的 IP 地址和端口",
+                    "correct": true,
+                    "hint": "IP + 端口（如 192.168.1.100:8502）"
+                  },
+                  {
+                    "text": "MAC 地址",
+                    "correct": false,
+                    "hint": "连接用 IP 不用 MAC"
+                  },
+                  {
+                    "text": "主机名",
+                    "correct": false,
+                    "hint": "一般用 IP"
+                  },
+                  {
+                    "text": "网关地址",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：验证连接",
+                "narrative": "厂长：动手。用命令行工具读取从站寄存器，验证 ModbusTCP 连接（温度在 192.168.1.100:8502）。",
+                "question": "在终端输入命令，读取从站保持寄存器（功能码 03）：",
+                "inputType": "command",
+                "correctCommand": "modpoll -m tcp -t 4 -r 1 -1 -p 8502 192.168.1.100",
+                "aliases": [
+                  "modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100"
+                ],
+                "outputLines": [
+                  {
+                    "text": "modpoll 3.0 - FieldTalk(tm) Modbus(R) Master Simulator",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "Protocol configuration: MODBUS/TCP",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "Reading 1 register(s) from address 1",
+                    "color": "",
+                    "delay": 300
+                  },
+                  {
+                    "text": "register 1: 256 (0x0100)  → 温度值",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "厂长：读到寄存器数据了，从站和配置都对！",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 从站连接成功，读到寄存器数据！"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "数据在源头处理",
+      "factoryArea": "edge_cabinet",
+      "areaName": "边缘柜",
+      "areaIcon": "📦",
+      "color": "#ff5555",
+      "narrative": {
+        "intro": "设备数据终于正常了——但 500GB 一天，厂里光纤都被挤爆了。厂长站在边缘柜前面挠头：「数据必须就近处理，别全部往云端送。」你打开边缘计算柜，开始思考怎么在数据出生地解决问题。",
+        "complete": "边缘柜的指示灯闪烁正常，网络带宽用压回了安全线。现在数据在源头处理，只向上传结论。厂长指着仪表板说：「这叫快。」"
+      },
+      "tasks": [
+        {
+          "id": "4-0",
+          "title": "用Function节点模拟传感器",
+          "type": "code_review",
+          "config": {
+            "code": "msg.payload = {\\n  temperature: 25 + Math.random() * 60,\\n  vibration: Math.random() * 1.5\\n};\\nreturn msg;",
+            "hint": "这段代码生成了什么数据？",
+            "question": "temperature的范围是多少？",
+            "options": [
+              "25-60",
+              "60-120",
+              "0-100",
+              "25-85"
+            ],
+            "answer": 3
+          },
+          "xp": 100,
+          "tags": [
+            "edge_arch",
+            "node_red_flow"
+          ]
+        },
+        {
+          "id": "4-1",
+          "title": "温度超标立即报警",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "在Node-RED中，用____节点实现条件判断",
+            "answer": "Switch",
+            "options": [
+              "Switch",
+              "Function",
+              "Change",
+              "Inject"
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "edge_gateway",
+            "node_red_flow"
+          ]
+        },
+        {
+          "id": "4-2",
+          "title": "滑动均值计算",
+          "type": "sort",
+          "config": {
+            "items": [
+              "缓存10个数据到context",
+              "收到新数据时加入缓存",
+              "缓存满10个后计算平均值",
+              "输出平均值，其余return null"
+            ],
+            "answer": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "edge_arch",
+            "data_processing"
+          ]
+        },
+        {
+          "id": "4-3",
+          "title": "边缘计算驱动力排序",
+          "type": "sort",
+          "config": {
+            "items": [
+              "省：减少带宽成本",
+              "快：毫秒级响应",
+              "稳：断网也能本地运行",
+              "密：敏感数据不出厂"
+            ],
+            "answer": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "edge_arch"
+          ]
+        },
+        {
+          "id": "4-4",
+          "title": "理解数据筛选效果",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "滑动均值后，数据量减少了约____%",
+            "answer": "85",
+            "options": [
+              "50",
+              "75",
+              "85",
+              "99"
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "data_model",
+            "edge_arch"
+          ]
+        },
+        {
+          "id": "4-5",
+          "title": "OpenPLC安装与配置",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "OpenPLC 是什么",
+                "narrative": "厂长：OpenPLC 是开源的「软 PLC」——把 PLC 的逻辑控制功能做成软件，跑在普通 PC 或边缘设备上，成本低、能定制。",
+                "question": "OpenPLC 是什么？",
+                "options": [
+                  {
+                    "text": "开源软 PLC（PLC 功能做成软件）",
+                    "correct": true,
+                    "hint": "软 PLC = 用软件实现 PLC 逻辑控制"
+                  },
+                  {
+                    "text": "一台实体 PLC 硬件",
+                    "correct": false,
+                    "hint": "实体 PLC 是硬件盒子，OpenPLC 是软件"
+                  },
+                  {
+                    "text": "一个数据库",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "一个网页框架",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "安装方式",
+                "narrative": "厂长：OpenPLC 从源码编译安装——先装依赖（gcc/make/git 等），再编译，最后启动 Web 界面。",
+                "question": "OpenPLC 的安装方式是？",
+                "options": [
+                  {
+                    "text": "装依赖 → 源码编译 → 启动 Web 界面",
+                    "correct": true,
+                    "hint": "从源码编译安装"
+                  },
+                  {
+                    "text": "apt 一键装好",
+                    "correct": false,
+                    "hint": "OpenPLC 需要编译，不是 apt 直接装"
+                  },
+                  {
+                    "text": "Docker 拉镜像",
+                    "correct": false,
+                    "hint": "可以但默认是编译"
+                  },
+                  {
+                    "text": "图形界面拖拽",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "Web 界面",
+                "narrative": "厂长：OpenPLC 装好后，浏览器访问它的 Web 界面（默认 8080 端口）就能配置 PLC 程序。",
+                "question": "OpenPLC 的 Web 界面默认端口是？",
+                "options": [
+                  {
+                    "text": "8080",
+                    "correct": true,
+                    "hint": "浏览器访问 http://本机IP:8080 进入配置界面"
+                  },
+                  {
+                    "text": "1880",
+                    "correct": false,
+                    "hint": "1880 是 Node-RED"
+                  },
+                  {
+                    "text": "3000",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "22",
+                    "correct": false,
+                    "hint": "22 是 SSH"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：启动 OpenPLC",
+                "narrative": "厂长：动手。用 systemctl 启动 OpenPLC 服务。",
+                "question": "在终端输入命令，启动 OpenPLC 服务：",
+                "inputType": "command",
+                "correctCommand": "sudo systemctl start openplc",
+                "aliases": [
+                  "systemctl start openplc",
+                  "sudo systemctl start openplc.service"
+                ],
+                "outputLines": [
+                  {
+                    "text": "● openplc.service - OpenPLC Runtime",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "     Active: active (running)",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "     Main PID: 5321 (openplc)",
+                    "color": "",
+                    "delay": 300
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ OpenPLC 服务已启动！浏览器访问 8080 端口进入配置界面。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "device_onboard",
+            "plc"
+          ]
+        },
+        {
+          "id": "4-6",
+          "title": "回顾反思",
+          "type": "quiz",
+          "config": {
+            "question": "软PLC(SoftPLC)不能完全替代硬PLC的是哪类功能？",
+            "options": [
+              "逻辑控制",
+              "安全功能（急停）",
+              "数据采集",
+              "运动控制"
+            ],
+            "answer": 1
+          },
+          "xp": 50,
+          "tags": [
+            "plc",
+            "safety"
+          ]
+        },
+        {
+          "id": "4-hidden",
+          "title": "🌶 全量vs筛选数据量对比",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "运行2分钟，全量数据约120条，筛选后约____条",
+            "answer": "18",
+            "options": [
+              "18",
+              "100",
+              "85",
+              "50"
+            ]
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "data_model",
+            "edge_arch"
+          ]
+        },
+        {
+          "id": "4-7",
+          "title": "边缘设备状态检查",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "systemctl status 看什么",
+                "narrative": "厂长：systemctl status 服务名 查看系统服务的运行状态——是否运行、占多少内存、跑了多久。",
+                "question": "systemctl status 命令用来？",
+                "options": [
+                  {
+                    "text": "查看系统服务的运行状态",
+                    "correct": true,
+                    "hint": "systemctl status 服务名 看状态"
+                  },
+                  {
+                    "text": "安装服务",
+                    "correct": false,
+                    "hint": "装服务用 apt/install"
+                  },
+                  {
+                    "text": "重启电脑",
+                    "correct": false,
+                    "hint": "重启用 reboot"
+                  },
+                  {
+                    "text": "查看日志",
+                    "correct": false,
+                    "hint": "看日志用 journalctl"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：查边缘服务状态",
+                "narrative": "厂长：动手。查看边缘服务 edge-service 的运行状态。",
+                "question": "在终端输入命令，查看边缘服务状态：",
+                "inputType": "command",
+                "correctCommand": "systemctl status edge-service",
+                "aliases": [
+                  "sudo systemctl status edge-service",
+                  "edge-service status"
+                ],
+                "outputLines": [
+                  {
+                    "text": "● edge-service.service - Edge Computing Service",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "     Loaded: loaded (/lib/systemd/system/edge-service.service; enabled)",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "     Active: active (running) since Mon 2026-07-20 09:15:23 CST",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "   Main PID: 3421 (edge-service)",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "      Tasks: 12",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "     Memory: 128.7M",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：边缘服务正常运行中！",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 边缘服务正常运行中！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "edge_gateway",
+            "fault_diag"
+          ]
+        },
+        {
+          "id": "4-8",
+          "title": "边缘计算 vs 云计算",
+          "type": "quiz",
+          "config": {
+            "question": "以下哪个场景最适合用边缘计算？",
+            "options": [
+              "企业ERP报表",
+              "毫秒级设备控制",
+              "视频监控录像",
+              "历史数据长期存档"
+            ],
+            "answer": 1
+          },
+          "xp": 50,
+          "tags": [
+            "edge_arch"
+          ]
+        },
+        {
+          "id": "4-9",
+          "title": "⚔️ Boss战：数据风暴来袭",
+          "type": "boss_fight",
+          "config": {
+            "bossName": "数据风暴",
+            "bossEmoji": "🌪️",
+            "phases": [
+              {
+                "name": "发现异常",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "网络流量突然飙升 500%，最先该查什么？",
+                    "options": [
+                      "检查哪个设备数据量异常",
+                      "直接重启核心交换机",
+                      "关掉所有设备",
+                      "通知全厂停工"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "定位源头",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "发现某个传感器每秒发 1000 条数据，问题在哪？",
+                    "options": [
+                      "传感器采样频率配置错误",
+                      "网络带宽不够",
+                      "服务器性能不足",
+                      "交换机端口故障"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "如何减少这个传感器的数据量？",
+                    "options": [
+                      "降低采样频率+边缘均值滤波",
+                      "拔掉网线",
+                      "格式化传感器",
+                      "升级到万兆网络"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "优化",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "边缘均值滤波后，数据量减少约多少？",
+                    "options": [
+                      "85%",
+                      "10%",
+                      "50%",
+                      "0%"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "数据风暴平息后，长效机制是什么？",
+                    "options": [
+                      "每个设备设置数据上限+监控告警",
+                      "永久关停这个传感器",
+                      "换一个更快的 CPU",
+                      "加一根光纤"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "fault_diag",
+            "edge_arch",
+            "data_model"
+          ]
+        },
+        {
+          "id": "4-10",
+          "title": "边缘计算三要素",
+          "type": "sort",
+          "config": {
+            "items": [
+              "数据采集（感知层）",
+              "数据处理（计算层）",
+              "数据上传（网络层）"
+            ],
+            "answer": [
+              0,
+              1,
+              2
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "edge_arch"
+          ]
+        },
+        {
+          "id": "4-11",
+          "title": "报警阈值配置策略",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "设置温度报警阈值时，正常范围 0-80℃，____℃ 触发预警比较合理",
+            "answer": "65",
+            "options": [
+              "85",
+              "100",
+              "65",
+              "80"
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "data_model",
+            "fault_diag"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "登上云端",
+      "factoryArea": "cloud_platform",
+      "areaName": "云平台",
+      "areaIcon": "☁️",
+      "color": "#2196f3",
+      "narrative": {
+        "intro": "边缘处理搞定了，但软件部署还是一团乱——每次更新都要跑遍全厂 50 台机器。厂长说：\"把应用打包成集装箱，送到云端统一管。\"上级给了你一台 Docker 主机和整个下午。",
+        "complete": "docker ps 显示全绿。你的应用像集装箱一样到处可以运行。现在解部署新版本只需要推送一个镜像——从几小时变成了几十秒。"
+      },
+      "tasks": [
+        {
+          "id": "5-0",
+          "title": "安装Docker",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "Docker 是什么",
+                "narrative": "厂长：Docker 是容器化工具——把应用连同环境打包成「集装箱」（镜像），一处构建、处处运行。比虚拟机更轻。",
+                "question": "Docker 是做什么的？",
+                "options": [
+                  {
+                    "text": "容器化——把应用和环境打包运行",
+                    "correct": true,
+                    "hint": "Docker 用容器打包应用，轻量可移植"
+                  },
+                  {
+                    "text": "数据库",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "防火墙",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "编程语言",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "怎么装",
+                "narrative": "厂长：Docker 用官方一键脚本安装（curl 下载执行），装完要重启会话让权限生效。",
+                "question": "安装 Docker 官方推荐的方式是？",
+                "options": [
+                  {
+                    "text": "官方安装脚本（curl 下载执行）",
+                    "correct": true,
+                    "hint": "get.docker.com 官方脚本一键装"
+                  },
+                  {
+                    "text": "从应用商店下载",
+                    "correct": false,
+                    "hint": "服务器一般用脚本装"
+                  },
+                  {
+                    "text": "源码编译",
+                    "correct": false,
+                    "hint": "没必要编译"
+                  },
+                  {
+                    "text": "复制文件",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：验证 Docker",
+                "narrative": "厂长：装好了。输入命令验证 Docker 版本，确认安装成功。",
+                "question": "在终端输入命令，查看 Docker 版本：",
+                "inputType": "command",
+                "correctCommand": "docker --version",
+                "aliases": [
+                  "docker version"
+                ],
+                "outputLines": [
+                  {
+                    "text": "Docker version 27.3.1, build 41ea5ea",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ Docker 装好了！下一关就可以跑容器了。"
+              }
+            ]
+          },
+          "xp": 0,
+          "auto": true,
+          "tags": [
+            "docker_deploy",
+            "package_mgmt"
+          ]
+        },
+        {
+          "id": "5-1",
+          "title": "运行Hello World容器",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "docker run 干什么",
+                "narrative": "厂长：docker run 镜像名 会从镜像创建并运行一个容器。第一次会先从 Docker Hub 拉取镜像。",
+                "question": "docker run hello-world 会？",
+                "options": [
+                  {
+                    "text": "拉取镜像并运行一个容器",
+                    "correct": true,
+                    "hint": "docker run = 拉镜像 + 建容器 + 运行"
+                  },
+                  {
+                    "text": "删除容器",
+                    "correct": false,
+                    "hint": "删除用 docker rm"
+                  },
+                  {
+                    "text": "查看容器",
+                    "correct": false,
+                    "hint": "查看用 docker ps"
+                  },
+                  {
+                    "text": "构建镜像",
+                    "correct": false,
+                    "hint": "构建用 docker build"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：跑 hello-world",
+                "narrative": "厂长：动手。运行 hello-world 容器，验证 Docker 装好了。",
+                "question": "在终端输入命令，运行 hello-world 容器：",
+                "inputType": "command",
+                "correctCommand": "docker run hello-world",
+                "aliases": [],
+                "outputLines": [
+                  {
+                    "text": "Unable to find image 'hello-world:latest' locally",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "latest: Pulling from library/hello-world",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Digest: sha256:a26bff933ddc26d5cdf2f16ad5fc6dc37f1cbfd7c1c6c33cfb614be3eafe13b1",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Status: Downloaded newer image for hello-world:latest",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Hello from Docker!",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "This message shows that your installation appears to be working correctly.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "To generate this message, Docker took the following steps:",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 1. The Docker client contacted the Docker daemon.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 2. The Docker daemon pulled the \"hello-world\" image from the Docker Hub.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": " 3. The Docker daemon created a new container from that image which runs the executable that produces the output you are currently reading.",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：Docker 跑起来了！从拉镜像到启动容器，就这么一条命令。记住，镜像中心叫 Docker Hub。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ Hello from Docker！你的安装正常。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "docker_deploy"
+          ]
+        },
+        {
+          "id": "5-2",
+          "title": "运行Nginx网页服务器",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "docker run -d --name mynginx -p ____:80 nginx",
+            "answer": "8080",
+            "options": [
+              "3000",
+              "8080",
+              "80",
+              "1880"
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "docker_deploy",
+            "network_port"
+          ]
+        },
+        {
+          "id": "5-3",
+          "title": "Docker命令匹配",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "docker ps",
+                "match": "查看运行中的容器"
+              },
+              {
+                "item": "docker stop",
+                "match": "停止容器"
+              },
+              {
+                "item": "docker rm",
+                "match": "删除容器"
+              },
+              {
+                "item": "docker pull",
+                "match": "下载镜像"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "docker_deploy"
+          ]
+        },
+        {
+          "id": "5-4",
+          "title": "用Docker运行Node-RED",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "Docker版Node-RED使用端口____区别于原生的1880",
+            "answer": "1881",
+            "options": [
+              "1880",
+              "1881",
+              "3000",
+              "8080"
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "docker_deploy",
+            "node_red_flow"
+          ]
+        },
+        {
+          "id": "5-5",
+          "title": "Docker vs 虚拟机对比",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "启动时间",
+                "match": "Docker:秒级/VM:分钟级"
+              },
+              {
+                "item": "磁盘占用",
+                "match": "Docker:MB级/VM:GB级"
+              },
+              {
+                "item": "内核隔离",
+                "match": "Docker:共享内核/VM:独立内核"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "docker_deploy",
+            "vm_vs_container"
+          ]
+        },
+        {
+          "id": "5-6",
+          "title": "回顾反思",
+          "type": "quiz",
+          "config": {
+            "question": "Docker容器删除后数据丢失，如何持久化？",
+            "options": [
+              "用docker export",
+              "用docker commit",
+              "重启容器",
+              "挂载数据卷(-v)"
+            ],
+            "answer": 3
+          },
+          "xp": 50,
+          "tags": [
+            "docker_deploy",
+            "storage"
+          ]
+        },
+        {
+          "id": "5-hidden",
+          "title": "🌶 双开原生vs容器对比",
+          "type": "sort",
+          "config": {
+            "items": [
+              "原生Node-RED(1880)",
+              "Docker Node-RED(1881)",
+              "对比安装方式",
+              "对比隔离性",
+              "对比数据持久化"
+            ],
+            "answer": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "docker_deploy",
+            "edge_arch"
+          ]
+        },
+        {
+          "id": "5-7",
+          "title": "查看运行中的容器",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "docker ps 看什么",
+                "narrative": "厂长：docker ps 列出当前运行中的容器——ID、镜像、状态、端口映射都在这。",
+                "question": "docker ps 用来？",
+                "options": [
+                  {
+                    "text": "查看运行中的容器",
+                    "correct": true,
+                    "hint": "docker ps = process status 运行中的容器"
+                  },
+                  {
+                    "text": "停止容器",
+                    "correct": false,
+                    "hint": "停止用 docker stop"
+                  },
+                  {
+                    "text": "删除镜像",
+                    "correct": false,
+                    "hint": "删除镜像用 docker rmi"
+                  },
+                  {
+                    "text": "拉取镜像",
+                    "correct": false,
+                    "hint": "拉取用 docker pull"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：看容器",
+                "narrative": "厂长：动手。查看当前运行中的 Docker 容器。",
+                "question": "在终端输入命令，查看运行中的容器：",
+                "inputType": "command",
+                "correctCommand": "docker ps",
+                "aliases": [
+                  "docker container ls"
+                ],
+                "outputLines": [
+                  {
+                    "text": "CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS                    NAMES",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "e3a7b2c9d1f0   nginx     \"/docker-entrypoint.…\"   5 minutes ago   Up 5 minutes   0.0.0.0:8080->80/tcp   mynginx",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：mynginx 容器正在运行，端口映射 8080→80。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ mynginx 容器正在运行，端口 8080→80。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "docker_deploy",
+            "monitor"
+          ]
+        },
+        {
+          "id": "5-8",
+          "title": "容器网络模式",
+          "type": "quiz",
+          "config": {
+            "question": "Docker 默认的网络模式是什么？",
+            "options": [
+              "overlay（覆盖）",
+              "none（无网络）",
+              "host（主机）",
+              "bridge（桥接）"
+            ],
+            "answer": 3
+          },
+          "xp": 50,
+          "tags": [
+            "docker_deploy",
+            "network_mode"
+          ]
+        },
+        {
+          "id": "5-9",
+          "title": "⚔️ Boss战：容器集体宕机",
+          "type": "boss_fight",
+          "config": {
+            "bossName": "容器集群崩溃",
+            "bossEmoji": "💥",
+            "phases": [
+              {
+                "name": "应急",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "所有容器同时停止响应，第一件事做什么？",
+                    "options": [
+                      "检查 Docker 守护进程是否运行",
+                      "一个一个重启容器",
+                      "重装 Docker",
+                      "删除所有镜像"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "排查",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "docker ps 显示为空，怎么查看所有容器（含已停止的）？",
+                    "options": [
+                      "docker ps -a",
+                      "docker ps -l",
+                      "docker ps -q",
+                      "docker ps -s"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "发现资源耗尽，哪个命令查看容器资源占用？",
+                    "options": [
+                      "docker stats",
+                      "docker top",
+                      "docker logs",
+                      "docker inspect"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "恢复",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "容器日志占满了磁盘，怎么清理？",
+                    "options": [
+                      "docker system prune",
+                      "rm -rf /var/log",
+                      "docker rmi --all",
+                      "format硬盘"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "防止再次崩溃的长效机制是什么？",
+                    "options": [
+                      "限制每个容器的内存+CPU上限",
+                      "买更大的硬盘",
+                      "每天手动重启",
+                      "关掉监控"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "docker_deploy",
+            "fault_diag"
+          ]
+        },
+        {
+          "id": "5-10",
+          "title": "Docker Compose多容器编排",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "Docker Compose 的配置文件默认名为____",
+            "answer": "docker-compose.yml",
+            "options": [
+              "Dockerfile",
+              "docker.config",
+              "docker-compose.yml",
+              "compose.json"
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "docker_deploy",
+            "orchestration"
+          ]
+        },
+        {
+          "id": "5-11",
+          "title": "镜像构建优化",
+          "type": "quiz",
+          "config": {
+            "question": "减少 Docker 镜像体积，最有效的方法是什么？",
+            "options": [
+              "用最新的 Ubuntu",
+              "用更大的硬盘",
+              "使用 Alpine 基础镜像",
+              "装更多软件包"
+            ],
+            "answer": 2
+          },
+          "xp": 50,
+          "tags": [
+            "docker_deploy",
+            "optimization"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "搭建你的驾驶舱",
+      "factoryArea": "big_screen",
+      "areaName": "监控大屏",
+      "areaIcon": "📊",
+      "color": "#e040fb",
+      "narrative": {
+        "intro": "所有数据都在后台跑，厂长只能靠纸质报表了解车间状态。他今天走进中控室说：\"给这面空墙配大屏。所有关键数据必须一眼看懂——不然厂房线出问题我不会看到，你也不会。\"",
+        "complete": "大屏亮起。温度曲线缓缓波动、振动峰值清晰、报警点标红。厂长靠在椅背上：\"现在我能一眼看出工厂在呼吸。\"这是你带给工厂的第一面镜子。"
+      },
+      "tasks": [
+        {
+          "id": "6-0",
+          "title": "安装Dashboard插件",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "Dashboard 插件是什么",
+                "narrative": "厂长：Node-RED Dashboard 插件给数据加上可视化界面——仪表盘（Gauge）、趋势图（Chart）、按钮、报警都能拖出来。",
+                "question": "Node-RED Dashboard 用来？",
+                "options": [
+                  {
+                    "text": "给数据做可视化界面（仪表盘/图表/按钮）",
+                    "correct": true,
+                    "hint": "Dashboard = 监控大屏插件"
+                  },
+                  {
+                    "text": "连接数据库",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "管理用户",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "编译代码",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "怎么安装",
+                "narrative": "厂长：在 Node-RED 右上角菜单打开「管理面板」，在「安装」里搜索 node-red-dashboard，点安装。",
+                "question": "安装 Dashboard 插件的方式是？",
+                "options": [
+                  {
+                    "text": "Node-RED 管理面板搜索 node-red-dashboard 安装",
+                    "correct": true,
+                    "hint": "管理面板 → 安装 → 搜 node-red-dashboard"
+                  },
+                  {
+                    "text": "浏览器插件市场",
+                    "correct": false,
+                    "hint": "是 Node-RED 的插件不是浏览器插件"
+                  },
+                  {
+                    "text": "apt 安装",
+                    "correct": false,
+                    "hint": "Node-RED 插件用节点管理面板装"
+                  },
+                  {
+                    "text": "手动复制文件",
+                    "correct": false,
+                    "hint": "用管理面板最方便"
+                  }
+                ]
+              },
+              {
+                "title": "安装后怎么用",
+                "narrative": "厂长：装好后左侧节点面板会出现 ui 开头的节点（ui_gauge、ui_chart 等），拖到画布就能用。",
+                "question": "安装成功后，怎么找到 Dashboard 节点？",
+                "options": [
+                  {
+                    "text": "左侧节点面板出现 ui 开头的节点",
+                    "correct": true,
+                    "hint": "ui_gauge/ui_chart/ui_button 等"
+                  },
+                  {
+                    "text": "重启电脑才有",
+                    "correct": false,
+                    "hint": "装完刷新即可"
+                  },
+                  {
+                    "text": "要去官网下载",
+                    "correct": false,
+                    "hint": "管理面板已装好"
+                  },
+                  {
+                    "text": "没有节点",
+                    "correct": false,
+                    "hint": "装好就有"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 0,
+          "auto": true,
+          "tags": [
+            "node_red_flow",
+            "dashboard"
+          ]
+        },
+        {
+          "id": "6-1",
+          "title": "认识Dashboard三原则",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "操作员3秒看懂",
+                "match": "一目了然"
+              },
+              {
+                "item": "只显示关键指标",
+                "match": "重点突出"
+              },
+              {
+                "item": "报警后直接操作",
+                "match": "可操作"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "dashboard",
+            "ux_design"
+          ]
+        },
+        {
+          "id": "6-2",
+          "title": "Dashboard布局结构排序",
+          "type": "sort",
+          "config": {
+            "items": [
+              "Tab（页面）",
+              "Group（卡片组）",
+              "Widget（仪表盘）"
+            ],
+            "answer": [
+              0,
+              1,
+              2
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "dashboard",
+            "layout"
+          ]
+        },
+        {
+          "id": "6-3",
+          "title": "配置温度仪表盘(Gauge)",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "Gauge节点的颜色分段，绿色表示____",
+            "answer": "正常",
+            "options": [
+              "正常",
+              "报警",
+              "预警",
+              "关闭"
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "dashboard",
+            "visualization"
+          ]
+        },
+        {
+          "id": "6-4",
+          "title": "搭建双线趋势图(Chart)",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "Chart节点显示两条曲线，需要用____字段区分",
+            "answer": "topic",
+            "options": [
+              "name",
+              "topic",
+              "url",
+              "payload"
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "dashboard",
+            "timeseries_db"
+          ]
+        },
+        {
+          "id": "6-5",
+          "title": "配置报警通知(Notification)",
+          "type": "diagnosis_tree",
+          "config": {
+            "scenario": "Notification一直没有弹出",
+            "steps": [
+              {
+                "question": "先检查什么？",
+                "options": [
+                  "网络连接",
+                  "Notification节点配置",
+                  "Switch阈值是否触发"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "数据值85℃，阈值设了80℃，应该触发吗？",
+                "options": [
+                  "应该",
+                  "不应该"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "如果阈值触发但没弹窗，检查？",
+                "options": [
+                  "Notification的level",
+                  "Gauge的颜色",
+                  "Chart的时间范围"
+                ],
+                "correct": 0
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "dashboard",
+            "fault_diag",
+            "alerting"
+          ]
+        },
+        {
+          "id": "6-6",
+          "title": "回顾反思",
+          "type": "quiz",
+          "config": {
+            "question": "Dashboard三原则中，你认为哪条最重要？",
+            "options": [
+              "重点突出",
+              "都重要",
+              "一目了然",
+              "可操作"
+            ],
+            "answer": 1
+          },
+          "xp": 50,
+          "tags": [
+            "data_model"
+          ]
+        },
+        {
+          "id": "6-hidden",
+          "title": "🌶 三屏联动（温度/振动/报警）",
+          "type": "code_review",
+          "config": {
+            "code": "[\\n  {topic:'温度', payload:75.3},\\n  {topic:'振动', payload:2.1}\\n]",
+            "question": "这段数据送到Chart后会出现？",
+            "options": [
+              "报错",
+              "空白",
+              "两条曲线",
+              "一条曲线"
+            ],
+            "answer": 2
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "data_model",
+            "timeseries_db",
+            "node_red_flow"
+          ]
+        },
+        {
+          "id": "6-7",
+          "title": "实时数据监控",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "curl -s 干什么",
+                "narrative": "厂长：curl 是命令行浏览器。-s 是静默模式（不显示进度条）。curl -s 网址 把网页内容抓下来。",
+                "question": "curl -s 后面的 -s 表示？",
+                "options": [
+                  {
+                    "text": "静默模式（不显示进度条）",
+                    "correct": true,
+                    "hint": "-s = silent 静默"
+                  },
+                  {
+                    "text": "发 s 个请求",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "用 ssl",
+                    "correct": false,
+                    "hint": "https 用 -k 或自动"
+                  },
+                  {
+                    "text": "保存文件",
+                    "correct": false,
+                    "hint": "保存用 -o"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：看 Dashboard",
+                "narrative": "厂长：动手。用 curl 查看本机 Node-RED 的监控大屏页面内容。",
+                "question": "在终端输入命令，抓取 Dashboard 页面：",
+                "inputType": "command",
+                "correctCommand": "curl -s http://localhost:1880/ui/dashboard | head -20",
+                "aliases": [
+                  "curl -s http://localhost:1880/ui/dashboard"
+                ],
+                "outputLines": [
+                  {
+                    "text": "<!DOCTYPE html>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "<html>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "<head>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "  <title>锐智工厂 · 监控大屏</title>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "</head>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "<body>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "  <h1>🏭 锐智工厂实时监控</h1>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "  <div>🌡️ 温度: 75.3℃</div>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "  <div>📳 振动: 2.1mm/s</div>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "</body>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "</html>",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：Dashboard 正常运行，数据实时刷新！",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ Dashboard 正常运行，数据实时刷新！"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "data_model",
+            "timeseries_db"
+          ]
+        },
+        {
+          "id": "6-8",
+          "title": "理解数据刷新机制",
+          "type": "quiz",
+          "config": {
+            "question": "Node-RED Dashboard 的数据刷新机制是什么？",
+            "options": [
+              "页面定时刷新（轮询）",
+              "WebSocket 实时推送",
+              "SSE 单向推送",
+              "用户手动刷新"
+            ],
+            "answer": 1
+          },
+          "xp": 50,
+          "tags": [
+            "timeseries_db",
+            "node_red_flow"
+          ]
+        },
+        {
+          "id": "6-9",
+          "title": "⚔️ Boss战：监控大屏黑屏",
+          "type": "boss_fight",
+          "config": {
+            "bossName": "监控大屏黑屏",
+            "bossEmoji": "📺",
+            "phases": [
+              {
+                "name": "诊断",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "Dashboard 页面显示空白，先查什么？",
+                    "options": [
+                      "检查 Node-RED 是否运行",
+                      "检查显示器电源",
+                      "换一根 HDMI 线",
+                      "重装浏览器"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "排查",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "Node-RED 正常运行但 Dashboard 没数据，查什么？",
+                    "options": [
+                      "检查 Flow 是否部署了",
+                      "重启 Node-RED 服务",
+                      "重装 Dashboard 插件",
+                      "换个端口"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "Flow 已部署但数据不更新，可能是什么问题？",
+                    "options": [
+                      "WebSocket 连接断开",
+                      "浏览器版本太旧",
+                      "服务器磁盘满了",
+                      "CPU 使用率 100%"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "修复",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "WebSocket 断开，怎么确认？",
+                    "options": [
+                      "打开浏览器开发者工具看 WebSocket 状态",
+                      "ping 服务器",
+                      "用 curl 测试 HTTP",
+                      "查看系统日志"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "确保大屏长期稳定，最佳方案是什么？",
+                    "options": [
+                      "加一个看门狗自动重启 Node-RED",
+                      "每天手动刷新页面",
+                      "用物理大屏代替网页",
+                      "关掉自动更新"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "fault_diag",
+            "timeseries_db",
+            "edge_arch"
+          ]
+        },
+        {
+          "id": "6-10",
+          "title": "Dashboard配色心理学",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "监控大屏上____色通常表示危险/报警",
+            "answer": "红",
+            "options": [
+              "绿",
+              "红",
+              "蓝",
+              "黄"
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "data_model"
+          ]
+        },
+        {
+          "id": "6-11",
+          "title": "多屏联动架构设计",
+          "type": "sort",
+          "config": {
+            "items": [
+              "车间现场屏（实时数据）",
+              "中控室屏（综合概览）",
+              "厂长办公室屏（KPI报表）"
+            ],
+            "answer": [
+              0,
+              1,
+              2
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "edge_arch",
+            "node_red_flow"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "数据大贯通",
+      "factoryArea": "data_pipe",
+      "areaName": "数据管道",
+      "areaIcon": "🔗",
+      "color": "#ff9800",
+      "narrative": {
+        "intro": "前六章你搭建了一座能稳定运行的数字工厂。但数据流动路径你还没亲手接过。今天的任务是把从传感器到屏幕的全部路径串起来——像拼好工厂的神经系统。一刻钟后厂长来验收。",
+        "complete": "校长站在大屏前面，看着数据沿链路的每一块流过。他对你说：\"从传感器里脉冲到你写的MQTT再到Dashboard上那条曲线——你用一整天画完了这座工厂的神经系统。\""
+      },
+      "tasks": [
+        {
+          "id": "7-0",
+          "title": "安装Mosquitto",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "Mosquitto 是什么",
+                "narrative": "厂长：Mosquitto 是开源的 MQTT Broker（消息中转站）——设备把消息发到它，订阅者从它拿消息，实现发布-订阅解耦。",
+                "question": "Mosquitto 是？",
+                "options": [
+                  {
+                    "text": "MQTT Broker（消息中转站）",
+                    "correct": true,
+                    "hint": "Mosquitto = MQTT 服务器/消息代理"
+                  },
+                  {
+                    "text": "数据库",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "网页服务器",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "容器工具",
+                    "correct": false,
+                    "hint": "Docker 才是"
+                  }
+                ]
+              },
+              {
+                "title": "怎么安装",
+                "narrative": "厂长：Mosquitto 用 apt 装：sudo apt install mosquitto mosquitto-clients。mosquitto 是服务端，mosquitto-clients 是发布/订阅命令行工具。",
+                "question": "安装 Mosquitto（含命令行工具）的命令是？",
+                "options": [
+                  {
+                    "text": "sudo apt install mosquitto mosquitto-clients",
+                    "correct": true,
+                    "hint": "两个包：服务端 + 客户端工具"
+                  },
+                  {
+                    "text": "sudo apt install mosquitto",
+                    "correct": false,
+                    "hint": "只装服务端，没有命令行工具"
+                  },
+                  {
+                    "text": "pip install mosquitto",
+                    "correct": false,
+                    "hint": "不是 Python 包"
+                  },
+                  {
+                    "text": "npm install mosquitto",
+                    "correct": false,
+                    "hint": "不是 npm 包"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：安装 Mosquitto",
+                "narrative": "厂长：动手。用 apt 安装 Mosquitto 服务端和客户端工具。",
+                "question": "在终端输入命令，安装 Mosquitto：",
+                "inputType": "command",
+                "correctCommand": "sudo apt install mosquitto mosquitto-clients",
+                "aliases": [
+                  "apt install mosquitto mosquitto-clients",
+                  "sudo apt install -y mosquitto mosquitto-clients"
+                ],
+                "outputLines": [
+                  {
+                    "text": "Reading package lists... Done",
+                    "color": "dim",
+                    "delay": 300
+                  },
+                  {
+                    "text": "Setting up mosquitto (2.0.18-0ubuntu1) ...",
+                    "color": "",
+                    "delay": 400
+                  },
+                  {
+                    "text": "Setting up mosquitto-clients (2.0.18-0ubuntu1) ...",
+                    "color": "",
+                    "delay": 400
+                  },
+                  {
+                    "text": "Mosquitto Broker 已安装并启动。",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ Mosquitto Broker 装好并启动了！"
+              }
+            ]
+          },
+          "xp": 0,
+          "auto": true,
+          "tags": [
+            "mqtt",
+            "apt_basic"
+          ]
+        },
+        {
+          "id": "7-1",
+          "title": "MQTT发布-订阅初体验",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "mosquitto_sub 干什么",
+                "narrative": "厂长：mosquitto_sub 是 MQTT 的订阅命令——订阅某个主题，等消息来。",
+                "question": "mosquitto_sub 用来？",
+                "options": [
+                  {
+                    "text": "订阅主题，等待接收消息",
+                    "correct": true,
+                    "hint": "sub = subscribe 订阅"
+                  },
+                  {
+                    "text": "发布消息",
+                    "correct": false,
+                    "hint": "发布用 mosquitto_pub"
+                  },
+                  {
+                    "text": "启动 Broker",
+                    "correct": false,
+                    "hint": "启动 Broker 用 mosquitto -d"
+                  },
+                  {
+                    "text": "删除主题",
+                    "correct": false,
+                    "hint": "没有删除主题命令"
+                  }
+                ]
+              },
+              {
+                "title": "-h 和 -t 参数",
+                "narrative": "厂长：-h 指定 Broker 主机（localhost），-t 指定订阅的主题（factory/temp）。",
+                "question": "mosquitto_sub -h localhost -t factory/temp 里的 -t 表示？",
+                "options": [
+                  {
+                    "text": "订阅的主题",
+                    "correct": true,
+                    "hint": "-t = topic 主题"
+                  },
+                  {
+                    "text": "主机",
+                    "correct": false,
+                    "hint": "-h 才是主机"
+                  },
+                  {
+                    "text": "端口",
+                    "correct": false,
+                    "hint": "端口用 -p"
+                  },
+                  {
+                    "text": "消息内容",
+                    "correct": false,
+                    "hint": "消息内容用 -m"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：订阅主题",
+                "narrative": "厂长：动手。订阅 factory/temp 主题，等着接收温度数据。",
+                "question": "在终端输入命令，订阅 factory/temp 主题：",
+                "inputType": "command",
+                "correctCommand": "mosquitto_sub -h localhost -t factory/temp",
+                "aliases": [
+                  "mosquitto_sub -h localhost -t 'factory/temp'"
+                ],
+                "outputLines": [
+                  {
+                    "text": "(等待消息...)",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "✅ 已成功订阅 factory/temp 主题，正在等待消息…",
+                    "color": "green",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：订阅端就绪！按 Ctrl+C 可退出。现在它默默等着，只要有设备往 factory/temp 发消息，你就能收到。这就是 MQTT 的\"发布-订阅\"模式的订阅端。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 订阅端就绪，正在等待消息…"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "mqtt",
+            "pub_sub"
+          ]
+        },
+        {
+          "id": "7-2",
+          "title": "理解Topic通配符",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "factory/+/temp",
+                "match": "匹配任意车间温度"
+              },
+              {
+                "item": "factory/#",
+                "match": "匹配factory下所有主题"
+              },
+              {
+                "item": "factory/workshop1/temp",
+                "match": "精确匹配1号车间"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "mqtt",
+            "topic_pattern"
+          ]
+        },
+        {
+          "id": "7-3",
+          "title": "工业大数据4V匹配",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "每秒1000个振动采样",
+                "match": "Velocity"
+              },
+              {
+                "item": "500GB/天的数据量",
+                "match": "Volume"
+              },
+              {
+                "item": "波形/频谱/图像混合",
+                "match": "Variety"
+              },
+              {
+                "item": "0.01%数据包含故障信号",
+                "match": "Value"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "big_data",
+            "4V"
+          ]
+        },
+        {
+          "id": "7-4",
+          "title": "搭建MQTT传感器→Dashboard全链路",
+          "type": "sort",
+          "config": {
+            "items": [
+              "传感器模拟(Inject+Function)",
+              "MQTT发布节点(mqtt out)",
+              "Mosquitto Broker",
+              "MQTT订阅节点(mqtt in)",
+              "Dashboard显示"
+            ],
+            "answer": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "mqtt",
+            "node_red_flow",
+            "dashboard"
+          ]
+        },
+        {
+          "id": "7-5",
+          "title": "理解发布者-订阅者解耦",
+          "type": "quiz",
+          "config": {
+            "question": "禁用订阅Flow 30秒后重新启用，数据会怎样？",
+            "options": [
+              "丢失的数据补发过来",
+              "Broker会缓存所有数据",
+              "中间的数据就丢失了",
+              "订阅者自动重连"
+            ],
+            "answer": 2
+          },
+          "xp": 100,
+          "tags": [
+            "mqtt",
+            "qos_reliability"
+          ]
+        },
+        {
+          "id": "7-6",
+          "title": "回顾反思",
+          "type": "quiz",
+          "config": {
+            "question": "MQTT和Modbus最本质的区别是什么？",
+            "options": [
+              "一个快一个慢",
+              "一个开源一个商业",
+              "一请求-响应，一发布-订阅",
+              "一个无线一个有线"
+            ],
+            "answer": 2
+          },
+          "xp": 50,
+          "tags": [
+            "mqtt",
+            "protocol_compare"
+          ]
+        },
+        {
+          "id": "7-hidden",
+          "title": "🌶 断线重连30秒",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "MQTT中通知其他设备'本设备离线'的机制叫____",
+            "answer": "LWT",
+            "options": [
+              "Topic",
+              "Retained",
+              "QoS",
+              "LWT"
+            ]
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "mqtt",
+            "last_will"
+          ]
+        },
+        {
+          "id": "7-7",
+          "title": "MQTT发布消息实操",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "mosquitto_pub 干什么",
+                "narrative": "厂长：mosquitto_pub 是 MQTT 的发布命令——往某个主题发消息，订阅者立即收到。",
+                "question": "mosquitto_pub 用来？",
+                "options": [
+                  {
+                    "text": "发布消息到主题",
+                    "correct": true,
+                    "hint": "pub = publish 发布"
+                  },
+                  {
+                    "text": "订阅主题",
+                    "correct": false,
+                    "hint": "订阅用 mosquitto_sub"
+                  },
+                  {
+                    "text": "查看消息记录",
+                    "correct": false,
+                    "hint": "没有这个"
+                  },
+                  {
+                    "text": "删除消息",
+                    "correct": false,
+                    "hint": "MQTT 消息不删除"
+                  }
+                ]
+              },
+              {
+                "title": "-m 参数",
+                "narrative": "厂长：-m 指定要发布的消息内容。mosquitto_pub -h localhost -t factory/temp -m 75.3 就是把 75.3 发到 factory/temp 主题。",
+                "question": "mosquitto_pub ... -m 75.3 里的 -m 表示？",
+                "options": [
+                  {
+                    "text": "要发布的消息内容",
+                    "correct": true,
+                    "hint": "-m = message 消息"
+                  },
+                  {
+                    "text": "主题",
+                    "correct": false,
+                    "hint": "主题用 -t"
+                  },
+                  {
+                    "text": "主机",
+                    "correct": false,
+                    "hint": "主机用 -h"
+                  },
+                  {
+                    "text": "QoS 等级",
+                    "correct": false,
+                    "hint": "QoS 用 -q"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：发布温度",
+                "narrative": "厂长：动手。向 factory/temp 主题发布一条温度消息 75.3。",
+                "question": "在终端输入命令，发布温度 75.3 到 factory/temp：",
+                "inputType": "command",
+                "correctCommand": "mosquitto_pub -h localhost -t factory/temp -m 75.3",
+                "aliases": [
+                  "mosquitto_pub -h localhost -t factory/temp -m \"75.3\""
+                ],
+                "outputLines": [
+                  {
+                    "text": "（消息已发布，无输出表示成功）",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：消息发出去了！订阅端会立即收到这条消息。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ 消息发出去了！订阅端会立即收到。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "mqtt",
+            "pub_basic"
+          ]
+        },
+        {
+          "id": "7-8",
+          "title": "MQTT服务质量(QoS)",
+          "type": "quiz",
+          "config": {
+            "question": "MQTT QoS 2 表示什么？",
+            "options": [
+              "不保证送达",
+              "至少发送一次（可能重复）",
+              "最多发送一次（可能丢失）",
+              "精确发送一次（保序不重复）"
+            ],
+            "answer": 3
+          },
+          "xp": 50,
+          "tags": [
+            "mqtt",
+            "qos"
+          ]
+        },
+        {
+          "id": "7-9",
+          "title": "⚔️ Boss战：消息黑洞",
+          "type": "boss_fight",
+          "config": {
+            "bossName": "消息黑洞",
+            "bossEmoji": "🕳️",
+            "phases": [
+              {
+                "name": "发现",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "Dashboard 数据 5 分钟没更新了，最先排查什么？",
+                    "options": [
+                      "检查 MQTT Broker 是否运行",
+                      "重启大屏电脑",
+                      "拔插网线",
+                      "重装浏览器"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "定位",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "Broker 正常运行但没消息，查什么？",
+                    "options": [
+                      "mosquitto_sub 订阅看是否有消息",
+                      "检查传感器电源",
+                      "重启传感器",
+                      "重新部署 Flow"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "订阅不到消息，可能是什么原因？",
+                    "options": [
+                      "发布端崩溃导致没数据发出",
+                      "MQTT 版本不匹配",
+                      "Broker IP 变了",
+                      "防火墙阻挡 WebSocket"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "恢复",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "发现发布端进程挂了，怎么自动恢复？",
+                    "options": [
+                      "配置 systemd 自动重启服务",
+                      "写脚本每分钟检查一次",
+                      "让厂长手动重启",
+                      "换一个 Broker"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "如何监控消息链路是否健康？",
+                    "options": [
+                      "加一个心跳主题，订阅端定时检查",
+                      "每天手动查看一次",
+                      "相信设备不会出问题",
+                      "关掉报警"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "mqtt",
+            "fault_diag"
+          ]
+        },
+        {
+          "id": "7-10",
+          "title": "MQTT主题命名规范",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "MQTT 主题建议用____分隔层级，如 factory/workshop1/temp",
+            "answer": "/",
+            "options": [
+              "-",
+              ".",
+              "/",
+              "_"
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "mqtt",
+            "naming_convention"
+          ]
+        },
+        {
+          "id": "7-11",
+          "title": "数据链路安全三要素",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "传感器→Broker 传输加密",
+                "match": "TLS/SSL"
+              },
+              {
+                "item": "客户端连接需要身份验证",
+                "match": "用户名+密码"
+              },
+              {
+                "item": "确保数据不被篡改",
+                "match": "消息签名"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "mqtt",
+            "security_tls"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "展望未来",
+      "factoryArea": "ai_lab",
+      "areaName": "AI实验室",
+      "areaIcon": "🤖",
+      "color": "#9c27b0",
+      "narrative": {
+        "intro": "你的工厂能跑起基本业务了。但厂长合上门，坐到你旁边：\"明天才是重点——明天能发生什么问题？你需要看懂AI、5G 和数字孪生——老板刚才打电话说，下半年我们就要用的。\"",
+        "complete": "全息投影在实验室展开——这不是科幻，是你刚建成的数字孪生厂。屏幕上写着：预测到97%故障预警已送达。厂长拍了拍你的肩膀：\"你从昨天会做到明天——你已经是未来工厂的人。\""
+      },
+      "tasks": [
+        {
+          "id": "8-0",
+          "title": "安装AI编程工具",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "AI 工具有哪些形态",
+                "narrative": "厂长：AI 编程工具有四种接入形态：网页聊天、命令行 CLI、集成到 IDE、API 调用。课程里我们用命令行/网页形态。",
+                "question": "下面哪个不是 AI 编程工具的接入形态？",
+                "options": [
+                  {
+                    "text": "手机短信",
+                    "correct": true,
+                    "hint": "网页/CLI/IDE/API 才是常见形态"
+                  },
+                  {
+                    "text": "网页聊天",
+                    "correct": false,
+                    "hint": "是形态之一"
+                  },
+                  {
+                    "text": "命令行 CLI",
+                    "correct": false,
+                    "hint": "是形态之一"
+                  },
+                  {
+                    "text": "IDE 集成",
+                    "correct": false,
+                    "hint": "是形态之一"
+                  }
+                ]
+              },
+              {
+                "title": "安装配置",
+                "narrative": "厂长：命令行形态的 AI 工具一般用包管理器装（如 pip/npm 安装 CLI），装完配 API key 就能用。",
+                "question": "命令行 AI 工具通常怎么安装？",
+                "options": [
+                  {
+                    "text": "用包管理器（pip/npm）安装 CLI 工具",
+                    "correct": true,
+                    "hint": "pip/npm 装 CLI，再配 API key"
+                  },
+                  {
+                    "text": "复制 dll 文件",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "编译内核",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "改注册表",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 0,
+          "auto": true,
+          "tags": [
+            "ai_tools",
+            "dev_setup"
+          ]
+        },
+        {
+          "id": "8-1",
+          "title": "5G三种工业场景匹配",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "高清视频质检",
+                "match": "eMBB"
+              },
+              {
+                "item": "远程控制起重机",
+                "match": "uRLLC"
+              },
+              {
+                "item": "上千个传感器上报",
+                "match": "mMTC"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "5g",
+            "network_types"
+          ]
+        },
+        {
+          "id": "8-2",
+          "title": "工业AI三种形态匹配",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "用摄像头检测产品缺陷",
+                "match": "视觉检测"
+              },
+              {
+                "item": "从振动频谱预测轴承寿命",
+                "match": "预测性维护"
+              },
+              {
+                "item": "找到最优工艺参数组合",
+                "match": "过程优化"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "ai_vision",
+            "predictive_maintenance",
+            "process_optimization"
+          ]
+        },
+        {
+          "id": "8-3",
+          "title": "数字孪生三级排序",
+          "type": "sort",
+          "config": {
+            "items": [
+              "以虚映实（镜像映射）",
+              "以虚控实（远程控制）",
+              "以虚优实（优化仿真）"
+            ],
+            "answer": [
+              0,
+              1,
+              2
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "digital_twin",
+            "simulation"
+          ]
+        },
+        {
+          "id": "8-4",
+          "title": "AI代码找茬",
+          "type": "code_review",
+          "config": {
+            "code": "const mqtt = require('mqtt')\\nconst client = mqtt.connect('mqtt://localhost:1883')\\nclient.on('connect', () => {\\n  client.publish('factory/temp', '72.5')\\n})",
+            "hint": "这段代码少了什么？",
+            "question": "代码中的明显问题是什么？",
+            "options": [
+              "缺少注释",
+              "端口号错了",
+              "主题命名不规范",
+              "没有错误处理"
+            ],
+            "answer": 3
+          },
+          "xp": 100,
+          "tags": [
+            "mqtt",
+            "code_review",
+            "security_tls"
+          ]
+        },
+        {
+          "id": "8-5",
+          "title": "伦理两难——65%置信度",
+          "type": "ethics",
+          "config": {
+            "scenario": "AI预测反应釜72小时内失效，置信度65%。停机检修损失50万，不停机可能损失500万。",
+            "choices": [
+              "咨询AI更多信息",
+              "立即停机，安全第一",
+              "降负荷运行，观察24小时",
+              "继续生产，65%不够高"
+            ],
+            "consequences": [
+              "AI无法提供更多信息",
+              "安全但造成误停机损失",
+              "折中方案",
+              "高风险"
+            ],
+            "best": 2
+          },
+          "xp": 100,
+          "tags": [
+            "ethics",
+            "decision_making",
+            "risk_management"
+          ]
+        },
+        {
+          "id": "8-6",
+          "title": "回顾反思",
+          "type": "quiz",
+          "config": {
+            "question": "工业AI的定位应该是什么？",
+            "options": [
+              "自主执行所有操作",
+              "替代人类决策者",
+              "辅助人类决策的工具",
+              "替代安全PLC"
+            ],
+            "answer": 2
+          },
+          "xp": 50,
+          "tags": [
+            "ethics",
+            "ai_safety"
+          ]
+        },
+        {
+          "id": "8-hidden",
+          "title": "🌶 用AI代码教会同学",
+          "type": "ethics",
+          "config": {
+            "scenario": "你写了一段很漂亮的MQTT代码，同学抄袭提交了。老师问你们俩谁写的——你怎么回答？",
+            "choices": [
+              "说是一起合作的",
+              "承认自己写的，举报同学",
+              "私下跟同学说这样做不对",
+              "默不作声"
+            ],
+            "consequences": [
+              "折中方案",
+              "安全但造成误停机损失",
+              "既坚持原则又给对方留面子",
+              "高风险"
+            ],
+            "best": 2
+          },
+          "xp": 300,
+          "hidden": true,
+          "tags": [
+            "ethics",
+            "academic_integrity"
+          ]
+        },
+        {
+          "id": "8-7",
+          "title": "AI模型推理请求",
+          "type": "install_wizard",
+          "config": {
+            "steps": [
+              {
+                "title": "curl -X POST 干什么",
+                "narrative": "厂长：curl 默认是 GET（拿数据）。加 -X POST 就是发送数据给服务器——这里把振动、温度数据 POST 给 AI 预测接口。",
+                "question": "curl -X POST 是用来？",
+                "options": [
+                  {
+                    "text": "向服务器发送数据（如提交预测请求）",
+                    "correct": true,
+                    "hint": "-X POST 指定请求方法为 POST"
+                  },
+                  {
+                    "text": "下载文件",
+                    "correct": false,
+                    "hint": "下载用 GET/curl -O"
+                  },
+                  {
+                    "text": "删除文件",
+                    "correct": false,
+                    "hint": "不是"
+                  },
+                  {
+                    "text": "查看目录",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：调用 AI 预测",
+                "narrative": "厂长：动手。用 curl POST 请求调用 AI 预测接口，预测轴承剩余寿命（振动 2.1、温度 75.3）。",
+                "question": "在终端输入命令，调用 AI 预测接口：",
+                "inputType": "command",
+                "correctCommand": "curl -X POST http://localhost:5000/predict -H \"Content-Type: application/json\" -d '{\"vibration\":2.1,\"temperature\":75.3}'",
+                "aliases": [
+                  "curl -X POST http://localhost:5000/predict -H 'Content-Type: application/json' -d '{\"vibration\":2.1,\"temperature\":75.3}'"
+                ],
+                "outputLines": [
+                  {
+                    "text": "{",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "  \"prediction\": {",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "    \"rul_hours\": 1872,",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "    \"confidence\": 0.87,",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "    \"status\": \"normal\"",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "  },",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "  \"model_version\": \"v2.3.1\"",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "}",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：AI 预测轴承还能运行 1872 小时（约 78 天），置信度 87%。",
+                    "color": "green",
+                    "delay": 250
+                  }
+                ],
+                "successText": "✅ AI 预测轴承还能运行 1872 小时（约 78 天），置信度 87%。"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "ai_inference",
+            "api_integration"
+          ]
+        },
+        {
+          "id": "8-8",
+          "title": "理解数字孪生价值",
+          "type": "fill_blank",
+          "config": {
+            "prompt": "数字孪生的最高级形态是____（以虚优实）",
+            "answer": "优化仿真",
+            "options": [
+              "镜像映射",
+              "远程控制",
+              "优化仿真",
+              "数据采集"
+            ]
+          },
+          "xp": 50,
+          "tags": [
+            "digital_twin",
+            "conceptual"
+          ]
+        },
+        {
+          "id": "8-9",
+          "title": "⚔️ Boss战：AI模型漂移",
+          "type": "boss_fight",
+          "config": {
+            "bossName": "AI 模型漂移",
+            "bossEmoji": "🧠",
+            "phases": [
+              {
+                "name": "发现异常",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "AI 预测准确率从 90% 掉到 60%，最先查什么？",
+                    "options": [
+                      "检查输入数据分布是否变化",
+                      "重新训练整个模型",
+                      "换一个 AI 框架",
+                      "增加更多服务器"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "分析",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "数据分布变了是什么意思？",
+                    "options": [
+                      "设备老化导致振动特征偏移",
+                      "数据格式错误",
+                      "网络丢包导致数据缺失",
+                      "数据库满了"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "检测到数据漂移后该怎么做？",
+                    "options": [
+                      "用新数据增量训练模型",
+                      "删掉旧数据",
+                      "提高报警阈值",
+                      "关掉 AI 功能"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              },
+              {
+                "name": "预防",
+                "bossHP": 100,
+                "questions": [
+                  {
+                    "question": "如何早期发现模型漂移？",
+                    "options": [
+                      "监控预测置信度+定期回测",
+                      "每天人工检查预测结果",
+                      "相信模型不会出错",
+                      "关掉监控减少干扰"
+                    ],
+                    "answer": 0
+                  },
+                  {
+                    "question": "确保 AI 长期稳定运行的最佳实践？",
+                    "options": [
+                      "建立数据漂移监控+自动重训练 Pipeline",
+                      "买更贵的服务器",
+                      "用更多的传感器",
+                      "换一个更大的模型"
+                    ],
+                    "answer": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "xp": 200,
+          "tags": [
+            "ai_ai",
+            "model_drift",
+            "fault_diag"
+          ]
+        },
+        {
+          "id": "8-10",
+          "title": "工业AI伦理困境",
+          "type": "ethics",
+          "config": {
+            "scenario": "AI 预测一台关键设备 24 小时内故障概率 85%，但人工检查发现设备运行正常。厂长让你做决定——停机检修（损失 20 万）还是继续生产（可能炸机损失 200 万）？",
+            "choices": [
+              "让 AI 重新采集数据再预测",
+              "相信人工检查，继续生产",
+              "降负荷运行，同时请第三方检测",
+              "相信 AI，立即停机"
+            ],
+            "consequences": [
+              "AI 给出相同结果",
+              "高风险",
+              "折中稳妥方案",
+              "安全但可能误判"
+            ],
+            "best": 2
+          },
+          "xp": 100,
+          "tags": [
+            "ethics",
+            "risk_management",
+            "decision_making"
+          ]
+        },
+        {
+          "id": "8-11",
+          "title": "工业元宇宙展望",
+          "type": "scenario_match",
+          "config": {
+            "pairs": [
+              {
+                "item": "AR 远程指导维修",
+                "match": "专家不用到现场"
+              },
+              {
+                "item": "数字孪生全厂仿真",
+                "match": "投产前验证优化"
+              },
+              {
+                "item": "区块链工业溯源",
+                "match": "产品全生命周期可追溯"
+              }
+            ]
+          },
+          "xp": 100,
+          "tags": [
+            "digital_twin",
+            "metaverse",
+            "blockchain"
+          ]
+        }
+      ]
+    }
+  ]
+}
