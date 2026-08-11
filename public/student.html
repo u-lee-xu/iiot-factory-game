@@ -25,6 +25,7 @@ body {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 20px; background: var(--panel);
   border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px;
+  position: sticky; top: 0; z-index: 50;
 }
 .h-left { display: flex; align-items: center; gap: 10px; }
 .h-left .logo { color: var(--cyan); font-size: 19px; }
@@ -33,7 +34,7 @@ body {
   background: var(--amber); color: #000; padding: 1px 8px;
   font-size: 16px; font-weight: bold; border-radius: 2px;
 }
-.h-right { display: flex; align-items: center; gap: 12px; font-size: 16px; }
+.h-right { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px 12px; font-size: 16px; }
 .director-avatar {
   width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
   background: #1a1a24; border: 1px solid var(--border); border-radius: 4px;
@@ -43,9 +44,9 @@ body {
 .director-avatar.director-mood-stern { transform: scale(1.05); box-shadow: 0 0 12px #f40; animation: stern-shake 0.5s ease; }
 .director-avatar.director-mood-awkward { filter: grayscale(0.3) sepia(0.2); opacity: 0.9; }
 .director-avatar.director-mood-thinking { animation: thinking-bounce 1.5s infinite; }
-.xp-wrap { width: 160px; height: 12px; background: #1a1a24; border: 1px solid var(--border); position: relative; overflow: hidden; }
+.xp-wrap { width: 160px; height: 16px; background: #1a1a24; border: 1px solid var(--border); position: relative; overflow: hidden; }
 .xp-fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--green)); transition: width .5s; }
-.xp-label { position: absolute; top: 0; left: 0; right: 0; text-align: center; line-height: 12px; font-size: 11px; color: #000; font-weight: bold; }
+.xp-label { position: absolute; top: 0; left: 0; right: 0; text-align: center; line-height: 16px; font-size: 12px; font-weight: bold; color: #fff; text-shadow: 0 0 3px #000, 0 0 1px #000, 0 1px 2px rgba(0,0,0,.95); }
 .btn-logout { background: none; border: 1px solid var(--border); color: var(--dim); padding: 3px 8px; font-family: inherit; font-size: 16px; cursor: pointer; }
 .btn-logout:hover { border-color: var(--red); color: var(--red); }
 
@@ -287,6 +288,7 @@ body {
 .wiz-dot.active::after { content: ''; position: absolute; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--amber); animation: wiz-pulse 1.2s infinite; }
 @keyframes wiz-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
 .wizard-narrative { background: rgba(255,176,0,.06); border-left: 3px solid var(--amber); padding: 10px 14px; margin-bottom: 12px; font-size: 15px; line-height: 1.6; color: var(--text); border-radius: 0 6px 6px 0; }
+.wiz-explain { background: rgba(0,188,212,.07); border-left: 3px solid var(--cyan); padding: 8px 12px; margin-top: 10px; font-size: 14px; line-height: 1.7; color: var(--text); border-radius: 0 6px 6px 0; }
 .wiz-narr-icon { font-size: 16px; }
 .wiz-narr-label { color: var(--amber); font-weight: bold; margin-right: 4px; }
 .wizard-question { font-size: 16px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
@@ -383,12 +385,33 @@ body {
   position: fixed; bottom: 24px; right: 24px;
   padding: 8px 16px; font-size: 16px; font-weight: bold;
   opacity: 0; transition: opacity .3s; pointer-events: none;
-  z-index: 200;
+  z-index: 9600;
 }
 .toast.show { opacity: 1; }
 .toast.success { background: var(--green); color: #000; }
 .toast.info { background: var(--cyan); color: #000; }
 .toast.error { background: var(--red); color: #000; }
+/* 🐛 抓虫有奖 - Bug 反馈 */
+@keyframes bugPulse { 0%,100%{ box-shadow:0 0 0 0 rgba(255,176,0,.55);} 50%{ box-shadow:0 0 0 12px rgba(255,176,0,0);} }
+#bugFloater{ position:fixed; bottom:18px; right:18px; z-index:8000; background:linear-gradient(135deg,#ffb000,#ff7a00); color:#000; font-weight:bold; padding:11px 16px; border-radius:30px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:15px; box-shadow:0 4px 18px rgba(255,150,0,.4); animation:bugPulse 2.2s infinite; user-select:none; }
+#bugFloater:hover{ filter:brightness(1.12); }
+.bug-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:9600; display:none; align-items:center; justify-content:center; }
+.bug-overlay.show{ display:flex; }
+.bug-box{ background:#12121a; border:2px solid var(--amber); border-radius:10px; width:480px; max-width:94vw; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 0 60px rgba(255,176,0,.22); }
+.bug-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+.bug-title{ color:var(--amber); font-weight:bold; font-size:17px; }
+.bug-close{ background:none; border:none; color:var(--dim); font-size:20px; cursor:pointer; }
+.bug-body{ padding:16px 18px; display:flex; flex-direction:column; gap:12px; }
+.bug-tip{ font-size:13px; color:var(--dim); line-height:1.7; background:rgba(255,176,0,.08); border:1px dashed rgba(255,176,0,.4); border-radius:6px; padding:10px 12px; }
+.bug-field label{ display:block; font-size:13px; color:var(--dim); margin-bottom:4px; }
+.bug-field input,.bug-field textarea{ width:100%; background:#0a0a10; border:1px solid var(--border); color:var(--text); font-family:inherit; font-size:15px; padding:9px 11px; outline:none; border-radius:4px; }
+.bug-field input:focus,.bug-field textarea:focus{ border-color:var(--amber); }
+.bug-field textarea{ min-height:110px; resize:vertical; }
+.bug-err{ color:var(--red); font-size:13px; min-height:16px; }
+#bugSubmit{ background:linear-gradient(135deg,#ffb000,#ff7a00); color:#000; border:none; font-weight:bold; font-size:16px; padding:11px; border-radius:6px; cursor:pointer; }
+#bugSubmit:disabled{ opacity:.5; cursor:not-allowed; }
+@media (max-width:640px){ #bugFloater{ bottom:12px; right:12px; padding:9px 13px; font-size:14px; } }
+
 
 /* ===== Level Up ===== */
 .level-up-overlay {
@@ -536,6 +559,17 @@ body {
 .lb-close { margin-left: auto; background: none; border: none; color: var(--dim); font-size: 20px; cursor: pointer; padding: 10px 12px; }
 .lb-close:hover { color: var(--red); }
 .lb-body { overflow-y: auto; padding: 16px; }
+.rec-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.72); z-index: 9100; display: none; align-items: center; justify-content: center; }
+.rec-overlay.show { display: flex; }
+.rec-box { background: #12121a; border: 2px solid var(--border); border-radius: 10px; width: 520px; max-width: 94vw; max-height: 84vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.15); }
+.rec-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.rec-title { color: var(--amber); font-weight: bold; font-size: 17px; }
+.rec-body { overflow-y: auto; padding: 14px 16px; }
+.rec-card { border: 1px solid var(--border); background: rgba(0,0,0,.25); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+.rec-card .rc-name { font-size: 16px; font-weight: bold; color: var(--text); margin-bottom: 6px; }
+.rec-card .rc-row { font-size: 14px; color: var(--dim); line-height: 1.8; }
+.rec-card .rc-row b { color: var(--amber); }
+.rec-empty { text-align: center; color: var(--dim); padding: 24px; font-size: 15px; line-height: 1.8; }
 .lb-summary { display: flex; gap: 28px; justify-content: center; padding: 10px; background: rgba(0,188,212,.06); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px; font-size: 15px; color: var(--text); }
 .lb-summary b { color: var(--amber); }
 .lb-list { display: flex; flex-direction: column; gap: 6px; }
@@ -563,6 +597,8 @@ body {
 .ach-tag { display: inline-block; margin-top: 6px; font-size: 11px; color: var(--green); border: 1px solid var(--green); border-radius: 3px; padding: 1px 6px; }
 .ach-tag.can { color: var(--amber); border-color: var(--amber); }
 @keyframes achPop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes achSpark { 0% { transform: scale(.3); opacity: 0; } 35% { opacity: 1; } 100% { transform: scale(1.4) translateY(-22px); opacity: 0; } }
+@keyframes achBounce { 0% { transform: scale(.3); opacity: 0; } 55% { transform: scale(1.25); } 75% { transform: scale(.95); } 100% { transform: scale(1); opacity: 1; } }
 .lb-empty { text-align: center; color: var(--dim); padding: 30px; }
 
 /* ===== Password Modal ===== */
@@ -580,7 +616,52 @@ body {
 
 /* ===== Mini Game: Memory Match ===== */
 .mm-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.8); z-index: 9500; display: flex; align-items: center; justify-content: center; }
+/* 打开游戏/弹层时锁定页面滚动，避免边缘出现滚动条 */
+body:has(.mm-overlay) { overflow: hidden; }
+/* 🔫 术语防御战（打字炮台） */
+.sh-box { width: 900px; max-width: 96vw; background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.22); display: flex; flex-direction: column; height: 72vh; max-height: 660px; }
+.sh-stats { display: flex; gap: 16px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; }
+.sh-stats b { color: var(--cyan); }
+.sh-tip { padding: 6px 14px; font-size: 12px; color: var(--dim); text-align: center; border-top: 1px solid var(--border); }
+@media (max-width:700px){
+  .sh-box { width: 96vw; height: 92dvh; max-height: none; }
+  .sh-stats { font-size: 13px; gap: 10px; }
+  .sh-tip { font-size: 11px; }
+  #shCanvas { touch-action: none; }
+}
+.ty-box { width: 880px; max-width: 96vw; height: min(680px, 92dvh); background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.22); position: relative; display: flex; flex-direction: column; }
+.ty-stats { display: flex; gap: 18px; padding: 8px 16px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 15px; flex-wrap: wrap; }
+.ty-stats b { color: var(--cyan); }
+.ty-field { position: relative; flex: 1; min-height: 0; overflow: hidden; background: radial-gradient(ellipse at 50% 100%, rgba(0,188,212,.12), transparent 60%); }
+.ty-word { position: absolute; font-family: 'Courier New', monospace; font-size: 21px; font-weight: bold; color: var(--text); background: rgba(0,0,0,.55); border: 1px solid var(--border); padding: 5px 11px; border-radius: 6px; }
+.ty-word .ty-prefix { color: var(--green); }
+.ty-word.ty-target { outline: 2px dashed var(--cyan); outline-offset: 2px; }
+.ty-word.ty-boom { background: var(--amber); color: #000; transform: scale(1.3); transition: all .18s; }
+.ty-word.ty-leak { border-color: var(--red); color: var(--red); opacity: .4; }
+.ty-word.ty-boss { border: 2px solid var(--amber); background: rgba(255,176,0,.18); color: var(--amber); font-size: 23px; box-shadow: 0 0 14px rgba(255,176,0,.4); }
+.ty-word.ty-boss-hit { border-color: var(--red); background: rgba(255,85,85,.25); color: var(--red); }
+.ty-boom-p { position: absolute; font-size: 18px; pointer-events: none; z-index: 8; animation: tyBoomP .65s ease-out forwards; }
+.ty-boom-p.big { font-size: 26px; }
+@keyframes tyBoomP { 0% { opacity: 1; transform: translate(0,0) scale(.5); } 100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(1.5); } }
+.ty-boss-tip { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(18,18,26,.96); border: 2px solid var(--amber); border-radius: 10px; padding: 16px 24px; text-align: center; z-index: 10; box-shadow: 0 0 30px rgba(255,176,0,.4); font-size: 15px; color: var(--text); line-height: 1.7; }
+.ty-cannon { font-size: 46px; text-align: center; height: 62px; line-height: 62px; user-select: none; }
+
+.ty-bullet { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle, #fff, var(--amber)); box-shadow: 0 0 10px var(--amber); transition: transform .24s linear; z-index: 5; }
+.ty-field.ty-hit { box-shadow: inset 0 0 40px rgba(255,85,85,.35); }
+.ty-field.ty-err { box-shadow: inset 0 0 24px rgba(255,85,85,.4); }
+.ty-result { background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; padding: 30px 44px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(0,188,212,.22); }
+.tut-box { background: #12121a; border: 2px solid var(--amber); border-radius: 12px; padding: 28px 34px; max-width: 460px; width: 92%; text-align: center; box-shadow: 0 0 60px rgba(255,176,0,.2); }
+.tut-title { font-size: 20px; color: var(--amber); font-weight: bold; margin-bottom: 14px; }
+.tut-step { font-size: 15px; color: var(--text); line-height: 1.7; margin: 6px 0; text-align: left; padding: 8px 12px; background: rgba(0,0,0,.25); border-left: 3px solid var(--cyan); border-radius: 0 6px 6px 0; }
+.tut-step b { color: var(--green); }
+.tut-tip { font-size: 12px; color: var(--dim); margin-top: 10px; }
+@media (max-width:640px){ .ty-box{ height: 88dvh; max-width: 98vw; } .ty-word{ font-size:17px; } .ty-stats{ font-size:14px; gap:12px; } }
+/* 手机端隐藏打字类防御战（无键盘体验差） */
+@media (max-width:700px){ .review-inline.ty-only-desktop, .review-inline.pc-only, .gz-row.pc-only { display: none; } }
 .mm-box { background: #12121a; border: 2px solid var(--border); border-radius: 12px; width: min(780px, 94vw); max-height: 92vh; display: flex; flex-direction: column; padding: 18px; box-shadow: 0 0 60px rgba(0,188,212,.15); overflow: hidden; }
+/* 翻牌等需要撑满的游戏：给 mm-box 一个确定高度，flex:1 的网格才能撑开（否则在手机上塌缩成内容高度、卡片变小） */
+.mm-box.mm-fill { height: min(92vh, 780px); }
+@supports (height: 1dvh) { .mm-box.mm-fill { height: min(92dvh, 780px); } }
 .mm-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 .mm-title { font-size: 20px; color: var(--amber); font-weight: bold; }
 .mm-sub { font-size: 13px; color: var(--dim); margin-top: 4px; }
@@ -588,7 +669,7 @@ body {
 .mm-close:hover { color: var(--red); }
 .mm-stats { display: flex; gap: 20px; font-size: 15px; color: var(--text); margin-bottom: 14px; }
 .mm-stats b { color: var(--amber); }
-.mm-grid { display: grid; gap: 10px; overflow-y: auto; }
+.mm-grid { display: grid; gap: 10px; flex: 1; min-height: 0; overflow: hidden; align-content: center; justify-content: center; }
 .mm-card { perspective: 800px; cursor: pointer; aspect-ratio: 1; }
 .mm-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .35s ease; }
 .mm-card.flipped .mm-inner { transform: rotateY(180deg); }
@@ -749,13 +830,28 @@ body {
 .pd-cmd { margin-top: 8px; padding: 6px 8px; background: #000; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; color: var(--green); font-family: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pd-cat { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--cyan); border: 1px solid rgba(0,188,212,.4); border-radius: 3px; padding: 1px 6px; }
 
+/* ===== Game Zone (游戏专区) ===== */
+.gz-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.72); z-index: 9150; display: none; align-items: center; justify-content: center; }
+.gz-overlay.show { display: flex; }
+.gz-box { background: #12121a; border: 2px solid var(--border); border-radius: 10px; width: min(760px, 94vw); max-height: 84vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.15); }
+.gz-section { font-size: 15px; color: var(--amber); font-weight: bold; margin: 16px 0 8px; }
+.gz-section:first-child { margin-top: 0; }
+.gz-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: rgba(0,0,0,.2); cursor: pointer; transition: all .2s; }
+.gz-row:hover { border-color: var(--cyan); background: rgba(0,188,212,.06); }
+.gz-row.locked { opacity: .5; cursor: not-allowed; }
+.gz-emoji { font-size: 22px; }
+.gz-name { font-size: 15px; color: var(--text); flex: 1; }
+.gz-meta { font-size: 12px; color: var(--dim); }
+
 /* ===== Mobile adaptation ===== */
 @media (max-width: 560px) {
-  .mm-box { padding: 12px; }
-  .mm-grid, .mm-stack-grid { gap: 6px; }
-  .mm-stats { gap: 12px; font-size: 13px; margin-bottom: 10px; }
-  .mm-emoji { font-size: 15px; }
-  .mm-text { font-size: 10px; }
+  .mm-box { padding: 8px; width: min(780px, 98vw); }
+  .mm-box.mm-fill { height: 95dvh; max-height: 95dvh; }
+  .mm-grid, .mm-stack-grid { gap: 4px; }
+  .mm-stats { gap: 12px; font-size: 13px; margin-bottom: 8px; }
+  .mm-head { margin-bottom: 6px; }
+  .mm-emoji { font-size: 18px; }
+  .mm-text { font-size: 12px; -webkit-line-clamp: 3; }
   .mm-title { font-size: 17px; }
   .mm-sub { font-size: 12px; }
   .mm-stack { min-height: 300px; }
@@ -780,10 +876,15 @@ body {
   </div>
   <div class="h-right">
     <div class="xp-wrap"><div class="xp-fill" id="xpFill"></div><span class="xp-label" id="xpLabel">0</span></div>
+    <button class="btn-icon" onclick="openWallet()" title="工资与商城">💰<span id="walletAmt" style="font-size:12px;margin-left:2px">0</span></button>
+    <button class="btn-icon" onclick="openGameZone()" title="游戏专区">🎮</button>
     <button class="btn-icon" onclick="openLeaderboard()" title="班级排行榜">🏆</button>
     <button class="btn-icon" onclick="openAchievements()" title="我的成就">🎖️</button>
+    <button class="btn-icon" onclick="openGameRecords()" title="我的战绩">📊</button>
     <button class="btn-icon" onclick="openPasswordModal()" title="设置/修改密码" id="passwordBtn" style="display:none">🔑</button>
     <button class="btn-icon" onclick="openPedia()" title="术语图鉴">📖</button>
+    <button class="btn-icon" id="soundToggle" onclick="toggleSound()" title="音效开关">🔊</button>
+    <button class="btn-icon" id="musicToggle" onclick="toggleMusic()" title="背景音乐">🎵</button>
     <span class="director-avatar" id="directorAvatar" style="font-size:20px;margin-left:8px;cursor:default;transition:transform .2s">👨‍💼</span>
     <button class="btn-logout" onclick="logout()">退出</button>
   </div>
@@ -839,6 +940,14 @@ body {
   </div>
 </div>
 
+<!-- 我的战绩 -->
+<div class="rec-overlay" id="recOverlay" onclick="if(event.target===this)closeGameRecords()">
+  <div class="rec-box">
+    <div class="rec-head"><div class="rec-title">📊 我的战绩</div><span class="lb-close" onclick="closeGameRecords()">✕</span></div>
+    <div class="rec-body" id="recBody"></div>
+  </div>
+</div>
+
 <!-- Password Modal -->
 <div class="pw-overlay" id="pwOverlay" onclick="if(event.target===this)closePasswordModal()">
   <div class="pw-box">
@@ -879,15 +988,60 @@ body {
   </div>
 </div>
 
+<!-- 🐛 抓虫有奖 - Bug 反馈入口 -->
+<div id="bugFloater" onclick="openBugReport()" title="反馈 Bug，抓虫有奖">🐛 <span>反馈 Bug · 抓虫有奖</span></div>
+<div class="bug-overlay" id="bugOverlay" onclick="if(event.target===this)closeBugReport()">
+  <div class="bug-box">
+    <div class="bug-head">
+      <div class="bug-title">🐛 反馈 Bug · 抓虫有奖</div>
+      <button class="bug-close" onclick="closeBugReport()">✕</button>
+    </div>
+    <div class="bug-body">
+      <div class="bug-tip">在锐智工厂里发现任何问题（页面错乱、卡住、报错、题目/答案有误、提示不清晰…）都可以反馈。老师核实后会给<b>有效反馈</b>发成就徽章 🎖️，抓虫有奖！</div>
+      <div class="bug-field">
+        <label>出现在哪（选填）</label>
+        <input id="bugLocation" placeholder="例如：L3 翻牌游戏 / 答题页 / 排行榜 / 教师端…" maxlength="100">
+      </div>
+      <div class="bug-field">
+        <label>遇到的问题</label>
+        <textarea id="bugContent" placeholder="描述你遇到的 Bug：点什么没反应、数字显示错、卡住不动、提示不对…"></textarea>
+      </div>
+      <div class="bug-err" id="bugErr"></div>
+      <button id="bugSubmit" onclick="submitBugReport()">🐛 提交反馈</button>
+    </div>
+  </div>
+</div>
+
 <!-- Scanlines CRT effect -->
 <div class="scanlines"></div>
-
-<!-- Sound toggle -->
-<div style="position:fixed;top:10px;right:58px;z-index:300;font-size:16px;cursor:pointer;opacity:.5" id="soundToggle" onclick="toggleSound()">🔊</div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<script>
+// zzfx() - the universal entry point -- returns a AudioBufferSourceNode
+zzfx=(...t)=>zzfxP(zzfxG(...t))
+
+// zzfxP() - the sound player -- returns a AudioBufferSourceNode
+zzfxP=(...t)=>{let e=zzfxX.createBufferSource(),f=zzfxX.createBuffer(t.length,t[0].length,zzfxR);t.map((d,i)=>f.getChannelData(i).set(d)),e.buffer=f,e.connect(zzfxX.destination),e.start();return e}
+
+// zzfxG() - the sound generator -- returns an array of sample data
+zzfxG=(q=1,k=.05,c=220,e=0,t=0,u=.1,r=0,F=1,v=0,z=0,w=0,A=0,l=0,B=0,x=0,G=0,d=0,y=1,m=0,C=0)=>{let b=2*Math.PI,H=v*=500*b/zzfxR**2,I=(0<x?1:-1)*b/4,D=c*=(1+2*k*Math.random()-k)*b/zzfxR,Z=[],g=0,E=0,a=0,n=1,J=0,K=0,f=0,p,h;e=99+zzfxR*e;m*=zzfxR;t*=zzfxR;u*=zzfxR;d*=zzfxR;z*=500*b/zzfxR**3;x*=b/zzfxR;w*=b/zzfxR;A*=zzfxR;l=zzfxR*l|0;for(h=e+m+t+u+d|0;a<h;Z[a++]=f)++K%(100*G|0)||(f=r?1<r?2<r?3<r?Math.sin((g%b)**3):Math.max(Math.min(Math.tan(g),1),-1):1-(2*g/b%2+2)%2:1-4*Math.abs(Math.round(g/b)-g/b):Math.sin(g),f=(l?1-C+C*Math.sin(2*Math.PI*a/l):1)*(0<f?1:-1)*Math.abs(f)**F*q*zzfxV*(a<e?a/e:a<e+m?1-(a-e)/m*(1-y):a<e+m+t?y:a<h-d?(h-a-d)/u*y:0),f=d?f/2+(d>a?0:(a<h-d?1:(h-a)/d)*Z[a-d|0]/2):f),p=(c+=v+=z)*Math.sin(E*x-I),g+=p-p*B*(1-1E9*(Math.sin(a)+1)%2),E+=p-p*B*(1-1E9*(Math.sin(a)**2+1)%2),n&&++n>A&&(c+=w,D+=w,n=0),!l||++J%l||(c=D,v=H,n=n||1);return Z}
+
+// zzfxV - global volume
+zzfxV=.3
+
+// zzfxR - global sample rate
+zzfxR=44100
+
+// zzfxX - the common audio context
+zzfxX=new(window.AudioContext||webkitAudioContext);
+</script>
+<script>
+//! ZzFXM (v2.0.3) | (C) Keith Clark | MIT | https://github.com/keithclark/ZzFXM
+zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q=0,s=1,v={},w=zzfxR/e*60>>2;for(;s;k++)R=[s=a=d=m=0],t.map((e,d)=>{for(x=f[e][k]||[0,0,0],s|=!!f[e][k],G=m+(f[e][0].length-2-!a)*w,p=d==t.length-1,o=2,r=m;o<x.length+p;a=++o){for(g=x[o],u=o==x.length+p-1&&p||c!=(x[0]||0)|g|0,z=0;z<w&&a;z++>w-99&&u?i+=(i<1)/99:0)h=(1-i)*R[M++]/2||0,b[r]=(b[r]||0)-h*q+h,j[r]=(j[r++]||0)+h*q+h;g&&(i=g%1,q=x[1]||0,(g|=0)&&(R=v[[c=x[M=0]||0,g]]=v[[c,g]]||(l=[...n[c]],l[2]*=2**((g-12)/12),g>0?zzfxG(...l):[])))}m=G});return[b,j]}
+</script>
+<script src="/data/music.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════════════
 // BLOCK INDEX
@@ -928,7 +1082,7 @@ body {
 const API = location.origin;
 
 // 学生密码开关（临时暂停，先测翻牌）
-const PASSWORD_ENABLED = false;
+const PASSWORD_ENABLED = true;
 const token = sessionStorage.getItem('token');
 const role = sessionStorage.getItem('role');
 const myName = sessionStorage.getItem('name');
@@ -944,7 +1098,7 @@ const RANKS = [
 ];
 
 let content = null;       // game content from API
-let gameState = { check: {}, stars: {}, achievements: {}, hasPassword: false };
+let gameState = { check: {}, stars: {}, achievements: {}, teacherAwards: {}, hasPassword: false };
 // 交互统计变量（部分交互复用同一组计数，需全局兜底，避免 ReferenceError）
 let errors = 0;
 let streak = 0;
@@ -969,6 +1123,76 @@ function getAudioCtx() {
 function toggleSound() {
   soundEnabled = !soundEnabled;
   document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+}
+
+// =========================================================================
+// =========================================================================
+// 2b. 8-BIT BACKGROUND MUSIC（ZzFXM 渲染成 AudioBuffer 循环播放，按场景切换）
+// =========================================================================
+let musicEnabled = true;
+let currentTrack = null;
+let musicGainNode = null;
+let musicSrc = null;
+
+function getMusicSong(name) {
+  if (window.MUSIC_SONGS && window.MUSIC_SONGS[name]) return window.MUSIC_SONGS[name];
+  return (window.MUSIC_SONGS && window.MUSIC_SONGS.hub) || null;
+}
+function playMusic(name) {
+  const song = getMusicSong(name);
+  if (!song) return;
+  if (currentTrack === name && musicSrc) return;
+  currentTrack = name;
+  if (!musicEnabled) return;
+  const ctx = getAudioCtx();
+  try { if (ctx.state === 'suspended') ctx.resume(); } catch(e){}
+  if (!musicGainNode) {
+    musicGainNode = ctx.createGain();
+    musicGainNode.gain.value = 0.7;
+    musicGainNode.connect(ctx.destination);
+  }
+  if (musicSrc) { try { musicSrc.stop(); } catch(e){} musicSrc = null; }
+  try {
+    const data = zzfxM.apply(null, song);
+    const buf = ctx.createBuffer(data.length, data[0].length, zzfxR);
+    for (let i = 0; i < data.length; i++) buf.getChannelData(i).set(data[i]);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    src.connect(musicGainNode);
+    musicSrc = src;
+    musicGainNode.gain.cancelScheduledValues(ctx.currentTime);
+    musicGainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
+    musicGainNode.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.3);
+    src.start();
+  } catch(e) { /* music not critical */ }
+}
+function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  try { localStorage.setItem('music_enabled', musicEnabled ? '1' : '0'); } catch(e){}
+  const el = document.getElementById('musicToggle');
+  if (el) el.textContent = musicEnabled ? '🎵' : '🔕';
+  if (musicEnabled) {
+    if (currentTrack && !musicSrc) playMusic(currentTrack);
+  } else {
+    if (musicSrc) { try { musicSrc.stop(); } catch(e){} musicSrc = null; }
+  }
+}
+
+// ===== 区域(幕)背景音乐 & 按幕选小游戏配乐 =====
+let currentAreaKey = 'hub';
+function setArea(lvId) {
+  const lv = content && content.levels.find(l => l.id === lvId);
+  currentAreaKey = (lv && lv.factoryArea) || 'hub';
+}
+function playAreaMusic() { playMusic(currentAreaKey || 'hub'); }
+// 按「幕 + 游戏类型」选小游戏配乐，缺省降级：类型_幕 → 类型 → match
+function gameSong(type) {
+  const k = type + '_L' + currentLevelId;
+  if (window.MUSIC_SONGS && window.MUSIC_SONGS[k]) return k;
+  const fb = type === 'memory' ? 'match' : type;
+  if (window.MUSIC_SONGS && window.MUSIC_SONGS[fb]) return fb;
+  return 'match';
 }
 
 function playSound(type, opt) {
@@ -1115,6 +1339,42 @@ function playSound(type, opt) {
         o.start(now); o.stop(now + 0.12);
         break;
       }
+      case 'shoot': {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'square';
+        o.frequency.setValueAtTime(340, now);
+        o.frequency.linearRampToValueAtTime(220, now + 0.05);
+        g.gain.setValueAtTime(0.04, now);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+        o.start(now); o.stop(now + 0.07);
+        break;
+      }
+      case 'hit': {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(260, now);
+        o.frequency.linearRampToValueAtTime(180, now + 0.08);
+        g.gain.setValueAtTime(0.08, now);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+        o.start(now); o.stop(now + 0.1);
+        break;
+      }
+      case 'pickup': {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.setValueAtTime(880, now);
+        o.frequency.linearRampToValueAtTime(1320, now + 0.1);
+        g.gain.setValueAtTime(0.12, now);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+        o.start(now); o.stop(now + 0.18);
+        break;
+      }
       case 'toggle': {
         [440, 660].forEach((freq, i) => {
           const o = ctx.createOscillator();
@@ -1187,9 +1447,9 @@ function generateTeach(task) {
     '2-hidden': 'SSH 免密登录通过密钥对实现：你在本地生成一对密钥（公钥+私钥），把公钥复制到服务器 ~/.ssh/authorized_keys 里，之后 SSH 登录就用密钥认证替代密码了。',
     '4-0': 'Node-RED 的 Function 节点用来写 JavaScript 代码处理数据。msg.payload 是消息的核心数据。这段代码模拟传感器：温度在 25-85℃ 之间随机，振动在 0-1.5 之间随机。',
     '4-1': 'Node-RED 中做条件判断用 Switch 节点。和编程语言的 switch/case 类似，你可以配置多条规则：温度 > 80 走报警分支，<= 80 走正常分支。',
-    '4-2': '滑动均值是边缘计算中最常用的数据平滑方法。缓存最近的 N 个数据点，每次新数据到来时重新计算平均值。能有效过滤传感器噪声，同时减少上传数据量。',
+    '4-2': '传感器报数会抖——比如温度 25、26、27、80、26…，那个 80 是异常毛刺。滑动均值就是「只看最近 10 个数，算个平均」：先有缓存 → 新数据来了塞进去 → 超过 10 个就把最旧那个挤掉（保持“最近 10 个”，这就是“滑动”）→ 攒满 10 个就算平均 → 输出平均值。这样输出平滑、还省流量。',
     '4-3': '边缘计算四大驱动力：省带宽（数据本地处理减少上传）、快响应（毫秒级本地决策）、稳运行（断网不影响本地控制）、密防护（敏感数据不出厂区）。',
-    '4-4': '滑动均值滤波后数据量大幅减少。原始每秒 1 个采样，10 个取均值后每秒只传 0.1 个，数据量减少约 85%。网络压力小多了，厂长很满意。',
+    '4-4': '滑动均值滤波后数据量大幅减少：原始每秒 1 个采样，10 个取均值后每秒只传 0.1 个——数据量只剩原来的 1/10，减少约 90%。网络压力小多了，厂长很满意。',
     '4-5': 'OpenPLC 是一个开源软 PLC，可以在普通电脑上运行 PLC 程序。和硬 PLC 相比，它成本低、灵活高，适合学习和原型验证。编译安装后通过浏览器访问 Web 界面进行编程。',
     '4-6': '软PLC用软件模拟所有PLC功能，成本低可定制，比硬PLC灵活太多。但硬PLC有独立电路和硬实时OS，带有严格安全认证——出了故障不会因为软件崩掉反应不过来。在生命安全的场景下必须靠哪个？',
     '4-hidden': '全量数据每分钟约 60 条，筛选后每分钟约 9 条。运行 2 分钟，全量约 120 条，筛选后约 18 条。这就是边缘计算的威力——少传数据，不丢信息。',
@@ -1249,7 +1509,7 @@ function generateTeach(task) {
     '3-3': 'ProfiNet 是西门子的工业以太网协议，毫秒级实时。记得那句：紫色线 Profibus 是老款、绿色工业网线 ProfiNet 是新款，都是西门子家的。',
     '3-4': '协议各有个性：ProfiNet=西门子毫秒实时，EtherCAT=倍福快到极致（飞读飞写），CC-Link IE=三菱环形冗余断线不断，Modbus=最老最开放变频仪表都支持，Powerlink=贝加莱标准硬件，EtherNet/IP=罗克韦尔基于以太网。',
     '3-5': 'Modbus 用寄存器组织数据，四种：线圈（1 位可读写，开关状态）、离散输入（1 位只读，限位开关）、保持寄存器（16 位可读写，设定值）、输入寄存器（16 位只读，测量值）。口诀：保持=设定值、输入=测量值、线圈=开关可写、离散=开关只读。',
-    '3-6': 'Modbus 通信故障排查按顺序来：网线（ip link）→ ping 从站 IP → 端口（ss -tln，如 8502）→ 从站 ID / 寄存器地址 → 防火墙。一步步排除，别跳步骤。',
+    '3-6': 'Modbus 通信故障排查按顺序来：网线（ip link）→ ping 从站 IP → 端口（ss -tln，如 502）→ 从站 ID / 寄存器地址 → 防火墙。一步步排除，别跳步骤。',
     '3-hidden': 'QModMaster 是外部调试工具，直连 Modbus 从站验证读写。连接时填从站的 IP 地址和端口，能读到数据就说明从站和配置都对。',
 
     '3-9': 'Modbus 通信中断的排障流程：先确认 Server 运行，再检查端口号是否匹配，最后查防火墙有没有阻挡。一步一步来，别跳步骤。',
@@ -1357,7 +1617,7 @@ function addDirectorBox(container, text, cb, mood) {
   `;
   container.prepend(box);
   const textEl = box.querySelector('.director-text');
-  typewrite(textEl, text, 25, () => {
+  typewrite(textEl, String(text || '').replace(/^厂长[:：]\s*/, ''), 25, () => {
     const toggle = box.querySelector('.teach-toggle');
     if (toggle) {
       toggle.style.display = 'block';
@@ -1456,7 +1716,14 @@ async function loadState() {
     gameState.check = res.data.check || {};
     gameState.stars = res.data.stars || {};
     gameState.achievements = res.data.achievements || {};
+    gameState.teacherAwards = res.data.teacherAwards || {};
     gameState.hasPassword = !!res.data.hasPassword;
+    gameState.coins = res.data.coins || 0;
+    gameState.inventory = res.data.inventory || {};
+    gameState.salaryInfo = res.data.salaryInfo || {};
+    if (res.data.salaryInfo && res.data.salaryInfo.justClaimed) {
+      setTimeout(() => showToast('💰 上班打卡 +' + res.data.salaryInfo.rate + ' 金币（今日工资）', 'success'), 1200);
+    }
   }
 }
 
@@ -1599,6 +1866,7 @@ function selectLevel(lvId) {
   const lv = content.levels.find(l => l.id === lvId);
   if (!lv) return;
   currentLevelId = lvId;
+  setArea(lvId); playAreaMusic();
   
   // Show level intro dialogue first
   showLevelIntro(lv, () => {
@@ -1631,8 +1899,7 @@ function renderMission() {
     const wasCompleted = sessionStorage.getItem('levelCompleteShown_' + lv.id) === 'true';
     if (!wasCompleted) {
       sessionStorage.setItem('levelCompleteShown_' + lv.id, 'true');
-      // Small delay to let UI settle
-      setTimeout(() => showLevelComplete(lv), 300);
+      pendingLevelComplete = lv;
     }
   } else {
     story.style.display = 'none';
@@ -1695,15 +1962,31 @@ function renderMission() {
       const isMatch = wType === 'match';
       const isStorm = wType === 'storm';
       const isAlarm = wType === 'alarm';
+      const isTyping = wType === 'typing';
+      const isShooter = wType === 'shooter';
       const row = document.createElement('li');
-      row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked');
-      row.innerHTML = '<span class="ri-emoji">' + (unlocked ? (isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : '🃏') : '🔒') + '</span><span class="ri-name">' + ((isQuick || isMatch || isStorm || isAlarm) ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name)) + '</span><span class="ri-meta">' + (isQuick ? w.size + ' 题' : isMatch ? w.size + ' 组' : isStorm ? (w.waves + ' 波') : isAlarm ? (w.devices + ' 台') : (w.size * 2) + ' 张') + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
+      row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter;
+      const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
+      let _meta;
+      if (isQuick) _meta = w.size + ' 题';
+      else if (isMatch) _meta = w.size + ' 组';
+      else if (isStorm) _meta = (w.waves || 0) + ' 波';
+      else if (isAlarm) _meta = (w.devices || 0) + ' 台';
+      else if (isTyping) _meta = (w.words ? w.words.length : 0) + ' 词';
+      else if (isShooter) _meta = (w.waves || 4) + ' 波编队' + (w.advanced ? ' · 进阶' : '');
+      else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
+      else _meta = (w.size * 2) + ' 张';
+      row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
       row.onclick = () => {
         if (!unlocked) { showToast('还没有解锁，先完成对应任务', 'error'); return; }
         if (isQuick) openQuickMatch(w, (win) => { if (win) showToast('⚡ 快打完成', 'success'); });
         else if (isMatch) openMatchGame(w, (win) => { if (win) showToast('🔗 连线完成', 'success'); });
         else if (isStorm) openStormDefense(w, (win) => { if (win) showToast('🌪️ 数据风暴守住了', 'success'); });
         else if (isAlarm) openAlarmRush(w, (win) => { if (win) showToast('🚨 产线守住了', 'success'); });
+        else if (isTyping) openTypingDefense(w, (win) => { if (win) showToast('🔫 术语防线守住了', 'success'); });
+        else if (isShooter) openShooter(w, (win) => { if (win) showToast('🛸 数据蜂群清空！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -1715,7 +1998,7 @@ function renderMission() {
     const lvDone = levelProgress(lv.id).completed;
     const row = document.createElement('li');
     row.className = 'review-inline review-bonus' + (lvDone ? ' unlocked' : ' locked');
-    row.innerHTML = '<span class="ri-emoji">' + (lvDone ? '🏆' : '🔒') + '</span><span class="ri-name">记忆大师挑战 · 三层堆叠</span><span class="ri-meta">' + (lvDone ? '可玩' : '通关本关解锁') + '</span>';
+    row.innerHTML = '<span class="ri-emoji">' + (lvDone ? '🏆' : '🔒') + '</span><span class="ri-name">记忆大师挑战 · 5 层递进</span><span class="ri-meta">' + (lvDone ? '可玩' : '通关本关解锁') + '</span>';
     row.onclick = () => {
       if (!lvDone) { showToast('通关本关后才能挑战记忆大师', 'error'); return; }
       openMemoryMatch(tl.bonus, (win) => { if (win) showToast('🏆 记忆大师完成！', 'success'); });
@@ -1772,6 +2055,7 @@ function closeModal() {
   if (!el) return;
   el.classList.remove('show');
   currentTaskId = null;
+  playAreaMusic();
 }
 
 function completeTask(taskId, xp) {
@@ -1981,7 +2265,8 @@ function renderTypeTerminal(container, task, cfg) {
           'docker': `用法：docker [命令] [选项]\n\n常用命令：\n  run         运行容器\n  ps          查看容器列表\n  stop        停止容器\n  rm          删除容器\n  pull        下载镜像`,
           'mosquitto_sub': `用法：mosquitto_sub [选项]\n\n选项：\n  -h <主机>    Broker 地址\n  -p <端口>    Broker 端口\n  -t <主题>    订阅主题\n  -v          显示消息详情`,
           'mosquitto_pub': `用法：mosquitto_pub [选项]\n\n选项：\n  -h <主机>    Broker 地址\n  -p <端口>    Broker 端口\n  -t <主题>    发布主题\n  -m <消息>    消息内容`,
-          'systemctl': `用法：systemctl [命令] [服务名]\n\n常用命令：\n  status       查看服务状态\n  start        启动服务\n  stop         停止服务\n  restart      重启服务\n  enable       设置开机自启\n\n示例：\n  systemctl status edge-service\n  systemctl restart ssh`
+          'systemctl': `用法：systemctl [命令] [服务名]\n\n常用命令：\n  status       查看服务状态\n  start        启动服务\n  stop         停止服务\n  restart      重启服务\n  enable       设置开机自启\n\n示例：\n  systemctl status edge-service\n  systemctl restart ssh`,
+          'ss': `用法：ss [选项]\n\n选项：\n  -t  仅显示 TCP\n  -l  仅显示监听（LISTEN）端口\n  -n  不解析服务名，显示数字端口\n  -p  显示使用该端口的进程\n\n示例：\n  ss -tlnp            列出所有 TCP 监听端口\n  ss -tln | grep 502  只看 502 端口`
         };
         const helpText = helpMap[baseCmd] || `${baseCmd}: 试试 ${expected[0]} 看看效果`;
         // Type out help line by line
@@ -2374,7 +2659,8 @@ registerInteraction('install_wizard', {
       updateProgress();
       const step = steps[current];
       const stage = document.getElementById('wizardStage');
-      var html = '<div class="wizard-narrative"><span class="wiz-narr-icon">\ud83d\udc68\u200d\ud83d\udcbc</span> <span class="wiz-narr-label">厂长：</span>' + step.narrative + '</div>';
+      var _narr = String(step.narrative || '').replace(/^厂长[:：]\s*/, '');
+      var html = '<div class="wizard-narrative"><span class="wiz-narr-icon">\ud83d\udc68\u200d\ud83d\udcbc</span> <span class="wiz-narr-label">厂长：</span>' + _narr + '</div>';
       html += '<div class="wizard-question">' + step.question + '</div>';
       if (step.inputType === 'number') {
         html += '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size: 15px"><input type="number" id="wizNum" placeholder="输入数字" style="width:80px;background:#0a0a10;border:1px solid var(--border);color:var(--text);padding:8px;font-size:14px" min="0" max="32"><span style="color:var(--dim)">GB</span></div>';
@@ -2489,15 +2775,26 @@ registerInteraction('install_wizard', {
       document.getElementById('modalFoot').innerHTML = '';
 
       if (!ok) {
-        // 两步提示：第一次给功能提示，第二次（连续猜错）直接给答案并标记经验减半
-        var already = !!cmdHintGiven[current];
+        // 渐进提示：若配置了 hints 数组则逐步给出答案片段，全部用完再给完整答案（标记经验减半）
+        var tries = cmdHintGiven[current] || 0;
+        var hintList = (step.hints && step.hints.length) ? step.hints : null;
         var hintText;
-        if (!already) {
-          hintText = '💡 提示: ' + String(step.errorHint || '再看看厂长刚才教的，命令格式要对').replace(/</g,'&lt;');
-          cmdHintGiven[current] = true;
+        if (hintList) {
+          if (tries < hintList.length) {
+            hintText = '💡 提示 ' + (tries + 1) + '/' + hintList.length + ': ' + String(hintList[tries]).replace(/</g,'&lt;');
+            cmdHintGiven[current] = tries + 1;
+          } else {
+            hintText = '📖 答案是: ' + String(step.correctCommand).replace(/</g,'&lt;');
+            cmdErrorCount++;
+          }
         } else {
-          hintText = '📖 答案是: ' + String(step.correctCommand).replace(/</g,'&lt;');
-          cmdErrorCount++;
+          if (tries === 0) {
+            hintText = '💡 提示: ' + String(step.errorHint || '再看看厂长刚才教的，命令格式要对').replace(/</g,'&lt;');
+            cmdHintGiven[current] = 1;
+          } else {
+            hintText = '📖 答案是: ' + String(step.correctCommand).replace(/</g,'&lt;');
+            cmdErrorCount++;
+          }
         }
         if (termRoot) {
           var termBody = termRoot.querySelector('.term-body');
@@ -2561,9 +2858,24 @@ registerInteraction('install_wizard', {
               okDiv.style.marginTop = '6px';
               out.appendChild(okDiv);
               playSound('success');
-              current++;
-              multiSelected = new Set();
-              setTimeout(function() { renderStep(); stage.style.opacity = '1'; }, 1200);
+              // 厂长解读终端输出含义（如有 explain 字段）
+              if (step.explain) {
+                var ex = document.createElement('div');
+                ex.className = 'wiz-explain';
+                ex.innerHTML = '<span style="color:var(--amber);font-weight:bold">厂长解读：</span>' + String(step.explain).replace(/</g,'&lt;');
+                out.appendChild(ex);
+                out.scrollTop = out.scrollHeight;
+              }
+              // 不自动跳转：看完结果点“确认”再进下一步
+              document.getElementById('modalFoot').innerHTML =
+                '<button class="btn btn-wiz-cancel" onclick="closeModal()">取消</button>' +
+                '<button class="btn btn-primary" onclick="window.wizNext()">\u2713 确认，下一步</button>';
+              window.wizNext = function() {
+                current++;
+                multiSelected = new Set();
+                renderStep();
+                stage.style.opacity = '1';
+              };
             } else {
       errors++;
       streak = 0;
@@ -2738,9 +3050,15 @@ registerInteraction('sort', {
     }
 
     container.innerHTML = `
+      <div class="wizard-narrative" id="sortTeach" style="margin-bottom:10px"></div>
       <div style="font-size: 14px;color:var(--dim);margin-bottom:10px">拖拽排序：将下列项目按正确顺序排列</div>
       <div class="sort-area" id="sortArea"></div>
     `;
+    // 题面上方内嵌教学（sort 本身不带讲解，这里补上）
+    try{
+      const _teach = generateTeach(task);
+      if (_teach) document.getElementById('sortTeach').innerHTML = '<span class="wiz-narr-label">厂长：</span>' + escHtml(_teach);
+    }catch(e){}
 
     const area = document.getElementById('sortArea');
     let dragSrc = null;
@@ -2821,7 +3139,7 @@ registerInteraction('sort', {
 registerInteraction('code_review', {
   render(container, task) {
     const cfg = task.config;
-    const codeLines = (cfg.code || '').split('\n').map(l => l.trim()).filter(Boolean);
+    const codeLines = (cfg.code || '').replace(/\\n/g, '\n').split('\n').map(l => l.trim()).filter(Boolean);
     const codeHtml = codeLines.map((l, i) =>
       '<div class="code-line"><span class="code-no">' + (i + 1) + '</span><span class="code-text">' + l + '</span></div>'
     ).join('');
@@ -3123,6 +3441,7 @@ registerInteraction('drag_classify', {
 registerInteraction('boss_fight', {
   render(container, task) {
     const cfg = task.config;
+    playMusic('boss');
     let phase = 0;
     let qIdx = 0;
     let bossHP = 100;
@@ -3509,9 +3828,121 @@ function renderHeader() {
   document.getElementById('rankDisplay').textContent = rank.title;
   document.getElementById('xpFill').style.width = Math.min(pct, 100) + '%';
   document.getElementById('xpLabel').textContent = xp + ' / ' + (nextRank ? nextRank.min + '' : 'MAX');
+  var _wa = document.getElementById('walletAmt');
+  if (_wa) _wa.textContent = (gameState.coins || 0);
   
   // Update director mini-avatar mood
   updateDirectorAvatar();
+}
+
+// =========================================================================
+// 9b. 工资 & 商城（钱包）
+// =========================================================================
+let SHOP_CACHE = null;
+function loadShop() {
+  if (SHOP_CACHE) return Promise.resolve(SHOP_CACHE);
+  return api('/api/student/shop').then(r => { SHOP_CACHE = (r && r.ok) ? r.data : []; return SHOP_CACHE; }).catch(() => []);
+}
+function walletRank(xp) {
+  var R=[{min:0,t:'实习生',e:'🔰'},{min:1000,t:'学徒',e:'🔧'},{min:2500,t:'技工',e:'⚙️'},{min:4500,t:'工程师',e:'🛠️'},{min:7000,t:'专家',e:'🏆'}];
+  var r=R[0]; for (var i=0;i<R.length;i++) if (xp>=R[i].min) r=R[i];
+  return r;
+}
+function buildWallet() {
+  if (document.getElementById('walletOverlay')) return;
+  var ov=document.createElement('div');
+  ov.className='gz-overlay'; ov.id='walletOverlay';
+  ov.innerHTML='<div class="gz-box"><div class="pd-head"><div><div class="pd-title">💰 工资与商城</div><div class="pd-sub">上班打卡领工资 · 金币买道具</div></div><div class="pd-close" onclick="closeWallet()">✕</div></div><div class="pd-body" id="walletBody"></div></div>';
+  document.body.appendChild(ov);
+}
+function openWallet(){ buildWallet(); renderWallet(); document.getElementById('walletOverlay').classList.add('show'); }
+function closeWallet(){ var o=document.getElementById('walletOverlay'); if(o) o.classList.remove('show'); }
+function renderWallet() {
+  var body=document.getElementById('walletBody'); if(!body) return;
+  var si=gameState.salaryInfo||{}, inv=gameState.inventory||{}, coins=gameState.coins||0;
+  var rank=walletRank(si.xp||0), rate=si.rate||100;
+  loadShop().then(function(items){
+    var html='';
+    html+='<div class="gz-section">📅 上班打卡</div>';
+    html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji">'+rank.e+'</span><span class="gz-name">'+rank.t+' · 日薪 <b style="color:var(--amber)">'+rate+'</b> 金币</span><span class="gz-meta">本月累计 <b style="color:var(--amber)">'+(si.monthTotal||0)+'</b></span></div>';
+    if (si.claimedToday) html+='<div class="gz-row" style="cursor:default;border-color:var(--green)"><span class="gz-emoji">✅</span><span class="gz-name">今日工资已领（'+rate+' 金币）</span></div>';
+    else html+='<div class="gz-row" onclick="claimSalaryNow()"><span class="gz-emoji">🕐</span><span class="gz-name">今日还没打卡领工资</span><span class="gz-meta"><button class="mm-btn primary" onclick="event.stopPropagation();claimSalaryNow()">打卡 +'+rate+'</button></span></div>';
+    html+='<div class="gz-section">🛒 商城 · 余额 <b style="color:var(--amber)">'+coins+'</b> 💰</div>';
+    (items||[]).forEach(function(it){
+      var afford=coins>=it.price;
+      var owned=(inv[it.id]||0)>0 && (it.type==='skin'||it.type==='title') ? '已拥有' : '';
+      html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji">'+it.emoji+'</span><span class="gz-name">'+escHtml(it.name)+' <span style="font-size:12px;color:var(--dim)">'+escHtml(it.desc)+'</span></span><span class="gz-meta">'+it.price+'💰 '+(owned?owned+' · ':'')+'</span><span><button class="mm-btn'+(afford?' primary':'')+'" data-id="'+it.id+'" '+(afford?'onclick="buyItem(this.dataset.id)"':'disabled style="opacity:.4"')+'>购买</button></span></div>';
+    });
+    var ownedList=Object.keys(inv).filter(function(k){return inv[k]>0;});
+    html+='<div class="gz-section">🎒 背包</div>';
+    if (!ownedList.length) html+='<div class="gz-row" style="cursor:default"><span class="gz-name" style="color:var(--dim)">背包空空，去商城买点道具吧</span></div>';
+    else {
+      ownedList.forEach(function(id){
+        var it=null; (items||[]).forEach(function(x){ if(x.id===id) it=x; });
+        var usable=(it && (it.type==='shooter'||it.type==='task'));
+        html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji">'+(it?it.emoji:'🎁')+'</span><span class="gz-name">'+escHtml(it?it.name:id)+' ×'+inv[id]+'</span><span class="gz-meta">'+(usable?'进游戏时可用':'永久生效')+'</span></div>';
+      });
+    }
+    // 外观
+    html+='<div class="gz-section">🎨 外观（装备皮肤，永久）</div>';
+    html+='<div class="gz-row" style="cursor:default;background:none"><span class="gz-name" style="font-size:13px;color:var(--cyan)">✈️ 飞机皮肤</span></div>';
+    Object.keys(PLANE_SKINS).forEach(function(id){
+      var sk=PLANE_SKINS[id], owned=(id==='default')||(inv[id]>0), eq=getEquippedSkin('plane')===id;
+      html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji" style="background:'+sk.col+';width:18px;height:18px;border-radius:4px;display:inline-block"></span><span class="gz-name">'+sk.name+'</span><span class="gz-meta">'+(eq?'已装备':(owned?'已拥有':'未拥有'))+'</span><span>'+(owned&&!eq?'<button class="mm-btn" data-type="plane" data-id="'+id+'" onclick="equipSkin(this.dataset.type,this.dataset.id)">装备</button>':'')+'</span></div>';
+    });
+    html+='<div class="gz-row" style="cursor:default;background:none"><span class="gz-name" style="font-size:13px;color:var(--cyan)">👾 敌人皮肤</span></div>';
+    Object.keys(ENEMY_SKIN_COLORS).forEach(function(id){
+      var sk=ENEMY_SKIN_COLORS[id], owned=(id==='default')||(inv[id]>0), eq=getEquippedSkin('enemy')===id;
+      html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji" style="background:'+sk.col+';width:18px;height:18px;border-radius:4px;display:inline-block"></span><span class="gz-name">'+sk.name+'</span><span class="gz-meta">'+(eq?'已装备':(owned?'已拥有':'未拥有'))+'</span><span>'+(owned&&!eq?'<button class="mm-btn" data-type="enemy" data-id="'+id+'" onclick="equipSkin(this.dataset.type,this.dataset.id)">装备</button>':'')+'</span></div>';
+    });
+    body.innerHTML=html;
+  });
+}
+function claimSalaryNow() {
+  api('/api/student/claim-salary', { method:'POST', body:'{}' }).then(function(r){
+    if (r && r.ok) {
+      gameState.coins=r.data.coins;
+      gameState.salaryInfo=Object.assign({}, gameState.salaryInfo, { monthTotal:r.data.monthTotal, rate:r.data.rate, claimedToday:true });
+      showToast('💰 打卡成功 +'+r.data.gained+' 金币','success');
+      renderWallet(); renderHeader();
+    } else showToast((r&&r.error)||'打卡失败','error');
+  });
+}
+function buyItem(itemId) {
+  api('/api/student/buy', { method:'POST', body:JSON.stringify({itemId:itemId}) }).then(function(r){
+    if (r && r.ok) {
+      gameState.coins=r.data.coins; gameState.inventory=r.data.inventory;
+      showToast('🛒 购买成功！','success');
+      renderWallet(); renderHeader();
+    } else showToast((r&&r.error)||'购买失败','error');
+  });
+}
+// ===== 皮肤系统 =====
+const PLANE_SKINS = {
+  default:      { name:'翠绿战机', col:'#00e676', ck:'#aaffcc' },
+  plane_skin:   { name:'黄金战机', col:'#ffb300', ck:'#ffe9a8' },
+  plane_red:    { name:'烈焰红',   col:'#ff5252', ck:'#ffd0d0' },
+  plane_blue:   { name:'冰晶蓝',   col:'#40c4ff', ck:'#d6f5ff' },
+  plane_purple: { name:'紫电',     col:'#b388ff', ck:'#ecdfff' },
+  plane_neon:   { name:'霓虹',     col:'#ff6ec7', ck:'#ffe0f3' }
+};
+const ENEMY_SKIN_COLORS = {
+  default:      { name:'网络蓝', col:'#00bcd4' },
+  enemy_night:  { name:'夜战迷彩', col:'#5c6bc0' },
+  enemy_matrix: { name:'矩阵绿', col:'#00c853' },
+  enemy_lava:   { name:'岩浆橙', col:'#ff7043' },
+  enemy_ice:    { name:'寒冰蓝', col:'#4fc3f7' },
+  enemy_void:   { name:'紫雾', col:'#ab6cff' }
+};
+function getEquippedSkin(type){ try{ return localStorage.getItem('skin_'+type) || 'default'; }catch(e){ return 'default'; } }
+function equippedEnemySkin(){ var m=ENEMY_SKIN_COLORS[getEquippedSkin('enemy')]; return m ? m.col : null; }
+function equipSkin(type, id){
+  var inv=gameState.inventory||{};
+  if (id!=='default' && !(inv[id]>0)) { showToast('还没有这个皮肤，先去商城买', 'error'); return; }
+  try{ localStorage.setItem('skin_'+type, id); }catch(e){}
+  var nm = type==='plane' ? ((PLANE_SKINS[id]||{}).name) : ((ENEMY_SKIN_COLORS[id]||{}).name);
+  showToast('🎨 已装备：'+(nm||id), 'success');
+  renderWallet();
 }
 
 // Director mini-avatar mood sync
@@ -3544,16 +3975,16 @@ function escHtml(str) {
 const ACHIEVEMENTS = [
   { id: 'first_task', name: '第一滴汗', desc: '完成第 1 个任务', emoji: '💧', test: c => c.doneCount >= 1 },
   { id: 'task_10', name: '小试牛刀', desc: '累计完成 10 个任务', emoji: '🔟', test: c => c.doneCount >= 10 },
-  { id: 'task_30', name: '熟练工', desc: '累计完成 30 个任务', emoji: '⚙️', test: c => c.doneCount >= 30 },
+  { id: 'task_30', name: '熟练工', desc: '累计完成 30 个任务', emoji: '🔧', test: c => c.doneCount >= 30 },
   { id: 'task_60', name: '产线骨干', desc: '累计完成 60 个任务', emoji: '🏅', test: c => c.doneCount >= 60 },
   { id: 'task_all', name: '全勤王', desc: '完成全部任务', emoji: '👑', test: c => c.allDone },
   { id: 'lv_1', name: '数字工位落成', desc: '完成第 1 关', emoji: '🖥️', test: c => !!c.levelDone['1'] },
   { id: 'lv_2', name: '正式入职', desc: '完成第 2 关', emoji: '🎛️', test: c => !!c.levelDone['2'] },
-  { id: 'lv_3', name: '设备联网成功', desc: '完成第 3 关', emoji: '⚙️', test: c => !!c.levelDone['3'] },
+  { id: 'lv_3', name: '设备联网成功', desc: '完成第 3 关', emoji: '🌐', test: c => !!c.levelDone['3'] },
   { id: 'lv_4', name: '边缘计算大师', desc: '完成第 4 关', emoji: '📦', test: c => !!c.levelDone['4'] },
   { id: 'lv_5', name: '云端漫步', desc: '完成第 5 关', emoji: '☁️', test: c => !!c.levelDone['5'] },
   { id: 'lv_6', name: '驾驶舱落成', desc: '完成第 6 关', emoji: '📊', test: c => !!c.levelDone['6'] },
-  { id: 'lv_7', name: '数据大贯通', desc: '完成第 7 关', emoji: '🔗', test: c => !!c.levelDone['7'] },
+  { id: 'lv_7', name: '数据大贯通', desc: '完成第 7 关', emoji: '🧲', test: c => !!c.levelDone['7'] },
   { id: 'lv_8', name: 'AI 实验室点亮', desc: '完成第 8 关', emoji: '🤖', test: c => !!c.levelDone['8'] },
   { id: 'factory_all', name: '全厂灯火通明', desc: '8 个区域全部点亮', emoji: '🏭', test: c => c.allLevels },
   { id: 'pioneer', name: '开路先锋', desc: '成为某一关的班级首位完成者', emoji: '🚩', test: c => c.isPioneer },
@@ -3562,23 +3993,23 @@ const ACHIEVEMENTS = [
   { id: 'xp_4500', name: '高级工程师', desc: '累计获得 4500 XP', emoji: '🛠️', test: c => c.xp >= 4500 },
   { id: 'star_3', name: '三星好评', desc: '某一关综合星数达到 3 星', emoji: '⭐', test: c => c.anyLevel3Star },
   { id: 'star_5', name: '满星传说', desc: '某一关综合星数达到 5 星', emoji: '🌟', test: c => c.anyLevel5Star },
-  { id: 'mm_streak', name: '翻牌连对王', desc: '某次翻牌连续配对成功 5 次（不失误）', emoji: '🃏', test: c => c.mmStreak >= 5 },
+  { id: 'mm_streak', name: '翻牌连对王', desc: '某次翻牌连续配对成功 5 次（不失误）', emoji: '🔥', test: c => c.mmStreak >= 5 },
   { id: 'qk_combo', name: '快打连击王', desc: '快打最高连击达到 5', emoji: '⚡', test: c => c.qkCombo >= 5 },
   { id: 'game_win1', name: '小游戏初体验', desc: '完成 1 个小游戏', emoji: '🎮', test: c => c.gamesWin >= 1 },
-  { id: 'game_win3', name: '小游戏新兵', desc: '完成 3 个小游戏', emoji: '🎯', test: c => c.gamesWin >= 3 },
-  { id: 'game_win8', name: '小游戏达人', desc: '完成 8 个小游戏', emoji: '🏆', test: c => c.gamesWin >= 8 },
+  { id: 'game_win3', name: '小游戏新兵', desc: '完成 3 个小游戏', emoji: '🎲', test: c => c.gamesWin >= 3 },
+  { id: 'game_win8', name: '小游戏达人', desc: '完成 8 个小游戏', emoji: '🥇', test: c => c.gamesWin >= 8 },
   { id: 'mm_matched', name: '翻牌收藏家', desc: '累计配对成功 30 次', emoji: '🗂️', test: c => c.mmMatched >= 30 },
   // —— 小游戏·分类累计 ——
   { id: 'mm_win3', name: '翻牌新生', desc: '累计完成 3 次翻牌游戏', emoji: '🃏', test: c => c.mmWins >= 3 },
-  { id: 'mm_win8', name: '翻牌熟练工', desc: '累计完成 8 次翻牌游戏', emoji: '🃏', test: c => c.mmWins >= 8 },
-  { id: 'qk_win5', name: '快打熟练工', desc: '累计完成 5 次快打', emoji: '⚡', test: c => c.qkWins >= 5 },
-  { id: 'qk_win12', name: '快打大师', desc: '累计完成 12 次快打', emoji: '⚡', test: c => c.qkWins >= 12 },
+  { id: 'mm_win8', name: '翻牌熟练工', desc: '累计完成 8 次翻牌游戏', emoji: '🧩', test: c => c.mmWins >= 8 },
+  { id: 'qk_win5', name: '快打熟练工', desc: '累计完成 5 次快打', emoji: '🖊️', test: c => c.qkWins >= 5 },
+  { id: 'qk_win12', name: '快打大师', desc: '累计完成 12 次快打', emoji: '🎓', test: c => c.qkWins >= 12 },
   { id: 'match_win3', name: '连线小能手', desc: '累计完成 3 次连线配对', emoji: '🔗', test: c => c.matchWins >= 3 },
-  { id: 'all_types', name: '全能选手', desc: '翻牌、快打、连线三类小游戏都完成过', emoji: '🎖️', test: c => c.mmWins >= 1 && c.qkWins >= 1 && c.matchWins >= 1 },
+  { id: 'all_types', name: '全能选手', desc: '翻牌、快打、连线三类小游戏都完成过', emoji: '🏟️', test: c => c.mmWins >= 1 && c.qkWins >= 1 && c.matchWins >= 1 },
   // —— 小游戏·单关重复（鼓励反复玩、加深记忆）——
   { id: 'l1_flip3', name: '首关翻牌·三顾', desc: '第 1 关翻牌游戏累计完成 3 次', emoji: '🧠', test: c => (c.lvlWins['1'] || 0) >= 3 },
   { id: 'l1_flip5', name: '首关翻牌·常客', desc: '第 1 关翻牌游戏累计完成 5 次', emoji: '🎩', test: c => (c.lvlWins['1'] || 0) >= 5 },
-  { id: 'l2_quick5', name: '二关快打·老手', desc: '第 2 关快打游戏累计完成 5 次', emoji: '⌨️', test: c => (c.lvlWins['2'] || 0) >= 5 },
+  { id: 'l2_quick5', name: '二关快打·老手', desc: '第 2 关快打游戏累计完成 5 次', emoji: '🐇', test: c => (c.lvlWins['2'] || 0) >= 5 },
   { id: 'l3_flip3', name: '三关翻牌·熟客', desc: '第 3 关翻牌游戏累计完成 3 次', emoji: '🔬', test: c => (c.lvlWins['3'] || 0) >= 3 },
   // —— 小游戏·累计 ——
   { id: 'game_20', name: '游戏厅常客', desc: '累计完成 20 个小游戏', emoji: '🕹️', test: c => c.gamesWin >= 20 },
@@ -3587,8 +4018,40 @@ const ACHIEVEMENTS = [
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
   { id: 'pedia_70', name: '图鉴收藏家', desc: '术语图鉴收集 70 个', emoji: '🏛️', test: c => c.pediaCount >= 70 },
   // —— 技术流（零失误 / 满贯）——
-  { id: 'mm_streak6', name: '翻牌零失误', desc: '某次翻牌连续配对成功 6 次（一次不失误）', emoji: '🎯', test: c => c.mmStreak >= 6 },
-  { id: 'qk_full', name: '快打满贯', desc: '快打最高连击达到 6（一次不错）', emoji: '🔥', test: c => c.qkCombo >= 6 }
+  { id: 'mm_streak6', name: '翻牌零失误', desc: '某次翻牌连续配对成功 6 次（一次不失误）', emoji: '💯', test: c => c.mmStreak >= 6 },
+  { id: 'qk_full', name: '快打满贯', desc: '快打最高连击达到 6（一次不错）', emoji: '🎯', test: c => c.qkCombo >= 6 },
+  // —— 登录签到（系统自动发放，教师也可手动补发）——
+  { id: 'login_first', name: '初次报到', desc: '完成人生第一次登录', emoji: '👋', test: () => false },
+  { id: 'login_3', name: '三日坚持', desc: '连续登录 3 天', emoji: '📆', test: () => false },
+  { id: 'login_7', name: '七日打卡', desc: '连续登录 7 天', emoji: '🗓️', test: () => false },
+  { id: 'login_14', name: '半月全勤', desc: '连续登录 14 天', emoji: '📅', test: () => false },
+  { id: 'login_30', name: '满月老友', desc: '连续登录 30 天', emoji: '🌕', test: () => false },
+  // —— 反馈 BUG · 抓虫有奖（教师手动发放，按反馈次数递进）——
+  { id: 'bug_1', name: '火眼金睛', desc: '反馈 1 个 Bug，眼睛真尖', emoji: '👁️', test: () => false },
+  { id: 'bug_3', name: '找茬学徒', desc: '反馈 3 个 Bug，正式入门', emoji: '🔍', test: () => false },
+  { id: 'bug_5', name: '质检员', desc: '反馈 5 个 Bug，领到质检工牌', emoji: '🧐', test: () => false },
+  { id: 'bug_8', name: 'Bug 猎手', desc: '反馈 8 个 Bug，一抓一个准', emoji: '🕵️', test: () => false },
+  { id: 'bug_12', name: '质检组长', desc: '反馈 12 个 Bug，能带找茬小队', emoji: '📋', test: () => false },
+  { id: 'bug_20', name: '质量工程师', desc: '反馈 20 个 Bug，产线质量你说了算', emoji: '🧪', test: () => false },
+  { id: 'bug_30', name: '质控总监', desc: '反馈 30 个 Bug，全厂质量大权在握', emoji: '📜', test: () => false },
+  { id: 'bug_50', name: 'Bug 终结者', desc: '反馈 50 个 Bug，让 Bug 无处可逃', emoji: '💣', test: () => false },
+  // —— 术语防御战（打字炮台）——
+  { id: 'ty_1', name: '首战告捷', desc: '完成 1 次术语防御战', emoji: '🔫', test: c => c.typingWins >= 1 },
+  { id: 'ty_2', name: '二连击落', desc: '完成 2 次术语防御战', emoji: '⌨️', test: c => c.typingWins >= 2 },
+  { id: 'ty_5', name: '键盘杀手', desc: '完成 5 次术语防御战', emoji: '🖱️', test: c => c.typingWins >= 5 },
+  { id: 'ty_10', name: '打字大师', desc: '完成 10 次术语防御战', emoji: '🎹', test: c => c.typingWins >= 10 },
+  { id: 'ty_20', name: '术语终结者', desc: '完成 20 次术语防御战', emoji: '🥷', test: c => c.typingWins >= 20 },
+  // —— 数据蜂群（小蜜蜂式射击）——
+  { id: 'sh_1', name: '首战清空', desc: '通关 1 次数据蜂群', emoji: '🛸', test: c => c.shooterWins >= 1 },
+  { id: 'sh_3', name: '蜂群杀手', desc: '通关 3 次数据蜂群', emoji: '🐝', test: c => c.shooterWins >= 3 },
+  { id: 'sh_5', name: '王牌炮手', desc: '通关 5 次数据蜂群', emoji: '💥', test: c => c.shooterWins >= 5 },
+  { id: 'sh_lv3', name: '火力全开', desc: '数据蜂群中火力升到 3 级', emoji: '🚀', test: c => (c.shooterMaxLevel||0) >= 3 },
+  { id: 'sh_pk20', name: '拾荒高手', desc: '数据蜂群累计拾取 20 个道具', emoji: '🎁', test: c => (c.shooterPickups||0) >= 20 },
+  // —— 解锁小游戏类型 ——
+  { id: 'gt_1', name: '游戏开张', desc: '解锁 1 种小游戏类型', emoji: '🎈', test: c => c.gameTypes >= 1 },
+  { id: 'gt_3', name: '渐入佳境', desc: '解锁 3 种小游戏类型', emoji: '🎪', test: c => c.gameTypes >= 3 },
+  { id: 'gt_5', name: '游戏老玩家', desc: '解锁 5 种小游戏类型', emoji: '🏆', test: c => c.gameTypes >= 5 },
+  { id: 'gt_all', name: '全类型制霸', desc: '解锁全部小游戏类型', emoji: '👾', test: c => c.gameTypes >= 7 }
 ];
 
 // 小游戏表现统计（localStorage，本地记录）
@@ -3601,8 +4064,359 @@ function bumpGameStats(patch) {
   Object.assign(s, patch);
   saveGameStats(s);
 }
+// ===== 小游戏周目：通关次数 → 二周目(加难) / 三周目(无限战) =====
+function miniTier(id) { if (!id) return 0; try { return parseInt(localStorage.getItem('mini_clear_' + id) || '0', 10); } catch (e) { return 0; } }
+function miniMarkClear(id) { if (!id) return; try { var n = miniTier(id); localStorage.setItem('mini_clear_' + id, String(n + 1)); } catch (e) {} }
+function miniTierBadge(id) {
+  var t = miniTier(id);
+  if (t >= 2) return ' <span style="color:var(--cyan)">∞ 无限战</span>';
+  if (t === 1) return ' <span style="color:var(--green)">✓ 已通关</span>';
+  return '';
+}
+function applyMiniTier(cfg) {
+  if (!cfg) return cfg;
+  var t = miniTier(cfg.id);
+  cfg._tier = t;
+  cfg._hard = t >= 1;      // 二周目：加难
+  cfg._endless = t >= 2;   // 三周目：不限时无限战
+  return cfg;
+}
+
 // 小游戏完成：+1 完成数（按类型/关卡累计）并触发成就判定
 // type: 'mm'(翻牌) | 'qk'(快打) | 'match'(连线) | 'other'
+// =========================================================================
+// 9f. TYPING DEFENSE — 术语防御战（打字炮台）
+// 关键词从上往下掉，底部炮台。输入完整命令→炮台发射打爆关键词；输错重新开始。
+// =========================================================================
+function openTypingDefense(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('typing')) { showTypingTutorial(cfg, function(){ openTypingDefense(cfg, onComplete); }); return; }
+  playMusic(gameSong('typing') || 'match');
+  const words = (cfg.words || []).filter(Boolean).map(String);
+  if (!words.length) { showToast('没有可用的关键词', 'error'); return; }
+  // 难度随游玩次数递进：新手(首玩必能通) → 进阶 → 高手
+  const _tw = (getGameStats().typingWins || 0);
+  const _diff = cfg._hard ? 2 : Math.min(_tw, 2);   // 二周目直接上高手场
+  const switchEnabled = _diff >= 1;   // 进阶/高手场开放 TAB 切词
+  const LV = [
+    { name:'新手场', waves:2, perWave:3, lives:6, wt:20, spd:10, acc:0.3, max:38, s0:3300, smin:1200 },
+    { name:'进阶场', waves:3, perWave:4, lives:5, wt:18, spd:13, acc:0.45,max:46, s0:3000, smin:1000 },
+    { name:'高手场', waves:4, perWave:5, lives:5, wt:15, spd:16, acc:0.6, max:55, s0:2800, smin:850  }
+  ][_diff];
+  const LIVES = LV.lives;
+  const WAVES = LV.waves;
+  const WAVE_TIME = LV.wt;             // 每波秒数
+  const BASE_SPEED = LV.spd, ACCEL = LV.acc, SPAWN0 = LV.s0, SPAWN_MIN = LV.smin, MAX_SPEED = LV.max;
+
+  function tier(text){ const n=text.length; return n>=8 ? {mul:1.25, pt:14} : n>=5 ? {mul:1.0, pt:10} : {mul:0.85, pt:8}; }
+  const bossPool = words.filter(w=>w.length>=7).length>=3 ? words.filter(w=>w.length>=7) : words.slice().sort((a,b)=>b.length-a.length).slice(0, Math.min(6, words.length));
+
+  let lives = LIVES, score = 0, combo = 0, win = false;
+  let wave = 1, waveLeft = 0, bossActive = false;
+  let waveTimeLeft = WAVE_TIME;
+  let paused = false, ended = false;
+  let typed = '';
+  let typedWord = null;   // 锁定目标：一旦开打某个词就只跟它比
+  let active = [];
+  let spawnTimer = null, loopTimer = null, t0 = Date.now();
+  let field = null;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9500;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML = `
+    <div class="ty-box">
+      <div class="mm-head">
+        <div>
+          <div class="mm-title">🔫 术语防御战 · <span id="tyDiff" style="color:#8b91a6;font-size:15px">${LV.name}</span></div>
+          <div class="mm-sub">${escHtml(cfg.name || '')} —— 分波防守，每波限时；Boss 要打两遍${switchEnabled ? '；TAB 切换目标词' : ''}</div>
+        </div>
+        <div class="mm-close" title="关闭">✕</div>
+      </div>
+      <div class="ty-stats">
+        <span>❤️ <b id="tyLives">${LIVES}</b></span>
+        <span>🌊 第 <b id="tyWave">1</b>/${WAVES} 波</span>
+        <span>剩 <b id="tyLeft">0</b></span>
+        <span>⏱ <b id="tyTime">${WAVE_TIME}</b>s</span>
+        <span>🎯 <b id="tyScore">0</b></span>
+        <span>⌨️ <b id="tyTyped" style="color:var(--amber)">…</b></span>
+        <span>🔥 <b id="tyCombo" style="color:#ff7a00"></b></span>
+      </div>
+      <div class="ty-field" id="tyField"></div>
+      <div class="ty-cannon" id="tyCannon">🔫</div>
+      <input id="tyInput" autocomplete="off" spellcheck="false" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none">
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const box = overlay.querySelector('.ty-box');
+  field = document.getElementById('tyField');
+  const input = document.getElementById('tyInput');
+  const livesEl = document.getElementById('tyLives');
+  const scoreEl = document.getElementById('tyScore');
+  const timeEl = document.getElementById('tyTime');
+  const typedEl = document.getElementById('tyTyped');
+  const comboEl = document.getElementById('tyCombo');
+  const waveEl = document.getElementById('tyWave');
+  const leftEl = document.getElementById('tyLeft');
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  box.addEventListener('mousedown', e => e.preventDefault());
+
+  function waveNeed(w){ return LV.perWave + w - 1; }
+  function waveSpeedMul(){ return 1 + (wave - 1) * 0.16; }
+  function wordSpeed(){ const el=(Date.now()-t0)/1000; return Math.min(BASE_SPEED + ACCEL*el, MAX_SPEED) * waveSpeedMul(); }
+
+  // 爆炸特效
+  function boomEffect(x, y, big){
+    const chars=['💥','✦','✧','⭐','💫'];
+    const n = big ? 14 : 9;
+    for(let i=0;i<n;i++){
+      const s=document.createElement('span');
+      s.className='ty-boom-p'+(big?' big':'');
+      s.textContent=chars[i%chars.length];
+      s.style.left=x+'px'; s.style.top=y+'px';
+      s.style.setProperty('--dx', (Math.random()*90-45)+'px');
+      s.style.setProperty('--dy', (Math.random()*-80-10)+'px');
+      field.appendChild(s);
+      setTimeout(()=>s.remove(), 650);
+    }
+  }
+
+  function spawnWord() {
+    if (ended || paused) return;
+    const text = words[Math.floor(Math.random() * words.length)];
+    const t = tier(text);
+    const el = document.createElement('div');
+    el.className = 'ty-word';
+    el.textContent = text;
+    const maxX = Math.max(10, field.clientWidth - 140);
+    el.style.left = (10 + Math.random() * maxX) + 'px';
+    el.style.top = '0px';
+    field.appendChild(el);
+    active.push({ text, y:0, el, disp: text, speed: wordSpeed() * t.mul * (0.92 + Math.random()*0.2), pt: t.pt, boss:false });
+    const gap = Math.max(SPAWN_MIN, SPAWN0 - (wave-1)*120);
+    spawnTimer = setTimeout(spawnWord, gap);
+  }
+  function spawnBoss() {
+    bossActive = true;
+    const text = bossPool[Math.floor(Math.random()*bossPool.length)];
+    const el = document.createElement('div');
+    el.className = 'ty-word ty-boss';
+    el.textContent = '👑 ' + text;
+    const maxX = Math.max(10, field.clientWidth - 190);
+    el.style.left = (10 + Math.random() * maxX) + 'px';
+    el.style.top = '0px';
+    field.appendChild(el);
+    active.push({ text, y:0, el, disp: '👑 ' + text, speed: wordSpeed() * 0.55, pt: 30, boss:true, hp:2, hit:0 });
+    leftEl.textContent = '👑';
+    playSound('alarm');
+    // 暂停 + 提示
+    paused = true;
+    clearTimeout(spawnTimer);
+    const tip = document.createElement('div');
+    tip.className = 'ty-boss-tip';
+    tip.innerHTML = '👑 <b>BOSS 来袭！</b>它很硬，要<u>打两遍</u>——打一遍会受伤，再打一遍才打爆！<button class="mm-btn primary" id="bossGo" style="margin-top:8px">开打！</button>';
+    field.appendChild(tip);
+    document.getElementById('bossGo').onclick = () => { tip.remove(); paused = false; spawnTimer = setTimeout(spawnWord, 1400); input.focus(); };
+  }
+
+  function clearScreen() {
+    active.forEach(w => { try{ w.el.remove(); }catch(e){} });
+    active = [];
+    clearTimeout(spawnTimer);
+    if (typedWord) { typed = ''; if (typedEl) typedEl.textContent = '…'; typedWord = null; }
+  }
+
+  function fireCannon(w, hit) {
+    // 命中判定：boss 2 血
+    if (w.boss && w.hit === 0) {
+      w.hit = 1;
+      w.el.classList.add('ty-boss-hit');
+      boomEffect(w.x + w.el.offsetWidth/2, w.y + 12, true);
+      playSound('error');
+      combo = 0; if(comboEl) comboEl.textContent='';
+      showToast('💥 BOSS 中招！再打一遍！', 'error');
+      return;
+    }
+    // 打爆（含 boss 第二下）
+    const cannonEl = document.getElementById('tyCannon');
+    const cb = cannonEl.getBoundingClientRect(), fb = field.getBoundingClientRect();
+    const cx = cb.left + cb.width/2 - fb.left, cy = cb.top - fb.top - 6;
+    const bullet = document.createElement('div');
+    bullet.className = 'ty-bullet';
+    bullet.style.left = cx + 'px'; bullet.style.top = cy + 'px';
+    field.appendChild(bullet);
+    const tx = w.x + w.el.offsetWidth/2, ty = w.y + 12;
+    requestAnimationFrame(() => { bullet.style.transform = 'translate('+(tx-cx)+'px,'+(ty-cy)+'px)'; });
+    setTimeout(() => {
+      bullet.remove();
+      boomEffect(tx, ty, !!w.boss);
+      w.el.classList.add('ty-boom');
+      setTimeout(() => { w.el.remove(); const idx=active.indexOf(w); if(idx>=0) active.splice(idx,1); }, 180);
+      combo++;
+      const gain = w.pt + (combo>=6?10 : combo>=3?5 : 0);
+      score += gain; scoreEl.textContent = score;
+      comboEl.textContent = combo>=2 ? 'x'+combo : '';
+      playSound('success');
+      if (w.boss) {
+        // 清屏 → 下一波 / 通关
+        clearScreen();
+        if (wave >= WAVES && !cfg._endless) { endGame(true); return; }   // 无限战：不结算继续
+        wave++; bossActive = false; waveLeft = waveNeed(wave); waveTimeLeft = WAVE_TIME;
+        waveEl.textContent = wave; leftEl.textContent = waveLeft; timeEl.textContent = waveTimeLeft;
+        showToast('🌊 第 '+wave+' 波！清屏加速', 'success');
+        spawnTimer = setTimeout(spawnWord, 800);
+      } else {
+        waveLeft--; leftEl.textContent = Math.max(0, waveLeft);
+        if (waveLeft <= 0 && !bossActive) { spawnBoss(); }
+      }
+    }, 240);
+  }
+
+  function leakWord(w) {
+    if (w.leaked) return;
+    if (typedWord === w) { typed = ''; if (typedEl) typedEl.textContent = '…'; typedWord = null; }
+    w.leaked = true; combo = 0; if(comboEl) comboEl.textContent='';
+    w.el.classList.add('ty-leak');
+    setTimeout(() => { w.el.remove(); const idx=active.indexOf(w); if(idx>=0) active.splice(idx,1); }, 200);
+    lives--; livesEl.textContent = lives;
+    field.classList.remove('ty-hit'); void field.offsetWidth; field.classList.add('ty-hit');
+    playSound('error');
+    if (lives <= 0) endGame(false);
+  }
+
+  function resetWordDisp(w) { if (w && w.el) w.el.innerHTML = escHtml(w.disp || w.text); }
+  function switchTarget() {           // 进阶/高手场：TAB 在候选词里切换目标
+    if (!switchEnabled || ended || paused) return;
+    const cands = active.filter(w => w.text.indexOf(typed) === 0);
+    if (cands.length < 2) return;
+    const cur = typedWord ? cands.indexOf(typedWord) : -1;
+    const next = cands[(cur + 1) % cands.length];
+    if (typedWord && typedWord !== next) {
+      typedWord.el.classList.remove('ty-target');
+      resetWordDisp(typedWord);
+    }
+    typedWord = next;
+    if (typed) {
+      typedWord.el.classList.remove('ty-target');
+      typedWord.el.innerHTML = '<span class="ty-prefix">'+escHtml(typed)+'</span>'+escHtml(typedWord.text.slice(typed.length));
+    } else {
+      typedWord.el.classList.add('ty-target');
+    }
+    playSound('click');
+  }
+  function clearTyped() {
+    typed = ''; typedEl.textContent = '…';
+    if (typedWord) { typedWord.el.classList.remove('ty-target'); resetWordDisp(typedWord); typedWord = null; }
+  }
+  function onKey(ch) {
+    if (ended || paused) return;
+    playSound('type');
+    if (typedWord) {
+      // 已锁定目标：只跟它比，打错就清空重来（不会悄悄切到别的词）
+      if (typedWord.text.indexOf(typed + ch) === 0) {
+        typed += ch; typedEl.textContent = typed;
+        typedWord.el.classList.remove('ty-target');
+        typedWord.el.innerHTML = '<span class="ty-prefix">'+escHtml(typed)+'</span>'+escHtml(typedWord.text.slice(typed.length));
+        if (typed === typedWord.text) { const w = typedWord; clearTyped(); fireCannon(w); }
+      } else {
+        clearTyped();
+        combo = 0; if (comboEl) comboEl.textContent = '';
+        field.classList.remove('ty-err'); void field.offsetWidth; field.classList.add('ty-err');
+      }
+      return;
+    }
+    // 新开一个词：锁定到「最靠近炮台」的匹配词
+    const cands = active.filter(w => w.text.indexOf(ch) === 0);
+    if (!cands.length) {
+      combo = 0; if (comboEl) comboEl.textContent = '';
+      field.classList.remove('ty-err'); void field.offsetWidth; field.classList.add('ty-err');
+      return;
+    }
+    typedWord = cands.reduce((a, b) => (b.y > a.y ? b : a));
+    typed = ch; typedEl.textContent = typed;
+    typedWord.el.innerHTML = '<span class="ty-prefix">'+escHtml(typed)+'</span>'+escHtml(typedWord.text.slice(typed.length));
+    if (typed === typedWord.text) { const w = typedWord; clearTyped(); fireCannon(w); }
+  }
+  input.addEventListener('keydown', e => {
+    e.preventDefault();
+    if (e.key === 'Escape') { closeGame(false); return; }
+    if (e.key === 'Tab') { switchTarget(); return; }
+    if (e.key.length === 1) onKey(e.key);
+  });
+  overlay.addEventListener('click', () => input.focus());
+  input.focus();
+
+  function tick() {
+    if (ended || paused) return;
+    const bottom = field.clientHeight - 42;
+    active.forEach(w => {
+      if (w.leaked) return;
+      w.y += w.speed * 0.225;
+      w.el.style.top = w.y + 'px';
+      if (w.y > bottom) leakWord(w);
+    });
+    waveTimeLeft = Math.max(0, waveTimeLeft - 0.1);
+    timeEl.textContent = Math.max(0, Math.ceil(waveTimeLeft));
+    if (waveTimeLeft <= 0) {
+      // 本波超时：扣一命，清屏，进下一波
+      if (lives > 0) lives--;
+      livesEl.textContent = lives;
+      clearScreen();
+      if (lives <= 0) { endGame(false); return; }
+      wave++; bossActive = false;
+      if (wave > WAVES) { endGame(true); return; }
+      waveLeft = waveNeed(wave); waveTimeLeft = WAVE_TIME;
+      waveEl.textContent = wave; leftEl.textContent = waveLeft; timeEl.textContent = waveTimeLeft;
+      showToast('⏱ 超时扣一命 · 进入第 '+wave+' 波', 'error');
+      spawnTimer = setTimeout(spawnWord, 900);
+    }
+  }
+  loopTimer = setInterval(tick, 100);
+
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true; win = isWin;
+    clearInterval(loopTimer); clearTimeout(spawnTimer);
+    try{
+      const _gs = getGameStats();
+      _gs.typingPlays = (_gs.typingPlays||0) + 1;
+      _gs.typingBest = Math.max(_gs.typingBest||0, score);
+      _gs.typingWaves = Math.max(_gs.typingWaves||0, wave);
+      _gs.typingCombo = Math.max(_gs.typingCombo||0, combo);
+      _gs.typingTime = Math.max(_gs.typingTime||0, Math.round((Date.now()-t0)/1000));
+      saveGameStats(_gs);
+    }catch(e){}
+    if (win) { recordGameWin('typing'); miniMarkClear(cfg.id); playSound('success'); }
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML =
+        '<div style="font-size:46px;line-height:1">'+(win?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(win?'var(--green)':'var(--red)')+';margin-top:8px">'+(win?'全部防线守住！':'防线失守')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">击落 <b style="color:var(--amber)">'+score+'</b> · 打到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波 · 剩余 ❤️ '+Math.max(0,lives)+'</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
+          '<button class="mm-btn" onclick="window.tyAgain()">🔁 再玩一次</button>'+
+          '<button class="mm-btn primary" onclick="window.tyDone()">收下奖励</button>'+
+        '</div>';
+      overlay.innerHTML = '';
+      overlay.appendChild(res);
+    }, 300);
+  }
+  window.tyAgain = () => { overlay.remove(); openTypingDefense(cfg, onComplete); };
+  window.tyDone = () => { if (onComplete) onComplete(win); overlay.remove(); };
+
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true; clearInterval(loopTimer); clearTimeout(spawnTimer);
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  // 开波
+  waveLeft = waveNeed(1); leftEl.textContent = waveLeft;
+  spawnWord();
+}
+
 function recordGameWin(type) {
   const t = type || 'mm';
   const gs = getGameStats();
@@ -3610,6 +4424,8 @@ function recordGameWin(type) {
   if (t === 'mm') gs.mmWins = (gs.mmWins || 0) + 1;
   else if (t === 'qk') gs.qkWins = (gs.qkWins || 0) + 1;
   else if (t === 'match') gs.matchWins = (gs.matchWins || 0) + 1;
+  else if (t === 'typing') gs.typingWins = (gs.typingWins || 0) + 1;
+  else if (t === 'shooter') gs.shooterWins = (gs.shooterWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -3634,6 +4450,11 @@ function achievementContext() {
   ctx.mmWins = gs.mmWins || 0;
   ctx.qkWins = gs.qkWins || 0;
   ctx.matchWins = gs.matchWins || 0;
+  ctx.typingWins = gs.typingWins || 0;
+  ctx.shooterWins = gs.shooterWins || 0;
+  ctx.shooterMaxLevel = gs.shooterMaxLevel || 0;
+  ctx.shooterPickups = gs.shooterPickups || 0;
+  ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
   content.levels.forEach(lv => {
@@ -3664,10 +4485,11 @@ function evaluateAchievements(showPopups) {
       newly.push(a);
     }
   });
+  if (PASSWORD_ENABLED) document.getElementById('passwordBtn').style.display = '';
   if (newly.length) {
     renderAchBar();
-  if (PASSWORD_ENABLED) document.getElementById('passwordBtn').style.display = '';
     saveState();
+    setSeenAch(gameState.achievements);
     if (showPopups) {
       achQueue = achQueue.concat(newly);
       drainAchQueue();
@@ -3676,31 +4498,94 @@ function evaluateAchievements(showPopups) {
   return newly;
 }
 
-function drainAchQueue() {
-  if (achQueue.length === 0) return;
-  const a = achQueue.shift();
-  showAchievementUnlock(a, () => setTimeout(drainAchQueue, 250));
+// ===== 登录弹窗队列：一次只弹一个、顺序弹出；重复弹窗默认每天一次 =====
+let loginPopQueue = [];
+let loginPopActive = false;
+let pendingLevelComplete = null;
+function dstr(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function popupShownToday(t){ try{ return localStorage.getItem('popup_day_'+t)===dstr(); }catch(e){ return false; } }
+function markPopupToday(t){ try{ localStorage.setItem('popup_day_'+t, dstr()); }catch(e){} }
+function enqueueLoginPopup(job){ loginPopQueue.push(job); drainLoginPopups(); }
+function drainLoginPopups(){
+  if (loginPopActive) return;
+  const job = loginPopQueue.shift();
+  if (!job) return;
+  loginPopActive = true;
+  job(function(){ loginPopActive = false; setTimeout(drainLoginPopups, 300); });
+}
+// 成就动画作为一个队列任务：排完当前成就再放行下一个弹窗
+let achShowing = false;
+function enqueueAchievementsJob(){
+  enqueueLoginPopup(function(done){
+    let lastEmptyAt = 0;
+    function settle(){
+      if (achQueue.length === 0 && !achShowing) {
+        if (!lastEmptyAt) lastEmptyAt = Date.now();
+        if (Date.now() - lastEmptyAt > 1000) return done();
+      } else { lastEmptyAt = 0; }
+      setTimeout(settle, 250);
+    }
+    settle();
+    drainAchQueue();
+  });
 }
 
-function showAchievementUnlock(ach, cb) {
+function drainAchQueue(onAllDone) {
+  if (achQueue.length === 0) { if (onAllDone) onAllDone(); return; }
+  const a = achQueue.shift();
+  showAchievementUnlock(a, () => setTimeout(() => drainAchQueue(onAllDone), 300), a.__source);
+}
+
+// —— 已看过的成就快照（登录后识别“老师新发/系统新发”的成就）——
+const ACH_SEEN_KEY = 'ach_seen_v1';
+function getSeenAch(){ try{ return JSON.parse(localStorage.getItem(ACH_SEEN_KEY)||'{}'); }catch(e){ return {}; } }
+function setSeenAch(o){ try{ localStorage.setItem(ACH_SEEN_KEY, JSON.stringify(o||{})); }catch(e){} }
+function detectNewServerAchievements(){
+  const seen = getSeenAch();
+  const fresh = [];
+  // 教师手动发放的成就（teacherAwards）
+  Object.keys(gameState.teacherAwards || {}).forEach(id => { if (!seen[id]) fresh.push({ id, source: 'teacher' }); });
+  // 系统自动发放的登录签到成就（login_*）
+  Object.keys(gameState.achievements || {}).forEach(id => { if (id.indexOf('login_') === 0 && !seen[id]) fresh.push({ id, source: 'auto' }); });
+  // 快照：所有成就（含教师发放）
+  const snap = Object.assign({}, gameState.achievements || {}, gameState.teacherAwards || {});
+  setSeenAch(snap);
+  if (!fresh.length) return;
+  achQueue = achQueue.concat(fresh.map(f => {
+    const a = ACHIEVEMENTS.find(x => x.id === f.id);
+    return a ? Object.assign({}, a, { __source: f.source }) : null;
+  }).filter(Boolean));
+  drainAchQueue();
+}
+
+function showAchievementUnlock(ach, cb, source) {
   playSound('levelup');
+  const isTeacher = source === 'teacher';
+  const srcLabel = isTeacher ? '🎁 老师发放的成就' : source === 'auto' ? '📅 登录签到成就' : '🎖️ 成就解锁';
+  const accent = isTeacher ? '#ffd27d' : 'var(--amber)';
+  const glow = isTeacher ? 'rgba(255,210,125,.38)' : 'rgba(255,176,0,.28)';
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.78);z-index:9998;display:flex;align-items:center;justify-content:center';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:10001;display:flex;align-items:center;justify-content:center';
   const box = document.createElement('div');
-  box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:12px;padding:30px 44px;max-width:400px;width:90%;text-align:center;box-shadow:0 0 60px rgba(255,176,0,.28);animation:achPop .4s ease';
-  box.innerHTML = `
-    <div style="font-size:58px;line-height:1">${ach.emoji}</div>
-    <div style="font-size:13px;color:var(--amber);margin:12px 0 6px;letter-spacing:3px">🎖️ 成就解锁</div>
-    <div style="font-size:22px;font-weight:bold;color:var(--text)">${ach.name}</div>
-    <div style="font-size:13px;color:var(--dim);margin-top:8px">${ach.desc}</div>
-  `;
+  box.style.cssText = 'background:#12121a;border:2px solid ' + accent + ';border-radius:14px;padding:34px 48px;max-width:430px;width:90%;text-align:center;box-shadow:0 0 80px ' + glow + ';animation:achPop .45s ease;position:relative;overflow:hidden';
+  let sparks = '';
+  const sc = ['✦','✧','✨','⭐'];
+  for (let i = 0; i < 12; i++) {
+    sparks += '<span style="position:absolute;left:' + (6 + Math.random() * 88).toFixed(1) + '%;top:' + (4 + Math.random() * 90).toFixed(1) + '%;font-size:' + (10 + Math.random() * 14).toFixed(1) + 'px;color:#ffd27d;opacity:0;animation:achSpark 1.3s ease-out ' + (Math.random() * .5).toFixed(2) + 's;pointer-events:none">' + sc[i % 4] + '</span>';
+  }
+  box.innerHTML = sparks + '<div style="font-size:64px;line-height:1;animation:achBounce .6s ease">' + ach.emoji + '</div>' +
+    '<div style="font-size:13px;color:' + accent + ';margin:14px 0 6px;letter-spacing:2px;font-weight:bold">' + srcLabel + '</div>' +
+    '<div style="font-size:24px;font-weight:bold;color:var(--text)">' + ach.name + '</div>' +
+    '<div style="font-size:13px;color:var(--dim);margin-top:8px;line-height:1.6">' + ach.desc + '</div>' +
+    '<div style="font-size:11px;color:#3a3a48;margin-top:14px">锐智工厂 · 已点亮 ' + Object.keys(gameState.achievements || {}).length + '/' + ACHIEVEMENTS.length + ' 枚徽章</div>';
   overlay.appendChild(box);
   document.body.appendChild(overlay);
+  achShowing = true;
   setTimeout(() => {
     overlay.style.opacity = '0';
     overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (cb) cb(); }, 300);
-  }, 2200);
+    setTimeout(() => { playAreaMusic(); overlay.remove(); achShowing = false; if (cb) cb(); }, 300);
+  }, 2500);
 }
 
 function renderAchBar() {
@@ -3712,7 +4597,7 @@ function renderAchBar() {
     return;
   }
   bar.innerHTML = '<span class="ach-bar-label">🎖️ 已点亮 ' + gotList.length + '/' + ACHIEVEMENTS.length + ' 枚徽章</span> '
-    + gotList.map(a => '<span class="ach-bar-emoji" title="' + a.name + '">' + a.emoji + '</span>').join('');
+    + gotList.map(a => '<span class="ach-bar-emoji" title="' + a.name + ((gameState.teacherAwards && gameState.teacherAwards[a.id]) ? '（老师发放）' : '') + '">' + a.emoji + '</span>').join('');
 }
 
 async function refreshLeaderboard() {
@@ -3720,6 +4605,34 @@ async function refreshLeaderboard() {
     const res = await api('/api/game/leaderboard');
     if (res && res.ok) leaderboardCache = res.data;
   } catch (e) { /* 网络失败静默，打开面板时重试 */ }
+}
+
+
+// 📊 我的战绩
+function openGameRecords(){ document.getElementById('recBody').innerHTML = renderGameRecords(); document.getElementById('recOverlay').classList.add('show'); }
+function closeGameRecords(){ document.getElementById('recOverlay').classList.remove('show'); }
+function renderGameRecords(){
+  const gs = getGameStats() || {};
+  const s = (k,d)=>(k in gs ? gs[k] : d);
+  let h = '';
+  h += '<div class="rec-card"><div class="rc-name">🔫 术语防御战</div>'+
+    '<div class="rc-row">游玩 <b>'+s('typingPlays',0)+'</b> 次 · 通关 <b>'+s('typingWins',0)+'</b> 次</div>'+
+    '<div class="rc-row">最高分 <b>'+s('typingBest',0)+'</b> · 最远到第 <b>'+s('typingWaves',0)+'</b> 波</div>'+
+    '<div class="rc-row">坚持最长 <b>'+s('typingTime',0)+'</b> 秒 · 最高连击 <b>'+s('typingCombo',0)+'</b></div></div>';
+  h += '<div class="rec-card"><div class="rc-name">🃏 翻牌</div>'+
+    '<div class="rc-row">完成 <b>'+s('mmWins',0)+'</b> 次 · 最高连对 <b>'+s('mmStreak',0)+'</b></div>'+
+    '<div class="rc-row">累计配对 <b>'+s('mmMatched',0)+'</b> 对</div></div>';
+  h += '<div class="rec-card"><div class="rc-name">⚡ 快打</div>'+
+    '<div class="rc-row">完成 <b>'+s('qkWins',0)+'</b> 次 · 最高连击 <b>'+s('qkCombo',0)+'</b></div></div>';
+  h += '<div class="rec-card"><div class="rc-name">🔗 连线</div>'+
+    '<div class="rc-row">完成 <b>'+s('matchWins',0)+'</b> 次</div></div>';
+  h += '<div class="rec-card"><div class="rc-name">🛸 数据蜂群</div>'+
+    '<div class="rc-row">游玩 <b>'+s('shooterPlays',0)+'</b> 次 · 通关 <b>'+s('shooterWins',0)+'</b> 次</div>'+
+    '<div class="rc-row">🚀 最强火力 <b>'+s('shooterMaxLevel',1)+'</b> 级 · 拾取道具 <b>'+s('shooterPickups',0)+'</b> 个</div>'+
+    '<div class="rc-row">最高分 <b>'+s('shooterBest',0)+'</b> · 最远到第 <b>'+s('shooterWaves',0)+'</b> 波</div></div>';
+  h += '<div class="rec-card"><div class="rc-name">🎮 小游戏总计</div>'+
+    '<div class="rc-row">累计完成 <b>'+s('gamesWin',0)+'</b> 个小游戏</div></div>';
+  return h;
 }
 
 function openLeaderboard() {
@@ -3745,6 +4658,13 @@ function switchLbTab(tab) {
   else renderLeaderboard(document.getElementById('lbBody'));
 }
 
+function _fmtTime(iso){
+  try{
+    const d=new Date(iso); if(isNaN(d.getTime())) return String(iso||'');
+    const p=n=>String(n).padStart(2,'0');
+    return (d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+  }catch(e){ return String(iso||''); }
+}
 function renderLeaderboard(body) {
   const d = leaderboardCache;
   if (!d || !content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
@@ -3762,11 +4682,20 @@ function renderLeaderboard(body) {
     html += `
       <div class="lb-row${isMe ? ' me' : ''}">
         <div class="lb-no">${i + 1}</div>
-        <div class="lb-name">${escHtml(r.name)}${pioneerLvs.length ? '<span class="lb-pioneer" title="先锋：第' + pioneerLvs.join('、第') + '关"> 🚩</span>' : ''}</div>
+        <div class="lb-name">${escHtml(r.name)}${((r.name===myName) && (gameState.inventory||{}).title_badge>0) ? '<span class="lb-pioneer" title="厂级先锋称号"> 🏅</span>' : ''}${pioneerLvs.length ? '<span class="lb-pioneer" title="先锋：第' + pioneerLvs.join('、第') + '关"> 🚩</span>' : ''}</div>
         <div class="lb-rank">${rank.emoji} ${rank.title}</div>
         <div class="lb-xp">${r.xp} XP</div>
         <div class="lb-bar"><div class="lb-bar-fill" style="width:${r.completion}%"></div><span>${r.completion}%</span></div>
       </div>`;
+  });
+  html += '</div>';
+  // ⏱ 我的通关记录（每关首通时间）
+  const _me = d.rows.find(r => r.name === myName);
+  const _mf = _me ? (_me.levelFinish || {}) : {};
+  html += '<div class="lb-pioneers"><div class="lb-pioneers-title">⏱ 我的通关记录（首通时间）</div>';
+  (content.levels || []).forEach(lv => {
+    const t = _mf[lv.id];
+    html += '<div class="lb-pioneer-line">第 ' + lv.id + ' 关 ' + escHtml(lv.areaName || '') + '：<b>' + (t ? _fmtTime(t) : '未通关') + '</b></div>';
   });
   html += '</div>';
   const pioneerKeys = Object.keys(d.pioneers);
@@ -3793,6 +4722,7 @@ function renderAchievements(body) {
         <div class="ach-name">${a.name}</div>
         <div class="ach-desc">${a.desc}</div>
         ${got ? '<div class="ach-tag">已解锁</div>' : (can ? '<div class="ach-tag can">可解锁</div>' : '')}
+    ${gameState.teacherAwards && gameState.teacherAwards[a.id] ? '<div class="ach-tag" style="color:#ffd27d">🎁 老师发放</div>' : ''}
       </div>`;
   });
   html += '</div>';
@@ -3842,26 +4772,26 @@ async function savePassword() {
 }
 
 // 登录后未设置密码时的引导提示
-function showPasswordPrompt() {
-  if (!PASSWORD_ENABLED) return;
-  if (gameState.hasPassword) return;
-  if (document.getElementById('pwPromptOverlay')) return;
+function showPasswordPrompt(done) {
+  if (!PASSWORD_ENABLED) { if (done) setTimeout(done, 50); return; }
+  if (gameState.hasPassword) { if (done) setTimeout(done, 50); return; }
+  if (document.getElementById('pwPromptOverlay')) { if (done) setTimeout(done, 50); return; }
   const overlay = document.createElement('div');
   overlay.id = 'pwPromptOverlay';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:8990;display:flex;align-items:center;justify-content:center';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center';
   const box = document.createElement('div');
   box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:10px;padding:24px 30px;max-width:430px;width:90%;box-shadow:0 0 40px rgba(255,176,0,.15)';
   box.innerHTML = `
-    <div style="font-size:18px;color:var(--amber);font-weight:bold;margin-bottom:12px">🔑 建议设置登录密码</div>
-    <div style="font-size:14px;line-height:1.8;color:var(--text);margin-bottom:20px">你的账号目前没有密码，任何知道你姓名的人都能登录你的账号、看到你的进度和徽章。设置一个密码更安心。</div>
+    <div style="font-size:18px;color:var(--amber);font-weight:bold;margin-bottom:12px">🔑 建议修改初始密码</div>
+    <div style="font-size:14px;line-height:1.8;color:var(--text);margin-bottom:20px">你的账号还在使用初始密码 123456，任何知道你姓名的人都能用这个密码登录。设置一个自己的密码更安心。</div>
     <div style="display:flex;gap:10px;justify-content:center">
       <button id="pwPromptGo" style="padding:9px 24px;background:var(--amber);color:#000;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit">去设置</button>
       <button id="pwPromptLater" style="padding:9px 24px;background:none;color:var(--dim);border:1px solid var(--border);border-radius:4px;font-size:15px;cursor:pointer;font-family:inherit">稍后再说</button>
     </div>`;
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-  box.querySelector('#pwPromptGo').onclick = () => { overlay.remove(); openPasswordModal(); };
-  box.querySelector('#pwPromptLater').onclick = () => { overlay.remove(); };
+  box.querySelector('#pwPromptGo').onclick = () => { playAreaMusic(); overlay.remove(); if (done) setTimeout(done, 50); openPasswordModal(); };
+  box.querySelector('#pwPromptLater').onclick = () => { playAreaMusic(); overlay.remove(); if (done) setTimeout(done, 50); };
 }
 
 // =========================================================================
@@ -3875,6 +4805,7 @@ function registerMiniGame(type, handler) {
 function loadTermCards() {
   return fetch('/data/term-cards.json').then(r => r.json()).then(d => {
     window.TERM_CARDS = d;
+    try { if (typeof evaluateAchievements === 'function') evaluateAchievements(false); } catch (e) {}
   }).catch(() => { window.TERM_CARDS = null; });
 }
 loadTermCards();
@@ -3885,11 +4816,854 @@ function getTermLevel(levelId) {
 }
 function termWarmupDone(key) { return localStorage.getItem('term_' + key) === '1'; }
 function markTermWarmupDone(key) { localStorage.setItem('term_' + key, '1'); }
+// 统计当前已解锁的小游戏类型数（按任务块完成判定）
+function countUnlockedGameTypes() {
+  try {
+    if (!window.TERM_CARDS || !window.TERM_CARDS.levels) return 0;
+    const set = new Set();
+    window.TERM_CARDS.levels.forEach(lv => {
+      (lv.warmups || []).forEach(w => {
+        const bt = w.blockTasks;
+        if (Array.isArray(bt) && bt.length && bt.every(tid => isTaskDone(tid))) set.add(w.type || 'memory');
+      });
+    });
+    return set.size;
+  } catch (e) { return 0; }
+}
+// ===== 游戏专区：解锁后直接选玩 =====
+let gzList = [];
+function gzEmoji(w) {
+  const t = w.type || 'memory';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':'🃏';
+}
+function gzMeta(w) {
+  const t = w.type || 'memory';
+  if (t==='quick') return (w.size||0) + ' 题';
+  if (t==='match') return (w.size||0) + ' 组';
+  if (t==='storm') return (w.waves||0) + ' 波';
+  if (t==='alarm') return (w.devices||0) + ' 台';
+  if (t==='typing') return ((w.words||[]).length) + ' 词';
+  if (t==='shooter') return (w.waves||4) + ' 波编队';
+  if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
+  return (w.size*2) + ' 张';
+}
+function gzName(w) {
+  const t = w.type || 'memory';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter';
+  return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
+}
+function renderGameZone(body) {
+  if (!window.TERM_CARDS || !content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
+  gzList = [];
+  let html = '';
+  content.levels.forEach(lv => {
+    const tl = getTermLevel(lv.id);
+    if (!tl) return;
+    const rows = [];
+    (tl.warmups || []).forEach(w => {
+      const idx = gzList.length;
+      gzList.push({ lvId: lv.id, w: w });
+      const unlocked = Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => isTaskDone(tid));
+      const advTag = w.advanced ? ' · <span style="color:var(--cyan)">进阶</span>' : '';
+      const tBadge = miniTierBadge(w.id);
+      rows.push('<div class="gz-row' + (unlocked ? '' : ' locked') + (w.advanced ? ' pc-only' : '') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
+        '<span class="gz-emoji">' + (unlocked ? gzEmoji(w) : '🔒') + '</span>' +
+        '<span class="gz-name">' + gzName(w) + tBadge + '</span>' +
+        '<span class="gz-meta">' + gzMeta(w) + advTag + ' · ' + (unlocked ? (w._tier>=1?'可挑战':'可玩') : '未解锁') + '</span></div>');
+    });
+    if (tl.bonus) {
+      const idx = gzList.length;
+      const lvDone = levelProgress(lv.id).completed;
+      gzList.push({ lvId: lv.id, bonus: true });
+      rows.push('<div class="gz-row' + (lvDone ? '' : ' locked') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
+        '<span class="gz-emoji">' + (lvDone ? '🏆' : '🔒') + '</span>' +
+        '<span class="gz-name">记忆大师挑战 · 5 层递进</span>' +
+        '<span class="gz-meta">' + (lvDone ? '可玩' : '通关本关解锁') + '</span></div>');
+    }
+    if (!rows.length) return;
+    html += '<div class="gz-section">第 ' + lv.id + ' 幕 · ' + escHtml(tl.name || lv.name) + '</div>' + rows.join('');
+  });
+  body.innerHTML = html || '<div class="lb-empty">还没有可玩的小游戏，先去闯关吧！</div>';
+}
+function gzPlay(idx) {
+  const it = gzList[idx];
+  if (!it) return;
+  if (it.bonus) {
+    const tl = getTermLevel(it.lvId);
+    if (!tl || !tl.bonus) return;
+    if (!levelProgress(it.lvId).completed) { showToast('通关本关后才能挑战记忆大师', 'error'); return; }
+    openMemoryMatch(tl.bonus, (win) => { if (win) showToast('🏆 记忆大师完成！', 'success'); });
+    return;
+  }
+  const w = it.w;
+  if (!(Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => isTaskDone(tid)))) {
+    showToast('先完成对应任务解锁这个小游戏', 'error'); return;
+  }
+  const t = w.type || 'memory';
+  if (t==='quick') openQuickMatch(w, (win)=>{ if(win) showToast('⚡ 快打完成','success'); });
+  else if (t==='match') openMatchGame(w, (win)=>{ if(win) showToast('🔗 连线完成','success'); });
+  else if (t==='storm') openStormDefense(w, (win)=>{ if(win) showToast('🌪️ 数据风暴守住了','success'); });
+  else if (t==='alarm') openAlarmRush(w, (win)=>{ if(win) showToast('🚨 产线守住了','success'); });
+  else if (t==='typing') openTypingDefense(w, (win)=>{ if(win) showToast('🔫 术语防线守住了','success'); });
+  else if (t==='shooter') openShooter(w, (win)=>{ if(win) showToast('🛸 数据蜂群清空！','success'); });
+  else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
+}
+function buildGameZone() {
+  if (document.getElementById('gzOverlay')) return;
+  const ov = document.createElement('div');
+  ov.className = 'gz-overlay';
+  ov.id = 'gzOverlay';
+  ov.innerHTML = `
+    <div class="gz-box">
+      <div class="pd-head">
+        <div><div class="pd-title">🎮 游戏专区</div><div class="pd-sub">解锁后直接来玩，通关的也能反复刷分</div></div>
+        <div class="pd-close" onclick="closeGameZone()">✕</div>
+      </div>
+      <div class="pd-body" id="gzBody"></div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+function openGameZone() {
+  buildGameZone();
+  renderGameZone(document.getElementById('gzBody'));
+  document.getElementById('gzOverlay').classList.add('show');
+}
+function closeGameZone() {
+  const ov = document.getElementById('gzOverlay');
+  if (ov) ov.classList.remove('show');
+}
 
 // 打开翻牌小游戏（memory_match）
+
+// ===== 小游戏首次引导 =====
+function tutSeen(t){ try{ return localStorage.getItem('game_tut_'+t)==='1'; }catch(e){ return false; } }
+function tutMark(t){ try{ localStorage.setItem('game_tut_'+t,'1'); }catch(e){} }
+function showGameTutorial(type, title, steps, onDone){
+  const ov=document.createElement('div');
+  ov.className='mm-overlay';
+  ov.innerHTML='<div class="tut-box"><div class="tut-title">'+title+'</div>'+
+    steps.map(s=>'<div class="tut-step">'+s+'</div>').join('')+
+    // （去掉“仅首次显示”提示）
+    '<button class="mm-btn primary" id="tutStart" style="margin-top:14px;font-size:16px">开始游戏 →</button></div>';
+  document.body.appendChild(ov);
+  ov.querySelector('#tutStart').onclick=()=>{ ov.remove(); tutMark(type); onDone(); };
+}
+// 打字游戏引导：慢速掉一个词→提示打字→打爆→正式开战
+function showTypingTutorial(cfg, onDone){
+  const words=(cfg.words||[]).filter(Boolean); const word=String(words[Math.floor(Math.random()*words.length)]||'ping');
+  const ov=document.createElement('div');
+  ov.className='mm-overlay';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
+  ov.innerHTML='<div class="ty-box">'+
+    '<div class="mm-head"><div><div class="mm-title">🔫 术语防御战 · 新手上路</div><div class="mm-sub">关键词往下掉，敲出完整命令把它打下来！先试一个，跟着打：</div></div>'+
+    '<div class="mm-close" id="tutX">✕</div></div>'+
+    '<div class="ty-stats"><span>⌨️ 请打出：<b style="color:var(--amber)">'+escHtml(word)+'</b></span></div>'+
+    '<div class="ty-field" id="tutField" style="min-height:180px"></div>'+
+    '<div class="ty-cannon">🔫</div>'+
+    '<input id="tutInput" autocomplete="off" spellcheck="false" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none"></div>';
+  document.body.appendChild(ov);
+  const field=ov.querySelector('#tutField'); const input=ov.querySelector('#tutInput');
+  const el=document.createElement('div'); el.className='ty-word'; el.textContent=word;
+  el.style.left='30%'; el.style.top='24px'; field.appendChild(el);
+  input.focus();
+  let typed='';
+  ov.querySelector('#tutX').onclick=()=>{ ov.remove(); tutMark('typing'); onDone(); };
+  input.addEventListener('keydown', function(e){
+    e.preventDefault(); if(e.key.length!==1) return; playSound('type');
+    if(word.indexOf(typed+e.key)===0){
+      typed+=e.key;
+      el.innerHTML='<span class="ty-prefix">'+escHtml(typed)+'</span>'+escHtml(word.slice(typed.length));
+      if(typed===word){
+        playSound('success'); el.classList.add('ty-boom');
+        setTimeout(function(){
+          ov.innerHTML='<div class="ty-result"><div style="font-size:46px">🎉</div>'+
+            '<div style="font-size:20px;color:var(--green);font-weight:bold;margin-top:8px">太棒了！打爆一个</div>'+
+            '<div style="font-size:15px;color:var(--dim);margin-top:6px;line-height:1.7">接下来正式开战：词会越来越快<br>记住——输错就重新开始</div>'+
+            '<button class="mm-btn primary" id="tutGo" style="margin-top:16px;font-size:16px">正式开战 →</button></div>';
+          ov.querySelector('#tutGo').onclick=function(){ ov.remove(); tutMark('typing'); onDone(); };
+        }, 700);
+      }
+    } else {
+      typed=''; el.innerHTML=escHtml(word); playSound('error');
+    }
+  });
+}
+
+// =========================================================================
+// 9g. SHOOTER — 数据蜂群 · 保卫工厂（小蜜蜂/Galaxian 风格）
+// =========================================================================
+let shooterBuff = null;   // 商城道具·本局开局加成
+let _shooterSkipLoadout = false;   // 本局已选择“不用道具”，不再弹装备窗
+function showShooterLoadout(cfg, onComplete) {
+  const inv = gameState.inventory || {};
+  const opts = [];
+  if ((inv['power_card']||0) > 0) opts.push({id:'power_card', e:'🚀', name:'火力礼包', desc:'开局直接 2 级火力', key:'pLevel'});
+  if ((inv['shield_card']||0) > 0) opts.push({id:'shield_card', e:'❤️', name:'开局护盾', desc:'开局 +1 命', key:'lives'});
+  if ((inv['slow_card']||0) > 0) opts.push({id:'slow_card', e:'⏳', name:'慢速卡', desc:'敌人全场缓速 8 秒', key:'slow'});
+  const ov=document.createElement('div');
+  ov.className='mm-overlay';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9550;display:flex;align-items:center;justify-content:center';
+  let boxes='';
+  opts.forEach(function(o,i){ boxes+='<label class="gz-row" style="cursor:pointer;flex:1;min-width:130px;margin:0"><input type="checkbox" id="lod_'+i+'" checked> <span class="gz-emoji">'+o.e+'</span> <span class="gz-name">'+o.name+'<span style="display:block;font-size:12px;color:var(--dim)">'+o.desc+'</span></span></label>'; });
+  ov.innerHTML='<div class="mm-box mm-fill" style="width:min(480px,92vw)"><div class="mm-head"><div><div class="mm-title">🎒 装备道具</div><div class="mm-sub">开局选商城买的一次性道具，更顺手</div></div></div><div class="mm-stats" style="margin-bottom:10px;flex-wrap:wrap">'+boxes+'</div><div style="display:flex;gap:10px;justify-content:center;margin-top:6px"><button class="mm-btn" onclick="window.__lodSkip()">不用道具</button><button class="mm-btn primary" onclick="window.__lodStart()">开始游戏</button></div></div>';
+  document.body.appendChild(ov);
+  window.__lodCfg=cfg; window.__lodDone=onComplete;
+  window.__lodStart=function(){
+    const use=[];
+    opts.forEach(function(o,i){ const cb=document.getElementById('lod_'+i); if(cb && cb.checked) use.push(o); });
+    const buff={lives:0,pLevel:0,slow:0};
+    use.forEach(function(o){
+      api('/api/student/consume-item',{method:'POST',body:JSON.stringify({itemId:o.id})});
+      if (o.key==='lives') buff.lives=1;
+      else if (o.key==='pLevel') buff.pLevel=1;
+      else if (o.key==='slow') buff.slow=1;
+      gameState.inventory[o.id]=(gameState.inventory[o.id]||1)-1;
+      if (gameState.inventory[o.id]<=0) delete gameState.inventory[o.id];
+    });
+    shooterBuff=buff;
+    _shooterSkipLoadout=true;
+    ov.remove();
+    renderHeader();
+    openShooter(cfg, onComplete);
+  };
+  window.__lodSkip=function(){ _shooterSkipLoadout=true; ov.remove(); openShooter(cfg, onComplete); };
+}
+function openShooter(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  const advanced = !!cfg.advanced;
+  const tutKey = advanced ? 'shooter_adv' : 'shooter';
+  if (!tutSeen(tutKey)) {
+    showGameTutorial(tutKey, advanced ? '🛸 数据蜂群 · 进阶' : '🛸 数据蜂群', [
+      advanced
+        ? '你的<b>飞机下面写着炮口文字</b>（一条解释），只有炮口<b>对应名词</b>的数据包才打得动，其余穿透'
+        : '你的<b>飞机下面写着一条解释</b>，去找到<b>对应名词</b>的数据包打',
+      advanced
+        ? '<b>↑/↓</b> 切换炮口名词——想打哪个敌人，就把炮口切到<b>和它相同的名词</b>；匹配上才打得动，否则子弹穿透不扣血'
+        : '只有<b>配对</b>的数据包才打得动；非配对的会被子弹穿透、不用管',
+      '<b>←/→</b> 移动（自动开火）；手机：<b>拖动</b>移动（自动开火）',
+      '初始火力弱，一个数据包要打 <b>3 下</b>才掉；多捡 ⚡ 道具升火力，越打越猛',
+      '打掉配对会<b>随机掉落</b>：⚡ 火力、❤ 回命、☄ 全屏爆破、⏳ 缓速、💎 财宝',
+      '配对命中 +10、连击加分；被子弹打中 -1 命，清空编队进下一波'
+    ], function(){ openShooter(cfg, onComplete); });
+    return;
+  }
+  const __inv = gameState.inventory || {};
+  if (!_shooterSkipLoadout && (((__inv['power_card']||0) > 0) || ((__inv['shield_card']||0) > 0) || ((__inv['slow_card']||0) > 0))) {
+    showShooterLoadout(cfg, onComplete);
+    return;
+  }
+  _shooterSkipLoadout = false;   // 本局装备/跳过已处理，之后从菜单再进时重新询问
+  playMusic(gameSong('shooter') || 'boss');
+  // 词库：pairs = [{term 名词, hint 解释}]
+  const pairs = (cfg.pairs || []).filter(Boolean);
+  if (!pairs.length) { showToast('没有可用的配对词库', 'error'); return; }
+  const terms = pairs.map(p => p.term);
+  const hintOf = {}; pairs.forEach(p => hintOf[p.term] = p.hint);
+  const WAVES = (cfg.waves || 4) + (cfg._hard ? 2 : 0);   // 二周目：多 2 波
+  const WAVE_LABEL = cfg._endless ? '∞' : WAVES;
+  const LIVES = cfg.lives || 5;
+  const COLS = cfg.cols || 6, ROWS = cfg.rows || 4;
+
+  let lives = LIVES + ((shooterBuff && shooterBuff.lives) || 0), score = 0, combo = 0, wave = 1, win = false, ended = false;
+  let keys = { left:false, right:false };
+  const W = 840, H = 560;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML = `
+    <div class="sh-box">
+      <div class="mm-head">
+        <div><div class="mm-title">🛸 数据蜂群</div><div class="mm-sub">${escHtml(cfg.name||'')} —— ${advanced ? '↑/↓ 切换炮口文字，打对应的名词' : '看飞机上的解释，打对应的名词'}</div></div>
+        <div class="mm-close" title="关闭">✕</div>
+      </div>
+      <div class="sh-stats">
+        <span>❤️ <b id="shLives">${LIVES}</b></span>
+        <span>🌊 第 <b id="shWave">1</b>/${WAVE_LABEL} 波</span>
+        ${advanced ? '<span>🎯 炮口 <b id="shTerm" style="color:#7ee8fa">—</b></span>' : ''}
+        <span>🎯 <b id="shScore">0</b></span>
+        <span>🚀 <b id="shPower" style="color:#7ee8fa">x1</b></span>
+        <span>🔥 <b id="shCombo" style="color:#ff7a00"></b></span>
+      </div>
+      <canvas id="shCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:radial-gradient(ellipse at 50% 20%, #101a2e, #06070d);cursor:crosshair;touch-action:none"></canvas>
+      <div class="sh-tip">${advanced ? '↑/↓ 切换炮口名词，匹配到敌人名词才打得动 · ←/→ 移动 · 自动开火' : '看飞机上的解释 → 打对应名词（非配对自动穿透） · ←/→移动 自动开火'}</div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const cv = document.getElementById('shCanvas');
+  const ctx = cv.getContext('2d');
+  const cw = cv.clientWidth || W, ch = cv.clientHeight || H;
+  const sfx = cw / W, sfy = ch / H;
+  const livesEl = document.getElementById('shLives');
+  const scoreEl = document.getElementById('shScore');
+  const waveEl = document.getElementById('shWave');
+  const comboEl = document.getElementById('shCombo');
+  const powerEl = document.getElementById('shPower');
+  const termEl = advanced ? document.getElementById('shTerm') : null;
+
+  let player = { x: W/2, w: 34, h: 18 };
+  let bullets = [], ebullets = [], booms = [], drops = [], floatTexts = [];
+  let enemies = [], targetTerm = terms[0];
+  let formX = 50, formY = 44, formDir = 1, formStep = 6;   // 下压步进放缓
+  let fireCd = 0, efireCd = 0, invuln = 0, muzzle = 0;
+  let pLevel = (shooterBuff && shooterBuff.pLevel) ? 1 : 0, picked = 0;   // 火力等级 0..3（显示 x1..x4）、本局拾取道具数
+  let termList = [], termIdx = 0;   // 进阶模式：可切换的炮口术语列表
+  const MAX_LVL = 3;
+  const BULLET_LVLS = [
+    { cd: 0.50, dmg: 1, vxs: [0],              col: '#ffe066', w: 4, h: 10, fx: 0 },
+    { cd: 0.42, dmg: 2, vxs: [-9, 9],          col: '#7ee8fa', w: 4, h: 10, fx: 1 },
+    { cd: 0.34, dmg: 3, vxs: [0, -62, 62],     col: '#7dff9e', w: 5, h: 12, fx: 2 },
+    { cd: 0.27, dmg: 4, vxs: [0, -42, 42, -108, 108], col: '#ff8fd8', w: 5, h: 12, fx: 3 }
+  ];
+  const ROW_PITCH = 46;          // 行距加大，行间留空放术语
+  const ENEMY_SKINS = [          // 敌人皮肤：每波换一套（后续可在商城购买更多）
+    { col: '#00bcd4' },          // 网络蓝
+    { col: '#ff7043' },          // 高温橙
+    { col: '#ab6cff' }           // 协议紫
+  ];
+  let slowT = (shooterBuff && shooterBuff.slow) ? 8 : 0, lasers = [], skin = ENEMY_SKINS[0];
+
+  function pickNextTarget(){
+    const avail = {};
+    enemies.forEach(e => { if (e.active) avail[e.term] = 1; });
+    const list = Object.keys(avail);
+    return list.length ? list[0] : null;
+  }
+  function cycleTerm(dir) {          // 进阶模式：↑/↓ 切换炮口
+    if (!termList.length) return;
+    termIdx = (termIdx + dir + termList.length) % termList.length;
+    targetTerm = termList[termIdx];
+    if (termEl) termEl.textContent = targetTerm;
+    playSound('click');
+    floatTexts.push({ x: player.x, y: H-96, txt: '🎯 ' + targetTerm, t: 0, col: '#7ee8fa' });
+  }
+  function nextActiveTerm() {        // 找一个还有敌人的其它名词
+    const avail = [];
+    enemies.forEach(e => { if (e.active && e.term !== targetTerm && avail.indexOf(e.term) < 0) avail.push(e.term); });
+    return avail.length ? avail[0] : null;
+  }
+  function makeWave() {
+    enemies = [];
+    formX = 50; formY = 44; formDir = 1;   // 每波都从原点出发
+    var _esCol = equippedEnemySkin();
+    skin = _esCol ? { col: _esCol } : ENEMY_SKINS[(wave - 1) % ENEMY_SKINS.length];   // 装备的敌人皮肤优先，否则每波轮换
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        enemies.push({ r, c, x: formX + c*118, y: formY + r*ROW_PITCH, w: 96, h: 26,
+          term: terms[(r*COLS+c) % terms.length], active:true, hp:3, maxHp:3, flash:0 });
+      }
+    }
+    if (advanced) {
+      const set = new Set();
+      enemies.forEach(e => set.add(e.term));
+      termList = Array.from(set);
+      termIdx = 0;
+      targetTerm = termList.length ? termList[0] : null;
+      if (termEl) termEl.textContent = targetTerm || '—';
+    } else {
+      targetTerm = pickNextTarget();
+    }
+  }
+  function fire() {
+    if (fireCd > 0) return;
+    const L = BULLET_LVLS[pLevel];
+    fireCd = L.cd;
+    muzzle = 0.08;
+    L.vxs.forEach(vx => {
+      bullets.push({ x: player.x, y: H-50, vx, vy: -500, dmg: L.dmg, w: L.w, h: L.h, col: L.col, fx: L.fx, t: 0 });
+    });
+    if (pLevel >= MAX_LVL) {   // 满级：机头同时射出激光
+      lasers.push({ x: player.x, t: 0, dur: 0.42, dmgT: 0 });
+    }
+    playSound('shoot');
+  }
+  function hitEnemy(e, b) {
+    e.hp -= b.dmg;
+    e.flash = 0.12;
+    if (e.hp > 0) {            // 没打死：闪白 + 火花，子弹消失（要再打几下）
+      playSound('hit');
+      booms.push({ x: b.x, y: b.y, t: 0, big: false, small: true });
+      return;
+    }
+    booms.push({ x: e.x + e.w/2, y: e.y + e.h/2, t: 0, big: true });
+    combo++;
+    let gain = 10;
+    if (combo >= 5) gain += 5;
+    score += gain; scoreEl.textContent = score;
+    comboEl.textContent = combo >= 2 ? 'x'+combo : '';
+    playSound('success');
+    e.active = false;
+    spawnDrop(e);
+    if (!enemies.some(x => x.active && x.term === targetTerm)) {
+      if (advanced) {
+        const nt = nextActiveTerm();
+        if (nt) {
+          targetTerm = nt;
+          termIdx = Math.max(0, termList.indexOf(nt));
+          if (termEl) termEl.textContent = nt;
+          showToast('🎯 炮口已切换 → ' + nt, 'info');
+          playSound('click');
+        }
+      } else {
+        targetTerm = pickNextTarget();
+      }
+    }
+  }
+  function spawnDrop(e) {
+    if (Math.random() > 0.18) return;
+    const roll = Math.random();
+    let type = 'P';
+    if (roll < 0.12) type = '☄';
+    else if (roll < 0.27) type = '⏳';
+    else if (roll < 0.40) type = '💎';
+    else if (roll < 0.62) type = '❤';
+    drops.push({ x: e.x + e.w/2, y: e.y + e.h/2, type, vy: 75 + Math.random()*35, t: 0, consumed: false });
+  }
+  function collectDrop(d) {
+    d.consumed = true;
+    picked++;
+    playSound('pickup');
+    if (d.type === 'P') {
+      if (pLevel < MAX_LVL) {
+        pLevel++;
+        powerEl.textContent = 'x' + (pLevel+1);
+        playSound('levelup');
+        floatTexts.push({ x: player.x, y: H-64, txt: '🚀 火力 ' + (pLevel+1) + ' 级！', t: 0, col: '#7ee8fa' });
+      } else {
+        score += 20; scoreEl.textContent = score;
+        floatTexts.push({ x: player.x, y: H-64, txt: '+20 火力已满', t: 0, col: '#ffe066' });
+      }
+    } else if (d.type === '❤') {
+      lives = Math.min(LIVES + 2, lives + 1);
+      livesEl.textContent = lives;
+      playSound('levelup');
+      floatTexts.push({ x: player.x, y: H-64, txt: '❤ +1 命', t: 0, col: '#ff7a7a' });
+    } else if (d.type === '⏳') {
+      slowT = 8;
+      playSound('levelup');
+      floatTexts.push({ x: player.x, y: H-64, txt: '⏳ 全场缓速 8 秒', t: 0, col: '#7ec8ff' });
+    } else if (d.type === '💎') {
+      score += 50; scoreEl.textContent = score;
+      playSound('levelup');
+      floatTexts.push({ x: player.x, y: H-64, txt: '💎 财宝 +50', t: 0, col: '#c9a6ff' });
+    } else { // ☄ 全屏爆破
+      let cleared = 0;
+      enemies.forEach(e => {
+        if (!e.active) return;
+        e.active = false; cleared++;
+        score += 10;
+        booms.push({ x: e.x + e.w/2, y: e.y + e.h/2, t: 0, big: true });
+      });
+      scoreEl.textContent = score;
+      playSound('fanfare');
+      targetTerm = pickNextTarget();
+      floatTexts.push({ x: player.x, y: H-64, txt: '☄ 全屏爆破 +' + (cleared*10), t: 0, col: '#ffb000' });
+    }
+  }
+  function loseLife() {
+    if (invuln > 0) return;
+    lives--; livesEl.textContent = lives;
+    invuln = 2;
+    booms.push({ x: player.x, y: H-26, t: 0, big: true });
+    playSound('error');
+    if (lives <= 0) { endGame(false); }
+  }
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true; win = isWin;
+    if (win) { recordGameWin('shooter'); miniMarkClear(cfg.id); playSound('success'); }
+    try{
+      const gs = getGameStats();
+      gs.shooterPlays = (gs.shooterPlays||0)+1;
+      gs.shooterBest = Math.max(gs.shooterBest||0, score);
+      gs.shooterWaves = Math.max(gs.shooterWaves||0, wave);
+      gs.shooterCombo = Math.max(gs.shooterCombo||0, combo);
+      gs.shooterMaxLevel = Math.max(gs.shooterMaxLevel||0, pLevel+1);
+      gs.shooterPickups = (gs.shooterPickups||0) + picked;
+      saveGameStats(gs);
+    }catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML =
+        '<div style="font-size:46px;line-height:1">'+(win?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(win?'var(--green)':'var(--red)')+';margin-top:8px">'+(win?'编队全清！工厂安全！':'防线被突破')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">配对命中 <b style="color:var(--amber)">'+score+'</b> 分 · 打到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
+          '<button class="mm-btn" onclick="window.shAgain()">🔁 再玩一次</button>'+
+          '<button class="mm-btn primary" onclick="window.shDone()">收下奖励</button>'+
+        '</div>';
+      overlay.innerHTML = '';
+      overlay.appendChild(res);
+    }, 300);
+  }
+  window.shAgain = () => { overlay.remove(); openShooter(cfg, onComplete); };
+  window.shDone = () => { if (onComplete) onComplete(win); overlay.remove(); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true; cancelAnimationFrame(raf);
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+
+  document.addEventListener('keydown', kd);
+  document.addEventListener('keyup', ku);
+  function kd(e){
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+    else if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+    else if (advanced && (e.key === 'ArrowUp' || e.key === 'w')) { e.preventDefault(); cycleTerm(1); }
+    else if (advanced && (e.key === 'ArrowDown' || e.key === 's')) { e.preventDefault(); cycleTerm(-1); }
+    else if (e.key === ' ') { e.preventDefault(); fire(); }
+    else if (e.key === 'Escape') { closeGame(false); }
+  }
+  function ku(e){ if (e.key==='ArrowLeft'||e.key==='a') keys.left=false; else if (e.key==='ArrowRight'||e.key==='d') keys.right=false; }
+  let dragging = false;
+  cv.addEventListener('pointerdown', e => { dragging = true; e.preventDefault(); });
+  cv.addEventListener('pointermove', e => { if (dragging) { const r=cv.getBoundingClientRect(); player.x = Math.max(20, Math.min(W-20, (e.clientX-r.left)/sfx)); } });
+  cv.addEventListener('pointerup', () => { dragging = false; });
+  cv.addEventListener('pointercancel', () => { dragging = false; });
+
+  function update(dt) {
+    if (ended) return;
+    if (invuln > 0) invuln -= dt;
+    // 自动开火（一直打，降低难度）
+    fireCd -= dt;
+    if (fireCd <= 0) fire();
+    if (muzzle > 0) muzzle -= dt;
+    // 移动
+    const spd = 300;
+    if (keys.left) player.x -= spd*dt;
+    if (keys.right) player.x += spd*dt;
+    player.x = Math.max(20, Math.min(W-20, player.x));
+    // 全场缓速计时
+    if (slowT > 0) slowT -= dt;
+    // 编队移动（更慢：第 1 波最慢，逐波加快；缓速时更慢）
+    const fMul = slowT > 0 ? 0.55 : 1;
+    formX += formDir * (9 + wave*2) * fMul * dt;
+    if (formX > W - COLS*118 - 20) { formDir = -1; formY += formStep; }
+    if (formX < 30) { formDir = 1; formY += formStep; }
+    enemies.forEach(e => {
+      if (!e.active) return;
+      e.x = formX + e.c*118;
+      e.y = formY + e.r*ROW_PITCH;
+      if (e.flash > 0) e.flash -= dt;
+      if (e.y > H - 60) { loseLife(); e.active=false; }
+    });
+    // 我方子弹（含横向速度 + 拖尾计时）
+    bullets.forEach(b => { b.x += b.vx*dt; b.y += b.vy*dt; b.t += dt; });
+    bullets = bullets.filter(b => b.y > -20);
+    // 激光：持续光束，对光束内的配对目标持续伤害
+    lasers.forEach(l => {
+      l.t += dt; l.dmgT += dt;
+      if (l.dmgT >= 0.12) {
+        l.dmgT = 0;
+        enemies.forEach(e => {
+          if (!e.active || e.term !== targetTerm) return;
+          if (l.x > e.x - 10 && l.x < e.x + e.w + 10) hitEnemy(e, { dmg: 2 });
+        });
+      }
+    });
+    lasers = lasers.filter(l => l.t < l.dur);
+    // 道具：下落 → 底部停留 → 拾取
+    drops.forEach(d => { if (d.y < H - 36) d.y += d.vy*dt; d.t += dt; });
+    drops.forEach(d => { if (d.y > H - 60 && Math.abs(d.x - player.x) < 28) collectDrop(d); });
+    drops = drops.filter(d => !d.consumed && d.t < 9);
+    // 敌方子弹（第 1 波不打，第 2 波起更慢更少）
+    if (wave >= 2) {
+      efireCd -= dt;
+      if (efireCd <= 0) {
+        efireCd = Math.max(1.6, 3.4 - wave*0.2) * (slowT > 0 ? 1.5 : 1);
+        const shooters = enemies.filter(e=>e.active && e.r === ROWS-1);
+        if (shooters.length) {
+          const s = shooters[Math.floor(Math.random()*shooters.length)];
+          ebullets.push({ x: s.x + s.w/2, y: s.y + s.h, vy: 120 + wave*8, w:4, h:10 });
+        }
+      }
+    }
+    ebullets.forEach(b => { b.y += b.vy*dt; });
+    ebullets = ebullets.filter(b => b.y < H+20);
+    // 碰撞
+    bullets.forEach(b => {
+      enemies.forEach(e => {
+        if (!e.active) return;
+        if (b.x > e.x && b.x < e.x+e.w && b.y > e.y && b.y < e.y+e.h) {
+          if (e.term === targetTerm) { b.hit = true; hitEnemy(e, b); }
+          else { booms.push({ x: b.x, y: b.y, t: 0, big: false, small: true }); }
+        }
+      });
+    });
+    bullets = bullets.filter(b => !b.hit);
+    ebullets.forEach(b => {
+      if (b.x > player.x-17 && b.x < player.x+17 && b.y > H-52 && b.y < H-24) { b.hit = true; loseLife(); }
+    });
+    ebullets = ebullets.filter(b => !b.hit);
+    booms.forEach(b => b.t += dt);
+    booms = booms.filter(b => b.t < 0.5);
+    floatTexts.forEach(f => f.t += dt);
+    floatTexts = floatTexts.filter(f => f.t < 1.3);
+    if (enemies.every(e => !e.active)) {
+      if (wave >= WAVES && !cfg._endless) { endGame(true); return; }   // 无限战：不结算，继续
+      wave++; waveEl.textContent = wave;
+      makeWave();
+      showToast('🌊 第 '+wave+' 波编队来袭！', 'success');
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    const sf = Math.max(0.6, cw / W);   // 显示缩放（手机端字也跟着变大）
+    // 背景网格
+    ctx.strokeStyle = 'rgba(0,188,212,.12)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<W;i+=40){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,H); ctx.stroke(); }
+    for(let j=0;j<H;j+=40){ ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(W,j); ctx.stroke(); }
+    // 敌人（名词）：进阶模式全部显示名词标签+血量，靠玩家主动匹配炮口；基础模式只高亮配对目标
+    enemies.forEach(e => {
+      if (!e.active) return;
+      const match = e.term === targetTerm;
+      if (advanced) {
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = skin.col;
+        ctx.strokeStyle = 'rgba(0,0,0,.6)';
+        ctx.lineWidth = 1;
+        ctx.fillRect(e.x, e.y, e.w, e.h);
+        ctx.strokeRect(e.x, e.y, e.w, e.h);
+        const label = e.term;
+        const fs = Math.max(8, Math.min(13, Math.floor(86 / Math.max(1, label.length) * 1.5)));
+        ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = 'rgba(0,0,0,.6)';
+        ctx.fillText(label, e.x + e.w/2 + 1, e.y - 9 + 1);
+        ctx.fillStyle = '#fff7d6';
+        ctx.fillText(label, e.x + e.w/2, e.y - 9);
+        const pw = 40, px = e.x + e.w/2 - pw/2, py = e.y + e.h - 7;
+        for (let i=0;i<e.maxHp;i++) {
+          const on = i < e.hp;
+          ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
+          ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
+        }
+      } else {
+        if (!match) ctx.globalAlpha = 0.4;
+        ctx.fillStyle = match ? '#ffb000' : skin.col;
+        ctx.strokeStyle = match ? '#fff' : 'rgba(0,0,0,.6)';
+        ctx.lineWidth = match ? 2 : 1;
+        ctx.fillRect(e.x, e.y, e.w, e.h);
+        ctx.strokeRect(e.x, e.y, e.w, e.h);
+        if (match) {
+          const label = e.term;
+          const fs = Math.max(8, Math.min(13, Math.floor(86 / Math.max(1, label.length) * 1.5)));
+          ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+          ctx.fillStyle = 'rgba(0,0,0,.6)';
+          ctx.fillText(label, e.x + e.w/2 + 1, e.y - 9 + 1);
+          ctx.fillStyle = '#fff7d6';
+          ctx.fillText(label, e.x + e.w/2, e.y - 9);
+          const pw = 40, px = e.x + e.w/2 - pw/2, py = e.y + e.h - 7;
+          for (let i=0;i<e.maxHp;i++) {
+            const on = i < e.hp;
+            ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
+            ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
+          }
+        }
+      }
+      // 命中闪白
+      if (e.flash > 0) {
+        ctx.globalAlpha = Math.min(1, e.flash/0.12) * 0.85;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(e.x, e.y, e.w, e.h);
+      }
+      ctx.globalAlpha = 1;
+    });
+    // 玩家（飞机带解释，火力高时带光环）
+    if (invuln <= 0 || Math.floor(invuln*8)%2===0) {
+      if (pLevel >= 2) {
+        ctx.globalAlpha = 0.4;
+        ctx.fillStyle = '#ffb000';
+        ctx.beginPath(); ctx.arc(player.x, H-48, 10 + pLevel*2, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      var _ps = PLANE_SKINS[getEquippedSkin('plane')] || PLANE_SKINS.default;
+      ctx.fillStyle = _ps.col;
+      ctx.beginPath();
+      ctx.moveTo(player.x, H-50); ctx.lineTo(player.x-18, H-26); ctx.lineTo(player.x+18, H-26);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = _ps.ck;
+      ctx.fillRect(player.x-3, H-44, 6, 8);
+      // 火力 ≥1：机尾喷焰
+      if (pLevel >= 1) {
+        ctx.fillStyle = BULLET_LVLS[pLevel].col;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath(); ctx.arc(player.x, H-24, 3 + pLevel, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+    // 枪口闪光
+    if (muzzle > 0) {
+      ctx.globalAlpha = muzzle/0.08;
+      ctx.fillStyle = BULLET_LVLS[pLevel].col;
+      ctx.beginPath(); ctx.arc(player.x, H-51, 6, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    // 进阶：飞机炮口标签（当前装载的名词，要主动匹配敌人）显示在机头上方
+    if (advanced && targetTerm) {
+      const tag = '🎯 ' + targetTerm;
+      ctx.font = 'bold ' + Math.round(12/sf) + 'px "Courier New", monospace';
+      const tw = ctx.measureText(tag).width + 14;
+      const ty = H - 64;
+      ctx.fillStyle = 'rgba(0,0,0,.72)';
+      ctx.strokeStyle = '#7ee8fa';
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(player.x - tw/2, ty - 14, tw, 18);
+      ctx.strokeRect(player.x - tw/2, ty - 14, tw, 18);
+      ctx.fillStyle = '#7ee8fa';
+      ctx.textAlign = 'center';
+      ctx.fillText(tag, player.x, ty - 1);
+    }
+    // 飞机下的解释（配对线索）
+    const hint = hintOf[targetTerm] || targetTerm;
+    ctx.fillStyle = '#ffd27d';
+    ctx.font = 'bold ' + Math.round(14/sf) + 'px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('🧩 ' + hint, player.x, H - 4);
+    // 激光束（满级武器）
+    lasers.forEach(l => {
+      const a = Math.max(0, 1 - l.t/l.dur);
+      ctx.globalAlpha = 0.9*a;
+      ctx.fillStyle = '#ff8fd8';
+      ctx.fillRect(l.x - 5, 0, 10, H - 50);
+      ctx.globalAlpha = 0.35*a;
+      ctx.fillRect(l.x - 11, 0, 22, H - 50);
+      ctx.globalAlpha = 1;
+    });
+    // 子弹（按火力等级带不同特效：拖尾/光晕/加宽）
+    bullets.forEach(b => {
+      ctx.save();
+      if (b.fx >= 1) {
+        ctx.globalAlpha = 0.35;
+        ctx.strokeStyle = b.col;
+        ctx.lineWidth = b.w + 4;
+        ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - b.vx*0.02, b.y - b.vy*0.02); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      ctx.fillStyle = b.col;
+      if (b.fx >= 2) {
+        ctx.globalAlpha = 0.45;
+        ctx.fillRect(b.x - b.w/2 - 2, b.y - b.h/2 - 2, b.w + 4, b.h + 4);
+        ctx.globalAlpha = 1;
+      }
+      ctx.fillRect(b.x - b.w/2, b.y - b.h/2, b.w, b.h);
+      ctx.restore();
+    });
+    ctx.fillStyle = '#ff5555';
+    ebullets.forEach(b => ctx.fillRect(b.x-2, b.y-5, 4, 10));
+    // 道具掉落（P 火力 / ❤ 回命 / ☄ 爆破）
+    drops.forEach(d => {
+      const y = Math.min(d.y, H - 38);
+      const bob = Math.sin(d.t*4) * 2;
+      const alpha = (d.y > H - 38 && d.t > 7.5) ? Math.max(0.2, 1 - (d.t - 7.5)) : 1;
+      ctx.globalAlpha = alpha;
+      const col = d.type === 'P' ? '#7ee8fa' : d.type === '❤' ? '#ff7a7a' : d.type === '⏳' ? '#5ac8ff' : d.type === '💎' ? '#c9a6ff' : '#ffb000';
+      ctx.fillStyle = col;
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(d.x, y + bob, 10, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#061018';
+      ctx.font = 'bold ' + Math.round(12/sf) + 'px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(d.type, d.x, y + bob + 1);
+      ctx.globalAlpha = 1;
+    });
+    // 拾取飘字
+    floatTexts.forEach(f => {
+      ctx.globalAlpha = Math.max(0, 1 - f.t/1.3);
+      ctx.fillStyle = f.col;
+      ctx.font = 'bold ' + Math.round(15/sf) + 'px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(f.txt, f.x, f.y - f.t*42);
+      ctx.globalAlpha = 1;
+    });
+    // 爆炸
+    booms.forEach(b => {
+      const a = 1 - b.t/0.5;
+      ctx.globalAlpha = a;
+      ctx.fillStyle = b.big ? '#ffb000' : '#ff7a00';
+      const r = 8 + b.t*60;
+      ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+    // 缓速指示
+    if (slowT > 0) {
+      ctx.globalAlpha = Math.min(1, slowT);
+      ctx.fillStyle = '#7ec8ff';
+      ctx.font = 'bold ' + Math.round(13/sf) + 'px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('⏳ 全场缓速 ' + slowT.toFixed(1) + 's', 10, 22);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    if (ended) return;
+    const dt = Math.min(0.05, (now - last)/1000);
+    last = now;
+    update(dt); draw();
+    raf = requestAnimationFrame(loop);
+  }
+  let raf;
+  shooterBuff = null;   // 已应用，清掉本次加成
+  makeWave();
+  raf = requestAnimationFrame(loop);
+  // 调试钩子：供自动化测试读取内部状态（无副作用）
+  window.__shooterDbg = () => ({
+    setPower: (l) => { pLevel = Math.max(0, Math.min(MAX_LVL, l)); powerEl.textContent = 'x' + (pLevel+1); },
+    playerX: player.x, wave, lives, score, combo, pLevel, picked, formX, formY,
+    targetTerm, active: enemies.filter(e=>e.active).length,
+    enemies: enemies.map((e,i)=>e.active?{id:i,term:e.term,x:Math.round(e.x),y:Math.round(e.y),hp:e.hp}:null).filter(Boolean),
+    drops: drops.length, bullets: bullets.length,
+    minY: enemies.filter(e=>e.active).length ? Math.min.apply(null, enemies.filter(e=>e.active).map(e=>e.y)) : 9999
+  });
+}
+
 function openMemoryMatch(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('memory')) {
+    showGameTutorial('memory', '🧠 翻牌配对', [
+      '翻开两张牌，把<b>术语</b>和它的<b>解释</b>配成一对',
+      '配对成功就消除，全部配完过关；<b>连对</b>有连击加成',
+      '牌堆里可能藏着<b>特殊卡</b>：⏱ 时间、💎 幸运、🛡 护身',
+      '多关玩法：过一关，卡片更多（4→6→8 张）'
+    ], function(){ openMemoryMatch(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('memory'));
   // 堆叠式（cfg.levels 存在时）
   if (cfg.levels) { openStackedMatch(cfg, onComplete); return; }
+  // 多关递进（cfg.rounds = 每关卡片对数，如 [2,3,4] → 4/6/8 张）：一关通过自动进下一关
+  if (cfg.rounds && cfg.rounds.length) {
+    let sizes = cfg.rounds.slice();
+    if (cfg._hard) sizes = sizes.map(function(r){ return Math.min(r + 1, 6); });   // 二周目：每关加一档
+    const base = Object.assign({}, cfg);
+    delete base.rounds;
+    let ri = 0;
+    (function go() {
+      if (ri >= sizes.length) {
+        if (cfg._endless) { sizes.push(sizes[sizes.length - 1] + 1); }   // 无限战：继续加牌
+        else { if (onComplete) onComplete(true); return; }
+      }
+      const sub = Object.assign({}, base, {
+        size: sizes[ri],
+        name: base.name + (sizes.length > 1 ? ' · 第 ' + (ri + 1) + '/' + sizes.length + ' 关' : ''),
+        _noRecord: ri < sizes.length - 1,
+        _autoNext: ri < sizes.length - 1,
+        _doneText: ri < sizes.length - 1 ? '下一关…' : undefined
+      });
+      openMemoryMatch(sub, function(win){ if (win) { ri++; go(); } else if (onComplete) onComplete(false); });
+    })();
+    return;
+  }
+  if (cfg._hard && !cfg.timed) { cfg.timed = true; cfg.timeLimit = cfg.timeLimit || 90; }   // 单关二周目：加限时
   const pairs = cfg.pairs.slice(0, cfg.size);
   let streak = 0;
   let bestStreak = 0;
@@ -3898,6 +5672,25 @@ function openMemoryMatch(cfg, onComplete) {
     cards.push({ pairId: i, kind: 'term', text: p.term, emoji: p.emoji });
     cards.push({ pairId: i, kind: 'hint', text: p.hint, emoji: p.emoji });
   });
+  // 事件卡：特殊道具卡，配成一对后触发效果（增加惊喜与节奏）
+  const EVENT_POOL = [
+    { id: 'time', emoji: '⏱', term: '时间卡', hint: '限时 +5 秒 / 免记 1 步', effect: 'time' },
+    { id: 'score', emoji: '💎', term: '幸运卡', hint: '少记 2 步', effect: 'score' },
+    { id: 'shield', emoji: '🛡', term: '护身卡', hint: '下次配错不扣时间/不记步数', effect: 'shield' }
+  ];
+  const deckEvents = [];
+  if (cfg.events !== false) {
+    const want = (Array.isArray(cfg.events) && cfg.events.length) ? cfg.events.slice() : [null];
+    const pool = EVENT_POOL.slice();
+    want.forEach(id => {
+      const evt = id ? pool.find(e => e.id === id) : pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+      if (!evt) return;
+      deckEvents.push(evt);
+      cards.push({ pairId: 'E_' + evt.id, kind: 'term', text: evt.term, emoji: evt.emoji, event: evt });
+      cards.push({ pairId: 'E_' + evt.id, kind: 'hint', text: evt.hint, emoji: evt.emoji, event: evt });
+    });
+  }
+  const totalPairs = cfg.size + deckEvents.length;
   // Fisher-Yates 洗牌
   for (let i = cards.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -3907,7 +5700,7 @@ function openMemoryMatch(cfg, onComplete) {
   const overlay = document.createElement('div');
   overlay.className = 'mm-overlay';
   overlay.innerHTML = `
-    <div class="mm-box">
+    <div class="mm-box mm-fill">
       <div class="mm-head">
         <div>
           <div class="mm-title">🧠 ${escHtml(cfg.name)}</div>
@@ -3918,7 +5711,8 @@ function openMemoryMatch(cfg, onComplete) {
       <div class="mm-stats">
         ${cfg.timed ? '<span>⏱ <b class="mm-timer">' + (cfg.timeLimit || 0) + '</b>s</span>' : ''}
         <span>步数 <b class="mm-moves">0</b></span>
-        <span>配对 <b class="mm-matched">0</b>/${cfg.size}</span>
+        <span>配对 <b class="mm-matched">0</b>/${totalPairs}</span>
+        <span>🔥 <b class="mm-combo" style="color:#ff7a00"></b></span>
       </div>
       ${cfg.timed ? '<div class="mm-timerbar"><div class="mm-timerbar-fill high" style="width:100%"></div></div>' : ''}
       <div class="mm-grid"></div>
@@ -3928,19 +5722,31 @@ function openMemoryMatch(cfg, onComplete) {
 
   const grid = overlay.querySelector('.mm-grid');
   const cols = Math.ceil(Math.sqrt(cards.length));
-  grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+  const rows = Math.ceil(cards.length / cols);
+  const gap = 10;
+  function fitCard(){
+    const aw = grid.clientWidth - (cols - 1) * gap;
+    const ah = grid.clientHeight - (rows - 1) * gap;
+    const size = Math.max(36, Math.floor(Math.min(aw / cols, ah / rows)));
+    grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + size + 'px)';
+    grid.style.gridTemplateRows = 'repeat(' + rows + ', ' + size + 'px)';
+  }
+  fitCard();
+  requestAnimationFrame(fitCard);
 
   const timerEl = overlay.querySelector('.mm-timer');
   const movesEl = overlay.querySelector('.mm-moves');
   const matchedEl = overlay.querySelector('.mm-matched');
+  const comboEl = overlay.querySelector('.mm-combo');
 
   let timeLeft = cfg.timeLimit || 0;
+  let mmTimeTotal = Math.max(cfg.timeLimit || 0, 1);
   let moves = 0, matched = 0;
   let flipped = [], lock = false, finished = false;
   let timer = null;
+  let shield = false;   // 护身卡：下次配错不扣时间
 
   if (cfg.timed) {
-    const mmTimeTotal = Math.max(cfg.timeLimit || 0, 1);
     let mmLastTick = 99;
     timer = setInterval(() => {
       timeLeft -= 0.1;
@@ -3955,6 +5761,34 @@ function openMemoryMatch(cfg, onComplete) {
       }
       if (timeLeft <= 0 && !finished) { clearInterval(timer); finish(false); }
     }, 100);
+  }
+
+  function isCardMatched(i) { return grid.children[i] && grid.children[i].classList.contains('matched'); }
+  function applyEvent(evt) {
+    if (evt.effect === 'time') {
+      if (cfg.timed) {
+        timeLeft = Math.min(cfg.timeLimit || 60, timeLeft + 5);
+        if (timerEl) timerEl.textContent = Math.max(Math.ceil(timeLeft), 0);
+        const bar = overlay.querySelector('.mm-timerbar-fill');
+        if (bar) {
+          const pct = Math.max(0, Math.min(100, (timeLeft / mmTimeTotal) * 100));
+          bar.style.width = pct + '%';
+          bar.className = 'mm-timerbar-fill ' + (pct > 50 ? 'high' : pct > 25 ? 'mid' : 'low');
+        }
+        showToast('⏱ 时间 +5 秒！', 'success');
+      } else {
+        moves = Math.max(0, moves - 1);
+        if (movesEl) movesEl.textContent = moves;
+        showToast('⏱ 少记 1 步，更容易拿三星', 'success');
+      }
+    } else if (evt.effect === 'score') {
+      moves = Math.max(0, moves - 2);
+      if (movesEl) movesEl.textContent = moves;
+      showToast('💎 少记 2 步，评价更稳', 'success');
+    } else if (evt.effect === 'shield') {
+      shield = true;
+      showToast('🛡 护身卡就绪：下次配错不扣时间/不记步数', 'info');
+    }
   }
 
   function flipCard(card) {
@@ -3979,17 +5813,41 @@ function openMemoryMatch(cfg, onComplete) {
           playSound('success');
           streak++;
           bestStreak = Math.max(bestStreak, streak);
+          if (comboEl) comboEl.textContent = streak >= 2 ? 'x' + streak : '';
           bumpGameStats({ mmStreak: bestStreak, mmMatched: (getGameStats().mmMatched || 0) + 1 });
           flipped = [];
           lock = false;
-          if (matched === cfg.size) { clearInterval(timer); finish(true); }
+          if (da.event) applyEvent(da.event);
+          if (matched === totalPairs) { clearInterval(timer); finish(true); }
         }, 320);
       } else {
         setTimeout(() => {
           a.classList.add('wrong');
           b.classList.add('wrong');
           streak = 0;
+          if (comboEl) comboEl.textContent = '';
           playSound('error');
+          if (cfg.timed) {
+            if (shield) {
+              shield = false;
+              showToast('🛡 护身生效，这次不扣时间', 'info');
+            } else {
+              timeLeft = Math.max(0, timeLeft - 2.5);
+              if (timerEl) timerEl.textContent = Math.max(Math.ceil(timeLeft), 0);
+              const bar = overlay.querySelector('.mm-timerbar-fill');
+              if (bar) {
+                const pct = Math.max(0, Math.min(100, (timeLeft / mmTimeTotal) * 100));
+                bar.style.width = pct + '%';
+                bar.className = 'mm-timerbar-fill ' + (pct > 50 ? 'high' : pct > 25 ? 'mid' : 'low');
+              }
+              showToast('❌ 记错了，时间 -2.5s', 'error');
+            }
+          } else if (shield) {
+            shield = false;
+            moves = Math.max(0, moves - 1);
+            if (movesEl) movesEl.textContent = moves;
+            showToast('🛡 护身生效，这次不记步数', 'info');
+          }
           setTimeout(() => {
             a.classList.remove('flipped', 'wrong');
             b.classList.remove('flipped', 'wrong');
@@ -4009,6 +5867,7 @@ function openMemoryMatch(cfg, onComplete) {
     card.addEventListener('click', () => flipCard(card));
     grid.appendChild(card);
   });
+  window.__mmDbg = () => ({ size: cfg.size, totalPairs: totalPairs, cards: cards.length, events: deckEvents.length });
 
   overlay.querySelector('.mm-close').onclick = () => {
     if (finished) return;
@@ -4019,10 +5878,11 @@ function openMemoryMatch(cfg, onComplete) {
   function closeOverlay() {
     overlay.style.opacity = '0';
     overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (onComplete) onComplete(false); }, 300);
+    setTimeout(() => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); }, 300);
   }
 
   function finish(win) {
+    if (finished) return;
     finished = true;
     clearInterval(timer);
     if (win) {
@@ -4038,7 +5898,7 @@ function openMemoryMatch(cfg, onComplete) {
         grid.style.display = 'none';
         const foot = overlay.querySelector('.mm-foot');
         if (foot) foot.style.display = 'none';
-        const stars = moves <= cfg.size ? 3 : moves <= cfg.size * 1.5 ? 2 : 1;
+        const stars = moves <= totalPairs ? 3 : moves <= totalPairs * 1.5 ? 2 : 1;
         const res = document.createElement('div');
         res.className = 'mm-result';
         res.innerHTML = `
@@ -4046,14 +5906,17 @@ function openMemoryMatch(cfg, onComplete) {
           <div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:6px">${escHtml(cfg.name)} 完成！</div>
           <div class="xp">+${cfg.xp || 0} XP</div>
           <div style="font-size:14px;color:var(--dim)">用 ${moves} 步配对 ${matched} 对 · 评价 ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+          <div style="font-size:13px;color:var(--cyan);margin-top:4px">厂长：术语全部入库！再看到它们就不会陌生了</div>
           <div class="note">热身奖励不计入排行榜，重在混个脸熟</div>
           <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
             <button class="mm-btn" data-act="again">🔁 再玩一次</button>
-            <button class="mm-btn primary" data-act="done">收下奖励继续</button>
+            <button class="mm-btn primary" data-act="done">${cfg._doneText || '收下奖励继续'}</button>
           </div>`;
         overlay.appendChild(res);
-        overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openMemoryMatch(cfg, onComplete); };
-        overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
+        overlay.querySelector('[data-act="again"]').onclick = () => { playAreaMusic(); overlay.remove(); openMemoryMatch(cfg, onComplete); };
+        const _done = () => { playAreaMusic(); overlay.remove(); if (!cfg._noRecord) { recordGameWin('mm'); miniMarkClear(cfg.id); } if (onComplete) onComplete(true); };
+        overlay.querySelector('[data-act="done"]').onclick = _done;
+        if (cfg._autoNext) { setTimeout(_done, 1600); }
       }, 700);
     } else {
       playSound('fail');
@@ -4062,15 +5925,15 @@ function openMemoryMatch(cfg, onComplete) {
       res.className = 'mm-result';
       res.innerHTML = `
         <div class="big">⏰</div>
-        <div style="font-size:20px;font-weight:bold;color:var(--red);margin-top:6px">时间到，还差 ${cfg.size - matched} 对</div>
+        <div style="font-size:20px;font-weight:bold;color:var(--red);margin-top:6px">时间到，还差 ${totalPairs - matched} 对</div>
         <div style="font-size:14px;color:var(--dim);margin-top:8px">混个脸熟就行，再试一次吧！</div>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn primary" data-act="retry">🔁 再来一次</button>
           <button class="mm-btn" data-act="skip">跳过，先干正事</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="retry"]').onclick = () => { overlay.remove(); openMemoryMatch(cfg, onComplete); };
-      overlay.querySelector('[data-act="skip"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(false); };
+      overlay.querySelector('[data-act="retry"]').onclick = () => { playAreaMusic(); overlay.remove(); openMemoryMatch(cfg, onComplete); };
+      overlay.querySelector('[data-act="skip"]').onclick = () => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); };
     }
   }
 }
@@ -4079,6 +5942,7 @@ function openMemoryMatch(cfg, onComplete) {
 
 // 番外：堆叠式多层翻牌（一层层揭开）
 function openStackedMatch(cfg, onComplete) {
+  playMusic('boss');
   const levels = cfg.levels;
   let cur = 0;
   let finished = false;
@@ -4171,6 +6035,15 @@ function openStackedMatch(cfg, onComplete) {
               a.classList.add('wrong');
               b.classList.add('wrong');
               playSound('error');
+              timeLeft = Math.max(0, timeLeft - 2.5);
+              if (timerEl) timerEl.textContent = Math.max(Math.ceil(timeLeft), 0);
+              const bar = overlay.querySelector('.mm-timerbar-fill');
+              if (bar) {
+                const pct = Math.max(0, Math.min(100, (timeLeft / mmTimeTotal) * 100));
+                bar.style.width = pct + '%';
+                bar.className = 'mm-timerbar-fill ' + (pct > 50 ? 'high' : pct > 25 ? 'mid' : 'low');
+              }
+              showToast('❌ 记错了，时间 -2.5s', 'error');
               setTimeout(() => {
                 a.classList.remove('flipped', 'wrong');
                 b.classList.remove('flipped', 'wrong');
@@ -4224,7 +6097,7 @@ function openStackedMatch(cfg, onComplete) {
   function closeOverlay() {
     overlay.style.opacity = '0';
     overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (onComplete) onComplete(false); }, 300);
+    setTimeout(() => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); }, 300);
   }
   function finish(win) {
     finished = true;
@@ -4243,7 +6116,7 @@ function openStackedMatch(cfg, onComplete) {
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { playAreaMusic(); overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
     } else {
       playSound('fail');
       const res = document.createElement('div');
@@ -4257,14 +6130,25 @@ function openStackedMatch(cfg, onComplete) {
           <button class="mm-btn" data-act="skip">先干正事</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="retry"]').onclick = () => { overlay.remove(); openStackedMatch(cfg, onComplete); };
-      overlay.querySelector('[data-act="skip"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(false); };
+      overlay.querySelector('[data-act="retry"]').onclick = () => { playAreaMusic(); overlay.remove(); openStackedMatch(cfg, onComplete); };
+      overlay.querySelector('[data-act="skip"]').onclick = () => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); };
     }
   }
 }
 
 // 连线匹配小游戏：左项↔右项配对
 function openMatchGame(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (tutSeen('match') === false) {
+    showGameTutorial('match', '🔗 连线配对', [
+      '把左边的<b>术语</b>连到右边对应的<b>解释</b>',
+      '全部配对成功即过关'
+    ], function(){ openMatchGame(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('match'));
+  if (cfg._hard) cfg.size = Math.min((cfg.size || 4) + 2, (cfg.pairs || []).length);   // 二周目：多加 2 组
   const pairs = (cfg.pairs || []).slice(0, cfg.size);
   const rights = pairs.map((p, i) => ({ text: p.right, pairIdx: i }));
   for (let i = rights.length - 1; i > 0; i--) {
@@ -4339,7 +6223,7 @@ function openMatchGame(cfg, onComplete) {
 
   overlay.querySelector('.mm-close').onclick = () => {
     if (finished) return;
-    overlay.remove();
+    playAreaMusic(); overlay.remove();
     if (onComplete) onComplete(false);
   };
   function finish(win) {
@@ -4350,8 +6234,8 @@ function openMatchGame(cfg, onComplete) {
       res.className = 'mm-result';
       res.innerHTML = `<div class="big">🔗</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:6px">${escHtml(cfg.name)} 完成！</div><div class="xp">+${cfg.xp || 0} XP</div><div style="font-size:14px;color:var(--dim)">${cfg.size} 组全部配对成功</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" data-act="again">🔁 再玩一次</button><button class="mm-btn primary" data-act="done">收下奖励</button></div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openMatchGame(cfg, onComplete); };
-      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('match'); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="again"]').onclick = () => { playAreaMusic(); overlay.remove(); openMatchGame(cfg, onComplete); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { playAreaMusic(); overlay.remove(); recordGameWin('match'); miniMarkClear(cfg.id); if (onComplete) onComplete(true); };
     }
   }
   render();
@@ -4359,6 +6243,17 @@ function openMatchGame(cfg, onComplete) {
 
 // 产线快打（命令快反）：看提示点对命令，计时+连击
 function openQuickMatch(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('quick')) {
+    showGameTutorial('quick', '⚡ 快打', [
+      '题目弹出，快速点选<b>正确答案</b>',
+      '连对越多连击越高、越爽',
+      '在倒计时结束前尽量多答对'
+    ], function(){ openQuickMatch(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('quick'));
   const questions = cfg.pairs.slice(0, cfg.size).map(pr => Object.assign({}, pr));
   for (let i = questions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -4366,7 +6261,7 @@ function openQuickMatch(cfg, onComplete) {
   }
   const distractors = (cfg.distractors || []).filter(d => !questions.some(q => q.term === d));
   let cur = 0, score = 0, combo = 0, bestCombo = 0;
-  let timeLeft = cfg.timeLimit || 45;
+  let timeLeft = cfg._endless ? 999999 : Math.round((cfg.timeLimit || 45) * (cfg._hard ? 0.7 : 1));
   let timer = null, finished = false;
 
   const overlay = document.createElement('div');
@@ -4428,7 +6323,10 @@ function openQuickMatch(cfg, onComplete) {
           overlay.querySelector('#qkMsg').innerHTML = '<span class="qk-ok">✓ 正确！' + (q.cmd ? ' 示例：' + escHtml(q.cmd) : '') + '</span>';
           if (q.id) unlockPedia(currentLevelId, [q.id]);
           cur++;
-          if (cur >= cfg.size) { clearInterval(timer); setTimeout(() => finish(true), 700); }
+          if (cur >= cfg.size) {
+            if (cfg._endless) { cur = 0; renderQ(); }   // 无限战：不结算，循环刷题
+            else { clearInterval(timer); setTimeout(() => finish(true), 700); }
+          }
           else setTimeout(renderQ, 550);
         } else {
           combo = 0;
@@ -4467,7 +6365,7 @@ function openQuickMatch(cfg, onComplete) {
   };
   function closeOverlay() {
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (onComplete) onComplete(false); }, 300);
+    setTimeout(() => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); }, 300);
   }
   function finish(win) {
     finished = true;
@@ -4488,8 +6386,8 @@ function openQuickMatch(cfg, onComplete) {
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openQuickMatch(cfg, onComplete); };
-      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('qk'); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="again"]').onclick = () => { playAreaMusic(); overlay.remove(); openQuickMatch(cfg, onComplete); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { playAreaMusic(); overlay.remove(); recordGameWin('qk'); miniMarkClear(cfg.id); if (onComplete) onComplete(true); };
     } else {
       playSound('fail');
       const res = document.createElement('div');
@@ -4503,8 +6401,8 @@ function openQuickMatch(cfg, onComplete) {
           <button class="mm-btn" data-act="skip">先干正事</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="retry"]').onclick = () => { overlay.remove(); openQuickMatch(cfg, onComplete); };
-      overlay.querySelector('[data-act="skip"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(false); };
+      overlay.querySelector('[data-act="retry"]').onclick = () => { playAreaMusic(); overlay.remove(); openQuickMatch(cfg, onComplete); };
+      overlay.querySelector('[data-act="skip"]').onclick = () => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); };
     }
   }
   renderQ();
@@ -4512,6 +6410,15 @@ function openQuickMatch(cfg, onComplete) {
 
 // ===== Storm Defense（数据风暴·守住管道，L4 新玩法）=====
 function openStormDefense(cfg, onComplete) {
+  if (!tutSeen('storm')) {
+    showGameTutorial('storm', '🌪️ 数据风暴', [
+      '数据风暴来了！拖<b>过滤器</b>处理涌入的数据',
+      '每种过滤器有费用，算力有限不能全开',
+      '别让管道崩了，守住每一波'
+    ], function(){ openStormDefense(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('storm'));
   const duration = cfg.duration || 60;
   const waves = cfg.waves || 5;
   const waveDur = duration / waves;
@@ -4722,7 +6629,7 @@ function openStormDefense(cfg, onComplete) {
   };
   function closeOverlay() {
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (onComplete) onComplete(false); }, 300);
+    setTimeout(() => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); }, 300);
   }
 
   function finish(win) {
@@ -4747,8 +6654,8 @@ function openStormDefense(cfg, onComplete) {
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openStormDefense(cfg, onComplete); };
-      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('storm'); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="again"]').onclick = () => { playAreaMusic(); overlay.remove(); openStormDefense(cfg, onComplete); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { playAreaMusic(); overlay.remove(); recordGameWin('storm'); if (onComplete) onComplete(true); };
     } else {
       playSound('fail');
       const res = document.createElement('div');
@@ -4762,8 +6669,8 @@ function openStormDefense(cfg, onComplete) {
           <button class="mm-btn" data-act="skip">先干正事</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="retry"]').onclick = () => { overlay.remove(); openStormDefense(cfg, onComplete); };
-      overlay.querySelector('[data-act="skip"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(false); };
+      overlay.querySelector('[data-act="retry"]').onclick = () => { playAreaMusic(); overlay.remove(); openStormDefense(cfg, onComplete); };
+      overlay.querySelector('[data-act="skip"]').onclick = () => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); };
     }
   }
 
@@ -4773,6 +6680,14 @@ function openStormDefense(cfg, onComplete) {
 
 // ===== Alarm Rush（值班抢险·别让产线烧了，L4 新玩法）=====
 function openAlarmRush(cfg, onComplete) {
+  if (!tutSeen('alarm')) {
+    showGameTutorial('alarm', '🚨 值班抢险', [
+      '产线设备<b>报警</b>了，快速处理',
+      '别让产线烧了，稳住每一波'
+    ], function(){ openAlarmRush(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('alarm'));
   const duration = cfg.duration || 40;
   const waves = cfg.waves || 4;
   const waveDur = duration / waves;
@@ -4939,7 +6854,7 @@ function openAlarmRush(cfg, onComplete) {
   };
   function closeOverlay() {
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (onComplete) onComplete(false); }, 300);
+    setTimeout(() => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); }, 300);
   }
 
   function finish(win) {
@@ -4964,8 +6879,8 @@ function openAlarmRush(cfg, onComplete) {
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="again"]').onclick = () => { overlay.remove(); openAlarmRush(cfg, onComplete); };
-      overlay.querySelector('[data-act="done"]').onclick = () => { overlay.remove(); recordGameWin('alarm'); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="again"]').onclick = () => { playAreaMusic(); overlay.remove(); openAlarmRush(cfg, onComplete); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { playAreaMusic(); overlay.remove(); recordGameWin('alarm'); if (onComplete) onComplete(true); };
     } else {
       playSound('fail');
       const res = document.createElement('div');
@@ -4979,8 +6894,8 @@ function openAlarmRush(cfg, onComplete) {
           <button class="mm-btn" data-act="skip">先干正事</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="retry"]').onclick = () => { overlay.remove(); openAlarmRush(cfg, onComplete); };
-      overlay.querySelector('[data-act="skip"]').onclick = () => { overlay.remove(); if (onComplete) onComplete(false); };
+      overlay.querySelector('[data-act="retry"]').onclick = () => { playAreaMusic(); overlay.remove(); openAlarmRush(cfg, onComplete); };
+      overlay.querySelector('[data-act="skip"]').onclick = () => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); };
     }
   }
 
@@ -5009,8 +6924,8 @@ function pediaCount(levelId) {
   const tl = getTermLevel(levelId);
   if (!tl) return { got: 0, total: 0 };
   const all = new Set();
-  tl.warmups.forEach(w => w.pairs.forEach(pr => all.add(pr.id)));
-  ((tl.bonus && tl.bonus.levels) || []).forEach(l => l.pairs.forEach(pr => all.add(pr.id)));
+  tl.warmups.forEach(w => (w.pairs || []).forEach(pr => { if (pr && pr.id) all.add(pr.id); }));
+  ((tl.bonus && tl.bonus.levels) || []).forEach(l => (l.pairs || []).forEach(pr => { if (pr && pr.id) all.add(pr.id); }));
   const got = new Set(getPedia()['' + levelId] || []);
   let gotCount = 0;
   all.forEach(id => { if (got.has(id)) gotCount++; });
@@ -5033,8 +6948,8 @@ function renderPedia() {
   }
   const pediaSet = new Set(getPedia()['' + currentLevelId] || []);
   const all = new Map();
-  tl.warmups.forEach(w => w.pairs.forEach(pr => all.set(pr.id, pr)));
-  ((tl.bonus && tl.bonus.levels) || []).forEach(l => l.pairs.forEach(pr => all.set(pr.id, pr)));
+  tl.warmups.forEach(w => (w.pairs || []).forEach(pr => { if (pr && pr.id) all.set(pr.id, pr); }));
+  ((tl.bonus && tl.bonus.levels) || []).forEach(l => (l.pairs || []).forEach(pr => { if (pr && pr.id) all.set(pr.id, pr); }));
   const entries = Array.from(all.values());
   const gotCount = entries.filter(pr => pediaSet.has(pr.id)).length;
   document.getElementById('pdProgress').textContent = (tl.emoji || '📖') + ' ' + (tl.name || ('第 ' + currentLevelId + ' 关')) + ' · 已收集 ' + gotCount + '/' + entries.length;
@@ -5092,7 +7007,7 @@ function showLevelUp(rank) {
 // 11. TOAST
 // =========================================================================
 
-function showWelcomeDialog(msg) {
+function showWelcomeDialog(msg, done) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center';
   const box = document.createElement('div');
@@ -5106,7 +7021,7 @@ function showWelcomeDialog(msg) {
   box.querySelector('button').onclick = () => {
     overlay.style.opacity = '0';
     overlay.style.transition = 'opacity .3s';
-    setTimeout(() => overlay.remove(), 300);
+    setTimeout(() => { overlay.remove(); if (done) setTimeout(done, 50); }, 300);
     playSound('click');
   };
   playSound('boot');
@@ -5173,7 +7088,7 @@ function showLevelIntro(lv, onStart) {
 // =========================================================================
 // P2 NARRATIVE SYSTEM: Level Complete Dialogue
 // =========================================================================
-function showLevelComplete(lv) {
+function showLevelComplete(lv, done) {
   const xpEarned = calculateLevelXP(lv.id);
   const totalXP = calcTotalXP();
   const rank = getRank(totalXP);
@@ -5230,7 +7145,7 @@ function showLevelComplete(lv) {
   btn.onclick = () => {
     overlay.style.opacity = '0';
     overlay.style.transition = 'opacity .3s';
-    setTimeout(() => overlay.remove(), 300);
+    setTimeout(() => { overlay.remove(); if (done) setTimeout(done, 50); }, 300);
     playSound('click');
   };
 }
@@ -5255,7 +7170,7 @@ function showTaskPreface(task, onStart) {
   const moodLine = getRandomMoodLine(mood);
   
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9998;display:flex;align-items:center;justify-content:center';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:10001;display:flex;align-items:center;justify-content:center';
   
   const box = document.createElement('div');
   box.style.cssText = 'background:#12121a;border:2px solid var(--cyan);border-radius:8px;padding:0;max-width:500px;width:90%;box-shadow:0 0 60px rgba(0,188,212,.2);overflow:hidden';
@@ -5309,6 +7224,21 @@ function showToast(msg, type) {
   el._hide = setTimeout(() => el.classList.remove('show'), 1500);
 }
 
+// 🐛 抓虫有奖 - Bug 反馈
+function openBugReport(){ document.getElementById('bugOverlay').classList.add('show'); }
+function closeBugReport(){ document.getElementById('bugOverlay').classList.remove('show'); document.getElementById('bugErr').textContent=''; }
+async function submitBugReport(){
+  const loc=document.getElementById('bugLocation').value.trim();
+  const content=document.getElementById('bugContent').value.trim();
+  const err=document.getElementById('bugErr');
+  if(!content){ err.textContent='请描述一下你遇到的问题'; return; }
+  const btn=document.getElementById('bugSubmit'); btn.disabled=true; btn.textContent='提交中…';
+  const res=await api('/api/student/bug-report',{method:'POST',body:JSON.stringify({location:loc,content})});
+  btn.disabled=false; btn.textContent='🐛 提交反馈';
+  if(!res || !res.ok){ err.textContent=(res&&res.error)||'提交失败，请重试'; return; }
+  closeBugReport(); showToast('🐛 已收到反馈，谢谢！抓虫有奖','success');
+}
+
 // =========================================================================
 // 12. LOGOUT
 // =========================================================================
@@ -5327,26 +7257,46 @@ async function init() {
     return;
   }
   await loadState();
+  detectNewServerAchievements();
   prevRank = getRank(calcTotalXP());
   renderFactory();
   renderMission();
   renderHeader();
   renderAchBar();
+  // 8bit 背景音乐（按场景切换）
+  try { if (localStorage.getItem('music_enabled') === '0') musicEnabled = false; } catch(e){}
+  const _musicBtn = document.getElementById('musicToggle');
+  if (_musicBtn) _musicBtn.textContent = musicEnabled ? '🎵' : '🔕';
+  // 按当前进度定位到第一个可进入的幕，播放对应区域背景乐
+  const _startLv = content.levels.find(l => l.id === 1 || (l.id > 1 && levelProgress(l.id - 1).completed)) || content.levels[0];
+  setArea(_startLv ? _startLv.id : 1);
+  playAreaMusic();
+  document.addEventListener('pointerdown', function _firstGesture(){
+    try { const _c = getAudioCtx(); if (_c && _c.state === 'suspended') _c.resume(); } catch(e){}
+    if (musicEnabled && currentTrack && !musicSrc) playMusic(currentTrack);
+    document.removeEventListener('pointerdown', _firstGesture);
+  });
   // 评估并弹出新解锁成就；异步刷新排行榜后再次评估（捕捉先锋等依赖排行数据的成就）
   evaluateAchievements(true);
   refreshLeaderboard().then(() => evaluateAchievements(true));
-  // 未设置密码时，欢迎弹窗结束后引导设置
-  if (PASSWORD_ENABLED && !gameState.hasPassword) {
-    setTimeout(showPasswordPrompt, 6000);
+  // —— 登录弹窗队列：按顺序一次一个（成就动画→关卡结算→厂长欢迎→改密引导；重复弹窗每天一次）——
+  enqueueAchievementsJob();
+  if (pendingLevelComplete && !popupShownToday('lv')) {
+    markPopupToday('lv');
+    enqueueLoginPopup(done => showLevelComplete(pendingLevelComplete, done));
   }
-  // Welcome dialogue — 厂长欢迎弹窗
-  setTimeout(() => {
-    const isReturning = gameState.check && Object.keys(gameState.check).length > 0;
-    const greetLines = isReturning
-      ? ['👨‍💼 厂长推门进来：「回来了？上次你修的产线跑得不错。今天还有活，别歇着。」']
-      : ['👨‍💼 厂长走过来，递给你工牌：「新来的？我是厂长。你负责把中控室搭起来——装系统、通网络、调链路。我在里面等你。」'];
-    showWelcomeDialog(greetLines[0]);
-  }, 1000);
+  const isReturning = gameState.check && Object.keys(gameState.check).length > 0;
+  const greetLines = isReturning
+    ? ['👨‍💼 厂长推门进来：「回来了？上次你修的产线跑得不错。今天还有活，别歇着。」']
+    : ['👨‍💼 厂长走过来，递给你工牌：「新来的？我是厂长。你负责把中控室搭起来——装系统、通网络、调链路。我在里面等你。」'];
+  if (!popupShownToday('welcome')) {
+    markPopupToday('welcome');
+    enqueueLoginPopup(done => showWelcomeDialog(greetLines[0], done));
+  }
+  if (PASSWORD_ENABLED && !gameState.hasPassword && !popupShownToday('pw')) {
+    markPopupToday('pw');
+    enqueueLoginPopup(done => showPasswordPrompt(done));
+  }
 }
 
 init();

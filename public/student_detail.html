@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学生详情 · 锐智工厂</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; background: #0f0f14; color: #c8c8d0; min-height: 100vh; }
+.header {
+  background: #181820; border-bottom: 1px solid #2a2a3a;
+  padding: 14px 24px; display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 50;
+}
+.header .back { background: none; border: 1px solid #2a2a3a; color: #00bcd4; padding: 6px 14px; font-family: inherit; font-size: 17px; cursor: pointer; transition: all .2s; }
+.header .back:hover { border-color: #00bcd4; background: #00bcd4; color: #000; }
+.header .t { color: #c8c8d0; font-size: 19px; }
+.header .t b { color: #ffb000; }
+.header .sp { flex: 1; }
+.logout-btn { background: none; border: 1px solid #2a2a3a; color: #606070; padding: 6px 16px; font-family: inherit; font-size: 17px; cursor: pointer; }
+.logout-btn:hover { border-color: #ff5555; color: #ff5555; }
+main { max-width: 1080px; margin: 0 auto; padding: 22px; }
+
+/* 学生概览 */
+.student-head { background: #181820; border: 1px solid #2a2a3a; padding: 20px 24px; margin-bottom: 20px; }
+.s-name { font-size: 26px; color: #00bcd4; font-weight: bold; margin-bottom: 6px; }
+.s-meta { font-size: 15px; color: #606070; margin-bottom: 14px; }
+.badge { display: inline-block; border: 1px solid #2a2a3a; color: #c8c8d0; font-size: 15px; padding: 2px 10px; margin-right: 8px; }
+.badge.rank { border-color: #ffb000; color: #ffb000; }
+.badge.pw-init { border-color: #ffb000; color: #ffb000; }
+.badge.pw-set { border-color: #00e676; color: #00e676; }
+.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 4px; }
+.stat { background: #12121a; border: 1px solid #2a2a3a; padding: 12px; text-align: center; }
+.stat .v { font-size: 24px; color: #00e676; }
+.stat .k { font-size: 14px; color: #606070; margin-top: 4px; }
+
+/* 分区标题 */
+h2.sec { font-size: 19px; font-weight: normal; color: #00bcd4; margin: 26px 0 12px; display: flex; align-items: center; gap: 8px; }
+h2.sec::before { content: ''; display: inline-block; width: 4px; height: 18px; background: #ffb000; }
+
+/* 关卡卡片 */
+.level-card { background: #181820; border: 1px solid #2a2a3a; margin-bottom: 12px; overflow: hidden; }
+.lv-head { display: flex; align-items: center; gap: 14px; padding: 14px 18px; cursor: pointer; user-select: none; flex-wrap: wrap; }
+.lv-head:hover { background: #1c1c28; }
+.lv-name { font-size: 19px; color: #c8c8d0; flex: 1; min-width: 160px; }
+.lv-pct { font-size: 17px; color: #606070; white-space: nowrap; }
+.lv-progress { flex-basis: 100%; height: 5px; background: #1e1e2a; border-radius: 3px; overflow: hidden; }
+.lv-progress .bar { height: 100%; border-radius: 3px; transition: width .3s; }
+.bar.high { background: #00e676; } .bar.mid { background: #ffb000; } .bar.low { background: #ff5555; }
+.lv-arrow { color: #3a3a48; font-size: 15px; }
+.lv-body { display: none; border-top: 1px solid #1e1e2a; padding: 6px 18px 14px; }
+.lv-body.open { display: block; }
+
+.stars-row { display: flex; align-items: center; gap: 14px; font-size: 19px; padding: 10px 18px; border-top: 1px solid #1e1e2a; flex-wrap: wrap; }
+.stars-row .label { color: #606070; font-size: 16px; }
+.stars-row .stars { color: #3a3a48; letter-spacing: 2px; cursor: pointer; }
+.stars-row .stars .on { color: #ffb000; }
+.stars-row .stars:hover .star { color: #ffc030; }
+.stars-row .hint { font-size: 14px; color: #3a3a48; }
+
+.task-list { list-style: none; margin-top: 8px; }
+.task-list li { padding: 7px 8px; border-radius: 4px; font-size: 17px; display: flex; align-items: center; gap: 10px; }
+.task-list li:nth-child(odd) { background: #12121a; }
+.task-list li .st { width: 22px; text-align: center; }
+.task-list li .st.done { color: #00e676; }
+.task-list li .st.todo { color: #3a3a48; }
+.task-list li .tt { flex: 1; }
+.task-list li .tt.done { color: #8b91a6; text-decoration: line-through; }
+.task-list li .tag { font-size: 13px; color: #606070; border: 1px solid #2a2a3a; padding: 0 6px; border-radius: 3px; }
+.task-list li .tag.hidden { color: #ff5555; border-color: #ff5555; }
+.task-list li .tag.reflect { color: #00bcd4; border-color: #00bcd4; }
+.task-list li .tag.auto { color: #ffb000; border-color: #ffb000; }
+.lv-finish { font-size: 14px; color: #00e676; margin-top: 8px; }
+
+/* 成就网格 */
+.ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.ach { background: #12121a; border: 1px solid #2a2a3a; padding: 12px; text-align: center; }
+.ach.locked { opacity: .3; filter: grayscale(1); }
+.ach .e { font-size: 30px; margin-bottom: 4px; }
+.ach .n { font-size: 16px; color: #c8c8d0; }
+.ach .d { font-size: 13px; color: #606070; margin-top: 4px; line-height: 1.5; }
+.ach .time { font-size: 12px; color: #00bcd4; margin-top: 4px; }
+.ach .had { font-size: 11px; color: #00e676; margin-top: 4px; }
+
+/* 发放成就选择网格 */
+.aw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; max-height: 46vh; overflow-y: auto; padding: 4px; }
+.aw-item { background: #12121a; border: 1px solid #2a2a3a; border-radius: 8px; padding: 10px 8px; text-align: center; cursor: pointer; user-select: none; transition: all .15s; position: relative; }
+.aw-item:hover { border-color: #00bcd4; }
+.aw-item.sel { border-color: #ffb000; background: rgba(255,176,0,.12); box-shadow: 0 0 12px rgba(255,176,0,.25); }
+.aw-item.sel::after { content: '✓'; position: absolute; top: 4px; right: 8px; color: #ffb000; font-weight: bold; }
+.aw-item .e { font-size: 26px; }
+.aw-item .n { font-size: 14px; color: #c8c8d0; margin-top: 4px; line-height: 1.4; }
+.aw-item .d { font-size: 11px; color: #606070; margin-top: 3px; line-height: 1.4; }
+.aw-item .has { font-size: 10px; color: #00e676; margin-top: 3px; }
+.aw-modal { width: 680px; max-width: 94vw; }
+.aw-modal .sub { line-height: 1.7; }
+
+/* 操作 */
+.actions { margin: 26px 0 40px; display: flex; gap: 10px; flex-wrap: wrap; }
+.btn { padding: 10px 18px; background: #2a2a3a; border: none; color: #c8c8d0; font-family: inherit; font-size: 17px; cursor: pointer; transition: all .2s; }
+.btn:hover { background: #3a3a4a; }
+.btn.green { background: #00e676; color: #000; font-weight: bold; } .btn.green:hover { background: #20f090; }
+.btn.amber { background: #ffb000; color: #000; font-weight: bold; } .btn.amber:hover { background: #ffc030; }
+.btn.red { background: #ff5555; color: #000; font-weight: bold; } .btn.red:hover { background: #ff7070; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #181820; border: 1px solid #2a2a3a; color: #c8c8d0; padding: 10px 20px; font-size: 17px; z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.toast.success { border-color: #00e676; } .toast.error { border-color: #ff5555; }
+
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 9990; display: none; align-items: center; justify-content: center; }
+.modal-mask.show { display: flex; }
+.modal-box { background: #181820; border: 1px solid #2a2a3a; border-radius: 8px; padding: 22px 26px; width: 400px; max-width: 92vw; }
+.modal-box h3 { color: #ffb000; font-weight: normal; font-size: 19px; margin-bottom: 6px; }
+.modal-box .sub { color: #606070; font-size: 15px; margin-bottom: 14px; }
+.modal-box input { width: 100%; padding: 9px 12px; background: #000; border: 1px solid #2a2a3a; color: #00e676; font-family: inherit; font-size: 17px; outline: none; margin-bottom: 14px; }
+.modal-box input:focus { border-color: #ffb000; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+@media (max-width: 640px) {
+  main { padding: 12px; }
+  .header { padding: 12px 14px; flex-wrap: wrap; gap: 8px; }
+  .lv-head { padding: 12px; }
+  .stat-cards { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <button class="back" onclick="location.href='teacher.html'">← 返回列表</button>
+  <div class="t">学生详情 · <b id="hName">—</b></div>
+  <div class="sp"></div>
+  <button class="logout-btn" onclick="logout()">退出</button>
+</header>
+<main>
+  <!-- 概览 -->
+  <section class="student-head">
+    <div class="s-name" id="sName">—</div>
+    <div class="s-meta" id="sMeta"></div>
+    <div>
+      <span class="badge rank" id="sRank">—</span>
+      <span class="badge pw-init" id="sPwInit" style="display:none">🔓 初始密码 123456</span>
+      <span class="badge pw-set" id="sPwSet" style="display:none">🔒 已设置密码</span>
+    </div>
+    <div class="stat-cards">
+      <div class="stat"><div class="v" id="stXp">0</div><div class="k">总 XP</div></div>
+      <div class="stat"><div class="v" id="stPct">0%</div><div class="k">完成度</div></div>
+      <div class="stat"><div class="v" id="stDone">0/0</div><div class="k">任务完成</div></div>
+      <div class="stat"><div class="v" id="stLv">0/8</div><div class="k">通关关卡</div></div>
+      <div class="stat"><div class="v" id="stAch">0</div><div class="k">已解锁成就</div></div>
+      <div class="stat"><div class="v" id="stLogin">0</div><div class="k">登录次数</div></div>
+    </div>
+  </section>
+
+  <h2 class="sec">关卡进度</h2>
+  <div id="levelList"></div>
+
+  <h2 class="sec">成就</h2>
+  <div class="ach-grid" id="achGrid"></div>
+
+  <h2 class="sec">操作</h2>
+  <div class="actions">
+    <button class="btn amber" id="btnAward">🎖️ 发成就</button>
+    <button class="btn green" id="btnSave">💾 保存师评</button>
+    <button class="btn amber" id="btnPw">🔑 设置密码</button>
+    <button class="btn" id="btnPwReset">🔓 重置为 123456</button>
+    <button class="btn red" id="btnReset">⟳ 重置进度</button>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-mask" id="awardMask" onclick="if(event.target===this)closeAward()">
+  <div class="modal-box aw-modal">
+    <h3>🎖️ 发放成就</h3>
+    <div class="sub">为「<span id="awName"></span>」发放<b>反馈 BUG</b> 成就（抓虫有奖，可多选）。按反馈次数递进：1 / 3 / 5 / 8 / 12 / 20 / 30 / 50 次。学生下次登录时有动画提示。</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <span style="font-size:14px;color:var(--dim,#8b91a6)">已选 <b id="awCount" style="color:#ffb000">0</b> 个</span>
+      <button class="btn" id="awAll" style="padding:4px 12px;font-size:14px">全选</button>
+      <button class="btn" id="awNone" style="padding:4px 12px;font-size:14px">清空</button>
+    </div>
+    <div class="aw-grid" id="awGrid"></div>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="btn" id="awCancel">取消</button>
+      <button class="btn green" id="awOk">发放</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal-box">
+    <h3 id="modalTitle">设置密码</h3>
+    <div class="sub" id="modalSub"></div>
+    <input id="modalInput" type="text" placeholder="新密码（至少 4 位）" maxlength="30">
+    <div class="modal-actions">
+      <button class="btn" id="modalCancel">取消</button>
+      <button class="btn green" id="modalOk">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+const RANKS = [
+  { min: 0, max: 999, name: '实习生' },
+  { min: 1000, max: 2499, name: '学徒' },
+  { min: 2500, max: 4499, name: '技工' },
+  { min: 4500, max: 6999, name: '工程师' },
+  { min: 7000, max: Infinity, name: '专家' }
+];
+const ACHS = [["first_task","第一滴汗","完成第 1 个任务","💧"],["task_10","小试牛刀","累计完成 10 个任务","🔟"],["task_30","熟练工","累计完成 30 个任务","⚙️"],["task_60","产线骨干","累计完成 60 个任务","🏅"],["task_all","全勤王","完成全部任务","👑"],["lv_1","数字工位落成","完成第 1 关","🖥️"],["lv_2","正式入职","完成第 2 关","🎛️"],["lv_3","设备联网成功","完成第 3 关","⚙️"],["lv_4","边缘计算大师","完成第 4 关","📦"],["lv_5","云端漫步","完成第 5 关","☁️"],["lv_6","驾驶舱落成","完成第 6 关","📊"],["lv_7","数据大贯通","完成第 7 关","🔗"],["lv_8","AI 实验室点亮","完成第 8 关","🤖"],["factory_all","全厂灯火通明","8 个区域全部点亮","🏭"],["pioneer","开路先锋","成为某一关的班级首位完成者","🚩"],["xp_1000","第一桶金","累计获得 1000 XP","💰"],["xp_2500","技工出师","累计获得 2500 XP","⚒️"],["xp_4500","高级工程师","累计获得 4500 XP","🛠️"],["star_3","三星好评","某一关综合星数达到 3 星","⭐"],["star_5","满星传说","某一关综合星数达到 5 星","🌟"],["mm_streak","翻牌连对王","某次翻牌连续配对成功 5 次（不失误）","🃏"],["qk_combo","快打连击王","快打最高连击达到 5","⚡"],["game_win1","小游戏初体验","完成 1 个小游戏","🎮"],["game_win3","小游戏新兵","完成 3 个小游戏","🎯"],["game_win8","小游戏达人","完成 8 个小游戏","🏆"],["mm_matched","翻牌收藏家","累计配对成功 30 次","🗂️"],["mm_win3","翻牌新生","累计完成 3 次翻牌游戏","🃏"],["mm_win8","翻牌熟练工","累计完成 8 次翻牌游戏","🃏"],["qk_win5","快打熟练工","累计完成 5 次快打","⚡"],["qk_win12","快打大师","累计完成 12 次快打","⚡"],["match_win3","连线小能手","累计完成 3 次连线配对","🔗"],["all_types","全能选手","翻牌、快打、连线三类小游戏都完成过","🎖️"],["l1_flip3","首关翻牌·三顾","第 1 关翻牌游戏累计完成 3 次","🧠"],["l1_flip5","首关翻牌·常客","第 1 关翻牌游戏累计完成 5 次","🎩"],["l2_quick5","二关快打·老手","第 2 关快打游戏累计完成 5 次","⌨️"],["l3_flip3","三关翻牌·熟客","第 3 关翻牌游戏累计完成 3 次","🔬"],["game_20","游戏厅常客","累计完成 20 个小游戏","🕹️"],["pedia_20","图鉴小成","术语图鉴收集 20 个","📖"],["pedia_40","图鉴达人","术语图鉴收集 40 个","📚"],["pedia_70","图鉴收藏家","术语图鉴收集 70 个","🏛️"],["mm_streak6","翻牌零失误","某次翻牌连续配对成功 6 次（一次不失误）","🎯"],["qk_full","快打满贯","快打最高连击达到 6（一次不错）","🔥"],["login_first","初次报到","完成人生第一次登录","👋"],["login_3","三日坚持","连续登录 3 天","📆"],["login_7","七日打卡","连续登录 7 天","🗓️"],["login_14","半月全勤","连续登录 14 天","📅"],["login_30","满月老友","连续登录 30 天","🏆"],["bug_1","火眼金睛","反馈 1 个 Bug，眼睛真尖","👁️"],["bug_3","找茬学徒","反馈 3 个 Bug，正式入门","🔍"],["bug_5","质检员","反馈 5 个 Bug，领到质检工牌","🛠️"],["bug_8","Bug 猎手","反馈 8 个 Bug，一抓一个准","🎯"],["bug_12","质检组长","反馈 12 个 Bug，能带找茬小队","📋"],["bug_20","质量工程师","反馈 20 个 Bug，产线质量你说了算","⚙️"],["bug_30","质控总监","反馈 30 个 Bug，全厂质量大权在握","🎖️"],["bug_50","Bug 终结者","反馈 50 个 Bug，让 Bug 无处可逃","🏆"],["ty_1","首战告捷","完成 1 次术语防御战","🔫"],["ty_2","二连击落","完成 2 次术语防御战","⌨️"],["ty_5","键盘杀手","完成 5 次术语防御战","🖱️"],["ty_10","打字大师","完成 10 次术语防御战","🎹"],["ty_20","术语终结者","完成 20 次术语防御战","⌨️"],["sh_1","首战清空","通关 1 次数据蜂群","🛸"],["sh_3","蜂群杀手","通关 3 次数据蜂群","🎯"],["sh_5","王牌炮手","通关 5 次数据蜂群","🏆"],["sh_lv3","火力全开","数据蜂群中火力升到 3 级","🚀"],["sh_pk20","拾荒高手","数据蜂群累计拾取 20 个道具","🎁"],["gt_1","游戏开张","解锁 1 种小游戏类型","🎈"],["gt_3","渐入佳境","解锁 3 种小游戏类型","🎪"],["gt_5","游戏老玩家","解锁 5 种小游戏类型","🏆"],["gt_all","全类型制霸","解锁全部小游戏类型","👾"]];
+
+const qs = new URLSearchParams(location.search);
+const NAME = (qs.get('name') || '').trim();
+let content = null, student = null;
+let grade = {};   // { [levelId]: {self,peer,teacher} } 当前师评草稿
+let starsDirty = false;
+
+function $(id){ return document.getElementById(id); }
+function getToken(){ return sessionStorage.getItem('token'); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function showToast(msg, type){
+  const el=$('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:'');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'), 3000);
+}
+function logout(){ sessionStorage.clear(); location.href='index.html'; }
+
+function taskXP(t){
+  if (t.hidden) return 300;
+  if (t.type === 'quiz' && t.xp <= 50) return 50;
+  if (t.xp === 0) return 0;
+  return t.xp || 100;
+}
+function levelCompleted(check, level){
+  let done=0, total=0;
+  (level.tasks||[]).forEach(t=>{ if(t.auto) return; total++; if(check[''+t.id]) done++; });
+  return total>0 && done>=total;
+}
+function rankForXP(xp){ for(const r of RANKS){ if(xp>=r.min && xp<=r.max) return r; } return RANKS[0]; }
+
+async function api(path, opt={}){
+  const token=getToken();
+  const headers=Object.assign({}, opt.headers||{});
+  if(token) headers['Authorization']='Bearer '+token;
+  if(opt.body) headers['Content-Type']='application/json';
+  try{
+    const res=await fetch(API+path, Object.assign({}, opt, {headers}));
+    if(res.status===401){ sessionStorage.clear(); location.href='index.html'; return null; }
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error||'请求失败');
+    return data;
+  }catch(e){
+    showToast(e.message||'请求失败','error');
+    return null;
+  }
+}
+
+// ===== 渲染 =====
+function render(){
+  const check=student.check||{};
+  let xp=0, done=0, total=0, lvDone=0, allLv=0;
+  (content.levels||[]).forEach(lv=>{
+    const comp=levelCompleted(check, lv);
+    if(comp){ lvDone++; allLv++; }
+    (lv.tasks||[]).forEach(t=>{
+      if(t.auto) return;
+      total++;
+      const c=check[''+t.id];
+      if(c){ done++; xp += (c&&c.half)? Math.floor(taskXP(t)/2) : taskXP(t); }
+    });
+  });
+  const pct= total? Math.round(done/total*100) : 0;
+  $('sName').textContent = NAME;
+  $('hName').textContent = NAME;
+  $('sMeta').textContent = '创建时间：' + (student.created_at||'—') + ' · 登录 ' + (student.loginCount||0) + ' 次 · 最近登录：' + (student.lastLoginDate||'—') + ' · 连续 ' + (student.loginStreak||0) + ' 天';
+  $('sRank').textContent = '🏅 ' + rankForXP(xp).name;
+  $('sPwInit').style.display = student.isDefaultPassword ? '' : 'none';
+  $('sPwSet').style.display = student.isDefaultPassword ? 'none' : '';
+  $('stXp').textContent = xp;
+  $('stPct').textContent = pct + '%';
+  $('stDone').textContent = done + '/' + total;
+  $('stLv').textContent = lvDone + '/' + (content.levels||[]).length;
+  $('stAch').textContent = Object.keys(student.achievements||{}).length + '/' + ACHS.length;
+  $('stLogin').textContent = (student.loginCount||0);
+  renderLevels();
+  renderAch();
+}
+
+function renderLevels(){
+  const box=$('levelList');
+  box.innerHTML='';
+  (content.levels||[]).forEach((lv, idx)=>{
+    const check=student.check||{};
+    let done=0, total=0;
+    (lv.tasks||[]).forEach(t=>{ if(t.auto) return; total++; if(check[''+t.id]) done++; });
+    const pct= total? Math.round(done/total*100) : 0;
+    const cls= pct>=80?'high': pct>=40?'mid':'low';
+    const st= grade[lv.id]||{self:0,peer:0,teacher:0};
+    const fin= student.levelFinishTimes && student.levelFinishTimes[lv.id];
+
+    let tasks='<ul class="task-list">';
+    (lv.tasks||[]).forEach(t=>{
+      const c=!!check[''+t.id];
+      const tag = t.hidden?'<span class="tag hidden">🌶 隐藏</span>' : (t.type==='review'||/回顾/.test(t.title))?'<span class="tag reflect">回顾</span>' : t.auto?'<span class="tag auto">环境准备</span>':'';
+      tasks+='<li><span class="st '+(c?'done':'todo')+'">'+(c?'✔':'○')+'</span><span class="tt '+(c?'done':'')+'">'+esc(t.title)+'</span>'+tag+'</li>';
+    });
+    tasks+='</ul>';
+
+    const card=document.createElement('div');
+    card.className='level-card';
+    card.innerHTML=
+      '<div class="lv-head" onclick="var b=this.parentElement.querySelector(\'.lv-body\');b.classList.toggle(\'open\');this.querySelector(\'.lv-arrow\').textContent=b.classList.contains(\'open\')?\'▴\':\'▾\'">'+
+        '<span class="lv-name">L'+lv.id+' '+esc(lv.name)+'</span>'+
+        '<span class="lv-pct">'+done+'/'+total+' · '+pct+'%</span>'+
+        '<span class="lv-progress"><div class="bar '+cls+'" style="width:'+pct+'%"></div></span>'+
+        '<span class="lv-arrow">▾</span>'+
+      '</div>'+
+      '<div class="stars-row">'+
+        '<span class="label">自评</span><span class="stars" data-kind="self">'+starHTML(st.self)+'</span>'+
+        '<span class="label">互评</span><span class="stars" data-kind="peer">'+starHTML(st.peer)+'</span>'+
+        '<span class="label">师评</span><span class="stars" data-kind="teacher">'+starHTML(st.teacher)+'</span>'+
+        '<span class="hint">（点击师评星星修改）</span>'+
+      '</div>'+
+      '<div class="lv-body">'+tasks+(fin?'<div class="lv-finish">✅ 通关时间：'+esc(new Date(fin).toLocaleString())+'</div>':'')+'</div>';
+    box.appendChild(card);
+
+    // 师评可点
+    card.querySelectorAll('.stars[data-kind="teacher"]').forEach(el=>{
+      el.addEventListener('click', e=>{
+        const target=e.target;
+        if(!target.classList.contains('star')) return;
+        const idx=Array.from(el.children).indexOf(target);
+        const lvId=lv.id;
+        if(!grade[lvId]) grade[lvId]={self:0,peer:0,teacher:0};
+        const newVal=idx+1;
+        grade[lvId].teacher = (grade[lvId].teacher===newVal)?0:newVal;
+        starsDirty=true;
+        el.innerHTML=starHTML(grade[lvId].teacher);
+      });
+    });
+  });
+}
+
+function starHTML(v){
+  let h='';
+  for(let i=1;i<=5;i++){ h+='<span class="star'+(i<=v?' on':'')+'">'+(i<=v?'★':'☆')+'</span>'; }
+  return h;
+}
+
+function renderAch(){
+  const got=student.achievements||{};
+  const ta=student.teacherAwards||{};
+  const box=$('achGrid');
+  box.innerHTML='';
+  ACHS.forEach(a=>{
+    const g=!!got[a[0]];
+    const el=document.createElement('div');
+    el.className='ach'+(g?'':' locked');
+    el.innerHTML='<div class="e">'+a[3]+'</div><div class="n">'+esc(a[1])+'</div><div class="d">'+esc(a[2])+'</div>'
+      +(ta[a[0]]?'<div class="had">🎁 老师发放</div>':'')
+      +(g?'<div class="time">'+esc(new Date(got[a[0]]).toLocaleDateString())+'</div>':'');
+    box.appendChild(el);
+  });
+}
+
+// ===== 操作 =====
+async function saveGrades(){
+  if(!starsDirty){ showToast('师评未修改',''); return; }
+  for(const lv of content.levels){
+    const g=grade[lv.id];
+    if(!g) continue;
+    const res=await api('/api/teacher/student/'+encodeURIComponent(NAME)+'/grade',{
+      method:'PUT', body:JSON.stringify({levelId:lv.id, teacherStars:g.teacher||0})
+    });
+    if(!res) return;
+    if(res.data && res.data.stars){ g.self=res.data.stars.self||0; g.peer=res.data.stars.peer||0; g.teacher=res.data.stars.teacher||0; }
+  }
+  starsDirty=false;
+  showToast('师评已保存','success');
+  loadStudent();
+}
+
+function openModal(title, sub, val, okLabel){
+  $('modalTitle').textContent=title;
+  $('modalSub').textContent=sub;
+  $('modalInput').value=val||'';
+  $('modalOk').textContent=okLabel||'保存';
+  $('modalMask').classList.add('show');
+  $('modalInput').focus();
+  return new Promise(resolve=>{
+    $('modalOk').onclick=()=>{ $('modalMask').classList.remove('show'); resolve($('modalInput').value.trim()); };
+    $('modalCancel').onclick=()=>{ $('modalMask').classList.remove('show'); resolve(null); };
+  });
+}
+
+async function setPassword(){
+  const curState = student.isDefaultPassword ? '当前为初始密码 123456' : '当前已设置个人密码';
+  const val=await openModal('🔑 设置密码', '为学生「'+NAME+'」设置新密码。'+curState+'。留空 = 清除密码。', '', '保存');
+  if(val===null) return;
+  if(val && val.length<4){ showToast('密码至少 4 位','error'); return; }
+  const res=await api('/api/teacher/student/'+encodeURIComponent(NAME)+'/password',{method:'PUT', body:JSON.stringify({password:val})});
+  if(!res) return;
+  showToast(val? '已设置密码':'已清除密码','success');
+  loadStudent();
+}
+
+async function resetPwDefault(){
+  if(!confirm('将「'+NAME+'」的密码重置为初始密码 123456？')) return;
+  const res=await api('/api/teacher/student/'+encodeURIComponent(NAME)+'/password',{method:'PUT', body:JSON.stringify({password:'123456'})});
+  if(!res) return;
+  showToast('已重置为 123456','success');
+  loadStudent();
+}
+
+async function resetProgress(){
+  if(!confirm('确认重置「'+NAME+'」的全部进度（任务/星级/成就）？此操作不可撤销。')) return;
+  const res=await api('/api/teacher/student/'+encodeURIComponent(NAME)+'/reset',{method:'POST'});
+  if(!res) return;
+  showToast('已重置进度','success');
+  loadStudent();
+}
+
+// ===== 发放成就 =====
+let awSel = {};   // { achId: true }
+function renderAwardGrid(){
+  const got = student.achievements || {};
+  const grid = $('awGrid');
+  grid.innerHTML = '';
+  // 手动发放页只显示『反馈 BUG』成就（其余为系统自动产生，不在此手动发放）
+  ACHS.filter(a=>a[0].indexOf('bug_')===0).forEach(a=>{
+    const id=a[0]; const has=!!got[id]; const sel=!!awSel[id];
+    const el=document.createElement('div');
+    el.className='aw-item'+(sel?' sel':'');
+    el.innerHTML='<div class="e">'+a[3]+'</div><div class="n">'+esc(a[1])+'</div><div class="d">'+esc(a[2])+'</div>'+ (has?'<div class="has">已拥有</div>':'');
+    el.onclick=()=>{
+      if(has){ showToast('该学生已拥有「'+a[1]+'」',''); return; }
+      if(awSel[id]) delete awSel[id]; else awSel[id]=true;
+      renderAwardGrid(); updateAwCount();
+    };
+    grid.appendChild(el);
+  });
+  updateAwCount();
+}
+function updateAwCount(){
+  const n=Object.keys(awSel).length;
+  $('awCount').textContent=n;
+  $('awOk').disabled = n===0;
+  $('awOk').textContent = n ? '发放 '+n+' 个成就' : '发放';
+}
+function openAward(){
+  awSel = {};
+  $('awName').textContent = NAME;
+  renderAwardGrid();
+  $('awardMask').classList.add('show');
+}
+function closeAward(){ $('awardMask').classList.remove('show'); }
+async function submitAward(){
+  const ids=Object.keys(awSel);
+  if(!ids.length){ showToast('请先选择成就','error'); return; }
+  const res=await api('/api/teacher/student/'+encodeURIComponent(NAME)+'/achievements',{method:'POST', body:JSON.stringify({achievementIds:ids})});
+  if(!res) return;
+  const parts=[];
+  if(res.data.awarded&&res.data.awarded.length) parts.push('发放 '+res.data.awarded.length+' 个：'+res.data.awarded.map(id=>{const a=ACHS.find(x=>x[0]===id); return a?esc(a[1]):id;}).join('、'));
+  if(res.data.exists&&res.data.exists.length) parts.push('已拥有 '+res.data.exists.length+' 个');
+  closeAward();
+  showToast('🎖️ '+parts.join('；'),'success');
+  loadStudent();
+}
+
+async function loadStudent(){
+  const [s, c] = await Promise.all([
+    api('/api/teacher/student/'+encodeURIComponent(NAME)),
+    api('/api/game/content')
+  ]);
+  if(!s || !c){ return; }
+  student=s.data; content=c.data;
+  grade={};
+  (content.levels||[]).forEach(lv=>{
+    const sd=(student.stars||{})[lv.id]||{};
+    grade[lv.id]={self:sd.self||0, peer:sd.peer||0, teacher:sd.teacher||0};
+  });
+  starsDirty=false;
+  render();
+}
+
+$('btnAward').onclick=openAward;
+$('awAll').onclick=()=>{ awSel={}; ACHS.filter(a=>a[0].indexOf('bug_')===0).forEach(a=>{ if(!(student.achievements||{})[a[0]]) awSel[a[0]]=true; }); renderAwardGrid(); };
+$('awNone').onclick=()=>{ awSel={}; renderAwardGrid(); };
+$('awCancel').onclick=closeAward;
+$('awOk').onclick=submitAward;
+$('btnSave').onclick=saveGrades;
+$('btnPw').onclick=setPassword;
+$('btnPwReset').onclick=resetPwDefault;
+$('btnReset').onclick=resetProgress;
+
+(function init(){
+  const token=getToken();
+  const role=sessionStorage.getItem('role');
+  if(!token || role!=='teacher'){ location.href='index.html'; return; }
+  if(!NAME){ location.href='teacher.html'; return; }
+  loadStudent();
+})();
+</script>
+</body>
+</html>

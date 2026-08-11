@@ -49,7 +49,7 @@
             "steps": [
               {
                 "title": "下载 VMware Workstation",
-                "narrative": "厂长递给你一台 Windows 笔记本，指着桌面说：「先在浏览器里搜 VMware Workstation 下载。记住——工厂里装的每一样软件都要来源干净，官网下载最可靠。别碰破解版，里面的木马能让整条产线瘫掉。现在告诉我，你打算去哪下载？」",
+                "narrative": "厂长递给你一台 Windows 笔记本：「咱们产线的服务器要跑 Ubuntu，可你手上只有这台 Windows——不用再买新电脑，装个 VMware Workstation 就行。它能在你的 Windows 里『虚拟』出一台电脑，专门用来跑 Ubuntu Server。这台被虚拟出来的电脑叫虚拟机，跟真电脑一样有自己的 CPU、内存、硬盘、网卡，你在里面随便折腾，弄坏了删掉重装就行，不影响外面的 Windows。先在浏览器里搜 VMware Workstation 下载。记住——工厂里装的每一样软件都要来源干净，官网下载最可靠。别碰破解版，里面的木马能让整条产线瘫掉。现在告诉我，你打算去哪下载？」",
                 "question": "从哪里下载 VMware Workstation？",
                 "options": [
                   {
@@ -100,7 +100,7 @@
               },
               {
                 "title": "选择网络模式",
-                "narrative": "厂长站起身，指着墙上的交换机拓扑图：接下来是网络配置，是最容易踩坑的地方。你看——你的笔记本插着一根网线连到车间交换机，交换机的另一边挂着 PLC、传感器和摄像头。默认情况下交换机只知道你笔记本这一个设备。你笔记本里跑的 Ubuntu 虚拟机，交换机是不知道的。想让车间里的设备能访问到 Ubuntu，你得让 Ubuntu 从虚拟机里走出来，像一台独立的物理主机一样站在车间交换机上。三个选项各是什么意思你先想清楚，然后选。",
+                "narrative": "厂长站起身，指着墙上的交换机拓扑图：接下来是网络配置，是最容易踩坑的地方。你看——你的笔记本插着一根网线连到车间交换机，交换机的另一边挂着 PLC、传感器和摄像头。默认情况下交换机只知道你笔记本这一个设备。你笔记本里跑的 Ubuntu 虚拟机，交换机是不知道的。想让车间里的设备能访问到 Ubuntu，你得让 Ubuntu 从虚拟机里走出来，像一台独立的物理主机一样站在车间交换机上。这有三种网络模式，先记清楚：**桥接（Bridged）**——Ubuntu 直接连到车间交换机、和 Windows 各拿一个独立 IP，车间设备能直接找到它；**NAT**——Ubuntu 借 Windows 上网，但车间里的 PLC 看不到它；**仅主机**——只有 Windows 和 Ubuntu 互通的封闭小圈子。你要让 PLC 能主动连上 Ubuntu，自然该选能让 Ubuntu 暴露出来的那种。三个选项各是什么意思，先想清楚再选。",
                 "question": "哪种模式能让 Ubuntu 直接暴露在车间交换机上，拥有独立 IP，像一台独立的物理主机一样被其他设备访问？",
                 "options": [
                   {
@@ -1274,7 +1274,7 @@
               },
               {
                 "title": "动手敲命令：禁 ping",
-                "narrative": "厂长：动手。在终端输入 iptables 命令，丢弃入站 ICMP 请求（禁 ping）。",
+                "narrative": "动手。iptables 加规则格式：iptables -A 链 -p 协议 --icmp-type 类型 -j 动作。禁 ping = 入站 INPUT 链 + ICMP 协议 + echo-request 类型 + DROP 丢弃：iptables -A INPUT -p icmp --icmp-type echo-request -j DROP。",
                 "question": "在终端输入命令，禁止外部 ping 本机：",
                 "inputType": "command",
                 "correctCommand": "iptables -A INPUT -p icmp --icmp-type echo-request -j DROP",
@@ -1336,6 +1336,202 @@
           "tags": [
             "device_onboard"
           ]
+        },
+        {
+          "id": "1-13b",
+          "type": "install_wizard",
+          "title": "查看端口监听",
+          "xp": 100,
+          "config": {
+            "steps": [
+              {
+                "title": "看端口开没开，用什么命令",
+                "narrative": "光会 ping 只到「网络通不通」，还得会看「端口开没开」。Linux 查看端口监听用 ss 命令：ss -tln 列出所有 TCP 监听端口（-t TCP、-l 监听、-n 数字不解析）。",
+                "question": "想确认某个端口有没有在监听，用哪个命令？",
+                "options": [
+                  {
+                    "text": "ss -tln（列出 TCP 监听端口）",
+                    "correct": true,
+                    "hint": "ss -tln 看端口监听状态"
+                  },
+                  {
+                    "text": "ping -c 4",
+                    "correct": false,
+                    "hint": "ping 是测网络连通，不是看端口"
+                  },
+                  {
+                    "text": "nslookup",
+                    "correct": false,
+                    "hint": "nslookup 是查域名的"
+                  },
+                  {
+                    "text": "traceroute",
+                    "correct": false,
+                    "hint": "traceroute 是看路由跳数"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：查看监听端口",
+                "narrative": "动手。在终端输入命令，看看本机有哪些 TCP 端口在监听。",
+                "question": "在终端输入命令，列出 TCP 监听端口：",
+                "inputType": "command",
+                "correctCommand": "ss -tln",
+                "aliases": [
+                  "ss -tlnp",
+                  "ss -ltn",
+                  "ss -tln | head"
+                ],
+                "outputLines": [
+                  {
+                    "text": "State  Recv-Q Send-Q  Local Address:Port   Peer Address:Port",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "LISTEN 0      128    0.0.0.0:502          0.0.0.0:*",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "LISTEN 0      128    0.0.0.0:22           0.0.0.0:*",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "LISTEN 0      4096   127.0.0.1:1880       0.0.0.0:*",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "厂长：502（Modbus）、22（SSH）、1880（Node-RED）这些端口都在监听。",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 已看到本机监听端口。",
+                "explain": "看到 LISTEN 就说明端口在监听。0.0.0.0:502 表示对所有网卡都监听 502 端口；Peer 列全是 * 表示还没有客户端连进来。",
+                "errorHint": "列出监听端口用 ss 加 -tln（-t TCP、-l 监听、-n 数字）"
+              },
+              {
+                "title": "管道 | 是什么",
+                "narrative": "想把一条命令的输出交给另一条命令继续处理，中间用「管道 |」连起来。| 就像一条传送带：左边命令的结果，哗啦啦流到右边命令的嘴里。比如 ss -tln | grep 502，就是「ss 列出所有端口 → 传给 grep → grep 挑出 502」。",
+                "question": "Linux 里符号 | 表示什么？",
+                "options": [
+                  {
+                    "text": "管道：把左边命令的输出传给右边命令",
+                    "correct": true,
+                    "hint": "| 管道 = 左边输出接右边输入"
+                  },
+                  {
+                    "text": "或者 / 或运算",
+                    "correct": false,
+                    "hint": "终端里 | 不是“或”（那是 ||）"
+                  },
+                  {
+                    "text": "重定向到文件",
+                    "correct": false,
+                    "hint": "重定向到文件用 >"
+                  },
+                  {
+                    "text": "注释符号",
+                    "correct": false,
+                    "hint": "注释用 #"
+                  }
+                ]
+              },
+              {
+                "title": "grep 是干什么的",
+                "narrative": "grep 是 Linux 的「搜索/过滤」命令——在一堆输出里，只保留包含指定关键字的行。grep 502 就是只留含 502 的那一行，把无关端口全过滤掉，一眼就看到目标端口。",
+                "question": "grep 502 的作用是？",
+                "options": [
+                  {
+                    "text": "只保留包含 502 的行，过滤掉其余",
+                    "correct": true,
+                    "hint": "grep = 搜索并过滤，只留匹配行"
+                  },
+                  {
+                    "text": "删除所有 502",
+                    "correct": false,
+                    "hint": "grep 是筛选不是删除"
+                  },
+                  {
+                    "text": "把 502 改成其他数字",
+                    "correct": false,
+                    "hint": "改值用 sed"
+                  },
+                  {
+                    "text": "显示系统日志",
+                    "correct": false,
+                    "hint": "不是"
+                  }
+                ]
+              },
+              {
+                "title": "端口太多，怎么只找 502",
+                "narrative": "ss -tln 会把所有端口都列出来，太多看不清。用管道 | grep 过滤出目标端口：ss -tln | grep 502。",
+                "question": "只想看 502 端口是否监听，用哪个命令？",
+                "options": [
+                  {
+                    "text": "ss -tln | grep 502",
+                    "correct": true,
+                    "hint": "管道 grep 502 只留包含 502 的行"
+                  },
+                  {
+                    "text": "ss 502",
+                    "correct": false,
+                    "hint": "ss 不支持直接这么查端口"
+                  },
+                  {
+                    "text": "ping 502",
+                    "correct": false,
+                    "hint": "502 不是 IP，ping 不了"
+                  },
+                  {
+                    "text": "cat /etc/services",
+                    "correct": false,
+                    "hint": "这是端口号说明文件，不是看监听状态"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：只查 502 端口",
+                "narrative": "动手。在终端输入命令，只查看 502 端口是否在监听。",
+                "question": "在终端输入命令，过滤出 502 端口：",
+                "inputType": "command",
+                "correctCommand": "ss -tln | grep 502",
+                "aliases": [
+                  "ss -tlnp | grep 502",
+                  "ss -tln|grep 502"
+                ],
+                "outputLines": [
+                  {
+                    "text": "LISTEN 0  128  0.0.0.0:502  0.0.0.0:*",
+                    "color": "green",
+                    "delay": 300
+                  },
+                  {
+                    "text": "厂长：502 端口在监听，ModbusTCP 服务已经起来了。",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 502 端口正在监听。",
+                "explain": "这一行就是 502 端口在监听的证据：LISTEN 是状态、0.0.0.0:502 是监听地址。grep 把无关端口过滤掉，一眼就能看到目标端口。",
+                "errorHint": "先 ss -tln 列出监听端口，再用 | grep 502 过滤"
+              }
+            ]
+          }
         },
         {
           "id": "1-14",
@@ -2408,7 +2604,7 @@
               },
               {
                 "title": "动手敲命令：验证 22 端口",
-                "narrative": "厂长：安全组放行了 22 端口。动手用 nc 测试云服务器 120.78.20.10 的 22 端口是否真的开放。",
+                "narrative": "安全组放行了 22 端口。动手用 nc（netcat）测端口：格式 nc -zv IP 端口——-z 只扫描不传数据、-v 显示结果：nc -zv 120.78.20.10 22。",
                 "question": "在终端输入命令，测试 120.78.20.10 的 22 端口：",
                 "inputType": "command",
                 "correctCommand": "nc -zv 120.78.20.10 22",
@@ -2689,7 +2885,7 @@
               },
               {
                 "title": "动手敲命令：生成密钥对",
-                "narrative": "厂长：动手。生成一对 ed25519 密钥（SSH 免密登录的基础）。",
+                "narrative": "动手。生成 SSH 密钥对用 ssh-keygen 命令：ssh-keygen -t ed25519（生成一对 ed25519 密钥，免密登录的基础）。",
                 "question": "在终端输入命令，生成 ed25519 密钥对：",
                 "inputType": "command",
                 "correctCommand": "ssh-keygen -t ed25519",
@@ -2881,7 +3077,7 @@
               },
               {
                 "title": "动手敲命令：端口转发",
-                "narrative": "厂长：动手。把本地 8080 端口转发到远程服务器的 80 端口（通过 SSH 隧道）。",
+                "narrative": "动手。用 SSH 隧道做本地端口转发，格式：ssh -L 本地端口:远程主机:远程端口 用户名@IP——把本地 8080 转发到远程 80。",
                 "question": "在终端输入命令，本地 8080 转发到远程 80（用户名 student@192.168.1.100）：",
                 "inputType": "command",
                 "correctCommand": "ssh -L 8080:localhost:80 student@192.168.1.100",
@@ -2978,7 +3174,7 @@
               },
               {
                 "title": "动手敲命令：查看 SSH 安全配置",
-                "narrative": "厂长：动手。查看 sshd_config 里 root 登录和端口设置，理解安全加固点。",
+                "narrative": "动手。用 grep 在配置文件里搜安全项：grep -E 'PermitRootLogin|Port' /etc/ssh/sshd_config，看 root 登录和端口设置。",
                 "question": "在终端输入命令，查看 SSH 配置里的安全相关项：",
                 "inputType": "command",
                 "correctCommand": "grep -E \"PermitRootLogin|Port\" /etc/ssh/sshd_config",
@@ -3549,7 +3745,7 @@
               },
               {
                 "title": "一句话记住",
-                "narrative": "厂长：记住每家的协议：西门子 ProfiNet、倍福 EtherCAT、三菱 CC-Link、最老最开放 Modbus。",
+                "narrative": "记住每家的协议：西门子 ProfiNet（毫秒实时）、倍福 EtherCAT（快到极致、飞读飞写）、三菱 CC-Link（环形冗余）、最老最开放 Modbus。",
                 "question": "EtherCAT 是哪家、特点是什么？",
                 "options": [
                   {
@@ -3690,7 +3886,7 @@
               },
               {
                 "title": "modpoll 命令格式",
-                "narrative": "厂长：光记住寄存器类型还不够，得会用工具读。命令行工具叫 modpoll，通用格式：modpoll [选项] 从站IP。常用选项：-m tcp 用 ModbusTCP 协议；-t 4 读保持寄存器（4=保持设定值、3=输入测量值、0=线圈）；-r 1 从 1 号地址开始读；-1 只读一次就停；-p 8502 指定从站端口。写法口诀：modpoll 打头，选项在中间，IP 放最后。",
+                "narrative": "厂长：光记住寄存器类型还不够，得会用工具读。命令行工具叫 modpoll，通用格式：modpoll [选项] 从站IP。常用选项：-m tcp 用 ModbusTCP 协议；-t 4 读保持寄存器（4=保持设定值、3=输入测量值、0=线圈）；-r 1 从 1 号地址开始读；-1 只读一次就停；-p 502 指定从站端口。写法口诀：modpoll 打头，选项在中间，IP 放最后。",
                 "question": "读保持寄存器（温度设定值），modpoll 里 -t 后面该填几？",
                 "options": [
                   {
@@ -3716,13 +3912,121 @@
                 ]
               },
               {
+                "title": "modpoll 选项：-m 协议模式",
+                "narrative": "厂长：modpoll 支持几种 Modbus 协议，咱们从站走的是 ModbusTCP（网络）。-m 就是指定协议模式。",
+                "question": "用网络方式连从站，modpoll 的 -m 后面该填什么？",
+                "options": [
+                  {
+                    "text": "tcp（ModbusTCP 网络）",
+                    "correct": true,
+                    "hint": "-m tcp = 走 TCP/IP 网络协议，咱们从站用的就是它"
+                  },
+                  {
+                    "text": "rtu（串口）",
+                    "correct": false,
+                    "hint": "-m rtu 是串口方式，咱们用的是网络不是串口"
+                  },
+                  {
+                    "text": "http",
+                    "correct": false,
+                    "hint": "modpoll 不支持 http"
+                  },
+                  {
+                    "text": "usb",
+                    "correct": false,
+                    "hint": "modpoll 没有 usb 模式"
+                  }
+                ]
+              },
+              {
+                "title": "modpoll 选项：-r 起始地址",
+                "narrative": "厂长：-r 指定从哪个地址开始读。温度设定值存在 1 号保持寄存器，从 1 号开始读。",
+                "question": "从 1 号地址开始读保持寄存器，-r 后面该填几？",
+                "options": [
+                  {
+                    "text": "1（起始地址）",
+                    "correct": true,
+                    "hint": "-r 1 = 从 1 号寄存器开始读"
+                  },
+                  {
+                    "text": "4",
+                    "correct": false,
+                    "hint": "-t 4 才是寄存器类型，-r 是起始地址"
+                  },
+                  {
+                    "text": "502",
+                    "correct": false,
+                    "hint": "502 是端口号，用 -p 指定"
+                  },
+                  {
+                    "text": "0",
+                    "correct": false,
+                    "hint": "温度设定值存在 1 号地址"
+                  }
+                ]
+              },
+              {
+                "title": "modpoll 选项：-p 端口",
+                "narrative": "厂长：从站的 ModbusTCP 服务监听在 502 端口。-p 用来指定要连的端口。",
+                "question": "从站端口是 502，-p 后面该填几？",
+                "options": [
+                  {
+                    "text": "502",
+                    "correct": true,
+                    "hint": "-p 502 = 连接 502 端口"
+                  },
+                  {
+                    "text": "22",
+                    "correct": false,
+                    "hint": "22 是 SSH 端口，不是 Modbus"
+                  },
+                  {
+                    "text": "80",
+                    "correct": false,
+                    "hint": "80 是网页服务端口"
+                  },
+                  {
+                    "text": "1",
+                    "correct": false,
+                    "hint": "1 是地址，端口用 -p 填 502"
+                  }
+                ]
+              },
+              {
+                "title": "组装完整命令",
+                "narrative": "厂长：把选项拼起来：modpoll 打头，选项在中间（-m 协议、-t 类型、-r 地址、-1 只读一次、-p 端口），从站 IP 放最后。",
+                "question": "读从站 192.168.1.100:502 的 1 号保持寄存器（读一次），哪条命令完整正确？",
+                "options": [
+                  {
+                    "text": "modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100",
+                    "correct": true,
+                    "hint": "选项齐全，IP 放最后，正确"
+                  },
+                  {
+                    "text": "modpoll -t 4 -r 1 192.168.1.100",
+                    "correct": false,
+                    "hint": "少了 -m 协议和 -p 端口"
+                  },
+                  {
+                    "text": "modpoll -m tcp -t 4 -r 1 -p 192.168.1.100 502",
+                    "correct": false,
+                    "hint": "502 是 -p 端口的值，IP 要放最后"
+                  },
+                  {
+                    "text": "192.168.1.100 modpoll -m tcp -t 4 -r 1 -p 502",
+                    "correct": false,
+                    "hint": "modpoll 打头，IP 放最后"
+                  }
+                ]
+              },
+              {
                 "title": "动手敲命令：读保持寄存器",
-                "narrative": "厂长：动手。用 modpoll 读从站（192.168.1.100:8502）的保持寄存器，看温度设定值。",
+                "narrative": "厂长：动手。用 modpoll 读从站（192.168.1.100:502）的保持寄存器，看温度设定值。",
                 "question": "在终端输入命令，读取保持寄存器：",
                 "inputType": "command",
-                "correctCommand": "modpoll -m tcp -t 4 -r 1 -1 -p 8502 192.168.1.100",
+                "correctCommand": "modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100",
                 "aliases": [
-                  "modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100"
+                  "modpoll -m tcp -t 4 -r 1 -p 502 192.168.1.100"
                 ],
                 "outputLines": [
                   {
@@ -3752,7 +4056,14 @@
                   }
                 ],
                 "successText": "✅ 保持寄存器读取成功！",
-                "errorHint": "格式: modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100（-m tcp 协议 -t 4 保持寄存器 -r 1 地址 -p 8502 端口，IP 放最后）"
+                "errorHint": "格式: modpoll -m tcp -t 4 -r 1 -p 502 192.168.1.100（-m tcp 协议 -t 4 保持寄存器 -r 1 地址 -p 502 端口，IP 放最后）",
+                "hints": [
+                  "第一步 -m 参数：从站走 ModbusTCP 协议，所以用 -m tcp",
+                  "第二步 -t 参数：读保持寄存器用 4，所以用 -t 4",
+                  "第三步 -r 参数：从 1 号地址开始读，所以用 -r 1",
+                  "第四步 -p 参数：从站端口是 502，所以用 -p 502",
+                  "第五步：IP 放最后、读一次加 -1 → modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100"
+                ]
               }
             ]
           }
@@ -3763,7 +4074,7 @@
           "title": "排查 Modbus 通信故障",
           "xp": 200,
           "config": {
-            "scenario": "ModbusTCP 从站（端口 8502）突然连不上了，厂长走过来：「别乱，按顺序排查。」",
+            "scenario": "ModbusTCP 从站（端口 502）突然连不上了，厂长走过来：「别乱，按顺序排查。」",
             "steps": [
               {
                 "question": "第一步先查什么？",
@@ -3788,7 +4099,7 @@
               {
                 "question": "ping 从站通了，说明网络通。下一步查什么？",
                 "options": [
-                  "查端口 8502 是否开放（ss -tln）",
+                  "查端口 502 是否开放（ss -tln）",
                   "重新插网线",
                   "换路由器",
                   "调波特率"
@@ -3819,6 +4130,273 @@
           }
         },
         {
+          "id": "3-6b",
+          "type": "install_wizard",
+          "title": "动手排障：敲命令定位 Modbus 故障",
+          "xp": 200,
+          "config": {
+            "steps": [
+              {
+                "title": "排查第一步：确认网卡",
+                "narrative": "从站（192.168.1.100:502）突然连不上了。别慌，按「网卡 → 网络 → 端口 → 从站」的顺序排查。第一步先确认本机网卡和链路状态——Linux 用 ip link 看链路（UP/DOWN），ip addr 看 IP 地址。",
+                "question": "查看本机网卡/链路状态，用哪个命令？",
+                "options": [
+                  {
+                    "text": "ip link",
+                    "correct": true,
+                    "hint": "ip link 看链路状态（UP/DOWN）和 MAC 地址"
+                  },
+                  {
+                    "text": "route -n",
+                    "correct": false,
+                    "hint": "route -n 是看路由表，不是网卡状态"
+                  },
+                  {
+                    "text": "nslookup",
+                    "correct": false,
+                    "hint": "nslookup 是查 DNS 域名的"
+                  },
+                  {
+                    "text": "docker ps",
+                    "correct": false,
+                    "hint": "docker ps 是看容器的，跟网卡无关"
+                  }
+                ]
+              },
+              {
+                "title": "排查第二步：测网络连通",
+                "narrative": "网卡正常（ens33 是 UP）。接下来测和从站之间的网络通不通。ping 加 -c 指定发包次数，发 4 个包就能确认。",
+                "question": "测与从站 192.168.1.100 的连通性，用哪个命令？",
+                "options": [
+                  {
+                    "text": "ping -c 4 192.168.1.100",
+                    "correct": true,
+                    "hint": "ping + -c 4（发 4 个包）+ 从站 IP，正确"
+                  },
+                  {
+                    "text": "ping 192.168.1.100",
+                    "correct": false,
+                    "hint": "不加 -c 会一直发下去，得按 Ctrl+C 才能停"
+                  },
+                  {
+                    "text": "ping -c 4 baidu.com",
+                    "correct": false,
+                    "hint": "要 ping 的是从站 192.168.1.100，不是外网"
+                  },
+                  {
+                    "text": "traceroute 192.168.1.100",
+                    "correct": false,
+                    "hint": "traceroute 是看路由经过了哪些跳，不是测连通"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：ping 从站",
+                "narrative": "动手。在终端输入命令，ping 从站 4 次确认网络通。",
+                "question": "在终端输入命令，ping 从站：",
+                "inputType": "command",
+                "correctCommand": "ping -c 4 192.168.1.100",
+                "aliases": [
+                  "ping -c4 192.168.1.100",
+                  "ping 192.168.1.100 -c 4"
+                ],
+                "outputLines": [
+                  {
+                    "text": "PING 192.168.1.100 (192.168.1.100) 56(84) bytes of data.",
+                    "color": "",
+                    "delay": 300
+                  },
+                  {
+                    "text": "64 bytes from 192.168.1.100: icmp_seq=1 ttl=64 time=0.418 ms",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "64 bytes from 192.168.1.100: icmp_seq=2 ttl=64 time=0.352 ms",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "64 bytes from 192.168.1.100: icmp_seq=3 ttl=64 time=0.397 ms",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "64 bytes from 192.168.1.100: icmp_seq=4 ttl=64 time=0.371 ms",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "--- 192.168.1.100 ping statistics ---",
+                    "color": "dim",
+                    "delay": 200
+                  },
+                  {
+                    "text": "4 packets transmitted, 4 received, 0% packet loss, time 3004ms",
+                    "color": "green",
+                    "delay": 300
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 网络通：4 个包全部收到，0% 丢包。",
+                "explain": "4 个包全部收到、0% 丢包 = 网络通。time 是往返延迟（毫秒），越小越顺畅；0% 丢包说明这条链路很健康。",
+                "errorHint": "ping 的目标是从站 192.168.1.100，记得用 -c 4 限制发包次数",
+                "hints": [
+                  "第一步：ping 的对象是从站 IP——192.168.1.100",
+                  "第二步：加 -c 4 限制发包次数（否则要 Ctrl+C 才停）",
+                  "完整命令 → ping -c 4 192.168.1.100"
+                ]
+              },
+              {
+                "title": "排查第三步：确认端口在监听",
+                "narrative": "ping 通说明网络通。但服务可能没起来——Linux 用 ss 看端口监听状态：ss -tlnp 列出所有 TCP 监听端口（-t TCP、-l 监听、-n 数字、-p 进程名），再用 | grep 502 过滤出目标端口。",
+                "question": "确认从站 502 端口是否在监听，用哪个命令？",
+                "options": [
+                  {
+                    "text": "ss -tlnp | grep 502",
+                    "correct": true,
+                    "hint": "ss -tlnp 列出 TCP 监听端口和进程，grep 502 过滤出目标端口"
+                  },
+                  {
+                    "text": "netstat -rn",
+                    "correct": false,
+                    "hint": "-rn 是路由表，看监听端口要用 -tlnp"
+                  },
+                  {
+                    "text": "ip addr show",
+                    "correct": false,
+                    "hint": "ip addr show 是看 IP 地址，不是端口"
+                  },
+                  {
+                    "text": "cat /etc/hosts",
+                    "correct": false,
+                    "hint": "hosts 是主机名映射文件，不是端口"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：查端口 502",
+                "narrative": "动手。在终端输入命令，看看 502 端口有没有在监听。",
+                "question": "在终端输入命令，查询 502 端口监听状态：",
+                "inputType": "command",
+                "correctCommand": "ss -tlnp | grep 502",
+                "aliases": [
+                  "ss -tlnp",
+                  "ss -tlnp|grep 502"
+                ],
+                "outputLines": [
+                  {
+                    "text": "LISTEN 0 128 0.0.0.0:502 0.0.0.0:*  users:((\"modbus-server\",pid=2143))",
+                    "color": "green",
+                    "delay": 300
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ 端口 502 正在监听（modbus-server 进程）。",
+                "explain": "LISTEN 0.0.0.0:502 表示 Modbus 服务在 502 端口正常监听，端口没被占用、服务在跑。",
+                "errorHint": "ss 加 -tlnp 列出监听端口，再用 grep 502 过滤出目标端口",
+                "hints": [
+                  "第一步：用 ss 加 -tlnp 列出 TCP 监听端口",
+                  "第二步：管道 grep 502 过滤出目标端口",
+                  "完整命令 → ss -tlnp | grep 502"
+                ]
+              },
+              {
+                "title": "排查第四步：用 modpoll 验证业务通信",
+                "narrative": "端口在监听、服务也在，但业务还是连不上——最后直接用 modpoll 读从站保持寄存器验证。格式：modpoll 打头，选项在中间（-m 协议、-t 类型、-r 地址、-1 只读一次、-p 端口），从站 IP 放最后。温度设定值在 1 号保持寄存器。",
+                "question": "用 modpoll 读从站 192.168.1.100:502 的 1 号保持寄存器（读一次），哪条命令正确？",
+                "options": [
+                  {
+                    "text": "modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100",
+                    "correct": true,
+                    "hint": "-m tcp 协议、-t 4 保持寄存器、-r 1 地址、-p 502 端口，IP 放最后"
+                  },
+                  {
+                    "text": "modpoll -m rtu -t 4 -r 1 -p 502 192.168.1.100",
+                    "correct": false,
+                    "hint": "咱们用的是 ModbusTCP（-m tcp），不是 RTU 串口"
+                  },
+                  {
+                    "text": "modpoll -t 4 -r 1 192.168.1.100",
+                    "correct": false,
+                    "hint": "少了 -m 协议和 -p 端口"
+                  },
+                  {
+                    "text": "modpoll -m tcp -t 4 -r 1 192.168.1.100:502",
+                    "correct": false,
+                    "hint": "端口要用 -p 502 单独指定，IP 不带冒号"
+                  }
+                ]
+              },
+              {
+                "title": "动手敲命令：modpoll 读保持寄存器",
+                "narrative": "动手。在终端输入命令，用 modpoll 读从站（192.168.1.100:502）的保持寄存器，看温度设定值。",
+                "question": "在终端输入命令，读取保持寄存器：",
+                "inputType": "command",
+                "correctCommand": "modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100",
+                "aliases": [
+                  "modpoll -m tcp -t 4 -r 1 -p 502 192.168.1.100"
+                ],
+                "outputLines": [
+                  {
+                    "text": "modpoll 3.0 - FieldTalk(tm) Modbus(R) Master Simulator",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Protocol configuration: MODBUS/TCP",
+                    "color": "dim",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Slave configuration... address = 1, start reference = 1, count = 1",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "Reading 1 register(s) from address 1",
+                    "color": "",
+                    "delay": 250
+                  },
+                  {
+                    "text": "register 1: 256 (0x0100)  → 温度设定值 25.6℃",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "厂长：读到了！通信恢复——原来是业务层的问题，网络和端口都没事。",
+                    "color": "green",
+                    "delay": 400
+                  },
+                  {
+                    "text": "",
+                    "color": "",
+                    "delay": 100
+                  }
+                ],
+                "successText": "✅ Modbus 通信恢复，读到保持寄存器 #1 = 25.6（温度设定值）。",
+                "explain": "读到了保持寄存器 #1 = 25.6（温度设定值）——说明 ModbusTCP 通信完全正常：网络、端口、从站都没问题，故障定位完成。",
+                "errorHint": "modpoll 打头，选项在中间：-m 协议、-t 类型、-r 地址、-p 端口，IP 放最后——把刚才教学里各选项的值按顺序填进去",
+                "hints": [
+                  "第一步 -m 参数：从站走 ModbusTCP 协议，所以用 -m tcp",
+                  "第二步 -t 参数：读保持寄存器用 4，所以用 -t 4",
+                  "第三步 -r 参数：从 1 号地址开始读，所以用 -r 1",
+                  "第四步 -p 参数：从站端口是 502，所以用 -p 502",
+                  "第五步：IP 放最后、读一次加 -1 → modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100"
+                ]
+              }
+            ]
+          }
+        },
+        {
           "id": "3-7",
           "type": "boss_fight",
           "title": "⚔️ Boss战：Modbus 通信故障",
@@ -3844,7 +4422,7 @@
                   {
                     "question": "ModbusTCP 从站默认示例端口是多少？",
                     "options": [
-                      "8502",
+                      "502",
                       "1880",
                       "8080",
                       "3000"
@@ -3948,7 +4526,7 @@
                   {
                     "text": "从站的 IP 地址和端口",
                     "correct": true,
-                    "hint": "IP + 端口（如 192.168.1.100:8502）"
+                    "hint": "IP + 端口（如 192.168.1.100:502）"
                   },
                   {
                     "text": "MAC 地址",
@@ -4005,23 +4583,23 @@
               },
               {
                 "title": "动手②：查端口是否开放（L1 综合）",
-                "narrative": "厂长：第二步，按第一幕的排查顺序（网线→IP→端口）。用 ss 看从站的 8502 端口（ModbusTCP 模拟端口）是否监听。",
-                "question": "在终端输入命令，查看 8502 端口监听状态：",
+                "narrative": "厂长：第二步，按第一幕的排查顺序（网线→IP→端口）。用 ss 看从站的 502 端口（ModbusTCP 模拟端口）是否监听。",
+                "question": "在终端输入命令，查看 502 端口监听状态：",
                 "inputType": "command",
-                "correctCommand": "ss -tln | grep 8502",
+                "correctCommand": "ss -tln | grep 502",
                 "aliases": [
-                  "ss -tln | grep 8502",
+                  "ss -tln | grep 502",
                   "ss -tln"
                 ],
-                "errorHint": "用 ss -tln 看监听端口，过滤 8502",
+                "errorHint": "用 ss -tln 看监听端口，过滤 502",
                 "outputLines": [
                   {
-                    "text": "LISTEN  0  128  0.0.0.0:8502  0.0.0.0:*",
+                    "text": "LISTEN  0  128  0.0.0.0:502  0.0.0.0:*",
                     "color": "green",
                     "delay": 400
                   },
                   {
-                    "text": "厂长：8502 端口在监听，ModbusTCP 从站就绪！",
+                    "text": "厂长：502 端口在监听，ModbusTCP 从站就绪！",
                     "color": "green",
                     "delay": 400
                   },
@@ -4031,18 +4609,25 @@
                     "delay": 100
                   }
                 ],
-                "successText": "✅ 8502 端口正常监听！"
+                "successText": "✅ 502 端口正常监听！"
               },
               {
                 "title": "动手③：读寄存器验证（L3）",
                 "narrative": "厂长：第三步，用 modpoll 直连从站读保持寄存器（温度设定值），和 QModMaster 干的事一样。",
                 "question": "在终端输入命令，读取从站保持寄存器：",
                 "inputType": "command",
-                "correctCommand": "modpoll -m tcp -t 4 -r 1 -1 -p 8502 192.168.1.100",
+                "correctCommand": "modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100",
                 "aliases": [
-                  "modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100"
+                  "modpoll -m tcp -t 4 -r 1 -p 502 192.168.1.100"
                 ],
-                "errorHint": "格式: modpoll -m tcp -t 4 -r 1 -p 8502 192.168.1.100（-m tcp 协议 -t 4 保持寄存器 -r 1 地址 -p 8502 端口）",
+                "errorHint": "格式: modpoll -m tcp -t 4 -r 1 -p 502 192.168.1.100（-m tcp 协议 -t 4 保持寄存器 -r 1 地址 -p 502 端口）",
+                "hints": [
+                  "第一步 -m 参数：从站走 ModbusTCP 协议，所以用 -m tcp",
+                  "第二步 -t 参数：读保持寄存器用 4，所以用 -t 4",
+                  "第三步 -r 参数：从 1 号地址开始读，所以用 -r 1",
+                  "第四步 -p 参数：从站端口是 502，所以用 -p 502",
+                  "第五步：IP 放最后、读一次加 -1 → modpoll -m tcp -t 4 -r 1 -1 -p 502 192.168.1.100"
+                ],
                 "outputLines": [
                   {
                     "text": "Protocol configuration: MODBUS/TCP",
@@ -4118,7 +4703,7 @@
           "title": "用Function节点模拟传感器",
           "type": "code_review",
           "config": {
-            "code": "msg.payload = {\\n  temperature: 25 + Math.random() * 60,\\n  vibration: Math.random() * 1.5\\n};\\nreturn msg;",
+            "code": "msg.payload = {\n  temperature: 25 + Math.random() * 60,\n  vibration: Math.random() * 1.5\n};\nreturn msg;",
             "hint": "这段代码生成了什么数据？",
             "question": "temperature的范围是多少？",
             "options": [
@@ -4138,15 +4723,117 @@
         {
           "id": "4-1",
           "title": "温度超标立即报警",
-          "type": "fill_blank",
+          "type": "install_wizard",
           "config": {
-            "prompt": "在Node-RED中，用____节点实现条件判断",
-            "answer": "Switch",
-            "options": [
-              "Switch",
-              "Function",
-              "Change",
-              "Inject"
+            "steps": [
+              {
+                "title": "条件判断用什么节点",
+                "narrative": "传感器数据进来后，得判断「温度超没超标」再分流。Node-RED 里做条件判断用 Switch 节点——和编程语言的 switch/case 类似：配置多条规则，数据满足哪条就走哪个分支。",
+                "question": "Node-RED 里做条件判断，用哪个节点？",
+                "options": [
+                  {
+                    "text": "Switch（条件判断/分流）",
+                    "correct": true,
+                    "hint": "Switch 节点做条件判断，按规则分流"
+                  },
+                  {
+                    "text": "Function",
+                    "correct": false,
+                    "hint": "Function 是写代码的，也能判断但用 Switch 更直观"
+                  },
+                  {
+                    "text": "Change",
+                    "correct": false,
+                    "hint": "Change 是改消息内容/属性，不是判断"
+                  },
+                  {
+                    "text": "Inject",
+                    "correct": false,
+                    "hint": "Inject 是手动注入/定时触发，不做判断"
+                  }
+                ]
+              },
+              {
+                "title": "怎么配规则：温度分流",
+                "narrative": "Switch 的规则：一条规则一个条件。温度 > 80 的走「报警」输出分支，<= 80 的走「正常」分支——两条规则各管一路，数据满足哪条就从哪个口出来。",
+                "question": "温度 > 80 报警、<= 80 正常，Switch 节点要配几条规则？",
+                "options": [
+                  {
+                    "text": "两条规则（>80 报警，<=80 正常）",
+                    "correct": true,
+                    "hint": "报警一条、正常一条，各走一个分支"
+                  },
+                  {
+                    "text": "只配一条规则",
+                    "correct": false,
+                    "hint": "一条规则只能管一种情况，另一路就没出口了"
+                  },
+                  {
+                    "text": "用 Change 节点改温度值",
+                    "correct": false,
+                    "hint": "Change 是改值，不是做条件分流"
+                  },
+                  {
+                    "text": "Switch 不能做数值比较",
+                    "correct": false,
+                    "hint": "Switch 支持数值比较（>、<、>=、<= 等）"
+                  }
+                ]
+              },
+              {
+                "title": "Switch 规则怎么写（格式）",
+                "narrative": "Switch 每条规则 = 属性 + 条件 + 值。温度存在 msg.payload.temperature，判断它是否 > 80，规则就写成：msg.payload.temperature > 80——也就是「属性选消息字段、条件选符号（>、>=、== 等）、值填 80」。",
+                "question": "温度在 msg.payload.temperature，要判断温度 > 80，Switch 规则该怎么写？",
+                "options": [
+                  {
+                    "text": "msg.payload.temperature > 80",
+                    "correct": true,
+                    "hint": "属性在前、条件在中间、值在后，正确"
+                  },
+                  {
+                    "text": "temperature 80 >",
+                    "correct": false,
+                    "hint": "顺序反了，应该 属性 条件 值"
+                  },
+                  {
+                    "text": "80 > msg.payload.temperature",
+                    "correct": false,
+                    "hint": "把 80 放前面方向反了，变成 80 大于温度"
+                  },
+                  {
+                    "text": "msg > 80",
+                    "correct": false,
+                    "hint": "msg 是整条消息，要精确到温度字段 msg.payload.temperature"
+                  }
+                ]
+              },
+              {
+                "title": "实战判断：85℃ 走哪",
+                "narrative": "现在来了一条数据：temperature = 85。阈值是 80，85 > 80，满足「报警」那条规则。",
+                "question": "temperature = 85，阈值 80，这条数据该走哪个分支？",
+                "options": [
+                  {
+                    "text": "报警分支（>80）",
+                    "correct": true,
+                    "hint": "85 > 80，走报警"
+                  },
+                  {
+                    "text": "正常分支（<=80）",
+                    "correct": false,
+                    "hint": "85 不小于等于 80"
+                  },
+                  {
+                    "text": "两条都走",
+                    "correct": false,
+                    "hint": "一条数据只走满足条件的那条规则"
+                  },
+                  {
+                    "text": "哪条都不走，报错",
+                    "correct": false,
+                    "hint": "85 满足报警规则，会走报警分支"
+                  }
+                ]
+              }
             ]
           },
           "xp": 100,
@@ -4161,16 +4848,18 @@
           "type": "sort",
           "config": {
             "items": [
-              "缓存10个数据到context",
-              "收到新数据时加入缓存",
-              "缓存满10个后计算平均值",
-              "输出平均值，其余return null"
+              "读取缓存（最近的数据）",
+              "收到新数据，加入缓存",
+              "缓存超过10个，挤掉最旧的（保持最近10个）",
+              "攒满10个，算平均值",
+              "输出平均值"
             ],
             "answer": [
               0,
               1,
               2,
-              3
+              3,
+              4
             ]
           },
           "xp": 100,
@@ -4182,19 +4871,25 @@
         {
           "id": "4-3",
           "title": "边缘计算驱动力排序",
-          "type": "sort",
+          "type": "scenario_match",
           "config": {
-            "items": [
-              "省：减少带宽成本",
-              "快：毫秒级响应",
-              "稳：断网也能本地运行",
-              "密：敏感数据不出厂"
-            ],
-            "answer": [
-              0,
-              1,
-              2,
-              3
+            "pairs": [
+              {
+                "item": "省带宽",
+                "match": "数据在本地处理，只把结果上传，少占网络带宽"
+              },
+              {
+                "item": "快响应",
+                "match": "毫秒级本地决策，不等云端来回"
+              },
+              {
+                "item": "稳运行",
+                "match": "车间断网，产线本地也能继续运行"
+              },
+              {
+                "item": "密防护",
+                "match": "工艺配方等敏感数据不出厂区"
+              }
             ]
           },
           "xp": 100,
@@ -4208,12 +4903,12 @@
           "type": "fill_blank",
           "config": {
             "prompt": "滑动均值后，数据量减少了约____%",
-            "answer": "85",
+            "answer": "90",
             "options": [
               "50",
               "75",
-              "85",
-              "99"
+              "90",
+              "95"
             ]
           },
           "xp": 100,
@@ -4705,7 +5400,7 @@
               },
               {
                 "title": "动手②：统计数据量（L4）",
-                "narrative": "厂长：第二步，统计传感器日志——全量有多少行，筛选后剩多少（模拟边缘筛选）。",
+                "narrative": "第二步，统计传感器日志行数——用 wc -l：wc -l /var/log/sensor.log。看全量多少行、筛选后剩多少（模拟边缘筛选）。",
                 "question": "在终端输入命令，统计传感器日志行数：",
                 "inputType": "command",
                 "correctCommand": "wc -l /var/log/sensor.log",
@@ -5407,7 +6102,7 @@
               },
               {
                 "title": "动手①：启动原生 Node-RED（L3 综合）",
-                "narrative": "厂长：第一步，回顾第三幕——用命令启动原生 Node-RED。",
+                "narrative": "第一步，回顾第三幕——在终端输入 node-red 启动原生 Node-RED。",
                 "question": "在终端输入命令，启动原生 Node-RED：",
                 "inputType": "command",
                 "correctCommand": "node-red",
@@ -6071,7 +6766,7 @@
           "title": "🌶 三屏联动（温度/振动/报警）",
           "type": "code_review",
           "config": {
-            "code": "[\\n  {topic:'温度', payload:75.3},\\n  {topic:'振动', payload:2.1}\\n]",
+            "code": "[\n  {topic:'温度', payload:75.3},\n  {topic:'振动', payload:2.1}\n]",
             "question": "这段数据送到Chart后会出现？",
             "options": [
               "报错",
@@ -6912,7 +7607,7 @@
           "title": "AI代码找茬",
           "type": "code_review",
           "config": {
-            "code": "const mqtt = require('mqtt')\\nconst client = mqtt.connect('mqtt://localhost:1883')\\nclient.on('connect', () => {\\n  client.publish('factory/temp', '72.5')\\n})",
+            "code": "const mqtt = require('mqtt')\nconst client = mqtt.connect('mqtt://localhost:1883')\nclient.on('connect', () => {\n  client.publish('factory/temp', '72.5')\n})",
             "hint": "这段代码少了什么？",
             "question": "代码中的明显问题是什么？",
             "options": [

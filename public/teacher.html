@@ -6,154 +6,47 @@
 <title>教师端 · 锐智工厂</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Courier New', monospace;
-  background: #0f0f14; color: #c8c8d0;
-  min-height: 100vh;
-}
-
-.header {
-  background: #181820; border-bottom: 1px solid #2a2a3a;
-  padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
-}
+body { font-family: 'Courier New', monospace; background: #0f0f14; color: #c8c8d0; min-height: 100vh; }
+.header { background: #181820; border-bottom: 1px solid #2a2a3a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
 .header .logo { font-size: 20px; color: #00bcd4; display: flex; align-items: center; gap: 10px; }
 .header .logo span { color: #c8c8d0; }
-.header .badge { font-size: 17px; color: #ffb000; border: 1px solid #ffb000; padding: 2px 8px; }
-.logout-btn {
-  background: none; border: 1px solid #2a2a3a; color: #606070; padding: 6px 16px;
-  font-family: inherit; font-size: 17px; cursor: pointer; transition: all .2s;
-}
+.logout-btn { background: none; border: 1px solid #2a2a3a; color: #606070; padding: 6px 16px; font-family: inherit; font-size: 17px; cursor: pointer; transition: all .2s; }
 .logout-btn:hover { border-color: #ff5555; color: #ff5555; }
-
 main { max-width: 1200px; margin: 0 auto; padding: 24px; }
-
 .controls { margin-bottom: 20px; }
-.controls h2 { font-size: 17px; font-weight: normal; color: #00bcd4; margin-bottom: 12px; }
+.controls h2 { font-size: 19px; font-weight: normal; color: #00bcd4; margin-bottom: 12px; }
 .batch-add { display: flex; gap: 8px; }
-.batch-add input {
-  flex: 1; padding: 10px 12px; background: #000; border: 1px solid #2a2a3a;
-  color: #00e676; font-family: inherit; font-size: 17px; outline: none;
-}
+.batch-add input { flex: 1; padding: 10px 12px; background: #000; border: 1px solid #2a2a3a; color: #00e676; font-family: inherit; font-size: 17px; outline: none; }
 .batch-add input:focus { border-color: #ffb000; }
 .batch-add input::placeholder { color: #3a3a48; }
-.btn {
-  padding: 10px 18px; background: #2a2a3a; border: none;
-  color: #c8c8d0; font-family: inherit; font-size: 17px; cursor: pointer;
-  transition: all .2s; white-space: nowrap;
-}
+.btn { padding: 10px 18px; background: #2a2a3a; border: none; color: #c8c8d0; font-family: inherit; font-size: 17px; cursor: pointer; transition: all .2s; white-space: nowrap; }
 .btn:hover { background: #3a3a4a; }
 .btn.primary { background: #ffb000; color: #000; font-weight: bold; }
 .btn.primary:hover { background: #ffc030; }
-.btn.green { background: #00e676; color: #000; font-weight: bold; }
-.btn.green:hover { background: #20f090; }
-.btn.red { background: #ff5555; color: #000; font-weight: bold; }
-.btn.red:hover { background: #ff7070; }
-.btn:disabled { opacity: .4; cursor: not-allowed; }
-
 .table-wrap { overflow-x: auto; border: 1px solid #2a2a3a; background: #181820; }
 table { width: 100%; border-collapse: collapse; font-size: 17px; }
-thead th {
-  background: #12121a; color: #606070; font-weight: normal; font-size: 19px;
-  padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2a3a;
-  white-space: nowrap;
-}
+thead th { background: #12121a; color: #606070; font-weight: normal; font-size: 19px; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2a3a; white-space: nowrap; }
 tbody td { padding: 10px 14px; border-bottom: 1px solid #1e1e2a; vertical-align: middle; }
 tbody tr:hover { background: #1c1c28; }
 tbody tr:last-child td { border-bottom: none; }
-
-.rank-intern { color: #606070; }
-.rank-apprentice { color: #00bcd4; }
-.rank-worker { color: #ffb000; }
-.rank-engineer { color: #00e676; }
-.rank-expert { color: #ff5555; }
-
-.progress-mini {
-  display: inline-block; width: 60px; height: 6px; background: #1e1e2a;
-  border-radius: 3px; vertical-align: middle; margin-right: 8px; overflow: hidden;
-}
+.rank-intern { color: #606070; } .rank-apprentice { color: #00bcd4; }
+.rank-worker { color: #ffb000; } .rank-engineer { color: #00e676; } .rank-expert { color: #ff5555; }
+.progress-mini { display: inline-block; width: 60px; height: 6px; background: #1e1e2a; border-radius: 3px; vertical-align: middle; margin-right: 8px; overflow: hidden; }
 .progress-mini .bar { height: 100%; background: #00bcd4; border-radius: 3px; transition: width .3s; }
-.progress-mini .bar.high { background: #00e676; }
-.progress-mini .bar.mid { background: #ffb000; }
-
-.detail-btn {
-  background: none; border: 1px solid #2a2a3a; color: #00bcd4; padding: 4px 12px;
-  font-family: inherit; font-size: 19px; cursor: pointer; transition: all .2s;
-}
+.progress-mini .bar.high { background: #00e676; } .progress-mini .bar.mid { background: #ffb000; }
+.detail-btn { background: none; border: 1px solid #2a2a3a; color: #00bcd4; padding: 4px 12px; font-family: inherit; font-size: 19px; cursor: pointer; transition: all .2s; }
 .detail-btn:hover { background: #00bcd4; color: #000; }
-.detail-btn.active { background: #00bcd4; color: #000; }
-.delete-btn {
-  background: none; border: none; color: #606070; font-family: inherit; font-size: 19px;
-  cursor: pointer; padding: 4px 8px; transition: all .2s;
-}
+.delete-btn { background: none; border: none; color: #606070; font-family: inherit; font-size: 19px; cursor: pointer; padding: 4px 8px; transition: all .2s; }
 .delete-btn:hover { color: #ff5555; }
-
-.detail-panel {
-  margin-top: 16px; background: #181820; border: 1px solid #2a2a3a;
-  display: none; animation: slideDown .25s ease;
-}
-@keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; } }
-.detail-panel.open { display: block; }
-.detail-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 20px; border-bottom: 1px solid #2a2a3a;
-}
-.detail-header h3 { font-size: 17px; font-weight: normal; color: #ffb000; }
-.close-btn {
-  background: none; border: none; color: #606070; font-size: 20px; cursor: pointer;
-  line-height: 1; padding: 0 4px;
-}
-.close-btn:hover { color: #ff5555; }
-.detail-body { padding: 16px 20px; }
-
-.level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
-.level-card {
-  background: #12121a; border: 1px solid #2a2a3a; padding: 14px;
-}
-.level-card .lv-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
-}
-.level-card .lv-name { font-size: 19px; color: #c8c8d0; }
-.level-card .lv-pct { font-size: 17px; color: #606070; }
-.level-card .lv-progress {
-  height: 4px; background: #1e1e2a; border-radius: 2px; margin-bottom: 10px; overflow: hidden;
-}
-.level-card .lv-progress .bar { height: 100%; border-radius: 2px; transition: width .3s; }
-.level-card .lv-progress .bar.high { background: #00e676; }
-.level-card .lv-progress .bar.mid { background: #ffb000; }
-.level-card .lv-progress .bar.low { background: #ff5555; }
-
-.stars-row { display: flex; align-items: center; gap: 12px; font-size: 19px; }
-.stars-row .label { color: #606070; font-size: 17px; min-width: 28px; }
-.stars-row .stars { color: #3a3a48; letter-spacing: 2px; font-size: 19px; }
-.stars-row .stars .on { color: #ffb000; }
-.stars-row .stars.editable { cursor: pointer; }
-.stars-row .stars.editable .on { color: #ffb000; }
-.stars-row .stars.editable:hover .star { color: #ffc030; }
-.stars-row .star-empty { color: #3a3a48; }
-
-.detail-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
-
 .empty { color: #606070; text-align: center; padding: 40px; font-size: 17px; }
 .loading { text-align: center; padding: 40px; color: #606070; }
-.error-msg { color: #ff5555; text-align: center; padding: 10px; font-size: 17px; }
-
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: #181820; border: 1px solid #2a2a3a; color: #c8c8d0;
-  padding: 10px 20px; font-size: 17px; z-index: 999;
-  opacity: 0; transition: opacity .3s; pointer-events: none;
-}
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #181820; border: 1px solid #2a2a3a; color: #c8c8d0; padding: 10px 20px; font-size: 17px; z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none; }
 .toast.show { opacity: 1; }
-.toast.success { border-color: #00e676; }
-.toast.error { border-color: #ff5555; }
-
+.toast.success { border-color: #00e676; } .toast.error { border-color: #ff5555; }
 @media (max-width: 640px) {
   main { padding: 12px; }
   .batch-add { flex-direction: column; }
   .header { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
-  .header .logo { font-size: 19px; }
-  .level-grid { grid-template-columns: 1fr; }
-  .detail-body { padding: 12px; }
 }
 </style>
 </head>
@@ -166,7 +59,7 @@ tbody tr:last-child td { border-bottom: none; }
   <section class="controls">
     <h2>学生管理</h2>
     <div class="batch-add">
-      <input id="namesInput" type="text" placeholder="输入姓名，用逗号分隔" onkeydown="if(event.key==='Enter')addStudents()">
+      <input id="namesInput" type="text" placeholder="输入姓名，用逗号分隔（初始密码 123456）" onkeydown="if(event.key==='Enter')addStudents()">
       <button class="btn primary" onclick="addStudents()">批量添加</button>
     </div>
     <div id="batchResult" style="font-size: 19px;color:#606070;margin-top:6px;min-height:18px"></div>
@@ -174,111 +67,16 @@ tbody tr:last-child td { border-bottom: none; }
   <section class="table-wrap" id="tableContainer">
     <div class="loading" id="loadingIndicator">加载中...</div>
   </section>
-  <section class="detail-panel" id="detailPanel">
-    <div class="detail-header">
-      <h3 id="detailName"></h3>
-      <button class="close-btn" onclick="closeDetail()">×</button>
-    </div>
-    <div class="detail-body" id="detailBody"></div>
+
+  <section class="controls" style="margin-top:28px">
+    <h2 style="margin-bottom:10px">🐛 Bug 反馈 · 抓虫有奖</h2>
+    <div id="bugList"><div class="loading">加载中...</div></div>
   </section>
 </main>
 <div class="toast" id="toast"></div>
 
 <script>
 const API = window.location.origin;
-
-const LEVELS = [
-  {id:1, name:'你的第一间数字工位', tasks:[
-    '环境准备：安装VMware + Ubuntu Server',
-    '任务1-1：查看本机网络配置',
-    '任务1-2：网络连通性诊断（ping）',
-    '任务1-3：修改IP地址（演示）',
-    '任务2-1：DNS查询（nslookup）',
-    '任务2-2：Windows防火墙配置',
-    '任务2-3：Ubuntu防火墙配置（ufw）',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：tracert追踪路由'
-  ]},
-  {id:2, name:'入职第一天', tasks:[
-    '任务1-1：安装并启动SSH服务',
-    '任务1-2：从Windows SSH远程登录',
-    '任务1-3：Linux常用命令入门（9个命令）',
-    '任务1-4：软件包管理（apt/curl）',
-    '任务2-1：注册云服务器',
-    '任务2-2：配置安全组',
-    '任务2-3：SSH登录云服务器',
-    '任务2-4：本地 vs 云服务器对比',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：SSH免密登录'
-  ]},
-  {id:3, name:'设备联网攻坚战', tasks:[
-    '环境准备：安装Node-RED',
-    '任务1-1：启动Node-RED并设为开机自启',
-    '任务1-2：访问Web界面',
-    '任务1-3：安装Modbus节点',
-    '任务1-4：用Node-RED关联ISA-95模型',
-    '任务2-1：搭建ModbusTCP从站',
-    '任务2-2：搭建ModbusTCP主站',
-    '任务2-3：QModMaster直连从站',
-    '任务2-4：制造并排查通信故障',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：一次修复故障（Boss战）'
-  ]},
-  {id:4, name:'数据在源头处理', tasks:[
-    '任务1-1：用Function节点模拟传感器',
-    '任务1-2：温度超标立即报警',
-    '任务1-3：滑动均值计算',
-    '任务2-1：振动异常判断',
-    '任务2-2：数据筛选对比（减少85%）',
-    '任务2-3：安装OpenPLC',
-    '任务2-4：上传控制程序',
-    '任务2-5：Node-RED读取PLC变量',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：全量vs筛选数据量对比'
-  ]},
-  {id:5, name:'登上云端', tasks:[
-    '环境准备：安装Docker',
-    '任务1-1：运行Hello World容器',
-    '任务1-2：运行Nginx网页服务器',
-    '任务1-3：容器启停和删除',
-    '任务2-1：用Docker运行Node-RED',
-    '任务2-2：双开对比原生vs容器',
-    '任务2-3：容器完全迁移',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：双开Node-RED原生vs容器对比'
-  ]},
-  {id:6, name:'搭建你的驾驶舱', tasks:[
-    '环境准备：安装Dashboard插件',
-    '任务1-1：六种节点逐一上手（Gauge/Chart等）',
-    '任务1-2：理解Tab→Group→Widget布局',
-    '任务2-1：创建布局（Tab+4个Group）',
-    '任务2-2：搭建温度+振动仪表盘',
-    '任务2-3：搭建趋势图',
-    '任务2-4：搭建LED/Text/Button/Notification',
-    '任务2-5：整体联调',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：温度/振动/报警三屏联动'
-  ]},
-  {id:7, name:'数据大贯通', tasks:[
-    '环境准备：安装Mosquitto',
-    '任务1-1：两个终端发布-订阅体验',
-    '任务1-2：多Topic订阅',
-    '任务2-1：搭建三个MQTT传感器发布者',
-    '任务2-2：Dashboard订阅显示',
-    '任务2-3：趋势图和告警',
-    '任务2-4：感受发布者-订阅者解耦',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：断线重连30秒'
-  ]},
-  {id:8, name:'展望未来', tasks:[
-    '环境准备：安装AI编程工具',
-    '任务1-1：用AI编写温度监控代码',
-    '任务2-1：用AI生成MQTT数据采集代码',
-    '回顾反思',
-    '\uD83C\uDF36 隐藏挑战：用AI生成的代码教会同学'
-  ]}
-];
-
 const RANKS = [
   { min: 0, max: 999, name: '实习生', cls: 'rank-intern' },
   { min: 1000, max: 2499, name: '学徒', cls: 'rank-apprentice' },
@@ -286,356 +84,159 @@ const RANKS = [
   { min: 4500, max: 6999, name: '工程师', cls: 'rank-engineer' },
   { min: 7000, max: Infinity, name: '专家', cls: 'rank-expert' }
 ];
-
 let students = [];
-let detailStudent = null;
-let detailStars = {};
+let content = null;
 
-function $id(id) { return document.getElementById(id); }
-
-function getToken() { return sessionStorage.getItem('token'); }
-
-function rankForXP(xp) {
-  for (const r of RANKS) {
-    if (xp >= r.min && xp <= r.max) return r;
-  }
-  return RANKS[0];
+function $(id){ return document.getElementById(id); }
+function getToken(){ return sessionStorage.getItem('token'); }
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function showToast(msg, type){
+  const el=$('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:'');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'), 3000);
 }
-
-function isAutoTask(name) {
-  return name.includes('环境准备');
+function rankForXP(xp){ for(const r of RANKS){ if(xp>=r.min && xp<=r.max) return r; } return RANKS[0]; }
+function taskXP(t){
+  if (t.hidden) return 300;
+  if (t.type === 'quiz' && t.xp <= 50) return 50;
+  if (t.xp === 0) return 0;
+  return t.xp || 100;
 }
-
-function isHiddenTask(name) {
-  return name.includes('隐藏挑战');
-}
-
-function isReflection(name) {
-  return name === '回顾反思';
-}
-
-function calcXP(checkData) {
-  let xp = 0;
-  LEVELS.forEach(lv => {
-    lv.tasks.forEach((name, i) => {
-      const key = lv.id + '-' + i;
-      if (checkData && checkData[key]) {
-        if (isHiddenTask(name)) xp += 300;
-        else if (isReflection(name)) xp += 50;
-        else if (isAutoTask(name)) xp += 0;
-        else xp += 100;
-      }
-    });
-  });
-  return xp;
-}
-
-function calcCompletion(checkData) {
-  let done = 0, total = 0;
-  LEVELS.forEach(lv => {
-    lv.tasks.forEach((name, i) => {
-      if (isAutoTask(name)) return;
+function studentStats(s){
+  const check = s.check || {};
+  let xp=0, done=0, total=0;
+  (content.levels||[]).forEach(lv=>{
+    (lv.tasks||[]).forEach(t=>{
+      if(t.auto) return;
       total++;
-      const key = lv.id + '-' + i;
-      if (checkData && checkData[key]) done++;
+      const c=check[''+t.id];
+      if(c){ done++; xp += (c&&c.half)? Math.floor(taskXP(t)/2) : taskXP(t); }
     });
   });
-  return total > 0 ? Math.round(done / total * 100) : 0;
+  return { xp, done, total, pct: total? Math.round(done/total*100):0 };
 }
 
-function calcLevelCompletion(checkData, levelId) {
-  const lv = LEVELS.find(l => l.id === levelId);
-  if (!lv) return { done: 0, total: 0, pct: 0 };
-  let done = 0, total = 0;
-  lv.tasks.forEach((name, i) => {
-    if (isAutoTask(name)) return;
-    total++;
-    const key = lv.id + '-' + i;
-    if (checkData && checkData[key]) done++;
-  });
-  const pct = total > 0 ? Math.round(done / total * 100) : 0;
-  return { done, total, pct };
-}
-
-async function apiFetch(path, options = {}) {
-  const token = getToken();
-  const headers = { ...options.headers };
-  if (token) headers['Authorization'] = 'Bearer ' + token;
-  if (options.body) {
-    headers['Content-Type'] = 'application/json';
-  }
-  try {
-    const res = await fetch(API + path, { ...options, headers });
-    if (res.status === 401) {
-      sessionStorage.clear();
-      window.location.href = 'index.html';
-      return null;
-    }
-    if (res.status === 204) return { ok: true };
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || '请求失败');
+async function api(path, opt={}){
+  const token=getToken();
+  const headers=Object.assign({}, opt.headers||{});
+  if(token) headers['Authorization']='Bearer '+token;
+  if(opt.body) headers['Content-Type']='application/json';
+  try{
+    const res=await fetch(API+path, Object.assign({}, opt, {headers}));
+    if(res.status===401){ sessionStorage.clear(); window.location.href='index.html'; return null; }
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error||'请求失败');
     return data;
-  } catch (e) {
-    if (e.message.includes('Failed to fetch')) {
-      showToast('网络错误，请检查服务是否启动', 'error');
-    } else {
-      showToast(e.message, 'error');
-    }
+  }catch(e){
+    showToast(e.message||'请求失败','error');
     return null;
   }
 }
 
-function showToast(msg, type) {
-  const el = $id('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (type ? ' ' + type : '');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove('show'), 3000);
+async function loadContent(){
+  const c=await api('/api/game/content');
+  if(c) content=c.data;
 }
-
-async function loadStudents() {
-  const container = $id('tableContainer');
-  container.innerHTML = '<div class="loading">加载中...</div>';
-  const data = await apiFetch('/api/teacher/students');
-  if (!data) return;
-  students = data.data || [];
+async function loadStudents(){
+  const container=$('tableContainer');
+  container.innerHTML='<div class="loading">加载中...</div>';
+  const data=await api('/api/teacher/students');
+  if(!data) return;
+  students=data.data||[];
   renderTable();
 }
-
-function renderTable() {
-  const container = $id('tableContainer');
-  if (students.length === 0) {
-    container.innerHTML = '<div class="empty">暂无学生数据，请在上方添加学生</div>';
+function renderTable(){
+  const container=$('tableContainer');
+  if(!content){ container.innerHTML='<div class="loading">加载内容中...</div>'; return; }
+  if(students.length===0){
+    container.innerHTML='<div class="empty">暂无学生数据，请在上方添加学生</div>';
     return;
   }
-  let html = '<table><thead><tr><th>姓名</th><th>密码</th><th>等级</th><th>XP</th><th>完成度</th><th>操作</th></tr></thead><tbody>';
-  students.forEach((s, idx) => {
-    const xp = calcXP(s.check);
-    const rank = rankForXP(xp);
-    const pct = calcCompletion(s.check);
-    const barCls = pct >= 80 ? 'high' : pct >= 40 ? 'mid' : '';
-    const isOpen = detailStudent && detailStudent.created_at === s.created_at && detailStudent.name === s.name;
-    html += '<tr>' +
-      '<td>' + escHtml(s.name) + '</td>' +
-      '<td>' + (s.hasPassword
-        ? '<span title="密码：' + escHtml(s.password) + '" style="cursor:help">🔒</span>'
-        : '<span style="color:#3a3a48" title="未设置密码">○</span>') + '</td>' +
-      '<td class="' + rank.cls + '">' + rank.name + '</td>' +
-      '<td style="color:#00e676">' + xp + '</td>' +
-      '<td><div class="progress-mini"><div class="bar ' + barCls + '" style="width:' + pct + '%"></div></div>' + pct + '%</td>' +
-      '<td>' +
-        '<button class="detail-btn' + (isOpen ? ' active' : '') + '" onclick="toggleDetail(' + idx + ')">详情</button> ' +
-        '<button class="delete-btn" onclick="deleteStudent(' + idx + ')">删除</button>' +
+  let html='<table><thead><tr><th>姓名</th><th>密码</th><th>等级</th><th>XP</th><th>完成度</th><th>登录</th><th>操作</th></tr></thead><tbody>';
+  students.forEach(s=>{
+    const st=studentStats(s);
+    const rank=rankForXP(st.xp);
+    const pct=st.pct;
+    const barCls= pct>=80?'high': pct>=40?'mid':'';
+    html+='<tr>'+
+      '<td>'+esc(s.name)+'</td>'+
+      '<td>'+(s.hasPassword
+        ? '<span title="已设置个人密码" style="color:#00e676;cursor:help">🔒</span>'
+        : '<span title="初始密码 123456" style="color:#ffb000;cursor:help">初始</span>')+'</td>'+
+      '<td class="'+rank.cls+'">'+rank.name+'</td>'+
+      '<td style="color:#00e676">'+st.xp+'</td>'+
+      '<td><div class="progress-mini"><div class="bar '+barCls+'" style="width:'+pct+'%"></div></div>'+pct+'%</td>'+
+      '<td style="color:#ffb000" title="最近登录：'+(s.lastLoginDate||'—')+' · 连续 '+(s.loginStreak||0)+' 天">'+(s.loginCount||0)+' 次</td>'+
+      '<td>'+
+        '<button class="detail-btn" onclick="openDetail(\''+encodeURIComponent(s.name)+'\')">详情</button> '+
+        '<button class="delete-btn" onclick="deleteStudent(\''+encodeURIComponent(s.name)+'\')">删除</button>'+
       '</td></tr>';
   });
-  html += '</tbody></table>';
-  container.innerHTML = html;
+  html+='</tbody></table>';
+  container.innerHTML=html;
 }
+function openDetail(nameEnc){ location.href='student_detail.html?name='+nameEnc; }
 
-function escHtml(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-async function addStudents() {
-  const input = $id('namesInput');
-  const raw = input.value.trim();
-  if (!raw) { showToast('请输入学生姓名', 'error'); return; }
-  const names = raw.split(/[,，、\s]+/).filter(Boolean);
-  if (names.length === 0) { showToast('请输入有效姓名', 'error'); return; }
-  const data = await apiFetch('/api/teacher/students', {
-    method: 'POST',
-    body: JSON.stringify({ names })
-  });
-  if (!data) return;
-  input.value = '';
-  const parts = [];
-  if (data.added && data.added.length) parts.push('新增 ' + data.added.length + ' 人：' + data.added.join('、'));
-  if (data.exists && data.exists.length) parts.push('已存在 ' + data.exists.length + ' 人：' + data.exists.join('、'));
-  $id('batchResult').textContent = parts.join(' | ');
-  showToast('添加完成', 'success');
+async function addStudents(){
+  const raw=$('namesInput').value.trim();
+  if(!raw){ showToast('请输入学生姓名','error'); return; }
+  const names=raw.split(/[,，、\s]+/).filter(Boolean);
+  if(names.length===0){ showToast('请输入有效姓名','error'); return; }
+  const data=await api('/api/teacher/students',{method:'POST', body:JSON.stringify({names})});
+  if(!data) return;
+  $('namesInput').value='';
+  const parts=[];
+  if(data.added&&data.added.length) parts.push('新增 '+data.added.length+' 人：'+data.added.join('、'));
+  if(data.exists&&data.exists.length) parts.push('已存在 '+data.exists.length+' 人');
+  $('batchResult').textContent=parts.join(' | ');
+  showToast('添加完成（初始密码 123456）','success');
   loadStudents();
 }
-
-async function deleteStudent(idx) {
-  const s = students[idx];
-  if (!s) return;
-  if (!confirm('确认删除学生「' + s.name + '」？此操作不可撤销。')) return;
-  const data = await apiFetch('/api/teacher/student/' + encodeURIComponent(s.name), { method: 'DELETE' });
-  if (!data) return;
-  if (detailStudent && detailStudent.name === s.name) closeDetail();
-  showToast('已删除 ' + s.name, 'success');
+async function deleteStudent(nameEnc){
+  const name=decodeURIComponent(nameEnc);
+  if(!confirm('确认删除学生「'+name+'」？此操作不可撤销。')) return;
+  const data=await api('/api/teacher/student/'+nameEnc,{method:'DELETE'});
+  if(!data) return;
+  showToast('已删除 '+name,'success');
   loadStudents();
 }
-
-function toggleDetail(idx) {
-  const s = students[idx];
-  if (!s) return;
-  if (detailStudent && detailStudent.name === s.name && detailStudent.created_at === s.created_at) {
-    closeDetail();
-    renderTable();
-    return;
-  }
-  openDetail(s);
-}
-
-function openDetail(s) {
-  detailStudent = s;
-  detailStars = {};
-  LEVELS.forEach(lv => {
-    const starData = (s.stars && s.stars[lv.id]) || { self: 0, peer: 0, teacher: 0 };
-    detailStars[lv.id] = { self: starData.self || 0, peer: starData.peer || 0, teacher: starData.teacher || 0 };
-  });
-
-  $id('detailName').textContent = s.name + ' — 关卡进度';
-  $id('detailPanel').classList.add('open');
-  renderDetail();
-  renderTable();
-}
-
-function closeDetail() {
-  detailStudent = null;
-  detailStars = {};
-  $id('detailPanel').classList.remove('open');
-  renderTable();
-}
-
-function renderDetail() {
-  const s = detailStudent;
-  if (!s) return;
-  const body = $id('detailBody');
-  let html = '<div class="level-grid">';
-  LEVELS.forEach(lv => {
-    const comp = calcLevelCompletion(s.check, lv.id);
-    const barCls = comp.pct >= 80 ? 'high' : comp.pct >= 40 ? 'mid' : 'low';
-    const stars = detailStars[lv.id] || { self: 0, peer: 0, teacher: 0 };
-    html += '<div class="level-card">' +
-      '<div class="lv-header">' +
-        '<div class="lv-name">Lv.' + lv.id + ' ' + escHtml(lv.name) + '</div>' +
-        '<div class="lv-pct">' + comp.done + '/' + comp.total + ' · ' + comp.pct + '%</div>' +
-      '</div>' +
-      '<div class="lv-progress"><div class="bar ' + barCls + '" style="width:' + comp.pct + '%"></div></div>' +
-      '<div class="stars-row">' +
-        '<span class="label">自评</span>' +
-        '<span class="stars">' + starHTML(stars.self, false) + '</span>' +
-        '<span class="label">互评</span>' +
-        '<span class="stars">' + starHTML(stars.peer, false) + '</span>' +
-        '<span class="label">师评</span>' +
-        '<span class="stars editable" data-lv="' + lv.id + '">' + starHTML(stars.teacher, true) + '</span>' +
-      '</div>' +
+async function loadBugReports(){
+  const box=$('bugList');
+  const data=await api('/api/teacher/bug-reports');
+  if(!data){ return; }
+  const list=data.data||[];
+  if(!list.length){ box.innerHTML='<div class="empty">暂无 Bug 反馈。学生会在右下角「🐛 反馈 Bug · 抓虫有奖」入口提交。</div>'; return; }
+  let html='<div style="display:flex;flex-direction:column;gap:8px">';
+  list.forEach(r=>{
+    html+='<div style="border:1px solid #2a2a3a;background:#12121a;padding:12px 14px;border-radius:6px">'+
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px">'+
+        '<b style="color:#ffb000">'+esc(r.name)+'</b>'+
+        (r.location?'<span style="color:#00bcd4;font-size:15px">📍 '+esc(r.location)+'</span>':'')+
+        '<span style="color:#606070;font-size:15px;flex:1">'+esc(r.created_at||'')+'</span>'+
+        '<button class="btn" style="padding:2px 10px;font-size:14px" onclick="delBug('+r.id+')">删除</button>'+
+      '</div>'+
+      '<div style="color:#c8c8d0;font-size:16px;line-height:1.6;white-space:pre-wrap">'+esc(r.content)+'</div>'+
     '</div>';
   });
-  html += '</div>';
-  html += '<div class="detail-actions">' +
-    '<button class="btn" onclick="resetPassword()">🔑 密码</button>' +
-    '<button class="btn green" onclick="saveGrades()">💾 保存师评</button>' +
-    '<button class="btn red" onclick="resetStudent()">⟳ 重置</button>' +
-  '</div>';
-  body.innerHTML = html;
-
-  body.querySelectorAll('.stars.editable').forEach(el => {
-    el.addEventListener('click', function(e) {
-      const lvId = parseInt(this.dataset.lv);
-      const idx = Array.from(this.children).indexOf(e.target);
-      if (idx < 0) return;
-      const newVal = idx + 1;
-      if (detailStars[lvId].teacher === newVal) {
-        detailStars[lvId].teacher = 0;
-      } else {
-        detailStars[lvId].teacher = newVal;
-      }
-      renderDetail();
-    });
-  });
+  html+='</div>';
+  box.innerHTML=html;
+}
+async function delBug(id){
+  if(!confirm('删除这条 Bug 反馈？')) return;
+  const data=await api('/api/teacher/bug-reports/'+id,{method:'DELETE'});
+  if(!data) return;
+  loadBugReports();
 }
 
-function starHTML(val, editable) {
-  let h = '';
-  for (let i = 1; i <= 5; i++) {
-    h += '<span class="star' + (i <= val ? ' on' : '') + '" data-i="' + i + '">' + (i <= val ? '\u2605' : '\u2606') + '</span>';
-  }
-  return h;
-}
+function logout(){ sessionStorage.clear(); window.location.href='index.html'; }
 
-async function saveGrades() {
-  const s = detailStudent;
-  if (!s) return;
-  for (const lv of LEVELS) {
-    const teacherStars = detailStars[lv.id] ? detailStars[lv.id].teacher : 0;
-    if (teacherStars === 0) continue;
-    const data = await apiFetch('/api/teacher/student/' + encodeURIComponent(s.name) + '/grade', {
-      method: 'PUT',
-      body: JSON.stringify({ levelId: lv.id, teacherStars })
-    });
-    if (!data) return;
-    if (data.data && data.data.stars) {
-      detailStars[lv.id] = {
-        self: data.data.stars.self || 0,
-        peer: data.data.stars.peer || 0,
-        teacher: data.data.stars.teacher || 0
-      };
-    }
-  }
-  showToast('师评已保存', 'success');
-  renderDetail();
-  loadStudents();
-}
-
-// 教师设置/重置学生密码（留空清除）
-function resetPassword() {
-  const s = detailStudent;
-  if (!s) return;
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9990;display:flex;align-items:center;justify-content:center';
-  overlay.innerHTML = `
-    <div style="background:#181820;border:2px solid #2a2a3a;border-radius:10px;padding:24px 30px;width:400px;max-width:92vw;box-shadow:0 0 40px rgba(0,188,212,.15)">
-      <div style="font-size:18px;color:#ffb000;font-weight:bold;margin-bottom:6px">🔑 设置「${escHtml(s.name)}」的密码</div>
-      <div style="font-size:13px;color:#606070;margin-bottom:14px">当前状态：${s.hasPassword ? '已设置（🔒）' : '未设置（○）'} · 留空并保存 = 清除密码</div>
-      <input id="rpInput" type="text" placeholder="新密码（至少 4 位，留空清除）" maxlength="30" style="width:100%;padding:9px 12px;background:#000;border:1px solid #2a2a3a;color:#00e676;font-family:inherit;font-size:17px;outline:none;margin-bottom:16px">
-      <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button id="rpCancel" style="padding:8px 18px;background:none;color:#606070;border:1px solid #2a2a3a;border-radius:4px;font-size:15px;cursor:pointer;font-family:inherit">取消</button>
-        <button id="rpOk" style="padding:8px 18px;background:#ffb000;color:#000;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit">保存</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  overlay.querySelector('#rpCancel').onclick = () => overlay.remove();
-  overlay.querySelector('#rpOk').onclick = async () => {
-    const pw = overlay.querySelector('#rpInput').value.trim();
-    if (pw && pw.length < 4) { showToast('密码至少 4 位', 'error'); return; }
-    const data = await apiFetch('/api/teacher/student/' + encodeURIComponent(s.name) + '/password', {
-      method: 'PUT',
-      body: JSON.stringify({ password: pw })
-    });
-    if (!data) return;
-    overlay.remove();
-    showToast(pw ? '已设置密码' : '已清除密码', 'success');
-    loadStudents();
-  };
-  overlay.querySelector('#rpInput').focus();
-}
-
-async function resetStudent() {
-  const s = detailStudent;
-  if (!s) return;
-  if (!confirm('确认重置学生「' + s.name + '」的全部进度？此操作不可撤销。')) return;
-  const data = await apiFetch('/api/teacher/student/' + encodeURIComponent(s.name) + '/reset', { method: 'POST' });
-  if (!data) return;
-  showToast('已重置 ' + s.name, 'success');
-  closeDetail();
-  loadStudents();
-}
-
-function logout() {
-  sessionStorage.clear();
-  window.location.href = 'index.html';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const token = getToken();
-  if (!token) { window.location.href = 'index.html'; return; }
-  loadStudents();
-});
+(async function init(){
+  const token=getToken();
+  const role=sessionStorage.getItem('role');
+  if(!token || role!=='teacher'){ window.location.href='index.html'; return; }
+  await loadContent();
+  await loadStudents();
+  loadBugReports();
+})();
 </script>
 </body>
 </html>

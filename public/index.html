@@ -43,9 +43,64 @@
   .btn-link:hover { border-color: #00bcd4; color: #00bcd4; }
   .error { color: #ff5555; font-size: 19px; margin-top: 8px; min-height: 18px; }
   .sep { text-align: center; color: #2a2a3a; font-size: 19px; margin: 12px 0; }
+
+  /* ── 右上角音乐切换控制 ── */
+  #musicCtl { position: fixed; top: 12px; right: 12px; z-index: 99; font-family: 'Courier New', monospace; }
+  #musicBtn {
+    display: flex; align-items: center; gap: 6px;
+    background: #181820; border: 1px solid #2a2a3a; color: #c8c8d0;
+    padding: 6px 11px; border-radius: 6px; cursor: pointer; font-size: 16px;
+    opacity: .8; user-select: none; max-width: 56vw;
+  }
+  #musicBtn:hover { opacity: 1; border-color: #00bcd4; }
+  #musicBtn .lbl { font-size: 12px; color: #8b91a6; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #musicPop {
+    position: absolute; top: 46px; right: 0; width: 340px; max-width: 92vw;
+    background: #181820; border: 1px solid #2a2a3a; border-radius: 8px;
+    display: none; overflow: hidden; box-shadow: 0 10px 34px rgba(0,0,0,.55);
+  }
+  #musicPop.open { display: block; }
+  .mp-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 13px; border-bottom: 1px solid #2a2a3a; }
+  .mp-head .t { color: #00bcd4; font-size: 14px; font-weight: bold; }
+  .mp-head .close { cursor: pointer; color: #606070; font-size: 15px; padding: 0 4px; }
+  .mp-head .close:hover { color: #ff5555; }
+  .mp-now { padding: 8px 13px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2a2a3a; font-size: 13px; color: #ffd27d; }
+  .mp-now .cur { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mp-nav { display: flex; gap: 5px; flex-shrink: 0; }
+  .mp-nav button { background: #22222e; border: 1px solid #2a2a3a; color: #c8c8d0; cursor: pointer; border-radius: 4px; padding: 2px 8px; font-size: 13px; }
+  .mp-nav button:hover { border-color: #00bcd4; color: #00bcd4; }
+  #mpGroups { max-height: 46vh; overflow-y: auto; padding: 4px 8px 10px; }
+  .mp-grp { color: #00bcd4; font-size: 12px; margin: 10px 0 3px; font-weight: bold; }
+  .mp-song { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #c8c8d0; }
+  .mp-song:hover { background: #22222e; }
+  .mp-song.playing { background: #1e1a10; color: #ffd27d; }
+  .mp-song .e { width: 20px; text-align: center; }
+  .mp-song .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mp-song .t { font-size: 11px; color: #505060; }
+  .mp-note { padding: 8px 13px; font-size: 11px; color: #505060; text-align: center; border-top: 1px solid #2a2a3a; }
+  @media (max-width: 480px) {
+    #musicBtn .lbl { display: none; }
+    #musicPop { width: 300px; }
+  }
 </style>
 </head>
 <body>
+<div id="musicCtl">
+  <div id="musicBtn" title="切换背景音乐"><span id="musicIcon">🎵</span><span class="lbl" id="musicLbl">登录页</span></div>
+  <div id="musicPop">
+    <div class="mp-head"><span class="t">🎵 背景音乐切换</span><span class="close" id="mpClose" title="关闭">✕</span></div>
+    <div class="mp-now">
+      <span id="mpNowName" class="cur">—</span>
+      <span class="mp-nav">
+        <button id="mpPrev" title="上一首">⏮</button>
+        <button id="mpNext" title="下一首">⏭</button>
+        <button id="mpMuteBtn" title="静音">🔊</button>
+      </span>
+    </div>
+    <div id="mpGroups"></div>
+    <div class="mp-note">点击即播放（循环）· ZzFXM 纯合成 · 名曲均为公有领域民歌/古典</div>
+  </div>
+</div>
 <div class="card">
   <div class="logo">⚙</div>
   <h1>锐智工厂 · 工业互联网实训</h1>
@@ -54,9 +109,9 @@
     <label>姓名</label>
     <input id="nameInput" type="text" placeholder="输入你的姓名" maxlength="20" autofocus>
   </div>
-  <div class="field" id="studentPwField" style="display:none">
-    <label>密码 <span style="color:#3a3a48;font-size:15px">(已暂停，暂无需填写)</span></label>
-    <input id="studentPw" type="password" placeholder="选填" maxlength="30">
+  <div class="field" id="studentPwField">
+    <label>密码 <span style="color:#3a3a48;font-size:15px">(初始密码 123456)</span></label>
+    <input id="studentPw" type="password" placeholder="初始密码 123456" maxlength="30" autocomplete="current-password">
   </div>
   <div class="field" id="pwField" style="display:none">
     <label>教师密码</label>
@@ -69,10 +124,171 @@
 </div>
 
 <script>
+// ZzFXM 渲染库（登录页背景音乐，纯合成）
+zzfxV=.3; zzfxR=44100;
+zzfxG=(q=1,k=.05,c=220,e=0,t=0,u=.1,r=0,F=1,v=0,z=0,w=0,A=0,l=0,B=0,x=0,G=0,d=0,y=1,m=0,C=0)=>{let b=2*Math.PI,H=v*=500*b/zzfxR**2,I=(0<x?1:-1)*b/4,D=c*=(1+2*k*Math.random()-k)*b/zzfxR,Z=[],g=0,E=0,a=0,n=1,J=0,K=0,f=0,p,h;e=99+zzfxR*e;m*=zzfxR;t*=zzfxR;u*=zzfxR;d*=zzfxR;z*=500*b/zzfxR**3;x*=b/zzfxR;w*=b/zzfxR;A*=zzfxR;l=zzfxR*l|0;for(h=e+m+t+u+d|0;a<h;Z[a++]=f)++K%(100*G|0)||(f=r?1<r?2<r?3<r?Math.sin((g%b)**3):Math.max(Math.min(Math.tan(g),1),-1):1-(2*g/b%2+2)%2:1-4*Math.abs(Math.round(g/b)-g/b):Math.sin(g),f=(l?1-C+C*Math.sin(2*Math.PI*a/l):1)*(0<f?1:-1)*Math.abs(f)**F*q*zzfxV*(a<e?a/e:a<e+m?1-(a-e)/m*(1-y):a<e+m+t?y:a<h-d?(h-a-d)/u*y:0),f=d?f/2+(d>a?0:(a<h-d?1:(h-a)/d)*Z[a-d|0]/2):f),p=(c+=v+=z)*Math.sin(E*x-I),g+=p-p*B*(1-1E9*(Math.sin(a)+1)%2),E+=p-p*B*(1-1E9*(Math.sin(a)**2+1)%2),n&&++n>A&&(c+=w,D+=w,n=0),!l||++J%l||(c=D,v=H,n=n||1);return Z}
+zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q=0,s=1,v={},w=zzfxR/e*60>>2;for(;s;k++)R=[s=a=d=m=0],t.map((e,d)=>{for(x=f[e][k]||[0,0,0],s|=!!f[e][k],G=m+(f[e][0].length-2-!a)*w,p=d==t.length-1,o=2,r=m;o<x.length+p;a=++o){for(g=x[o],u=o==x.length+p-1&&p||c!=(x[0]||0)|g|0,z=0;z<w&&a;z++>w-99&&u?i+=(i<1)/99:0)h=(1-i)*R[M++]/2||0,b[r]=(b[r]||0)-h*q+h,j[r]=(j[r++]||0)+h*q+h;g&&(i=g%1,q=x[1]||0,(g|=0)&&(R=v[[c=x[M=0]||0,g]]=v[[c,g]]||(l=[...n[c]],l[2]*=2**((g-12)/12),g>0?zzfxG(...l):[])))}m=G});return[b,j]}
+</script>
+<script src="/data/music.js"></script>
+<script>
+// ===== 背景音乐播放器 + 右上角切换控制 =====
+const AUD_GROUPS = [
+  { t:'登录页', items:[ ['login','🏠','登录页','柔和邀请'] ] },
+  { t:'工厂背景 · 每幕一首', items:[
+    ['control_room','🖥️','L1 中控室','C大调明亮'],
+    ['console','⌨️','L2 操作台','A小调稳健'],
+    ['workshop','⚙️','L3 车间','D小调机械'],
+    ['edge_cabinet','📦','L4 边缘柜','E小调脉冲'],
+    ['cloud_platform','☁️','L5 云平台','G大调空灵'],
+    ['big_screen','📺','L6 监控大屏','C小调数据'],
+    ['data_pipe','🛤️','L7 数据管道','A小调流动'],
+    ['ai_lab','🤖','L8 AI实验室','D小调神秘'],
+  ]},
+  { t:'小游戏', items:[
+    ['match','🧠','L1 翻牌','125'],
+    ['memory_L3','🃏','L3 车间翻牌','116'],
+    ['match_L3','🔗','L3 连线','120'],
+    ['quick_L2','⚡','L2 快打','172'],
+    ['quick_L3','⚡','L3 快打','168'],
+    ['quick_L4','⚡','L4 快打','176'],
+    ['quick_L5','⚡','L5 快打','168'],
+    ['storm','🌪️','L4 风暴','140'],
+    ['alarm','🚨','L4 警报','158'],
+    ['boss','🏆','大师战','146'],
+  ]},
+  { t:'民歌·名曲复刻(完整)', items:[
+    ['mlh_full_sq','🪷','茉莉花·方波','完整'],
+    ['mlh_full_tri','🪷','茉莉花·三角','完整'],
+    ['mlh_full_saw','🪷','茉莉花·锯齿','完整'],
+    ['ode_full_sq','🎶','欢乐颂·方波','完整'],
+    ['ode_full_tri','🎶','欢乐颂·三角','完整'],
+    ['ode_full_saw','🎶','欢乐颂·锯齿','完整'],
+    ['twinkle_full_sq','✨','小星星·方波','完整'],
+    ['twinkle_full_tri','✨','小星星·三角','完整'],
+    ['twinkle_full_saw','✨','小星星·锯齿','完整'],
+    ['turk_full_sq','🕌','土耳其·方波','完整'],
+    ['turk_full_tri','🕌','土耳其·三角','完整'],
+    ['turk_full_saw','🕌','土耳其·锯齿','完整'],
+    ['elise_full_sq','🎼','爱丽丝·方波','完整'],
+    ['elise_full_tri','🎼','爱丽丝·三角','完整'],
+    ['elise_full_saw','🎼','爱丽丝·锯齿','完整'],
+  ]},
+  { t:'名曲复刻（公有领域）', items:[
+    ['tetris','🧱','俄罗斯方块·渐进版','144'],
+    ['tetris_arp','🎹','俄罗斯方块·琶音','二声部'],
+    ['tetris_echo','🔊','俄罗斯方块·回声','二声部'],
+    ['tetris_sus','🎻','俄罗斯方块·长音','二声部'],
+    ['tetris_ost','🥁','俄罗斯方块·固定音型','二声部'],
+  ]},
+];
+
+window.IndexPlayer = (function(){
+  const TRACK_KEY='bgm_track', MUTE_KEY='bgm_muted';
+  let ctx=null, src=null, gain=null, cur=null;
+  let muted=false;
+  let flat=[];   // [{key,name,emoji}]
+  try{ muted = localStorage.getItem(MUTE_KEY)==='1'; }catch(e){}
+
+  function audio(){
+    if(!ctx){ ctx=new(window.AudioContext||window.webkitAudioContext)(); }
+    if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} }
+    return ctx;
+  }
+  function play(key, persist){
+    if(!window.MUSIC_SONGS || !window.MUSIC_SONGS[key]) return;
+    const c=audio(); stop(false);
+    try{
+      const song=window.MUSIC_SONGS[key];
+      const data=zzfxM.apply(null,song);
+      const buf=c.createBuffer(data.length,data[0].length,zzfxR);
+      for(let i=0;i<data.length;i++) buf.getChannelData(i).set(data[i]);
+      if(!gain){ gain=c.createGain(); gain.gain.value=0.7; gain.connect(c.destination); }
+      const s=c.createBufferSource(); s.buffer=buf; s.loop=true; s.connect(gain); s.start();
+      src=s; cur=key;
+      if(persist){ try{ localStorage.setItem(TRACK_KEY, key); }catch(e){} }
+      updateUI();
+    }catch(e){}
+  }
+  function stop(resetUI){ if(src){ try{src.stop();}catch(e){} src=null; } cur=null; if(resetUI!==false) updateUI(); }
+  function playing(k){ return cur===k && !!src; }
+  function findIdx(k){ for(let i=0;i<flat.length;i++) if(flat[i].key===k) return i; return -1; }
+  function prev(){ if(!flat.length) return; const i=Math.max(0,findIdx(cur)); play(flat[(i-1+flat.length)%flat.length].key, true); }
+  function next(){ if(!flat.length) return; const i=Math.max(0,findIdx(cur)); play(flat[(i+1)%flat.length].key, true); }
+  function toggleMute(){
+    muted=!muted;
+    try{ localStorage.setItem(MUTE_KEY, muted?'1':'0'); }catch(e){}
+    if(muted){ stop(false); updateUI(); }
+    else{ const saved=localStorage.getItem(TRACK_KEY)||'login'; play(saved, false); }
+  }
+  function getName(k){ const f=flat.find(x=>x.key===k); return f?f.name:k; }
+  function markPlaying(){
+    document.querySelectorAll('.mp-song.playing').forEach(x=>x.classList.remove('playing'));
+    if(cur){ const el=document.getElementById('aud-'+cur); if(el) el.classList.add('playing'); }
+  }
+  function updateUI(){
+    const icon=document.getElementById('musicIcon');
+    const lbl=document.getElementById('musicLbl');
+    const now=document.getElementById('mpNowName');
+    const mb=document.getElementById('mpMuteBtn');
+    if(icon) icon.textContent = muted ? '🔕' : '🎵';
+    if(lbl) lbl.textContent = cur ? getName(cur) : (muted ? '已静音' : '登录页');
+    if(now) now.textContent = (muted ? '🔕 已静音 · ' : '🎵 ') + (cur ? getName(cur) : '未播放');
+    if(mb) mb.textContent = muted ? '🔇' : '🔊';
+    markPlaying();
+  }
+  function togglePop(){
+    const pop=document.getElementById('musicPop');
+    const open=pop.classList.toggle('open');
+    if(open) markPlaying();
+    return open;
+  }
+  function closePop(){ document.getElementById('musicPop').classList.remove('open'); }
+  function setList(groups){ flat=[]; groups.forEach(g=>g.items.forEach(it=>flat.push({key:it[0],name:it[2],emoji:it[1]}))); }
+  function onFirst(){
+    audio();
+    if(!muted && !src){ const saved=localStorage.getItem(TRACK_KEY)||'login'; play(saved, false); }
+    document.removeEventListener('pointerdown', onFirst);
+    document.removeEventListener('keydown', onFirst);
+  }
+  document.addEventListener('pointerdown', onFirst);
+  document.addEventListener('keydown', onFirst);
+  document.addEventListener('pointerdown', function(ev){
+    const ctl=document.getElementById('musicCtl');
+    if(ctl && !ctl.contains(ev.target)) closePop();
+  });
+  return { play, stop, playing, prev, next, toggleMute, isMuted:()=>muted, current:()=>cur,
+           getName, markPlaying, updateUI, togglePop, closePop, setList };
+})();
+
+(function(){
+  IndexPlayer.setList(AUD_GROUPS);
+  const box=document.getElementById('mpGroups');
+  AUD_GROUPS.forEach(g=>{
+    const h=document.createElement('div'); h.className='mp-grp'; h.textContent=g.t; box.appendChild(h);
+    g.items.forEach(([key,e,n,t])=>{
+      const r=document.createElement('div'); r.className='mp-song'; r.id='aud-'+key;
+      r.innerHTML='<span class="e">'+e+'</span><span class="n">'+n+'</span><span class="t">'+t+'</span>';
+      r.onclick=()=>{
+        const P=window.IndexPlayer;
+        if(P.playing(key)){ P.stop(); P.updateUI(); }
+        else P.play(key, true);
+      };
+      box.appendChild(r);
+    });
+  });
+  document.getElementById('musicBtn').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.togglePop(); });
+  document.getElementById('mpClose').addEventListener('click', function(){ IndexPlayer.closePop(); });
+  document.getElementById('mpPrev').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.prev(); });
+  document.getElementById('mpNext').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.next(); });
+  document.getElementById('mpMuteBtn').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.toggleMute(); });
+  IndexPlayer.updateUI();
+})();
+</script>
+<script>
 const API = window.location.origin;
 
 // 学生登录密码开关（临时暂停，先测翻牌）
-const PASSWORD_ENABLED = false;
+const PASSWORD_ENABLED = true;
 
 function $(id) { return document.getElementById(id); }
 
@@ -140,6 +356,7 @@ function setLoading(v) {
 }
 
 $('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') loginStudent(); });
+$('studentPw').addEventListener('keydown', e => { if (e.key === 'Enter') loginStudent(); });
 $('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') loginTeacher(); });
 
 const savedName = sessionStorage.getItem('name');

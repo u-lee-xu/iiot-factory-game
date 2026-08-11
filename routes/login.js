@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../db');
 
 // 学生登录密码开关（临时暂停：false 时不校验学生密码，方便先测翻牌）
-const PASSWORD_ENABLED = false;
+const PASSWORD_ENABLED = true;
 
 router.post('/login', (req, res) => {
   const { name, password } = req.body || {};
@@ -27,10 +27,15 @@ router.post('/login', (req, res) => {
     return res.status(404).json({ ok: false, error: '该姓名不存在，请联系老师添加' });
   }
 
-  if (PASSWORD_ENABLED && student.password && password !== student.password) {
-    return res.status(401).json({ ok: false, error: '密码错误' });
+  if (PASSWORD_ENABLED) {
+    const expected = db.isDefaultPassword(student.password) ? db.DEFAULT_PASSWORD : student.password;
+    if (password !== expected) {
+      const msg = db.isDefaultPassword(student.password) ? '密码错误，初始密码为 123456' : '密码错误';
+      return res.status(401).json({ ok: false, error: msg });
+    }
   }
 
+  db.incrementLoginCount(trimmed);
   const token = db.createSession('student', trimmed);
   res.json({
     ok: true, role: 'student', token,

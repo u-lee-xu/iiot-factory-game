@@ -5,6 +5,9 @@ const path = require('path');
 const db = require('../db');
 const { requireAuth } = require('../auth');
 
+// 不参与排行榜的账号（如教师演示号）
+const EXCLUDED_FROM_LEADERBOARD = ['张三'];
+
 const CONTENT_PATH = path.join(__dirname, '..', 'data', 'game-content.json');
 let cached = null;
 let mtime = 0;
@@ -52,7 +55,9 @@ router.get('/leaderboard', requireAuth, (req, res) => {
     return total > 0 && done >= total;
   }
 
-  const rows = db.listStudents().map(s => {
+  const rows = db.listStudents()
+    .filter(s => EXCLUDED_FROM_LEADERBOARD.indexOf(s.name) < 0)
+    .map(s => {
     const check = JSON.parse(s.check_data || '{}');
     let xp = 0, done = 0, total = 0;
     const levelDone = {};
@@ -92,10 +97,11 @@ router.get('/leaderboard', requireAuth, (req, res) => {
 
   rows.sort((a, b) => (b.xp - a.xp) || (a.name < b.name ? -1 : 1));
   const myRank = rows.findIndex(r => r.name === req.session.name) + 1;
+  const excludedSelf = EXCLUDED_FROM_LEADERBOARD.indexOf(req.session.name) >= 0;
   const classCompletion = rows.length
     ? Math.round(rows.reduce((s, r) => s + r.completion, 0) / rows.length) : 0;
 
-  res.json({ ok: true, data: { rows, pioneers, myRank, classCompletion } });
+  res.json({ ok: true, data: { rows, pioneers, myRank: excludedSelf ? 0 : myRank, classCompletion } });
 });
 
 module.exports = { router, getContent };
