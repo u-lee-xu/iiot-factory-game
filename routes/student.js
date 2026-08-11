@@ -106,8 +106,41 @@ router.put('/me', requireAuth, (req, res) => {
     return res.status(404).json({ ok: false, error: '账号不存在' });
   }
 
-  const currentCheck = check || JSON.parse(student.check_data);
-  const currentStars = stars || JSON.parse(student.stars_data);
+  const contentRes = getContent();
+  const validTasks = new Set();
+  const validLevels = new Set();
+  if (contentRes.ok && contentRes.data) {
+    contentRes.data.levels.forEach(lv => {
+      validLevels.add(String(lv.id));
+      (lv.tasks || []).forEach(t => validTasks.add(String(t.id)));
+    });
+  }
+  // 校验 check：只保留合法任务 id；空对象不允许覆盖已有进度（防误清空/防刷假 id）
+  let currentCheck = JSON.parse(student.check_data);
+  if (check && typeof check === 'object' && !Array.isArray(check)) {
+    const filtered = {};
+    Object.keys(check).forEach(k => {
+      if (validTasks.has(String(k))) {
+        const v = check[k];
+        filtered[k] = (v && v.half) ? { half: true } : true;
+      }
+    });
+    if (Object.keys(filtered).length > 0 || Object.keys(currentCheck).length === 0) {
+      currentCheck = filtered;
+    }
+  }
+  // 校验 stars：只保留合法关卡，结构 {self,peer,teacher}
+  let currentStars = JSON.parse(student.stars_data);
+  if (stars && typeof stars === 'object' && !Array.isArray(stars)) {
+    const f2 = {};
+    Object.keys(stars).forEach(k => {
+      if (validLevels.has(String(k))) {
+        const s2 = stars[k] || {};
+        f2[k] = { self: Math.max(0, Number(s2.self) || 0), peer: Math.max(0, Number(s2.peer) || 0), teacher: Math.max(0, Number(s2.teacher) || 0) };
+      }
+    });
+    currentStars = f2;
+  }
   const oldCheck = JSON.parse(student.check_data);
 
   db.updateStudentData(req.session.name, currentCheck, currentStars);
@@ -116,7 +149,6 @@ router.put('/me', requireAuth, (req, res) => {
   if (achievements) patch.achievements = achievements;
 
   // 检测新完成关卡，记录首次完成时间（用于先锋判定）
-  const contentRes = getContent();
   if (contentRes.ok && contentRes.data && contentRes.data.levels) {
     const finishTimes = JSON.parse(student.level_finish_times || '{}');
     let changed = false;
@@ -165,7 +197,7 @@ router.put('/password', requireAuth, (req, res) => {
     return res.status(400).json({ ok: false, error: '新密码不能为初始密码 123456' });
   }
   if (student.password && !db.isDefaultPassword(student.password)) {
-    if (!oldPassword || oldPassword !== student.password) {
+    if (!oldPassword || !db.verifyPassword(student.password, oldPassword)) {
       return res.status(400).json({ ok: false, error: '原密码错误' });
     }
   }

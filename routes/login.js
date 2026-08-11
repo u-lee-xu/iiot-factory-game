@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// 学生登录密码开关（临时暂停：false 时不校验学生密码，方便先测翻牌）
-const PASSWORD_ENABLED = true;
+// 学生登录密码开关（可通过环境变量 PASSWORD_ENABLED=false 关闭，默认开启）
+const PASSWORD_ENABLED = process.env.PASSWORD_ENABLED !== 'false';
 
 router.post('/login', (req, res) => {
   const { name, password } = req.body || {};
@@ -28,8 +28,7 @@ router.post('/login', (req, res) => {
   }
 
   if (PASSWORD_ENABLED) {
-    const expected = db.isDefaultPassword(student.password) ? db.DEFAULT_PASSWORD : student.password;
-    if (password !== expected) {
+    if (!db.verifyPassword(student.password, password)) {
       const msg = db.isDefaultPassword(student.password) ? '密码错误，初始密码为 123456' : '密码错误';
       return res.status(401).json({ ok: false, error: msg });
     }

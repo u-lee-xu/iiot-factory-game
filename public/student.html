@@ -2047,6 +2047,9 @@ function openTaskModal(lvId, taskId) {
       }
       handler.render(body, task);
     }
+    // 任务道具（商城买的：提示卡 / 免错金牌）
+    window.__passActive = false;
+    addTaskItemBar(task);
   });
 }
 
@@ -2058,11 +2061,89 @@ function closeModal() {
   playAreaMusic();
 }
 
+window.__closeOverlay = function(el){ var o = el.closest('.mm-overlay'); if (o) o.remove(); };
+function findTaskAnswer(task) {
+  var cfg = task.config || {}, parts = [];
+  if (cfg.command) parts.push('命令：' + (Array.isArray(cfg.command) ? cfg.command.join(' 或 ') : cfg.command));
+  function pick(opts, ans){
+    var idxs = (ans === undefined) ? [] : (Array.isArray(ans) ? ans : [ans]);
+    idxs.forEach(function(i){ var o = opts[Number(i)]; if (o === undefined) return; parts.push(typeof o === 'string' ? o : (o.text || o.label || '')); });
+  }
+  function pickCorrect(opts){ opts.forEach(function(o){ if (o && typeof o === 'object' && o.correct) parts.push((o.label ? o.label + '：' : '') + (o.text || '')); }); }
+  if (Array.isArray(cfg.options)) {
+    if (cfg.answer !== undefined) pick(cfg.options, cfg.answer);
+    else pickCorrect(cfg.options);
+  }
+  if (Array.isArray(cfg.questions)) cfg.questions.forEach(function(q){
+    var opts = q.options || [];
+    if (q.answer !== undefined || q.answers !== undefined) pick(opts, q.answer !== undefined ? q.answer : q.answers);
+    else pickCorrect(opts);
+  });
+  if (cfg.answer !== undefined && !Array.isArray(cfg.options)) parts.push('答案：' + (Array.isArray(cfg.answer) ? cfg.answer.join(' / ') : cfg.answer));
+  if (cfg.answers !== undefined) parts.push('答案：' + (Array.isArray(cfg.answers) ? cfg.answers.join(' / ') : cfg.answers));
+  if (Array.isArray(cfg.steps)) cfg.steps.forEach(function(st){
+    var opts = st.options || [];
+    if (st.answer !== undefined || st.correctNumber) pick(opts, st.answer !== undefined ? st.answer : st.correctNumber);
+    else pickCorrect(opts);
+    if (st.correctNumber && !Array.isArray(opts)) parts.push(st.title + '：' + st.correctNumber.join(' / '));
+  });
+  return parts.filter(Boolean).join('\n');
+}
+function showTaskHintPopup(msg) {
+  var ov = document.createElement('div');
+  ov.className = 'mm-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9600;display:flex;align-items:center;justify-content:center';
+  ov.innerHTML = '<div class="mm-box" style="width:min(480px,92vw);max-height:80vh"><div class="mm-head"><div><div class="mm-title">📝 提示卡</div><div class="mm-sub">厂长再讲一遍，别急</div></div><div class="mm-close" onclick="__closeOverlay(this)">✕</div></div><div class="pd-body" style="white-space:pre-wrap;font-size:14px;line-height:1.7;color:var(--text)">' + escHtml(msg) + '</div><div style="text-align:center;padding:14px"><button class="mm-btn primary" onclick="__closeOverlay(this)">知道了</button></div></div>';
+  document.body.appendChild(ov);
+}
+function useTaskHint(task) {
+  var inv = gameState.inventory || {};
+  if (!(inv['hint_card'] > 0)) return;
+  api('/api/student/consume-item', { method:'POST', body:JSON.stringify({itemId:'hint_card'}) }).then(function(r){
+    if (r && r.ok) {
+      gameState.inventory['hint_card']--; if (gameState.inventory['hint_card'] <= 0) delete gameState.inventory['hint_card'];
+      renderHeader();
+      var ans = findTaskAnswer(task);
+      var teach = generateTeach(task) || '厂长：再想想，答案在任务标题和提示里。';
+      showTaskHintPopup(teach + (ans ? '\n\n✅ 答案参考：\n' + ans : ''));
+      var btn = document.getElementById('taskHintBtn'); if (btn) { btn.style.opacity = '.4'; btn.disabled = true; }
+    } else showToast((r && r.error) || '使用失败', 'error');
+  });
+}
+function useTaskPass() {
+  var inv = gameState.inventory || {};
+  if (!(inv['pass_card'] > 0)) return;
+  api('/api/student/consume-item', { method:'POST', body:JSON.stringify({itemId:'pass_card'}) }).then(function(r){
+    if (r && r.ok) {
+      gameState.inventory['pass_card']--; if (gameState.inventory['pass_card'] <= 0) delete gameState.inventory['pass_card'];
+      renderHeader();
+      window.__passActive = true;
+      var btn = document.getElementById('taskPassBtn'); if (btn) { btn.style.opacity = '.4'; btn.disabled = true; }
+      showToast('🛡 免错金牌已启用：本关答错也拿满经验', 'success');
+    } else showToast((r && r.error) || '使用失败', 'error');
+  });
+}
+function addTaskItemBar(task) {
+  var inv = gameState.inventory || {};
+  var hasHint = (inv['hint_card'] || 0) > 0;
+  var hasPass = (inv['pass_card'] || 0) > 0;
+  if (!hasHint && !hasPass) return;
+  var foot = document.getElementById('modalFoot');
+  if (!foot) return;
+  var bar = document.createElement('div');
+  bar.style.cssText = 'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap';
+  if (hasHint) bar.innerHTML += '<button class="btn" id="taskHintBtn" title="消耗1张：显示答案参考">📝 提示卡×' + inv['hint_card'] + '</button>';
+  if (hasPass) bar.innerHTML += '<button class="btn" id="taskPassBtn" title="本关答错也按满经验结算">🛡 免错金牌×' + inv['pass_card'] + '</button>';
+  foot.appendChild(bar);
+  if (hasHint) document.getElementById('taskHintBtn').onclick = function(){ useTaskHint(task); };
+  if (hasPass) document.getElementById('taskPassBtn').onclick = function(){ useTaskPass(); };
+}
 function completeTask(taskId, xp) {
   try {
     // 经验减半：命令猜错多次时 xp 低于满值，存 half 标记（影响实际总分，可重刷拿满分）
     const tFull = (content.levels.find(l => l.tasks.some(t => t.id === taskId)) || {}).tasks;
     const tFullXp = tFull ? taskXP(tFull.find(t => t.id === taskId)) : xp;
+    if (window.__passActive && xp < tFullXp) { window.__passActive = false; xp = tFullXp; }   // 免错金牌：答错也拿满经验
     if (xp < tFullXp) gameState.check[taskId] = { half: true };
     else gameState.check[taskId] = true;
     closeModal();
@@ -2646,7 +2727,9 @@ registerInteraction('install_wizard', {
 
     function renderStep() {
       if (current >= steps.length) {
-        var finalXP = cmdErrorCount > 0 ? Math.floor(taskXP(task) / 2) : taskXP(task);
+        var passSaved = (cmdErrorCount > 0 && window.__passActive);
+        if (passSaved) window.__passActive = false;   // 用了免错金牌
+        var finalXP = (cmdErrorCount > 0 && !passSaved) ? Math.floor(taskXP(task) / 2) : taskXP(task);
         var halfNote = cmdErrorCount > 0
           ? '<div style="font-size: 13px;color:var(--amber);margin-top:6px">经验减半 · 实得 +'+ finalXP +' XP</div>'
           : '<div style="font-size: 13px;color:var(--dim);margin-top:6px">全对完成 · 经验满额</div>';
@@ -4262,7 +4345,7 @@ function openTypingDefense(cfg, onComplete) {
         // 清屏 → 下一波 / 通关
         clearScreen();
         if (wave >= WAVES && !cfg._endless) { endGame(true); return; }   // 无限战：不结算继续
-        wave++; bossActive = false; waveLeft = waveNeed(wave); waveTimeLeft = WAVE_TIME;
+        wave++; bossActive = false; waveLeft = waveNeed(wave); waveTimeLeft = cfg._endless ? Math.max(8, WAVE_TIME - (wave - 1)) : WAVE_TIME;
         waveEl.textContent = wave; leftEl.textContent = waveLeft; timeEl.textContent = waveTimeLeft;
         showToast('🌊 第 '+wave+' 波！清屏加速', 'success');
         spawnTimer = setTimeout(spawnWord, 800);
@@ -4366,7 +4449,7 @@ function openTypingDefense(cfg, onComplete) {
       if (lives <= 0) { endGame(false); return; }
       wave++; bossActive = false;
       if (wave > WAVES) { endGame(true); return; }
-      waveLeft = waveNeed(wave); waveTimeLeft = WAVE_TIME;
+      waveLeft = waveNeed(wave); waveTimeLeft = cfg._endless ? Math.max(8, WAVE_TIME - (wave - 1)) : WAVE_TIME;
       waveEl.textContent = wave; leftEl.textContent = waveLeft; timeEl.textContent = waveTimeLeft;
       showToast('⏱ 超时扣一命 · 进入第 '+wave+' 波', 'error');
       spawnTimer = setTimeout(spawnWord, 900);
@@ -5013,12 +5096,15 @@ function showShooterLoadout(cfg, onComplete) {
     opts.forEach(function(o,i){ const cb=document.getElementById('lod_'+i); if(cb && cb.checked) use.push(o); });
     const buff={lives:0,pLevel:0,slow:0};
     use.forEach(function(o){
-      api('/api/student/consume-item',{method:'POST',body:JSON.stringify({itemId:o.id})});
+      api('/api/student/consume-item',{method:'POST',body:JSON.stringify({itemId:o.id})}).then(function(r){
+        if (r && r.ok && gameState.inventory[o.id]) {
+          gameState.inventory[o.id]--;
+          if (gameState.inventory[o.id]<=0) delete gameState.inventory[o.id];
+        }
+      });
       if (o.key==='lives') buff.lives=1;
       else if (o.key==='pLevel') buff.pLevel=1;
       else if (o.key==='slow') buff.slow=1;
-      gameState.inventory[o.id]=(gameState.inventory[o.id]||1)-1;
-      if (gameState.inventory[o.id]<=0) delete gameState.inventory[o.id];
     });
     shooterBuff=buff;
     _shooterSkipLoadout=true;
@@ -5614,15 +5700,6 @@ function openShooter(cfg, onComplete) {
   shooterBuff = null;   // 已应用，清掉本次加成
   makeWave();
   raf = requestAnimationFrame(loop);
-  // 调试钩子：供自动化测试读取内部状态（无副作用）
-  window.__shooterDbg = () => ({
-    setPower: (l) => { pLevel = Math.max(0, Math.min(MAX_LVL, l)); powerEl.textContent = 'x' + (pLevel+1); },
-    playerX: player.x, wave, lives, score, combo, pLevel, picked, formX, formY,
-    targetTerm, active: enemies.filter(e=>e.active).length,
-    enemies: enemies.map((e,i)=>e.active?{id:i,term:e.term,x:Math.round(e.x),y:Math.round(e.y),hp:e.hp}:null).filter(Boolean),
-    drops: drops.length, bullets: bullets.length,
-    minY: enemies.filter(e=>e.active).length ? Math.min.apply(null, enemies.filter(e=>e.active).map(e=>e.y)) : 9999
-  });
 }
 
 function openMemoryMatch(cfg, onComplete) {
@@ -5659,6 +5736,7 @@ function openMemoryMatch(cfg, onComplete) {
         _autoNext: ri < sizes.length - 1,
         _doneText: ri < sizes.length - 1 ? '下一关…' : undefined
       });
+      if (cfg._endless) { sub.timed = true; sub.timeLimit = Math.max(18, 55 - ri * 3); }   // 无限战：逐关缩时
       openMemoryMatch(sub, function(win){ if (win) { ri++; go(); } else if (onComplete) onComplete(false); });
     })();
     return;
@@ -5867,8 +5945,6 @@ function openMemoryMatch(cfg, onComplete) {
     card.addEventListener('click', () => flipCard(card));
     grid.appendChild(card);
   });
-  window.__mmDbg = () => ({ size: cfg.size, totalPairs: totalPairs, cards: cards.length, events: deckEvents.length });
-
   overlay.querySelector('.mm-close').onclick = () => {
     if (finished) return;
     clearInterval(timer);
@@ -6116,7 +6192,7 @@ function openStackedMatch(cfg, onComplete) {
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
       overlay.appendChild(res);
-      overlay.querySelector('[data-act="done"]').onclick = () => { playAreaMusic(); overlay.remove(); recordGameWin('mm'); if (onComplete) onComplete(true); };
+      overlay.querySelector('[data-act="done"]').onclick = () => { playAreaMusic(); overlay.remove(); recordGameWin('mm'); miniMarkClear(cfg.id); if (onComplete) onComplete(true); };
     } else {
       playSound('fail');
       const res = document.createElement('div');
@@ -6261,7 +6337,8 @@ function openQuickMatch(cfg, onComplete) {
   }
   const distractors = (cfg.distractors || []).filter(d => !questions.some(q => q.term === d));
   let cur = 0, score = 0, combo = 0, bestCombo = 0;
-  let timeLeft = cfg._endless ? 999999 : Math.round((cfg.timeLimit || 45) * (cfg._hard ? 0.7 : 1));
+  let qkBaseTime = Math.round((cfg.timeLimit || 45) * (cfg._hard ? 0.7 : 1));   // 二周目初始时间打 7 折
+  let timeLeft = qkBaseTime;
   let timer = null, finished = false;
 
   const overlay = document.createElement('div');
@@ -6324,7 +6401,7 @@ function openQuickMatch(cfg, onComplete) {
           if (q.id) unlockPedia(currentLevelId, [q.id]);
           cur++;
           if (cur >= cfg.size) {
-            if (cfg._endless) { cur = 0; renderQ(); }   // 无限战：不结算，循环刷题
+            if (cfg._endless) { cur = 0; qkBaseTime = Math.max(6, qkBaseTime - 3); timeLeft = qkBaseTime; qkTimeTotal = qkBaseTime; renderQ(); showToast('⏱ 下一轮时间缩短到 ' + qkBaseTime + ' 秒！', 'info'); }   // 无限战：每轮缩 3 秒，直到来不及
             else { clearInterval(timer); setTimeout(() => finish(true), 700); }
           }
           else setTimeout(renderQ, 550);
@@ -6341,7 +6418,7 @@ function openQuickMatch(cfg, onComplete) {
     });
   }
 
-  const qkTimeTotal = Math.max(timeLeft, 1);
+  let qkTimeTotal = Math.max(timeLeft, 1);
   let qkLastTick = 99;
   timer = setInterval(() => {
     timeLeft -= 0.1;

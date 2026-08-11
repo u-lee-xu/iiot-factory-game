@@ -5,14 +5,27 @@ const crypto = require('crypto');
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'game.db');
 const DEFAULT_PASSWORD = '123456';
-function isDefaultPassword(pw) { return !pw || pw === DEFAULT_PASSWORD; }
+function hashPassword(pw) { return crypto.createHash('sha256').update(String(pw)).digest('hex'); }
+function isHashed(pw) { return typeof pw === 'string' && pw.length === 64 && /^[0-9a-f]{64}$/.test(pw); }
+function verifyPassword(stored, input) {
+  if (!stored) return input === DEFAULT_PASSWORD;
+  if (isHashed(stored)) return hashPassword(input) === stored;
+  return stored === input;   // 旧明文兼容
+}
+function isDefaultPassword(pw) {
+  if (!pw) return true;
+  if (isHashed(pw)) return hashPassword(DEFAULT_PASSWORD) === pw;
+  return pw === DEFAULT_PASSWORD;
+}
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
 let db;
 
 function save() {
   if (!db) return;
-  fs.writeFileSync(DB_PATH, Buffer.from(db.export()));
+  const tmp = DB_PATH + '.tmp';
+  fs.writeFileSync(tmp, Buffer.from(db.export()));
+  fs.renameSync(tmp, DB_PATH);   // 原子替换，避免中途被杀损坏库
 }
 
 function exec(sql, params) {
@@ -100,7 +113,7 @@ function findStudent(name) {
 
 function createStudent(name) {
   try {
-    exec('INSERT INTO students (name, password) VALUES (?, ?)', [name, DEFAULT_PASSWORD]);
+    exec('INSERT INTO students (name, password) VALUES (?, ?)', [name, hashPassword(DEFAULT_PASSWORD)]);
     save();
     return findStudent(name);
   } catch (e) {
@@ -311,7 +324,7 @@ function awardTeacherAchievements(name, ids) {
 
 function updateStudentPassword(name, password) {
   if (!findStudent(name)) return false;
-  exec('UPDATE students SET password = ? WHERE name = ?', [password, name]);
+  exec('UPDATE students SET password = ? WHERE name = ?', [hashPassword(password), name]);
   save();
   return true;
 }
@@ -340,9 +353,13 @@ function validateSession(token) {
   return queryOne("SELECT role, name FROM sessions WHERE token = ? AND expires_at > datetime('now')", [token]);
 }
 
+let _lastCleanup = 0;
 function cleanupExpiredSessions() {
+  const now = Date.now();
+  if (now - _lastCleanup < 60000) return;   // 最多每分钟清一次，避免每次请求全量写盘
+  _lastCleanup = now;
   exec("DELETE FROM sessions WHERE expires_at < datetime('now')");
-  save();
+  if (db.getRowsModified && db.getRowsModified() > 0) save();
 }
 
 module.exports = {
@@ -350,7 +367,7 @@ module.exports = {
   findStudent, createStudent, deleteStudent, listStudents,
   updateStudentData, updateStudentStars, updateStudentMeta, updateStudentPassword, resetStudent,
   getTeacherPassword, createSession, validateSession, cleanupExpiredSessions,
-  DEFAULT_PASSWORD, isDefaultPassword,
+  DEFAULT_PASSWORD, isDefaultPassword, hashPassword, verifyPassword, isHashed,
   recordLogin, incrementLoginCount, awardAchievements, awardTeacherAchievements,
   addBugReport, listBugReports, deleteBugReport,
   // 工资 & 商城
