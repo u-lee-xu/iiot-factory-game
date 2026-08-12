@@ -1404,6 +1404,10 @@ function playAreaMusic() { playMusic(currentAreaKey || 'hub'); }
 function gameSong(type) {
   const k = type + '_L' + currentLevelId;
   if (window.MUSIC_SONGS && window.MUSIC_SONGS[k]) return k;
+  // 新玩法默认配曲（可覆盖）
+  const MAP = { sorter:'alarm', forge:'boss', ll:'match', pipe:'console', m3:'quick', td:'alarm', t48:'quick', maze:'workshop', hack:'console', tyc:'workshop', lzr:'match', boss:'boss' };
+  const mapped = MAP[type];
+  if (mapped && window.MUSIC_SONGS && window.MUSIC_SONGS[mapped]) return mapped;
   const fb = type === 'memory' ? 'match' : type;
   if (window.MUSIC_SONGS && window.MUSIC_SONGS[fb]) return fb;
   return 'match';
