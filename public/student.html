@@ -4190,12 +4190,14 @@ function applyMiniTier(cfg) {
 // 9f. TYPING DEFENSE — 术语防御战（打字炮台）
 // 关键词从上往下掉，底部炮台。输入完整命令→炮台发射打爆关键词；输错重新开始。
 // =========================================================================
+function focusResultPrimary(overlay){ setTimeout(function(){ var b=overlay&&overlay.querySelector('.mm-btn.primary'); if(b) b.focus(); }, 50); }
 // 命令 → 作用/解释（打爆关键词时在爆炸中心展示）
 const TY_HINTS = {
   'ping':'测网络通不通','ip':'查看 IP/网卡','ls':'列出目录文件','cat':'查看文件内容','cd':'切换目录',
   'sudo':'管理员权限执行','uname':'查看系统信息','hostname':'查看主机名','apt':'安装/管理软件包',
   'curl':'命令行访问网站','nslookup':'查域名对应 IP','traceroute':'追踪路由路径','iptables':'配置防火墙规则',
-  'ss':'查看端口监听','grep':'搜索/过滤文本','nc':'测试端口连接','route':'查看路由表','ssh':'远程登录服务器'
+  'ss':'查看端口监听','grep':'搜索/过滤文本','nc':'测试端口连接','route':'查看路由表','ssh':'远程登录服务器',
+  'nano':'命令行文本编辑器','whoami':'查看当前用户名','reboot':'重启系统','docker':'容器化部署工具','systemctl':'管理系统服务'
 };
 function openTypingDefense(cfg, onComplete) {
   applyMiniTier(cfg);
@@ -4223,7 +4225,7 @@ function openTypingDefense(cfg, onComplete) {
 
   let lives = LIVES, score = 0, combo = 0, win = false;
   let wave = 1, waveLeft = 0, bossActive = false;
-  let waveTimeLeft = WAVE_TIME;
+  let elapsed = 0;   // 通关计时（秒），不做限时
   let paused = false, ended = false;
   let typed = '';
   let typedWord = null;   // 锁定目标：一旦开打某个词就只跟它比
@@ -4239,7 +4241,7 @@ function openTypingDefense(cfg, onComplete) {
       <div class="mm-head">
         <div>
           <div class="mm-title">🔫 术语防御战 · <span id="tyDiff" style="color:#8b91a6;font-size:15px">${LV.name}</span></div>
-          <div class="mm-sub">${escHtml(cfg.name || '')} —— 分波防守，每波限时；Boss 要打两遍${switchEnabled ? '；TAB 切换目标词' : ''}</div>
+          <div class="mm-sub">${escHtml(cfg.name || '')} —— 分波防守，只记通关用时；Boss 要打两遍${switchEnabled ? '；TAB 切换目标词' : ''}</div>
         </div>
         <div class="mm-close" title="关闭">✕</div>
       </div>
@@ -4247,7 +4249,7 @@ function openTypingDefense(cfg, onComplete) {
         <span>❤️ <b id="tyLives">${LIVES}</b></span>
         <span>🌊 第 <b id="tyWave">1</b>/${WAVES} 波</span>
         <span>剩 <b id="tyLeft">0</b></span>
-        <span>⏱ <b id="tyTime">${WAVE_TIME}</b>s</span>
+        <span>⏱ <b id="tyTime">0</b>s</span>
         <span>🎯 <b id="tyScore">0</b></span>
         <span>⌨️ <b id="tyTyped" style="color:var(--amber)">…</b></span>
         <span>🔥 <b id="tyCombo" style="color:#ff7a00"></b></span>
@@ -4302,11 +4304,13 @@ function openTypingDefense(cfg, onComplete) {
 
   function spawnWord() {
     if (ended || paused) return;
-    let text = words[Math.floor(Math.random() * words.length)];
-    let _g = 0;
-    while (bossActive && active.some(function(w){ return w.boss && w.text === text; }) && _g++ < 8) {
-      text = words[Math.floor(Math.random() * words.length)];   // 场上已有 BOSS 同名，重抽普通词
+    // 场上已有同名词（含 BOSS、含正在录入的词）则重抽，避免同时出现两个一样的词
+    let text = null;
+    for (let _g = 0; _g < 30; _g++) {
+      const c = words[Math.floor(Math.random() * words.length)];
+      if (!active.some(function(w){ return w.text === c; })) { text = c; break; }
     }
+    if (!text) { spawnTimer = setTimeout(spawnWord, 700); return; }   // 场上全被占用，稍后再试
     const t = tier(text);
     const el = document.createElement('div');
     el.className = 'ty-word';
@@ -4334,9 +4338,7 @@ function openTypingDefense(cfg, onComplete) {
     field.appendChild(el);
     active.push({ text, y:0, el, disp: '👑 ' + text, speed: wordSpeed() * 0.55, pt: 30, boss:true, hp:2, hit:0 });
     leftEl.textContent = '👑';
-    // BOSS 战重新给满倒计时，避免上一波剩余时间太短导致恢复后立刻超时扣命
-    waveTimeLeft = cfg._endless ? Math.max(8, WAVE_TIME - (wave - 1)) : WAVE_TIME;
-    if (timeEl) timeEl.textContent = Math.ceil(waveTimeLeft);
+    // 无超时限制，继续计通关用时
     playSound('alarm');
     // 暂停 + 提示
     paused = true;
@@ -4393,8 +4395,8 @@ function openTypingDefense(cfg, onComplete) {
         // 清屏 → 下一波 / 通关
         clearScreen();
         if (wave >= WAVES && !cfg._endless) { endGame(true); return; }   // 无限战：不结算继续
-        wave++; bossActive = false; waveLeft = waveNeed(wave); waveTimeLeft = cfg._endless ? Math.max(8, WAVE_TIME - (wave - 1)) : WAVE_TIME;
-        waveEl.textContent = wave; leftEl.textContent = waveLeft; timeEl.textContent = waveTimeLeft;
+        wave++; bossActive = false; waveLeft = waveNeed(wave);
+        waveEl.textContent = wave; leftEl.textContent = waveLeft;
         showToast('🌊 第 '+wave+' 波！清屏加速', 'success');
         spawnTimer = setTimeout(spawnWord, 800);
       } else {
@@ -4487,21 +4489,8 @@ function openTypingDefense(cfg, onComplete) {
       w.el.style.top = w.y + 'px';
       if (w.y > bottom) leakWord(w);
     });
-    waveTimeLeft = Math.max(0, waveTimeLeft - 0.1);
-    timeEl.textContent = Math.max(0, Math.ceil(waveTimeLeft));
-    if (waveTimeLeft <= 0) {
-      // 本波超时：扣一命，清屏，进下一波
-      if (lives > 0) lives--;
-      livesEl.textContent = lives;
-      clearScreen();
-      if (lives <= 0) { endGame(false); return; }
-      wave++; bossActive = false;
-      if (wave > WAVES) { endGame(true); return; }
-      waveLeft = waveNeed(wave); waveTimeLeft = cfg._endless ? Math.max(8, WAVE_TIME - (wave - 1)) : WAVE_TIME;
-      waveEl.textContent = wave; leftEl.textContent = waveLeft; timeEl.textContent = waveTimeLeft;
-      showToast('⏱ 超时扣一命 · 进入第 '+wave+' 波', 'error');
-      spawnTimer = setTimeout(spawnWord, 900);
-    }
+    elapsed += 0.1;
+    timeEl.textContent = Math.max(0, Math.ceil(elapsed));
   }
   loopTimer = setInterval(tick, 100);
 
@@ -4525,11 +4514,12 @@ function openTypingDefense(cfg, onComplete) {
       res.innerHTML =
         '<div style="font-size:46px;line-height:1">'+(win?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(win?'var(--green)':'var(--red)')+';margin-top:8px">'+(win?'全部防线守住！':'防线失守')+'</div>'+
-        '<div style="font-size:15px;color:var(--dim);margin-top:6px">击落 <b style="color:var(--amber)">'+score+'</b> · 打到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波 · 剩余 ❤️ '+Math.max(0,lives)+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">击落 <b style="color:var(--amber)">'+score+'</b> · 打到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波 · 剩余 ❤️ '+Math.max(0,lives)+' · 用时 <b style="color:var(--amber)">'+Math.ceil(elapsed)+'</b>s</div>'+
         '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
           '<button class="mm-btn" onclick="window.tyAgain()">🔁 再玩一次</button>'+
           '<button class="mm-btn primary" onclick="window.tyDone()">收下奖励</button>'+
         '</div>';
+      focusResultPrimary(overlay);
       overlay.innerHTML = '';
       overlay.appendChild(res);
     }, 300);
@@ -5449,6 +5439,7 @@ function openShooter(cfg, onComplete) {
           '<button class="mm-btn" onclick="window.shAgain()">🔁 再玩一次</button>'+
           '<button class="mm-btn primary" onclick="window.shDone()">收下奖励</button>'+
         '</div>';
+      focusResultPrimary(overlay);
       overlay.innerHTML = '';
       overlay.appendChild(res);
     }, 300);
@@ -5948,6 +5939,7 @@ function openDataRacing(cfg, onComplete) {
           '<button class="mm-btn" onclick="window.rrAgain()">🔁 再飙一次</button>'+
           '<button class="mm-btn primary" onclick="window.rrDone()">收下奖励</button>'+
         '</div>';
+      focusResultPrimary(overlay);
       overlay.innerHTML='';
       overlay.appendChild(res);
     }, 300);
@@ -6145,6 +6137,7 @@ function openSnake(cfg, onComplete) {
     if(isWin){ recordGameWin('snake'); miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(function(){
       const res=document.createElement('div'); res.className='ty-result';
+      focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🐍</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'网络三件套配对完成！':'网线断了，重接一下')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">配对 <b style="color:var(--amber)">'+paired+'</b> 对 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="font-size:13px;color:var(--dim);margin-top:4px">'+'记住的术语已收录图鉴'+(isWin?'':'，配对 '+WIN+' 对即通关')+'</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.snAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.snDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res);
     },300);
@@ -6266,6 +6259,7 @@ function openFlappy(cfg, onComplete) {
     if(ended)return; ended=true;
     if(isWin){ recordGameWin('flappy'); miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
+      focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🦅</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">掉进断线黑洞了</div><div style="font-size:15px;color:var(--dim);margin-top:6px">穿过 <b style="color:var(--amber)">'+score/10+'</b> 道命令题</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.fpAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.fpDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
@@ -6360,6 +6354,7 @@ function openMole(cfg, onComplete) {
     if(ended)return; ended=true;
     if(isWin){ recordGameWin('mole'); miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
+      focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🔨</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'边缘过滤完成！':'被正常数据骗了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">点掉异常 <b style="color:var(--amber)">'+killed+'</b> 个 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.moAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.moDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
@@ -6523,6 +6518,7 @@ function openPacman(cfg, onComplete) {
     if(ended)return; ended=true;
     if(isWin){ recordGameWin('pacman'); miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
+      focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">👾</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(isWin?'镜像全部回收！':'被清理进程回收了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 <b style="color:var(--amber)">'+level+'</b> 关</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.pcAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.pcDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
@@ -6628,6 +6624,7 @@ function openTank(cfg, onComplete) {
   }
   function endGame(isWin){ if(ended)return; ended=true; if(isWin){recordGameWin('tank');miniMarkClear(cfg.id);playSound('fanfare');}
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
+      focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🎯</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(base>0?'Broker 守住了！':'Broker 被攻破了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">守到第 <b style="color:var(--amber)">'+wave+'</b> 波 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.tkAgain()">🔁 再战</button><button class="mm-btn primary" onclick="window.tkDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300); }
   window.tkAgain=()=>{ overlay.remove(); openTank(cfg,onComplete); };
@@ -6726,6 +6723,7 @@ function openBreakout(cfg, onComplete) {
   }
   function endGame(isWin){ if(ended)return; ended=true; if(isWin){recordGameWin('breakout');miniMarkClear(cfg.id);playSound('fanfare');}
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
+      focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🧱</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(isWin?'故障全消！':'AI 决策失误，球漏了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 <b style="color:var(--amber)">'+level+'</b> 关</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.brAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.brDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300); }
   window.brAgain=()=>{ overlay.remove(); openBreakout(cfg,onComplete); };
