@@ -5753,8 +5753,7 @@ function openDataRacing(cfg, onComplete) {
     return;
   }
   playMusic(gameSong('racing') || 'boss');
-  const good = (cfg.good || ['正常数据']).map(String);
-  const bad = (cfg.bad || ['异常数据']).map(String);
+  const metric=cfg.metric||'温度', unit=cfg.unit||'', mx=cfg.max||80;   // 数值判断：读数>上限=异常
   const LANES = cfg.lanes || 4;
   const LIVES = (cfg.lives || 3) + ((shooterBuff && shooterBuff.lives) || 0);   // 商城护盾 +1 命
   const W = 840, H = 560;
@@ -5779,12 +5778,13 @@ function openDataRacing(cfg, onComplete) {
       </div>
       <div class="sh-stats">
         <span>❤️ <b id="rrLives">${LIVES}</b></span>
+        <span>🌡️ 正常 ≤<b id="rrMax">${mx}</b>${unit}</span>
         <span>⚡ <b id="rrSpeed" style="color:#7ee8fa">0</b></span>
         <span>🎯 <b id="rrScore">0</b></span>
         <span>🔥 <b id="rrCombo" style="color:#ff7a00"></b></span>
       </div>
       <canvas id="rrCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:radial-gradient(ellipse at 50% 10%, #0a1428, #04060c);cursor:pointer;touch-action:none"></canvas>
-      <div class="sh-tip">←/→ 或 点屏幕两侧切换车道 · 躲开异常🔥 · 吃正常数据</div>
+      <div class="sh-tip">←/→ 或 点屏幕两侧切换车道 · 读数 ≤${mx}${unit} 才吃 · 超限躲开</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick = () => closeGame(false);
@@ -5816,8 +5816,11 @@ function openDataRacing(cfg, onComplete) {
     let type='good';
     if (rr < 0.46) type='bad';
     else if (rr < 0.53) type='drop';
-    const label = type==='bad' ? bad[Math.floor(Math.random()*bad.length)] : (type==='good' ? good[Math.floor(Math.random()*good.length)] : '🎁');
-    items.push({ x, y:-30, type, label, vy: speed });
+    const val = 15 + Math.floor(Math.random()*(mx*1.5));
+    let label = metric+' '+val+unit;
+    if (type==='drop') label='🎁';
+    else type = (val <= mx) ? 'good' : 'bad';   // 读数判断：超上限=异常
+    items.push({ x, y:-30, type, label, vy: speed, val });
   }
 
   function update(dt){
@@ -5887,7 +5890,7 @@ function openDataRacing(cfg, onComplete) {
       const r = it.type==='drop'?20:28;
       ctx.beginPath(); ctx.arc(it.x, it.y, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
       ctx.fillStyle='#061018';
-      ctx.font='bold ' + Math.round(11/sf) + 'px sans-serif';
+      ctx.font='bold ' + Math.round(12/sf) + 'px sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
       const t = it.label.length>6 ? it.label.slice(0,6)+'…' : it.label;
       ctx.fillText(t, it.x, it.y);
@@ -6127,29 +6130,31 @@ function openFlappy(cfg, onComplete) {
   applyMiniTier(cfg);
   if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
   if (!tutSeen('flappy')) {
-    showGameTutorial('flappy', '🦅 云端跳跃', [
-      '你的<b>小飞机</b>要在云服务器之间穿行，<b>点击/空格/↑</b> 让它向上飞',
-      '穿过 <b>云服务器</b> 的缝隙，<b>别撞</b>云柱、别掉进<b>断线黑洞</b>',
-      '每穿过一列 +10 分，越往后飞得越快',
-      '撞一次 -1 命，3 条命用完结束'
+    showGameTutorial('flappy', '🦅 云端跳跃 · 命令三选一', [
+      '每根云柱是一道<b>命令选择题</b>：题目在上方，3 条飞行道各标一个选项',
+      '飞到<b>正确选项那条道</b>的缺口穿过 → +10；进错道撞云柱 -1 命',
+      '<b>点击/空格/↑</b> 起飞；看题选道，别只看缺口的颜色'
     ], function(){ openFlappy(cfg, onComplete); });
     return;
   }
   playMusic(gameSong('flappy') || 'hub');
-  const W=840, H=560;
+  const questions=(cfg.questions||[{q:'SSH 登录命令是？',opts:['ssh user@ip','apt install','nslookup'],ans:0}]).map(function(q){return {q:String(q.q||''),opts:(q.opts||[]).map(String),ans:Number(q.ans)||0};});
+  const W=840,H=560;
+  const laneYs=[H*0.25, H*0.5, H*0.75];
+  const gapHalf=50;
   let lives=3, score=0, ended=false;
   let py=H/2, vy=0, rot=0;
-  let pipes=[], timer=0, speed=150, gap=150;
+  let pipes=[], timer=0, speed=150;
   let particles=[];
   const overlay=document.createElement('div');
   overlay.className='mm-overlay';
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML=`
     <div class="sh-box">
-      <div class="mm-head"><div><div class="mm-title">🦅 云端跳跃</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 云服务器间穿行</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="mm-head"><div><div class="mm-title">🦅 云端跳跃</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 看题，飞到正确命令的道</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>❤️ <b id="fpLives">3</b></span><span>🎯 <b id="fpScore">0</b></span><span>⚡ <b id="fpSpeed">0</b></span></div>
       <canvas id="fpCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:linear-gradient(#7ec8ff,#cfe9ff);touch-action:none"></canvas>
-      <div class="sh-tip">点击 / 空格 / ↑ 起飞 · 穿过云缝 · 别撞云柱</div>
+      <div class="sh-tip">点击/空格/↑ 起飞 · 看题目选正确命令的道 · 进错道-1命</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick=()=>closeGame(false);
@@ -6161,25 +6166,27 @@ function openFlappy(cfg, onComplete) {
   cv.addEventListener('pointerdown', e=>{ e.preventDefault(); flap(); });
   function addParticles(x,y,c){ for(let i=0;i<8;i++)particles.push({x,y,vx:(Math.random()-.5)*100,vy:(Math.random()-.5)*100,t:0,color:c}); }
   function spawnPipe(){
-    const top = Math.random()*(H-260)+60;
-    pipes.push({x:W+40, top, bot: top+gap});
+    const q=questions[Math.floor(Math.random()*questions.length)];
+    pipes.push({x:W+60, q, ans:q.ans, scored:false});
   }
   function update(dt){
     if(ended)return;
     speed = 150 + score*3; speedEl.textContent=Math.round(speed);
     vy += 380*dt; py += vy*dt; rot = Math.max(-0.5, Math.min(1, vy/600));
     timer -= dt;
-    if(timer<=0){ spawnPipe(); timer = Math.max(1.1, 1.6 - score*0.02); }
+    if(timer<=0){ spawnPipe(); timer = Math.max(1.2, 1.7 - score*0.02); }
     pipes.forEach(p=>p.x -= speed*dt);
-    pipes = pipes.filter(p=>p.x>-40);
-    // 计分 + 碰撞
+    pipes = pipes.filter(p=>p.x>-70);
+    const cy = py+13;
     pipes.forEach(p=>{
-      if(!p.scored && p.x < 70){ p.scored=true; score+=10; scoreEl.textContent=score; playSound('success'); addParticles(70, py, '#fff'); }
-      if(p.x < 118 && p.x+60 > 60){
-        if(py < p.top || py+26 > p.bot){ hit(); }
+      if(!p.scored && p.x < 70){ p.scored=true; score+=10; scoreEl.textContent=score; playSound('success'); addParticles(70, cy, '#fff'); }
+      if(p.x < 126 && p.x+60 > 60){
+        let inOpen=false;
+        for(let i=0;i<3;i++){ if(Math.abs(cy - laneYs[i]) < gapHalf && i===p.ans) inOpen=true; }
+        if(!inOpen){ hit(); }
       }
     });
-    if(py<-10 || py>H-10){ hit(); }
+    if(py<-10||py>H-10){ hit(); }
   }
   function hit(){
     if(ended)return;
@@ -6189,22 +6196,38 @@ function openFlappy(cfg, onComplete) {
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
-    // 云背景
     for(let i=0;i<6;i++){ const cx=((i*160 - (performance.now()/20)%160)%W), cy=40+i*90; ctx.fillStyle='rgba(255,255,255,.6)'; ctx.beginPath(); ctx.arc(cx,cy,24,0,Math.PI*2); ctx.arc(cx+20,cy-8,18,0,Math.PI*2); ctx.arc(cx+40,cy,22,0,Math.PI*2); ctx.fill(); }
-    // 管道（云服务器）
     pipes.forEach(p=>{
-      ctx.fillStyle='#4caf50'; ctx.fillRect(p.x,0,60,p.top);
-      ctx.fillStyle='#66bb6a'; ctx.fillRect(p.x-5,p.top-18,70,18);
-      ctx.fillStyle='#4caf50'; ctx.fillRect(p.x,p.bot,60,H-p.bot);
-      ctx.fillStyle='#66bb6a'; ctx.fillRect(p.x-5,p.bot,70,18);
-      ctx.fillStyle='rgba(255,255,255,.5)'; ctx.fillRect(p.x+10,0,14,p.top); ctx.fillRect(p.x+10,p.bot,14,H-p.bot);
+      // 画管道（正确缺口开放，其余两段实心）
+      ctx.fillStyle='#4caf50';
+      let prevBottom=-10;
+      for(let i=0;i<3;i++){
+        const y0=laneYs[i]-gapHalf, y1=laneYs[i]+gapHalf;
+        ctx.fillRect(p.x, prevBottom, 60, y0-prevBottom);
+        ctx.fillRect(p.x, y1, 60, (i===2?H+10:laneYs[i+1]-gapHalf)-y1);
+        prevBottom = i===2 ? H+10 : laneYs[i+1]-gapHalf;
+      }
+      // 缺口标线：正确=绿，错误=红
+      for(let i=0;i<3;i++){
+        const y0=laneYs[i]-gapHalf;
+        ctx.fillStyle = (i===p.ans) ? 'rgba(102,187,106,.8)' : 'rgba(255,82,82,.6)';
+        ctx.fillRect(p.x-7, y0, 4, gapHalf*2);
+      }
+      // 选项标签（缺口左侧）
+      p.q.opts.forEach(function(o,i){
+        ctx.fillStyle = (i===p.ans) ? '#1b5e20' : '#795548';
+        ctx.font='bold '+Math.round(10/sf)+'px sans-serif'; ctx.textAlign='right';
+        ctx.fillText(o, p.x-12, laneYs[i]);
+      });
+      // 题目（云柱上方）
+      ctx.fillStyle='#fff'; ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.lineWidth=2;
+      ctx.font='bold '+Math.round(13/sf)+'px sans-serif'; ctx.textAlign='center';
+      ctx.strokeText('❓ '+p.q.q, p.x+30, 22); ctx.fillText('❓ '+p.q.q, p.x+30, 22);
     });
-    // 飞机
     ctx.save(); ctx.translate(70,py); ctx.rotate(rot);
     ctx.fillStyle='#00bcd4'; ctx.beginPath(); ctx.moveTo(26,0); ctx.lineTo(-18,-12); ctx.lineTo(-8,0); ctx.lineTo(-18,12); ctx.closePath(); ctx.fill();
     ctx.fillStyle='#b2ebf2'; ctx.fillRect(-4,-3,8,6);
     ctx.restore();
-    // 粒子
     particles.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,4,4); });
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
   }
@@ -6212,7 +6235,7 @@ function openFlappy(cfg, onComplete) {
     if(ended)return; ended=true;
     if(isWin){ recordGameWin('flappy'); miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
-      res.innerHTML='<div style="font-size:46px;line-height:1">🦅</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">掉进断线黑洞了</div><div style="font-size:15px;color:var(--dim);margin-top:6px">穿过 <b style="color:var(--amber)">'+score/10+'</b> 列云服务器</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.fpAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.fpDone()">收下奖励</button></div>';
+      res.innerHTML='<div style="font-size:46px;line-height:1">🦅</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">掉进断线黑洞了</div><div style="font-size:15px;color:var(--dim);margin-top:6px">穿过 <b style="color:var(--amber)">'+score/10+'</b> 道命令题</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.fpAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.fpDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
   window.fpAgain=()=>{ overlay.remove(); openFlappy(cfg,onComplete); };
@@ -6236,8 +6259,7 @@ function openMole(cfg, onComplete) {
     return;
   }
   playMusic(gameSong('mole') || 'hub');
-  const bad=(cfg.bad||['超温','爆振','超压','毛刺']).map(String);
-  const good=(cfg.good||['正常','均值','阈值内']).map(String);
+  const metric=cfg.metric||'温度', unit=cfg.unit||'', thr=cfg.threshold||80;   // 阈值判断：读数>阈值=异常
   const W=840,H=560, COLS=4, ROWS=3;
   const hw=160, hh=150;   // 每格大小
   const ox=(W-COLS*hw)/2, oy=(H-ROWS*hh)/2;
@@ -6249,9 +6271,9 @@ function openMole(cfg, onComplete) {
   overlay.innerHTML=`
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🔨 边缘打地鼠</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 点掉异常，别点正常</div></div><div class="mm-close" title="关闭">✕</div></div>
-      <div class="sh-stats"><span>❤️ <b id="moLives">3</b></span><span>🎯 <b id="moScore">0</b></span><span>🔨 <b id="moKill">0</b>/20</span><span>🔥 <b id="moCombo" style="color:#ff7a00"></b></span></div>
+      <div class="sh-stats"><span>❤️ <b id="moLives">3</b></span><span>🌡️ 正常 ≤<b id="moThr">${thr}</b>${unit}</span><span>🎯 <b id="moScore">0</b></span><span>🔨 <b id="moKill">0</b>/20</span><span>🔥 <b id="moCombo" style="color:#ff7a00"></b></span></div>
       <canvas id="moCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#0a0f16;cursor:pointer;touch-action:none"></canvas>
-      <div class="sh-tip">看到异常(红)就点 · 正常(绿)别点 · 越冒越快</div>
+      <div class="sh-tip">读数 <b>超过阈值</b>(${thr}${unit})就点掉 · 在范围内别点 · 越冒越快</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick=()=>closeGame(false);
@@ -6262,8 +6284,9 @@ function openMole(cfg, onComplete) {
   function spawn(){
     const i=Math.floor(Math.random()*(COLS*ROWS));
     const c=centerOf(i);
-    const isGood = Math.random() < 0.22;
-    active={ i, x:c.x, y:c.y, isGood, t:0, dur: Math.max(0.7, 1.5 - speed*0.15), label: isGood?good[Math.floor(Math.random()*good.length)] : bad[Math.floor(Math.random()*bad.length)] };
+    const val = 5 + Math.floor(Math.random()*(thr*1.5));   // 随机读数
+    const isGood = val <= thr;   // 读数在阈值内=正常
+    active={ i, x:c.x, y:c.y, isGood, val, t:0, dur: Math.max(0.7, 1.5 - speed*0.15), label: metric+' '+val+unit };
   }
   function addParticles(x,y,c){ for(let k=0;k<12;k++)particles.push({x,y,vx:(Math.random()-.5)*200,vy:(Math.random()-.5)*200-60,t:0,color:c}); }
   cv.addEventListener('pointerdown', e=>{
@@ -6290,12 +6313,13 @@ function openMole(cfg, onComplete) {
     if(active){
       const a = Math.sin(active.t*10)*0.12+0.9;
       ctx.globalAlpha=a;
-      ctx.fillStyle = active.isGood ? '#00c853' : '#ff5252';
-      ctx.shadowColor = active.isGood ? '#00c853' : '#ff5252'; ctx.shadowBlur=14;
-      ctx.beginPath(); ctx.arc(active.x, active.y, 42, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,152,0,.5)'; ctx.strokeStyle = active.isGood ? 'rgba(0,200,83,.6)' : 'rgba(255,82,82,.7)'; ctx.lineWidth=3; ctx.shadowBlur=12;
+      ctx.beginPath(); ctx.arc(active.x, active.y, 42, 0, Math.PI*2); ctx.fill(); ctx.stroke();
       ctx.shadowBlur=0;
-      ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(15/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(active.label, active.x, active.y);
+      ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(16/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(active.label, active.x, active.y-4);
+      ctx.fillStyle='#ffd27d'; ctx.font='bold '+Math.round(10/sf)+'px sans-serif';
+      ctx.fillText(active.isGood ? '正常' : '异常?', active.x, active.y+16);
       ctx.globalAlpha=1;
     }
     particles.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
@@ -6329,7 +6353,8 @@ function openPacman(cfg, onComplete) {
     return;
   }
   playMusic(gameSong('pacman') || 'hub');
-  const pellets=(cfg.pellets||['镜像层','端口映射','数据卷','环境变量']).map(String);
+  const pairs=(cfg.pairs||[{t:'docker run',h:'启动一个容器'}]).map(function(p){return {t:String(p.t),h:String(p.h)};});
+  const hintOf={}; pairs.forEach(function(p){hintOf[p.t]=p.h;});
   const ghostsN=(cfg.ghosts||['清理进程','镜像冲突','端口占用']).map(String);
   const W=840,H=560, COLS=19, ROWS=15, cell=Math.floor(Math.min(W,H)/Math.max(COLS,ROWS));
   // 迷宫 1=墙
@@ -6342,10 +6367,16 @@ function openPacman(cfg, onComplete) {
   let map=[], dots=0, level=1, lives=3, score=0, ended=false;
   let px,py,pdir={x:1,y:0}, nextDir={x:1,y:0}, mouth=0;
   let ghosts=[], power=0;
-  let particles=[];
+  let particles=[], floats=[];
+  let currentCmd='', specials=[], paired=0;
   function build(){
-    map=[]; dots=0;
+    map=[]; dots=0; specials=[]; currentCmd=''; paired=0;
     base.forEach((row,r)=>{ const arr=[]; for(let c=0;c<row.length;c++){ const ch=row[c]; arr.push(ch); if(ch==='0') dots++; } map.push(arr); });
+    // 放 2 对命令×动作配对卡
+    var cands=[];
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(map[r]&&map[r][c]==='0') cands.push([c,r]);
+    function place(kind,cmd,label){ if(!cands.length)return; const i=Math.floor(Math.random()*cands.length); const a=cands.splice(i,1)[0]; map[a[1]][a[0]]=' '; dots--; specials.push({x:a[0],y:a[1],kind:kind,cmd:cmd,label:label}); }
+    pairs.slice(0,2).forEach(function(p){ place('cmd', p.t, p.t); place('act', p.t, p.h); });
     px=1; py=1; pdir={x:1,y:0}; nextDir={x:1,y:0};
     ghosts=[{x:9,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[0]},{x:10,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[1]},{x:11,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[2]}];
     power=0;
@@ -6357,15 +6388,15 @@ function openPacman(cfg, onComplete) {
   overlay.innerHTML=`
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">👾 容器吃豆人</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 吃镜像层，躲清理进程</div></div><div class="mm-close" title="关闭">✕</div></div>
-      <div class="sh-stats"><span>❤️ <b id="pcLives">3</b></span><span>🎯 <b id="pcScore">0</b></span><span>🏆 第 <b id="pcLevel">1</b> 关</span></div>
+      <div class="sh-stats"><span>❤️ <b id="pcLives">3</b></span><span>🧩 带命令 <b id="pcCmd" style="color:#7ee8fa">—</b></span><span>🎯 <b id="pcScore">0</b></span><span>🏆 第 <b id="pcLevel">1</b> 关</span></div>
       <canvas id="pcCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#04060c;touch-action:none"></canvas>
-      <div class="sh-tip">←/→/↑/↓ 或 滑动 移动 · 吃镜像层 · 能量点后反吃幽灵</div>
+      <div class="sh-tip">←/→/↑/↓ 或 滑动 · 吃蓝色命令带着 → 吃对应黄色动作配对</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick=()=>closeGame(false);
   const cv=document.getElementById('pcCanvas'), ctx=cv.getContext('2d');
   const cw=cv.clientWidth||W; const sf=Math.max(0.6,cw/W);
-  const livesEl=document.getElementById('pcLives'), scoreEl=document.getElementById('pcScore'), levelEl=document.getElementById('pcLevel');
+  const livesEl=document.getElementById('pcLives'), scoreEl=document.getElementById('pcScore'), levelEl=document.getElementById('pcLevel'), termEl=document.getElementById('pcCmd');
   document.addEventListener('keydown', e=>{
     const k=e.key; e.preventDefault();
     if(k==='ArrowUp'||k==='w')nextDir={x:0,y:-1}; else if(k==='ArrowDown'||k==='s')nextDir={x:0,y:1};
@@ -6385,9 +6416,19 @@ function openPacman(cfg, onComplete) {
     const nx=px+pdir.x, ny=py+pdir.y;
     if(map[ny] && map[ny][nx]!=='1'){ px=nx; py=ny; }
     else { pdir={x:0,y:0}; }
-    // 吃豆
-    if(map[py] && map[py][px]==='0'){ map[py][px]=' '; dots--; score+=10; playSound('success');
+    // 吃镜像层
+    if(map[py] && map[py][px]==='0'){ map[py][px]=' '; dots--; score+=5; scoreEl.textContent=score; playSound('success');
       if((px+py)%13===0){ power=6; playSound('levelup'); }   // 能量点（端口映射）
+    }
+    // 配对卡：命令 / 动作
+    var sp = specials.filter(function(x){return x.x===px&&x.y===py;})[0];
+    if(sp){
+      specials=specials.filter(function(x){return x!==sp;});
+      if(sp.kind==='cmd'){ currentCmd=sp.cmd; score+=5; scoreEl.textContent=score; if(termEl)termEl.textContent=sp.label; playSound('click'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'带命令：'+sp.label,t:0,col:'#2196f3'}); }
+      else {
+        if(currentCmd && hintOf[currentCmd]===sp.label){ paired++; score+=25; scoreEl.textContent=score; currentCmd=''; if(termEl)termEl.textContent='—'; playSound('success'); addParticles(px*cell+cell/2,py*cell+cell/2,'#00e676'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'✅ '+hintOf[currentCmd===sp.cmd?sp.cmd:currentCmd]+' 配对成功',t:0,col:'#00e676'}); if(paired>=pairs.length){ power=6; playSound('levelup'); } }
+        else { score=Math.max(0,score-5); scoreEl.textContent=score; currentCmd=''; if(termEl)termEl.textContent='—'; playSound('error'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'❌ 命令不匹配',t:0,col:'#ff5252'}); }
+      }
     }
     // 幽灵移动（简化 AI：向玩家方向走，随机绕）
     ghosts.forEach(g=>{
@@ -6412,7 +6453,7 @@ function openPacman(cfg, onComplete) {
       }
     });
     // 过关
-    if(dots<=0){ level++; levelEl.textContent=level; score+=level*50; playSound('fanfare'); build(); }
+    if(dots<=0 && specials.length===0){ level++; levelEl.textContent=level; score+=level*50; playSound('fanfare'); build(); }
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
@@ -6432,10 +6473,20 @@ function openPacman(cfg, onComplete) {
       ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(9/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(g.n.length>2?g.n[0]:g.n, gx, gy-2);
     });
+    // 配对卡
+    specials.forEach(sp=>{ const sx=sp.x*cell+cell/2, sy=sp.y*cell+cell/2;
+      ctx.fillStyle = sp.kind==='cmd' ? '#2196f3' : '#ffb300';
+      ctx.shadowColor = sp.kind==='cmd' ? '#2196f3' : '#ffb300'; ctx.shadowBlur=8;
+      ctx.beginPath(); ctx.arc(sx,sy,9,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(7/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(sp.label.length>3?sp.label.slice(0,3)+'…':sp.label, sx, sy);
+    });
     // 能量点状态
     if(power>0){ ctx.fillStyle='#7ee8fa'; ctx.font='bold '+Math.round(14/sf)+'px sans-serif'; ctx.textAlign='left'; ctx.fillText('⚡ 幽灵可反吃 ' + power.toFixed(1)+'s', 10, 24); }
     particles.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,4,4); });
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
+    floats.forEach(f=>{ f.t+=dt; ctx.globalAlpha=Math.max(0,1-f.t/1.3); ctx.fillStyle=f.col; ctx.font='bold '+Math.round(11/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.fillText(f.txt, f.x, f.y-f.t*30); });
+    ctx.globalAlpha=1; floats=floats.filter(f=>f.t<1.3);
   }
   function endGame(isWin){
     if(ended)return; ended=true;
@@ -6465,10 +6516,12 @@ function openTank(cfg, onComplete) {
     return;
   }
   playMusic(gameSong('tank') || 'boss');
-  const en=(cfg.enemies||['垃圾订阅','断线黑洞','畸形消息']).map(String);
+  const topics=(cfg.topics||['factory/+/temp']).map(String);
+  const en=(cfg.enemies||[{topic:'factory/a/temp',name:'温度消息'}]).map(function(e){return {topic:e.topic||'factory/a/temp',name:e.name||e.topic};});
   const W=840,H=560;
   let lives=3, base=3, score=0, wave=1, ended=false;
   let tx=W/2, ty=H-60, dir={x:0,y:-1}, fireCd=0, invuln=0;
+  let topicIdx=0, cannonTopic=topics[0];   // 炮口主题：只打匹配主题的消息
   let bullets=[], foes=[], spawnT=0, toSpawn=6, particles=[];
   const overlay=document.createElement('div');
   overlay.className='mm-overlay';
@@ -6476,9 +6529,9 @@ function openTank(cfg, onComplete) {
   overlay.innerHTML=`
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🎯 消息守卫战</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 坦克守 Broker</div></div><div class="mm-close" title="关闭">✕</div></div>
-      <div class="sh-stats"><span>🚗 <b id="tkLives">3</b></span><span>🏰 <b id="tkBase">3</b></span><span>🎯 <b id="tkScore">0</b></span><span>🌊 第 <b id="tkWave">1</b> 波</span></div>
+      <div class="sh-stats"><span>🚗 <b id="tkLives">3</b></span><span>🏰 <b id="tkBase">3</b></span><span>🎯 <b id="tkTopic" style="color:#7ee8fa">${cannonTopic}</b></span><span>🌊 第 <b id="tkWave">1</b> 波</span></div>
       <canvas id="tkCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#071019;touch-action:none"></canvas>
-      <div class="sh-tip">WASD/滑动 移动 · 自动开炮 · 守 Broker 别让消息漏到底</div>
+      <div class="sh-tip">↑/↓ 切炮口主题 · 只打<b>匹配主题</b>的消息 · 守 Broker 别漏</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick=()=>closeGame(false);
@@ -6486,14 +6539,17 @@ function openTank(cfg, onComplete) {
   const cw=cv.clientWidth||W; const sf=Math.max(0.6,cw/W);
   const livesEl=document.getElementById('tkLives'), baseEl=document.getElementById('tkBase'), scoreEl=document.getElementById('tkScore'), waveEl=document.getElementById('tkWave');
   const keys={};
-  document.addEventListener('keydown', e=>{ keys[e.key]=true; if(e.key==='Escape')closeGame(false); });
+  document.addEventListener('keydown', e=>{ keys[e.key]=true;
+    if(e.key==='ArrowUp'||e.key==='w'){ topicIdx=(topicIdx+1)%topics.length; cannonTopic=topics[topicIdx]; var _t=document.getElementById('tkTopic'); if(_t)_t.textContent=cannonTopic; playSound('click'); }
+    else if(e.key==='ArrowDown'||e.key==='s'){ topicIdx=(topicIdx+topics.length-1)%topics.length; cannonTopic=topics[topicIdx]; var _t2=document.getElementById('tkTopic'); if(_t2)_t2.textContent=cannonTopic; playSound('click'); }
+    else if(e.key==='Escape')closeGame(false); });
   document.addEventListener('keyup', e=>{ keys[e.key]=false; });
   let joystick=null;
   cv.addEventListener('pointerdown',e=>{ joystick={x:e.clientX,y:e.clientY}; });
   cv.addEventListener('pointermove',e=>{ if(!joystick)return; const dx=e.clientX-joystick.x, dy=e.clientY-joystick.y; if(Math.abs(dx)>Math.abs(dy)) dir={x:Math.sign(dx),y:0}; else if(dy!==0) dir={x:0,y:Math.sign(dy)}; joystick.x=e.clientX; joystick.y=e.clientY; });
   cv.addEventListener('pointerup',()=>{ joystick=null; });
   function addParticles(x,y,c){ for(let i=0;i<12;i++)particles.push({x,y,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220,t:0,color:c}); }
-  function spawnFoe(){ const x=40+Math.random()*(W-80); foes.push({x,y:-20,vy:40+wave*8,label:en[Math.floor(Math.random()*en.length)]}); }
+  function spawnFoe(){ const x=40+Math.random()*(W-80); const e=en[Math.floor(Math.random()*en.length)]; foes.push({x,y:-20,vy:40+wave*8,topic:e.topic,label:e.name}); }
   function update(dt){
     if(ended)return;
     if(invuln>0)invuln-=dt;
@@ -6512,7 +6568,7 @@ function openTank(cfg, onComplete) {
     foes.forEach(f=>{ f.y+=f.vy*dt; });
     foes=foes.filter(f=>f.y<H+20);
     // 子弹命中
-    bullets.forEach(b=>{ foes.forEach(f=>{ if(!f.hit&&Math.abs(b.x-f.x)<22&&Math.abs(b.y-f.y)<22){ f.hit=true; b.hit=true; score+=10; scoreEl.textContent=score; addParticles(f.x,f.y,'#ffb000'); playSound('success'); } }); });
+    bullets.forEach(b=>{ foes.forEach(f=>{ if(!f.hit&&Math.abs(b.x-f.x)<22&&Math.abs(b.y-f.y)<22){ if(f.topic===cannonTopic){ f.hit=true; b.hit=true; score+=10; scoreEl.textContent=score; addParticles(f.x,f.y,'#ffb000'); playSound('success'); } else { b.hit=true; addParticles(f.x,f.y,'#7ee8fa'); playSound('click'); } } }); });
     bullets=bullets.filter(b=>!b.hit); foes=foes.filter(f=>!f.hit);
     // 敌人到基地
     foes.forEach(f=>{ if(f.y>H-28){ f.hit=true; base--; baseEl.textContent=base; addParticles(f.x,H-28,'#ff5252'); playSound('error'); if(base<=0){endGame(false);return;} } });
@@ -6533,8 +6589,8 @@ function openTank(cfg, onComplete) {
     if(invuln<=0||Math.floor(invuln*8)%2===0){ ctx.fillStyle='#00e676'; ctx.fillRect(tx-14,ty-12,28,24); ctx.fillStyle='#b2ff59'; ctx.fillRect(tx+dir.x*16-4,ty+dir.y*16-6,8,12); }
     // 子弹
     ctx.fillStyle='#ffe066'; bullets.forEach(b=>ctx.fillRect(b.x-3,b.y-3,6,6));
-    // 敌人
-    foes.forEach(f=>{ ctx.fillStyle='#ff5252'; ctx.shadowColor='#ff5252'; ctx.shadowBlur=8; ctx.fillRect(f.x-18,f.y-10,36,20); ctx.shadowBlur=0; ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(9/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(f.label.length>4?f.label.slice(0,4):f.label, f.x, f.y); });
+    // 敌人（匹配炮口主题的亮红，否则灰）
+    foes.forEach(f=>{ const match=f.topic===cannonTopic; ctx.fillStyle=match?'#ff5252':'#546e7a'; ctx.shadowColor=match?'#ff5252':'transparent'; ctx.shadowBlur=8; ctx.fillRect(f.x-18,f.y-10,36,20); ctx.shadowBlur=0; ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(8/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText((f.topic||'').length>6?(f.topic||'').slice(0,6):f.topic||'', f.x, f.y); });
     // 粒子
     particles.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
@@ -6564,7 +6620,8 @@ function openBreakout(cfg, onComplete) {
     return;
   }
   playMusic(gameSong('breakout') || 'hub');
-  const brickN=(cfg.bricks||['设备故障','模型漂移','数据偏差','能耗超标']).map(String);
+  const fault=(cfg.fault||['设备故障','模型漂移']).map(String);
+  const normal=(cfg.normal||['正常样本','冗余备份']).map(String);
   const W=840,H=560;
   let lives=3, score=0, level=1, ended=false;
   let px=W/2, pw=90, ball={x:W/2,y:H-60,vx:150,vy:-200}, onPaddle=true;
@@ -6588,7 +6645,9 @@ function openBreakout(cfg, onComplete) {
   function build(){
     bricks=[]; const rows=4+Math.min(level,3), cols=8;
     for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
-      bricks.push({ x: c*104+20, y: r*34+40, w:96, h:26, col: colors[(r+level)%colors.length], label: brickN[(r+c)%brickN.length] });
+      const isFault = Math.random() < 0.62;   // 62% 是故障（该打），其余是正常（不该打）
+      const label = isFault ? fault[Math.floor(Math.random()*fault.length)] : normal[Math.floor(Math.random()*normal.length)];
+      bricks.push({ x: c*104+20, y: r*34+40, w:96, h:26, col: isFault ? colors[(r+level)%colors.length] : '#546e7a', label, fault: isFault, flash:0 });
     }
     ball={x:W/2,y:H-60,vx:(Math.random()<.5?1:-1)*150,vy:-200}; onPaddle=true; px=W/2;
   }
@@ -6610,16 +6669,22 @@ function openBreakout(cfg, onComplete) {
       // 板碰撞
       if(ball.vy>0 && ball.y>H-70 && ball.y<H-50 && Math.abs(ball.x-px)<pw/2+6){ ball.vy=-Math.abs(ball.vy); ball.vx+=(ball.x-px)*0.6; playSound('type'); }
       // 砖碰撞
-      bricks.forEach(b=>{ if(!b.hit && ball.x>b.x-8&&ball.x<b.x+b.w+8&&ball.y>b.y-8&&ball.y<b.y+b.h+8){ b.hit=true; ball.vy*=-1; score+=10; scoreEl.textContent=score; addParticles(b.x+b.w/2,b.y+b.h/2,b.col); playSound('success'); } });
+      bricks.forEach(b=>{ if(!b.hit && ball.x>b.x-8&&ball.x<b.x+b.w+8&&ball.y>b.y-8&&ball.y<b.y+b.h+8){ ball.vy*=-1;
+        if(b.fault){ b.hit=true; score+=10; scoreEl.textContent=score; addParticles(b.x+b.w/2,b.y+b.h/2,b.col); playSound('success'); }
+        else { score=Math.max(0,score-5); scoreEl.textContent=score; b.flash=0.3; playSound('error'); }
+      } });
+      bricks.forEach(b=>{ if(b.flash>0)b.flash-=dt; });
       bricks=bricks.filter(b=>!b.hit);
-      // 过关
-      if(bricks.length===0){ level++; levelEl.textContent=level; score+=level*50; speed=Math.min(2,1+level*0.15); playSound('fanfare'); build(); }
+      // 过关：所有故障砖清完即可（正常砖是干扰，不用打）
+      if(!bricks.some(b=>b.fault)){ level++; levelEl.textContent=level; score+=level*50; speed=Math.min(2,1+level*0.15); playSound('fanfare'); build(); }
     }
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
     // 砖
-    bricks.forEach(b=>{ ctx.fillStyle=b.col; ctx.shadowColor=b.col; ctx.shadowBlur=8; ctx.fillRect(b.x,b.y,b.w,b.h); ctx.shadowBlur=0; ctx.fillStyle='#061018'; ctx.font='bold '+Math.round(10/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(b.label.length>4?b.label.slice(0,4):b.label, b.x+b.w/2, b.y+b.h/2); });
+    bricks.forEach(b=>{ ctx.fillStyle=b.col; ctx.shadowColor=b.fault?b.col:'transparent'; ctx.shadowBlur=8; ctx.fillRect(b.x,b.y,b.w,b.h); ctx.shadowBlur=0;
+      if(b.flash>0){ ctx.globalAlpha=Math.min(1,b.flash/0.3)*0.6; ctx.fillStyle='#fff'; ctx.fillRect(b.x,b.y,b.w,b.h); ctx.globalAlpha=1; }
+      ctx.fillStyle='#061018'; ctx.font='bold '+Math.round(10/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(b.label.length>4?b.label.slice(0,4):b.label, b.x+b.w/2, b.y+b.h/2); });
     // 板（AI 决策）
     ctx.fillStyle='#7ee8fa'; ctx.shadowColor='#7ee8fa'; ctx.shadowBlur=12; ctx.fillRect(px-pw/2, H-44, pw, 10); ctx.shadowBlur=0;
     // 球

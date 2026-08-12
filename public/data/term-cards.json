@@ -1489,7 +1489,54 @@
             "超时",
             "连接失败"
           ],
-          "subtitle": "在云服务器间跳跃，躲开断线黑洞"
+          "subtitle": "在云服务器间跳跃，躲开断线黑洞",
+          "questions": [
+            {
+              "q": "SSH 登录命令是？",
+              "opts": [
+                "ssh user@ip",
+                "apt install",
+                "nslookup"
+              ],
+              "ans": 0
+            },
+            {
+              "q": "查看当前目录？",
+              "opts": [
+                "pwd",
+                "cd",
+                "ls"
+              ],
+              "ans": 2
+            },
+            {
+              "q": "安装软件包？",
+              "opts": [
+                "apt install",
+                "rm -rf",
+                "cat"
+              ],
+              "ans": 0
+            },
+            {
+              "q": "查看本机 IP？",
+              "opts": [
+                "ip addr",
+                "whoami",
+                "date"
+              ],
+              "ans": 0
+            },
+            {
+              "q": "追踪网络路由？",
+              "opts": [
+                "traceroute",
+                "ping",
+                "hostname"
+              ],
+              "ans": 0
+            }
+          ]
         }
       ],
       "bonus": null
@@ -2455,7 +2502,10 @@
             "均值",
             "阈值内"
           ],
-          "subtitle": "传感器冒出异常就点掉（滑动均值/阈值过滤）"
+          "subtitle": "传感器冒出异常就点掉（滑动均值/阈值过滤）",
+          "metric": "温度",
+          "unit": "℃",
+          "threshold": 80
         }
       ],
       "bonus": null
@@ -2608,7 +2658,25 @@
             "镜像冲突",
             "端口占用"
           ],
-          "subtitle": "吃掉镜像层，躲开清理进程"
+          "subtitle": "吃掉镜像层，躲开清理进程",
+          "pairs": [
+            {
+              "t": "docker run",
+              "h": "启动一个容器"
+            },
+            {
+              "t": "docker ps",
+              "h": "查看运行中的容器"
+            },
+            {
+              "t": "docker rm",
+              "h": "删除容器"
+            },
+            {
+              "t": "docker pull",
+              "h": "下载镜像"
+            }
+          ]
         }
       ],
       "bonus": null
@@ -2646,7 +2714,10 @@
             "断链⛓️"
           ],
           "xp": 100,
-          "subtitle": "躲开异常数据块，吃正常数据加分，越跑越快"
+          "subtitle": "躲开异常数据块，吃正常数据加分，越跑越快",
+          "metric": "温度",
+          "unit": "℃",
+          "max": 80
         }
       ]
     },
@@ -2668,17 +2739,42 @@
           ],
           "xp": 100,
           "enemies": [
-            "垃圾订阅",
-            "断线黑洞",
-            "畸形消息",
-            "QoS0 洪水"
+            {
+              "topic": "factory/a/temp",
+              "name": "温度消息"
+            },
+            {
+              "topic": "factory/b/temp",
+              "name": "温度消息"
+            },
+            {
+              "topic": "factory/a/vib",
+              "name": "振动消息"
+            },
+            {
+              "topic": "factory/b/vib",
+              "name": "振动消息"
+            },
+            {
+              "topic": "factory/a/pres",
+              "name": "压力消息"
+            },
+            {
+              "topic": "factory/b/pres",
+              "name": "压力消息"
+            }
           ],
           "drops": [
             "⚡火力",
             "❤护盾",
             "💣爆破"
           ],
-          "subtitle": "坦克守卫 Broker，打掉垃圾消息"
+          "subtitle": "坦克守卫 Broker，打掉垃圾消息",
+          "topics": [
+            "factory/+/temp",
+            "factory/+/vib",
+            "factory/+/pres"
+          ]
         }
       ]
     },
@@ -2705,7 +2801,17 @@
             "数据偏差",
             "能耗超标"
           ],
-          "subtitle": "弹球消掉设备故障砖块，板=你的 AI 决策"
+          "subtitle": "弹球消掉设备故障砖块，板=你的 AI 决策",
+          "fault": [
+            "模型漂移",
+            "数据偏差",
+            "能耗超标"
+          ],
+          "normal": [
+            "正常样本",
+            "冗余备份",
+            "历史数据"
+          ]
         }
       ]
     }
