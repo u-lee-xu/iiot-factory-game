@@ -284,7 +284,23 @@ body {
 
 
 
+
+/* ===== 消消乐·三连车间 ===== */
+.m3-box { width: 520px; max-width: 96vw; background: #12121a; border: 2px solid var(--green); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,.18); display: flex; flex-direction: column; }
+.m3-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
+.m3-stats b { color: var(--green); }
+.m3-grid { display: grid; gap: 4px; padding: 10px; justify-content: center; margin: 0 auto; }
+.m3-tile { width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; border: 2px solid transparent; transition: transform .12s, border-color .12s; }
+.m3-tile.sel { border-color: #fff; transform: scale(1.1); }
+.m3-tile.hintpulse { animation: m3Pulse 1s infinite; }
+@keyframes m3Pulse { 0%,100%{ box-shadow: 0 0 0 rgba(255,255,255,0);} 50%{ box-shadow: 0 0 10px rgba(255,255,255,.6);} }
+.m3-legend { display: flex; gap: 10px; justify-content: center; padding: 0 12px 10px; flex-wrap: wrap; font-size: 12px; color: var(--dim); }
+.m3-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.m3-legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
 /* ===== 管道工·数据通路 ===== */
+/* ===== 连连看·对对碰 ===== */
+/* ===== 数据熔炉（合成大西瓜·数据单位）===== */
+/* ===== 数据分类大师（传送带分拣）===== */
 .pipe-box { width: 560px; max-width: 96vw; background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.2); display: flex; flex-direction: column; }
 .pipe-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
 .pipe-stats b { color: var(--cyan); }
@@ -2026,10 +2042,11 @@ function renderMission() {
       const isForge = wType === 'forge';
       const isLl = wType === 'll';
       const isPipe = wType === 'pipe';
+      const isM3 = wType === 'm3';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -2049,6 +2066,7 @@ function renderMission() {
       else if (isForge) _meta = '合成' + (w.target||'TB');
       else if (isLl) _meta = (w.pairs||[]).length + ' 组配对';
       else if (isPipe) _meta = (w.cols||4) + '×' + (w.rows||4) + ' 管道';
+      else if (isM3) _meta = (w.waves||3) + ' 波消消乐';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2071,6 +2089,7 @@ function renderMission() {
         else if (isForge) openForge(w, (win) => { if (win) showToast('🔥 合成成功！', 'success'); });
         else if (isLl) openLianLian(w, (win) => { if (win) showToast('🔗 全部配对！', 'success'); });
         else if (isPipe) openPipe(w, (win) => { if (win) showToast('🔧 数据通路接通！', 'success'); });
+        else if (isM3) openMatch3(w, (win) => { if (win) showToast('🍬 三连清场！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4197,6 +4216,9 @@ const ACHIEVEMENTS = [
   { id: 'pipe_1', name: '首次接通', desc: '管道工通关 1 次', emoji: '🔧', test: c => (c.pipeWins||0) >= 1 },
   { id: 'pipe_3', name: '管道工', desc: '管道工通关 3 次', emoji: '🔧', test: c => (c.pipeWins||0) >= 3 },
   { id: 'pipe_score', name: '无瑕管线', desc: '管道工单局得分 1500', emoji: '📶', test: c => (c.pipeBest||0) >= 1500 },
+  { id: 'm3_1', name: '首消三连', desc: '消消乐通关 1 次', emoji: '🍬', test: c => (c.m3Wins||0) >= 1 },
+  { id: 'm3_3', name: '连消熟手', desc: '消消乐通关 3 次', emoji: '🍬', test: c => (c.m3Wins||0) >= 3 },
+  { id: 'm3_score', name: '清场大师', desc: '消消乐单局得分 3000', emoji: '✨', test: c => (c.m3Best||0) >= 3000 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4640,6 +4662,7 @@ function recordGameWin(type) {
   else if (t === 'forge') gs.forgeWins = (gs.forgeWins || 0) + 1;
   else if (t === 'll') gs.llWins = (gs.llWins || 0) + 1;
   else if (t === 'pipe') gs.pipeWins = (gs.pipeWins || 0) + 1;
+  else if (t === 'm3') gs.m3Wins = (gs.m3Wins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4678,6 +4701,8 @@ function achievementContext() {
   ctx.llBest = gs.llBest || 0;
   ctx.pipeWins = gs.pipeWins || 0;
   ctx.pipeBest = gs.pipeBest || 0;
+  ctx.m3Wins = gs.m3Wins || 0;
+  ctx.m3Best = gs.m3Best || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -5059,7 +5084,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -5080,12 +5105,13 @@ function gzMeta(w) {
   if (t==='forge') return '合成' + (w.target||'TB');
   if (t==='ll') return ((w.pairs||[]).length) + ' 组配对';
   if (t==='pipe') return (w.cols||4) + '×' + (w.rows||4) + ' 管道';
+  if (t==='m3') return (w.waves||3) + ' 波消消乐';
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5153,6 +5179,7 @@ function gzPlay(idx) {
   else if (t==='forge') openForge(w, (win)=>{ if(win) showToast('🔥 合成成功！','success'); });
   else if (t==='ll') openLianLian(w, (win)=>{ if(win) showToast('🔗 全部配对！','success'); });
   else if (t==='pipe') openPipe(w, (win)=>{ if(win) showToast('🔧 数据通路接通！','success'); });
+  else if (t==='m3') openMatch3(w, (win)=>{ if(win) showToast('🍬 三连清场！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -7572,6 +7599,188 @@ function openPipe(cfg, onComplete) {
     if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
   }
   render();
+}
+
+// =========================================================================
+// 9v. MATCH3 — 消消乐·三连车间（同类三连消除，L5 分类）
+// =========================================================================
+function openMatch3(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('m3')) {
+    showGameTutorial('m3', '🍬 消消乐·三连车间', [
+      '<b>点击两个相邻的同类</b>（或点一个再点相邻），<b>三连</b>就消除',
+      '消除后上方会掉下新块，<b>连锁消除</b>分数更高',
+      '每波达到目标分即过关；步数用完就失败'
+    ], function(){ openMatch3(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('m3') || 'match');
+  const cats = (cfg.categories || []).map(c => ({ name: String(c.name||''), emoji: c.emoji||'🍬' }));
+  if (cats.length < 3) { showToast('分类种类太少', 'error'); return; }
+  const COLS = cfg.cols || 8, ROWS = cfg.rows || 6;
+  const COLORS = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c07bd6','#ff9f43'];
+  const WAVES = cfg.waves || 3;
+  let wave = 1, score = 0, moves = 0, ended = false;
+  let board = [], sel = null, resolving = false;
+
+  function newWave() {
+    const targets = [28, 40, 52];
+    const movesLim = [16, 18, 20];
+    waveTarget = targets[Math.min(wave-1, targets.length-1)];
+    waveMoves = movesLim[Math.min(wave-1, movesLim.length-1)];
+    moves = 0;
+    waveEl.textContent = wave + '/' + WAVES;
+    tgtEl.textContent = waveTarget;
+    movesEl.textContent = waveMoves;
+    // 生成无初始三连的板
+    do { genBoard(); } while (findMatches().length);
+    render();
+  }
+  function genBoard() {
+    board = [];
+    for (let r=0;r<ROWS;r++) { board[r]=[]; for (let c=0;c<COLS;c++) {
+      let col; do { col = Math.floor(Math.random()*cats.length); } while (r>=2 && board[r-1][c]===col && board[r-2][c]===col || c>=2 && board[r][c-1]===col && board[r][c-2]===col);
+      board[r][c] = col;
+    }}
+  }
+  function findMatches() {
+    const matched = new Set();
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      // 横向
+      if (c+2<COLS && board[r][c]===board[r][c+1] && board[r][c]===board[r][c+2]) {
+        let e=c; while (e<COLS && board[r][e]===board[r][c]) { matched.add(r*COLS+e); e++; }
+      }
+      // 纵向
+      if (r+2<ROWS && board[r][c]===board[r+1][c] && board[r][c]===board[r+2][c]) {
+        let e=r; while (e<ROWS && board[e][c]===board[r][c]) { matched.add(e*COLS+c); e++; }
+      }
+    }
+    return [...matched];
+  }
+  function removeAndCascade() {
+    resolving = true;
+    let matched = findMatches();
+    let gained = 0, combo = 0;
+    if (!matched.length) { resolving = false; return; }
+    function stepM() {
+      if (!matched.length) {
+        // 重力 + 补新
+        for (let c=0;c<COLS;c++) {
+          let write = ROWS-1;
+          for (let r=ROWS-1;r>=0;r--) if (!(matchedSet.has(r*COLS+c))) { board[write--][c] = board[r][c]; }
+          for (let r=write;r>=0;r--) board[r][c] = Math.floor(Math.random()*cats.length);
+        }
+        matchedSet = null;
+        render();
+        const next = findMatches();
+        if (next.length) { matched = next; matchedSet = new Set(next); combo++; setTimeout(stepM, 350); }
+        else { resolving = false; if (score>=waveTarget) onWaveClear(); }
+        return;
+      }
+      matchedSet = new Set(matched);
+      gained += matched.length;
+      combo++;
+      score += matched.length * 10 * combo;
+      scoreEl.textContent = score;
+      comboEl.textContent = combo>=2 ? '连消 x'+combo : '';
+      matched.forEach(idx => { board[Math.floor(idx/COLS)][idx%COLS] = -1; });
+      matched = [];   // 清空，避免 stepM 无限循环重复加分
+      playSound('success');
+      setTimeout(stepM, 250);
+    }
+    let matchedSet = new Set(matched);
+    stepM();
+  }
+  function swap(r1,c1,r2,c2) {
+    if (resolving || ended) return;
+    [board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];
+    if (findMatches().length) {
+      moves++; movesEl.textContent = Math.max(0, waveMoves - moves);
+      playSound('click');
+      render();
+      removeAndCascade();
+      if (moves >= waveMoves && !ended && score < waveTarget) endGame(false);
+    } else {
+      [board[r1][c1], board[r2][c2]] = [board[r2][c2], board[r1][c1]];   // 换回
+      playSound('error');
+      render();
+    }
+  }
+  function onWaveClear() {
+    if (ended) return;
+    if (wave >= WAVES) { endGame(true); return; }
+    wave++; newWave();
+    showToast('🌊 第 '+wave+' 波！目标更高', 'success');
+  }
+  function render() {
+    gridEl.innerHTML = '';
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      const d = document.createElement('div');
+      const col = board[r][c];
+      d.className = 'm3-tile' + (sel && sel.r===r && sel.c===c ? ' sel' : '');
+      if (col >= 0) { d.style.background = COLORS[col]; d.textContent = cats[col].emoji; }
+      else { d.style.background = 'transparent'; }
+      d.onclick = () => {
+        if (resolving || ended) return;
+        if (!sel) { sel = {r:r,c:c}; render(); return; }
+        if (sel.r===r && sel.c===c) { sel=null; render(); return; }
+        const dr=Math.abs(sel.r-r), dc=Math.abs(sel.c-c);
+        if (dr+dc === 1) { swap(sel.r, sel.c, r, c); sel=null; }
+        else { sel = {r:r,c:c}; render(); }
+      };
+      gridEl.appendChild(d);
+    }
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="m3-box">
+      <div class="mm-head"><div><div class="mm-title">🍬 ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="m3-stats">
+        <span>🌊 第 <b id="m3Wave">1</b>/${WAVES} 波</span>
+        <span>🎯 目标 <b id="m3Tgt">28</b> 分</span>
+        <span>🎯 <b id="m3Score">0</b></span>
+        <span>👣 步数 <b id="m3Moves">16</b></span>
+        <span>🔥 <b id="m3Combo" style="color:#ff7a00"></b></span>
+      </div>
+      <div class="m3-grid" id="m3Grid"></div>
+      <div class="m3-legend">${cats.map((c,i)=>'<span><i style="background:'+COLORS[i]+'"></i>'+escHtml(c.name)+'</span>').join('')}</div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const gridEl = document.getElementById('m3Grid');
+  const waveEl = document.getElementById('m3Wave'), tgtEl = document.getElementById('m3Tgt');
+  const scoreEl = document.getElementById('m3Score'), movesEl = document.getElementById('m3Moves'), comboEl = document.getElementById('m3Combo');
+  gridEl.style.gridTemplateColumns = 'repeat(' + COLS + ', 52px)';
+  gridEl.style.gridTemplateRows = 'repeat(' + ROWS + ', 52px)';
+
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true;
+    if (isWin) { recordGameWin('m3'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs=getGameStats(); _gs.m3Best=Math.max(_gs.m3Best||0, score); _gs.m3Wins=(_gs.m3Wins||0)+(isWin?1:0); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'三连清场，车间转起来了！':'步数用完')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.m3Again()">🔁 再来一局</button><button class="mm-btn primary" onclick="window.m3Done()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.m3Again = () => { overlay.remove(); openMatch3(cfg, onComplete); };
+  window.m3Done = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(ended && score>=waveTarget); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true;
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  newWave();
 }
 
 function openMemoryMatch(cfg, onComplete) {

@@ -2824,6 +2824,42 @@
        "h": "下载镜像"
       }
      ]
+    },
+    {
+     "id": "l5_m3",
+     "name": "消消乐 · Docker 分类",
+     "type": "m3",
+     "afterTask": "5-5",
+     "blockTasks": [
+      "5-5"
+     ],
+     "subtitle": "厂长：同类组件三连消除——镜像、容器、网络、卷、Compose，认清它们！",
+     "categories": [
+      {
+       "name": "镜像",
+       "emoji": "🐳"
+      },
+      {
+       "name": "容器",
+       "emoji": "📦"
+      },
+      {
+       "name": "网络",
+       "emoji": "🌐"
+      },
+      {
+       "name": "数据卷",
+       "emoji": "💾"
+      },
+      {
+       "name": "Compose",
+       "emoji": "🧩"
+      }
+     ],
+     "cols": 8,
+     "rows": 6,
+     "waves": 3,
+     "xp": 70
     }
    ],
    "bonus": null
