@@ -4362,7 +4362,7 @@ function openTypingDefense(cfg, onComplete) {
     if (w.boss && w.hit === 0) {
       w.hit = 1;
       w.el.classList.add('ty-boss-hit');
-      boomEffect(w.x + w.el.offsetWidth/2, w.y + 12, true);
+      boomEffect(w.el.offsetLeft + w.el.offsetWidth/2, w.el.offsetTop + w.el.offsetHeight/2, true);
       playSound('error');
       combo = 0; if(comboEl) comboEl.textContent='';
       showToast('💥 BOSS 中招！再打一遍！', 'error');
@@ -4376,7 +4376,7 @@ function openTypingDefense(cfg, onComplete) {
     bullet.className = 'ty-bullet';
     bullet.style.left = cx + 'px'; bullet.style.top = cy + 'px';
     field.appendChild(bullet);
-    const tx = w.x + w.el.offsetWidth/2, ty = w.y + 12;
+    const tx = w.el.offsetLeft + w.el.offsetWidth/2, ty = w.el.offsetTop + w.el.offsetHeight/2;
     requestAnimationFrame(() => { bullet.style.transform = 'translate('+(tx-cx)+'px,'+(ty-cy)+'px)'; });
     setTimeout(() => {
       bullet.remove();
