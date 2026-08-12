@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>教师端 · 锐智工厂</title>
 <style>
+  th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+  th.sortable:hover{color:var(--cyan)}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Courier New', monospace; background: #0f0f14; color: #c8c8d0; min-height: 100vh; }
 .header { background: #181820; border-bottom: 1px solid #2a2a3a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
@@ -85,6 +87,8 @@ const RANKS = [
   { min: 7000, max: Infinity, name: '专家', cls: 'rank-expert' }
 ];
 let students = [];
+let sortKey='login', sortAsc=false;   // 默认按登录次数从高到低
+const DEFAULT_ASC={name:true, xp:false, pct:false, login:false};   // 姓名升序，数值类默认降序
 let content = null;
 
 function $(id){ return document.getElementById(id); }
@@ -151,8 +155,24 @@ function renderTable(){
     container.innerHTML='<div class="empty">暂无学生数据，请在上方添加学生</div>';
     return;
   }
-  let html='<table><thead><tr><th>姓名</th><th>密码</th><th>等级</th><th>XP</th><th>完成度</th><th>登录</th><th>操作</th></tr></thead><tbody>';
-  students.forEach(s=>{
+  // 按当前排序键排序（默认登录次数从高到低）
+  const sorted=[...students].sort((a,b)=>{
+    const sa=studentStats(a), sb=studentStats(b);
+    if(sortKey==='name'){ const d=a.name.localeCompare(b.name,'zh'); return sortAsc? d : -d; }
+    let va,vb;
+    if(sortKey==='xp'){ va=sa.xp; vb=sb.xp; }
+    else if(sortKey==='pct'){ va=sa.pct; vb=sb.pct; }
+    else { va=a.loginCount||0; vb=b.loginCount||0; }
+    const d=va-vb;
+    return sortAsc? d : -d;
+  });
+  const arrow=(k)=> sortKey===k ? (sortAsc?' ▲':' ▼') : '';
+  const head=(k,label)=>'<th class="sortable" data-sort="'+k+'" title="点击排序">'+label+arrow(k)+'</th>';
+  let html='<table><thead><tr>'+
+    head('name','姓名')+'<th>密码</th><th>等级</th>'+
+    head('xp','XP')+head('pct','完成度')+head('login','登录')+
+    '<th>操作</th></tr></thead><tbody>';
+  sorted.forEach(s=>{
     const st=studentStats(s);
     const rank=rankForXP(st.xp);
     const pct=st.pct;
@@ -173,6 +193,10 @@ function renderTable(){
   });
   html+='</tbody></table>';
   container.innerHTML=html;
+  // 绑定表头点击排序：再点同列切换升/降序
+  container.querySelectorAll('th.sortable').forEach(th=>{
+    th.onclick=()=>{ const k=th.dataset.sort; if(sortKey===k){ sortAsc=!sortAsc; } else { sortKey=k; sortAsc=!!DEFAULT_ASC[k]; } renderTable(); };
+  });
 }
 function openDetail(nameEnc){ location.href='student_detail.html?name='+nameEnc; }
 
