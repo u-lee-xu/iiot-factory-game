@@ -290,7 +290,28 @@ body {
 
 
 
+
+/* ===== 激光反射·数据路由 ===== */
+.lzr-box { width: 520px; max-width: 96vw; background: #12121a; border: 2px solid var(--green); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,.18); display: flex; flex-direction: column; }
+.lzr-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
+.lzr-stats b { color: var(--green); }
+.lzr-grid { display: grid; gap: 2px; padding: 10px; margin: 0 auto; background:#0a0d14; border-radius: 8px; }
+.lzr-cell { width: 42px; height: 42px; border-radius: 4px; background:#0d141f; display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; }
+.lzr-cell.mir { background:#151a24; }
+.lzr-cell.src { background:transparent; }
+.lzr-cell.dst { background:transparent; }
+.lzr-cell.beam { box-shadow: inset 0 0 0 2px rgba(0,230,118,.5); }
+.lzr-tip { padding: 6px 14px; font-size: 12px; color: var(--dim); text-align: center; border-top: 1px solid var(--border); }
 /* ===== 工厂大亨·数据经营（放置） ===== */
+/* ===== 黑客终端·网络溯源 ===== */
+/* ===== 数据迷宫·包到彼岸 ===== */
+/* ===== 2048·数据融合 ===== */
+/* ===== 车间防线·塔防 ===== */
+/* ===== 消消乐·三连车间 ===== */
+/* ===== 管道工·数据通路 ===== */
+/* ===== 连连看·对对碰 ===== */
+/* ===== 数据熔炉（合成大西瓜·数据单位）===== */
+/* ===== 数据分类大师（传送带分拣）===== */
 .tyc-box { width: 520px; max-width: 96vw; background: #12121a; border: 2px solid var(--amber); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(255,176,0,.2); display: flex; flex-direction: column; }
 .tyc-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
 .tyc-stats b { color: var(--amber); }
@@ -2151,10 +2172,11 @@ function renderMission() {
       const isMaze = wType === 'maze';
       const isHack = wType === 'hack';
       const isTyc = wType === 'tyc';
+      const isLzr = wType === 'lzr';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : isTd ? '🛡️' : isT48 ? '🔢' : isMaze ? '🌐' : isHack ? '🕹️' : isTyc ? '🏭' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3 || isTd || isT48 || isMaze || isHack || isTyc;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : isTd ? '🛡️' : isT48 ? '🔢' : isMaze ? '🌐' : isHack ? '🕹️' : isTyc ? '🏭' : isLzr ? '🔦' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3 || isTd || isT48 || isMaze || isHack || isTyc || isLzr;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -2180,6 +2202,7 @@ function renderMission() {
       else if (isMaze) _meta = '迷宫寻路';
       else if (isHack) _meta = (w.nodes||[]).length + ' 个节点';
       else if (isTyc) _meta = '目标' + (w.target||50000);
+      else if (isLzr) _meta = '光束路由';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2208,6 +2231,7 @@ function renderMission() {
         else if (isMaze) openMaze(w, (win) => { if (win) showToast('🌐 数据包送达！', 'success'); });
         else if (isHack) openHacknet(w, (win) => { if (win) showToast('🕹️ 全网络拿下！', 'success'); });
         else if (isTyc) openTycoon(w, (win) => { if (win) showToast('🏭 产值达标！', 'success'); });
+        else if (isLzr) openLaser(w, (win) => { if (win) showToast('🔦 光束连通！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4349,6 +4373,8 @@ const ACHIEVEMENTS = [
   { id: 'hack_3', name: '网络黑客', desc: '黑客终端通关 3 次', emoji: '🕹️', test: c => (c.hackWins||0) >= 3 },
   { id: 'tyc_1', name: '工厂主', desc: '工厂大亨通关 1 次', emoji: '🏭', test: c => (c.tycWins||0) >= 1 },
   { id: 'tyc_3', name: '工业巨头', desc: '工厂大亨通关 3 次', emoji: '🏭', test: c => (c.tycWins||0) >= 3 },
+  { id: 'lzr_1', name: '点亮通路', desc: '激光反射通关 1 次', emoji: '🔦', test: c => (c.lzrWins||0) >= 1 },
+  { id: 'lzr_3', name: '光束大师', desc: '激光反射通关 3 次', emoji: '🔦', test: c => (c.lzrWins||0) >= 3 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4798,6 +4824,7 @@ function recordGameWin(type) {
   else if (t === 'maze') gs.mazeWins = (gs.mazeWins || 0) + 1;
   else if (t === 'hack') gs.hackWins = (gs.hackWins || 0) + 1;
   else if (t === 'tyc') gs.tycWins = (gs.tycWins || 0) + 1;
+  else if (t === 'lzr') gs.lzrWins = (gs.lzrWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4848,6 +4875,8 @@ function achievementContext() {
   ctx.hackBest = gs.hackBest || 0;
   ctx.tycWins = gs.tycWins || 0;
   ctx.tycBest = gs.tycBest || 0;
+  ctx.lzrWins = gs.lzrWins || 0;
+  ctx.lzrBest = gs.lzrBest || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -5229,7 +5258,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':t==='tyc'?'🏭':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':t==='tyc'?'🏭':t==='lzr'?'🔦':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -5256,12 +5285,13 @@ function gzMeta(w) {
   if (t==='maze') return '迷宫寻路';
   if (t==='hack') return ((w.nodes||[]).length) + ' 个节点';
   if (t==='tyc') return '目标' + (w.target||50000);
+  if (t==='lzr') return '光束路由';
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td'||t==='t48'||t==='maze'||t==='hack'||t==='tyc';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td'||t==='t48'||t==='maze'||t==='hack'||t==='tyc'||t==='lzr';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5335,6 +5365,7 @@ function gzPlay(idx) {
   else if (t==='maze') openMaze(w, (win)=>{ if(win) showToast('🌐 数据包送达！','success'); });
   else if (t==='hack') openHacknet(w, (win)=>{ if(win) showToast('🕹️ 全网络拿下！','success'); });
   else if (t==='tyc') openTycoon(w, (win)=>{ if(win) showToast('🏭 产值达标！','success'); });
+  else if (t==='lzr') openLaser(w, (win)=>{ if(win) showToast('🔦 光束连通！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -8618,6 +8649,110 @@ function openTycoon(cfg, onComplete) {
   }
   renderShop();
   raf = requestAnimationFrame(frame);
+}
+
+// =========================================================================
+// 9p. LASER — 激光反射·数据路由（放镜子把数据光束反射到目标）
+// =========================================================================
+function openLaser(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('lzr')) {
+    showGameTutorial('lzr', '🔦 激光反射·数据路由', [
+      '<b>点击空格放镜子</b>（再点切 /、\ ），把数据光束从 💡 反射到 📡',
+      '点镜子可循环：空 → / → \ → 空',
+      '光束到达目标即过关'
+    ], function(){ openLaser(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('lzr') || 'match');
+  const COLS = cfg.cols || 7, ROWS = cfg.rows || 7;
+  const src = { x:0, y:Math.floor(ROWS/2) }, dst = { x:COLS-1, y:0 };
+  let mirrors = {}, moves = 0, ended = false, resultWin = false;
+
+  function reflect(dir, m) {
+    if (m==='/') { if (dir[0]===1) return [0,-1]; if (dir[0]===-1) return [0,1]; if (dir[1]===-1) return [1,0]; return [-1,0]; }
+    else { if (dir[0]===1) return [0,1]; if (dir[0]===-1) return [0,-1]; if (dir[1]===-1) return [-1,0]; return [1,0]; }
+  }
+  function trace() {
+    let x=src.x, y=src.y, dir=[1,0]; const seen=new Set(); const path=[[x,y]];
+    while (true) {
+      x+=dir[0]; y+=dir[1];
+      if (x<0||y<0||x>=COLS||y>=ROWS) break;
+      if (x===dst.x && y===dst.y) { path.push([x,y]); return {win:true, path}; }
+      const k=x+','+y;
+      if (seen.has(k)) break;
+      seen.add(k); path.push([x,y]);
+      if (mirrors[k]) dir = reflect(dir, mirrors[k]);
+    }
+    return {win:false, path};
+  }
+  function render() {
+    const tr = trace();
+    gridEl.innerHTML='';
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      const d=document.createElement('div');
+      d.className='lzr-cell'; const k=c+','+r;
+      if (mirrors[k]) { d.classList.add('mir'); d.textContent=mirrors[k]; }
+      if (tr.path.some(p=>p[0]===c&&p[1]===r)) d.classList.add('beam');
+      if (c===src.x&&r===src.y){ d.textContent='💡'; }
+      if (c===dst.x&&r===dst.y){ d.textContent='📡'; }
+      d.onclick=()=>cycleMirror(k);
+      gridEl.appendChild(d);
+    }
+    movesEl.textContent = moves;
+    return tr.win;
+  }
+  function cycleMirror(k) {
+    if (ended) return;
+    moves++;
+    const cur=mirrors[k];
+    if (!cur) mirrors[k]='/';
+    else if (cur==='/') mirrors[k]='\\';
+    else delete mirrors[k];
+    playSound('click');
+    const win = render();
+    if (win) endGame(true);
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="lzr-box">
+      <div class="mm-head"><div><div class="mm-title">🔦 ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="lzr-stats"><span>👣 镜子 <b id="lzrMoves">0</b></span><span>🎯 让 💡 → 📡 连通</span></div>
+      <div class="lzr-grid" id="lzrGrid" style="grid-template-columns:repeat(${COLS},42px)"></div>
+      <div class="lzr-tip">点空格放 / 或 \ 镜子，把数据光束反射到 📡</div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const gridEl = document.getElementById('lzrGrid'), movesEl = document.getElementById('lzrMoves');
+
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true; resultWin = isWin;
+    if (isWin) { recordGameWin('lzr'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs=getGameStats(); _gs.lzrBest=Math.max(_gs.lzrBest||0, moves); _gs.lzrWins=(_gs.lzrWins||0)+(isWin?1:0); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'数据光束连通目标！':'还没连通')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">用了 <b style="color:var(--amber)">'+moves+'</b> 面镜子</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.lzrAgain()">🔁 再布一局</button><button class="mm-btn primary" onclick="window.lzrDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.lzrAgain = () => { overlay.remove(); openLaser(cfg, onComplete); };
+  window.lzrDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(resultWin); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true;
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  render();
 }
 
 function openMemoryMatch(cfg, onComplete) {
