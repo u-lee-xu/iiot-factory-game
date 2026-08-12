@@ -4316,15 +4316,20 @@ function openTypingDefense(cfg, onComplete) {
     field.appendChild(el);
     active.push({ text, y:0, el, disp: '👑 ' + text, speed: wordSpeed() * 0.55, pt: 30, boss:true, hp:2, hit:0 });
     leftEl.textContent = '👑';
+    // BOSS 战重新给满倒计时，避免上一波剩余时间太短导致恢复后立刻超时扣命
+    waveTimeLeft = cfg._endless ? Math.max(8, WAVE_TIME - (wave - 1)) : WAVE_TIME;
+    if (timeEl) timeEl.textContent = Math.ceil(waveTimeLeft);
     playSound('alarm');
     // 暂停 + 提示
     paused = true;
     clearTimeout(spawnTimer);
     const tip = document.createElement('div');
     tip.className = 'ty-boss-tip';
-    tip.innerHTML = '👑 <b>BOSS 来袭！</b>它很硬，要<u>打两遍</u>——打一遍会受伤，再打一遍才打爆！<button class="mm-btn primary" id="bossGo" style="margin-top:8px">开打！</button>';
+    tip.innerHTML = '👑 <b>BOSS 来袭！</b>它很硬，要<u>打两遍</u>——打一遍会受伤，再打一遍才打爆！<button class="mm-btn primary" id="bossGo" style="margin-top:8px">开打！(回车)</button>';
     field.appendChild(tip);
-    document.getElementById('bossGo').onclick = () => { tip.remove(); paused = false; spawnTimer = setTimeout(spawnWord, 1400); input.focus(); };
+    var _bg = document.getElementById('bossGo');
+    _bg.onclick = () => { tip.remove(); paused = false; spawnTimer = setTimeout(spawnWord, 1400); input.focus(); };
+    _bg.focus();   // 聚焦按钮：回车/空格 = 明确开打，不再是误触
   }
 
   function clearScreen() {
