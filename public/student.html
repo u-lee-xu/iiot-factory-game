@@ -1098,7 +1098,8 @@ body:has(.mm-overlay) { overflow: hidden; }
     <button class="btn-icon" onclick="openPasswordModal()" title="设置/修改密码" id="passwordBtn" style="display:none">🔑</button>
     <button class="btn-icon" onclick="openPedia()" title="术语图鉴">📖</button>
     <button class="btn-icon" id="soundToggle" onclick="toggleSound()" title="音效开关">🔊</button>
-    <button class="btn-icon" id="musicToggle" onclick="toggleMusic()" title="背景音乐">🎵</button>
+    <button class="btn-icon" id="musicToggle" onclick="toggleMusic()" title="背景音乐开关">🎵</button>
+    <button class="btn-icon" onclick="nextMusic()" title="切换背景曲">⏭</button>
     <span class="director-avatar" id="directorAvatar" style="font-size:20px;margin-left:8px;cursor:default;transition:transform .2s">👨‍💼</span>
     <button class="btn-logout" onclick="logout()">退出</button>
   </div>
@@ -1393,6 +1394,20 @@ function toggleMusic() {
   }
 }
 
+// 背景曲循环（首页右上角 ⏭ 切换可选曲目）
+const BG_TRACKS = ['hub','control_room','console','workshop','edge_cabinet','cloud_platform','big_screen','data_pipe','ai_lab','cafe_light','night_shift','rush_hour','calm_factory'];
+let bgIdx = 0;
+function nextMusic() {
+  const avail = BG_TRACKS.filter(t => window.MUSIC_SONGS && window.MUSIC_SONGS[t]);
+  if (!avail.length) return;
+  let i = avail.indexOf(currentTrack);
+  if (i < 0) i = bgIdx % avail.length;
+  i = (i + 1) % avail.length;
+  bgIdx = i;
+  const t = avail[i];
+  playMusic(t);
+  showToast('🎵 背景曲：' + t, 'info');
+}
 // ===== 区域(幕)背景音乐 & 按幕选小游戏配乐 =====
 let currentAreaKey = 'hub';
 function setArea(lvId) {
