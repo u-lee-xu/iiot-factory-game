@@ -694,6 +694,27 @@
      "perWave": 10,
      "lives": 3,
      "xp": 70
+    },
+    {
+     "id": "l1_forge",
+     "name": "数据熔炉 · 数据单位",
+     "type": "forge",
+     "afterTask": "1-4",
+     "blockTasks": [
+      "1-4"
+     ],
+     "subtitle": "厂长：把数据单元丢进熔炉，同类相撞合成更大的——比特合成字节，字节合成KB…目标是炼出 TB！",
+     "units": [
+      "bit",
+      "Byte",
+      "KB",
+      "MB",
+      "GB",
+      "TB"
+     ],
+     "target": "MB",
+     "drops": 26,
+     "xp": 70
     }
    ],
    "bonus": {
