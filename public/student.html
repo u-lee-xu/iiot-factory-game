@@ -5958,6 +5958,7 @@ function openDataRacing(cfg, onComplete) {
 }
 
 function openSnake(cfg, onComplete) {
+  // ================= 难度与配置 =================
   applyMiniTier(cfg);
   if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
   if (!tutSeen('snake')) {
@@ -5970,18 +5971,26 @@ function openSnake(cfg, onComplete) {
     return;
   }
   playMusic(gameSong('snake') || 'hub');
+
+  // ---- 词库 & 配对表 ----
   const pairs = (cfg.pairs || []).map(function(p){ return {id:p.id||'', t:String(p.t||''), h:String(p.h||'')}; }).filter(function(p){ return p.t && p.h; });
-  const terms = pairs.map(function(p){ return p.t; });
-  const hints = pairs.map(function(p){ return p.h; });
-  const hintOf = {}; pairs.forEach(function(p){ hintOf[p.t] = p.h; });
-  const idOf = {}; pairs.forEach(function(p){ idOf[p.t] = p.id; });
+  const terms = pairs.map(p=>p.t), hints = pairs.map(p=>p.h);
+  const hintOf = {}, idOf = {};
+  pairs.forEach(p=>{ hintOf[p.t]=p.h; idOf[p.t]=p.id; });
   const WIN = cfg.win || 6;
-  const W = 840, H = 560, cell = 24, COLS = Math.floor(W/cell), ROWS = Math.floor(H/cell);
+
+  // ---- 画布 / 网格（文字整体放大）----
+  const W = 840, H = 560, cell = 30, COLS = Math.floor(W/cell), ROWS = Math.floor(H/cell);
+  const F_FOOD = 15, F_FLOAT = 19;      // 屏上字号(px)：旧版 8/13 过小，明显放大
+
+  // ---- 游戏状态 ----
   let lives = 3, score = 0, combo = 0, paired = 0, ended = false, quizLock = false;
   let currentTerm = '';
   let snake = [{x:6,y:6},{x:5,y:6},{x:4,y:6}], dir = {x:1,y:0}, nextDir = {x:1,y:0};
   let speed = 5, timer = 0, invuln = 0, spawnTimer = 0;
   let foods = [], particles = [], floats = [];
+
+  // ================= 界面 =================
   const overlay = document.createElement('div');
   overlay.className = 'mm-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
@@ -6003,37 +6012,55 @@ function openSnake(cfg, onComplete) {
   const cv = document.getElementById('snCanvas'), ctx = cv.getContext('2d');
   const cw = cv.clientWidth || W; const sf = Math.max(0.6, cw/W);
   const livesEl=document.getElementById('snLives'), scoreEl=document.getElementById('snScore'), termEl=document.getElementById('snTerm'), pairEl=document.getElementById('snPair'), comboEl=document.getElementById('snCombo');
-  document.addEventListener('keydown', kd); document.addEventListener('keyup', ku);
+
+  // ================= 输入 =================
   function kd(e){
     if (quizLock) return;
-    if(e.key==='ArrowUp'||e.key==='w'){nextDir={x:0,y:-1};e.preventDefault();} else if(e.key==='ArrowDown'||e.key==='s'){nextDir={x:0,y:1};e.preventDefault();}
-    else if(e.key==='ArrowLeft'||e.key==='a'){nextDir={x:-1,y:0};e.preventDefault();} else if(e.key==='ArrowRight'||e.key==='d'){nextDir={x:1,y:0};e.preventDefault();}
-    else if(e.key==='Escape')closeGame(false);
+    if(e.key==='ArrowUp'||e.key==='w'){nextDir={x:0,y:-1};e.preventDefault();}
+    else if(e.key==='ArrowDown'||e.key==='s'){nextDir={x:0,y:1};e.preventDefault();}
+    else if(e.key==='ArrowLeft'||e.key==='a'){nextDir={x:-1,y:0};e.preventDefault();}
+    else if(e.key==='ArrowRight'||e.key==='d'){nextDir={x:1,y:0};e.preventDefault();}
+    else if(e.key==='Escape') closeGame(false);
   }
-  function ku(e){}
+  document.addEventListener('keydown', kd);
   let swipeStart=null;
-  cv.addEventListener('pointerdown', e=>{ if(quizLock)return; swipeStart={x:e.clientX,y:e.clientY}; });
-  cv.addEventListener('pointerup', e=>{ if(!swipeStart)return; const dx=e.clientX-swipeStart.x, dy=e.clientY-swipeStart.y; if(Math.abs(dx)>Math.abs(dy)) nextDir={x:Math.sign(dx),y:0}; else if(dy!==0) nextDir={x:0,y:Math.sign(dy)}; swipeStart=null; });
-  function isOnSnake(x,y){ return snake.some(function(s){ return s.x===x && s.y===y; }); }
+  cv.addEventListener('pointerdown', e=>{ if(quizLock) return; swipeStart={x:e.clientX,y:e.clientY}; });
+  cv.addEventListener('pointerup', e=>{ if(!swipeStart) return; const dx=e.clientX-swipeStart.x, dy=e.clientY-swipeStart.y; if(Math.abs(dx)>Math.abs(dy)) nextDir={x:Math.sign(dx),y:0}; else if(dy!==0) nextDir={x:0,y:Math.sign(dy)}; swipeStart=null; });
+
+  // ================= 食物 =================
+  function isOnSnake(x,y){ return snake.some(s=>s.x===x&&s.y===y); }
   function spawnFood(kind){
-    let tries=0, x,y;
-    do { x=Math.floor(Math.random()*COLS); y=Math.floor(Math.random()*ROWS); tries++; } while(isOnSnake(x,y) && tries<30);
-    const isTerm = kind ? kind==='term' : Math.random()<0.5;
-    if(isTerm){ const t=terms[Math.floor(Math.random()*terms.length)]; foods.push({x,y,kind:'term',label:t}); }
-    else { const h=hints[Math.floor(Math.random()*hints.length)]; foods.push({x,y,kind:'hint',label:h}); }
+    // 找一个空位（避开蛇身和已有食物），最多试 60 次
+    let x,y,tries=0;
+    do { x=Math.floor(Math.random()*COLS); y=Math.floor(Math.random()*ROWS); tries++; }
+    while((isOnSnake(x,y) || foods.some(f=>f.x===x&&f.y===y)) && tries<60);
+    // 场上不要出现两个一样的词/解释，避免配对歧义
+    const busy = {}; foods.forEach(f=>{ busy[f.label]=true; });
+    if(kind==='term'){
+      const pool = terms.filter(t=>!busy[t]);
+      const t = pool.length ? pool[Math.floor(Math.random()*pool.length)] : terms[Math.floor(Math.random()*terms.length)];
+      foods.push({x,y,kind:'term',label:t});
+    } else {
+      const pool = hints.filter(h=>!busy[h]);
+      const h = pool.length ? pool[Math.floor(Math.random()*pool.length)] : hints[Math.floor(Math.random()*hints.length)];
+      foods.push({x,y,kind:'hint',label:h});
+    }
   }
   function ensureFoods(){
-    if(!foods.some(function(f){return f.kind==='term';})) spawnFood('term');
-    if(!foods.some(function(f){return f.kind==='hint';})) spawnFood('hint');
-    while(foods.length < 4) spawnFood();
+    if(!foods.some(f=>f.kind==='term')) spawnFood('term');
+    if(!foods.some(f=>f.kind==='hint')) spawnFood('hint');
+    while(foods.length<5) spawnFood(Math.random()<0.5?'term':'hint');
   }
   function addParticles(x,y,c){ for(let i=0;i<14;i++)particles.push({x:x*cell+cell/2,y:y*cell+cell/2,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220,t:0,color:c}); }
-  function float(x,y,txt,c){ floats.push({x:x*cell+cell/2,y:y*cell+cell/2,txt:t,color:c,t:0}); }
-  // 厂长问答（每3对）
+  // 飘字：注意参数是 txt，对象里写 txt:txt（旧版误写 txt:t → 吃食物即 ReferenceError 死机）
+  function float(x,y,txt,c){ floats.push({x:x*cell+cell/2,y:y*cell+cell/2,txt:txt,color:c,t:0}); }
+
+  // ================= 厂长问答（每 3 对）=================
   function askFactoryQuiz(){
+    if(ended) return;
     quizLock = true;
     const q = pairs[Math.floor(Math.random()*pairs.length)];
-    const pool = pairs.filter(function(p){ return p.t !== q.t; }).map(function(p){ return p.h; });
+    const pool = pairs.filter(p=>p.t!==q.t).map(p=>p.h);
     const opts = [q.h].concat(pool.slice(0,3));
     for(let i=opts.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [opts[i],opts[j]]=[opts[j],opts[i]]; }
     const ov=document.createElement('div');
@@ -6042,7 +6069,7 @@ function openSnake(cfg, onComplete) {
     ov.innerHTML='<div class="mm-box" style="width:min(480px,92vw)"><div class="mm-head"><div><div class="mm-title">🤔 厂长提问</div><div class="mm-sub">答对额外 +1 命 / +30 分</div></div></div><div class="pd-body"><div style="font-size:16px;font-weight:bold;color:var(--amber);margin-bottom:10px">「'+escHtml(q.t)+'」是什么意思？</div><div style="display:flex;flex-direction:column;gap:8px" id="snqOpts"></div></div></div>';
     document.body.appendChild(ov);
     const box=ov.querySelector('#snqOpts');
-    opts.forEach(function(h,i){
+    opts.forEach(function(h){
       const b=document.createElement('button'); b.className='mm-btn'; b.style.cssText='text-align:left;white-space:normal;height:auto;line-height:1.4;padding:10px 14px';
       b.textContent=h;
       b.onclick=function(){
@@ -6053,69 +6080,82 @@ function openSnake(cfg, onComplete) {
       box.appendChild(b);
     });
   }
+
+  // ================= 吃食物 / 配对 =================
   function eat(f){
     if(f.kind==='term'){
+      // 吃蓝色术语：带着它（若已带别的词则换带）
+      const prev = currentTerm;
       currentTerm=f.label; termEl.textContent=f.label; termEl.style.color='#7ee8fa';
       score+=5; scoreEl.textContent=score; playSound('click');
-      float(f.x,f.y,'带着「'+f.label+'」，去找解释','#7ee8fa');
+      float(f.x,f.y, prev ? '换带「'+f.label+'」' : '带着「'+f.label+'」，去找解释', '#7ee8fa');
+    } else if(currentTerm && hintOf[currentTerm]===f.label){
+      // 配对成功
+      combo++; score += 25 + (combo>=5?10:combo>=3?5:0); paired++;
+      scoreEl.textContent=score; comboEl.textContent=combo>=2?'x'+combo:''; pairEl.textContent=paired;
+      addParticles(f.x,f.y,'#00e676'); float(f.x,f.y,'✅ '+currentTerm+'='+hintOf[currentTerm],'#00e676');
+      playSound('success');
+      if(idOf[currentTerm]) unlockPedia(currentLevelId, [idOf[currentTerm]]);   // 收录图鉴
+      currentTerm=''; termEl.textContent='—'; termEl.style.color='#7ee8fa';
+      if(paired>=WIN){ endGame(true); return; }
+      if(paired%3===0) setTimeout(askFactoryQuiz, 350);   // 特效播完再出题，避免打断
+    } else if(currentTerm){
+      // 吃错解释：清掉带的词
+      score+=2; scoreEl.textContent=score; combo=0; if(comboEl)comboEl.textContent='';
+      float(f.x,f.y,'❌ 不是「'+currentTerm+'」的解释','#ff5252'); playSound('error');
+      currentTerm=''; termEl.textContent='—';
     } else {
-      if(currentTerm && hintOf[currentTerm]===f.label){
-        combo++; score += 25 + (combo>=5?10:combo>=3?5:0); paired++;
-        scoreEl.textContent=score; comboEl.textContent=combo>=2?'x'+combo:''; pairEl.textContent=paired;
-        addParticles(f.x,f.y,'#00e676'); float(f.x,f.y,'✅ '+currentTerm+'='+hintOf[currentTerm],'#00e676');
-        playSound('success');
-        if(idOf[currentTerm]) unlockPedia(currentLevelId, [idOf[currentTerm]]);   // 收录图鉴
-        currentTerm=''; termEl.textContent='—'; termEl.style.color='#7ee8fa';
-        if(paired>=WIN){ endGame(true); return; }
-        if(paired%3===0) askFactoryQuiz();
-      } else if(currentTerm){
-        score+=2; scoreEl.textContent=score; combo=0; if(comboEl)comboEl.textContent='';
-        float(f.x,f.y,'❌ 不是「'+currentTerm+'」的解释','#ff5252'); playSound('error');
-        currentTerm=''; termEl.textContent='—';
-      } else {
-        score+=2; scoreEl.textContent=score; float(f.x,f.y,'先吃蓝色术语，再吃解释','#ffd27d');
-      }
+      score+=2; scoreEl.textContent=score; float(f.x,f.y,'先吃蓝色术语，再吃解释','#ffd27d');
     }
   }
-  ensureFoods();
-  function update(dt){
-    if(ended || quizLock) return;
-    if(invuln>0)invuln-=dt;
-    if(!(nextDir.x===-dir.x && nextDir.y===-dir.y)) dir=nextDir;
-    speed = 5 + paired*0.4; timer += dt; const step=1/speed;
-    if(timer<step) return; timer-=step;
-    const head={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
-    if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){ loseLife(); return; }
-    if(snake.some(function(s){return s.x===head.x&&s.y===head.y;})){ loseLife(); return; }
-    snake.unshift(head);
-    let ate=null;
-    foods.forEach(function(f){ if(!f.hit && f.x===head.x && f.y===head.y){ f.hit=true; ate=f; } });
-    if(ate){ eat(ate); if(ended)return; }
-    foods=foods.filter(function(f){return !f.hit;});
-    if(!ate) snake.pop();
-    // 补充食物
-    spawnTimer-=dt; if(spawnTimer<=0){ ensureFoods(); spawnTimer=0.6; }
-    if(cfg._endless && paired>0 && paired%10===0) speed = 5 + paired*0.6;  // 无限战更快
-  }
+
+  // ================= 移动 / 碰撞 =================
   function loseLife(){
     playSound('error'); invuln=1.5; lives--; livesEl.textContent=lives; addParticles(snake[0].x,snake[0].y,'#ff5252');
     if(lives<=0){ endGame(false); return; }
     snake=snake.slice(0,3); currentTerm=''; termEl.textContent='—';
   }
+  function step(){
+    const head={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+    if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){ loseLife(); return; }
+    if(snake.some(s=>s.x===head.x&&s.y===head.y)){ loseLife(); return; }
+    snake.unshift(head);
+    let ate=null;
+    for(let i=0;i<foods.length;i++){ const f=foods[i]; if(!f.hit && f.x===head.x && f.y===head.y){ f.hit=true; ate=f; break; } }
+    if(ate){ eat(ate); if(ended) return; }
+    foods=foods.filter(f=>!f.hit);
+    if(!ate) snake.pop();
+    // 补充食物
+    spawnTimer-=dt; if(spawnTimer<=0){ ensureFoods(); spawnTimer=0.6; }
+    if(cfg._endless && paired>0 && paired%10===0) speed = 5 + paired*0.6;   // 无限战更快
+  }
+  function update(dt){
+    if(ended || quizLock) return;
+    if(invuln>0) invuln-=dt;
+    if(!(nextDir.x===-dir.x && nextDir.y===-dir.y)) dir=nextDir;
+    speed = 5 + paired*0.4; timer += dt; const stepT=1/speed;
+    if(timer<stepT) return; timer-=stepT;
+    step();
+  }
+
+  // ================= 渲染 =================
   function draw(){
     ctx.clearRect(0,0,W,H);
     ctx.strokeStyle='rgba(0,188,212,.07)'; ctx.lineWidth=1;
     for(let x=0;x<=W;x+=cell){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<=H;y+=cell){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-    // 食物
+    // 食物：蓝=术语 / 黄=解释，圆点 + 上方完整文字（深色描边便于阅读）
     foods.forEach(function(f){
       const fx=f.x*cell+cell/2, fy=f.y*cell+cell/2;
       const isTerm = f.kind==='term';
       ctx.fillStyle = isTerm ? '#2196f3' : '#ffb300';
       ctx.shadowColor = isTerm ? '#2196f3' : '#ffb300'; ctx.shadowBlur=10;
-      ctx.beginPath(); ctx.arc(fx,fy,11,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
-      ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(8/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(f.label.length>4?f.label.slice(0,4)+'…':f.label, fx, fy);
+      ctx.beginPath(); ctx.arc(fx,fy,13,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+      ctx.font='bold '+Math.round(F_FOOD/sf)+'px sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+      ctx.lineWidth=4; ctx.strokeStyle='rgba(0,0,0,.85)';
+      ctx.strokeText(f.label, fx, fy-18);
+      ctx.fillStyle='#fff'; ctx.fillText(f.label, fx, fy-18);
     });
     // 蛇（带词时蛇头发蓝光）
     snake.forEach(function(s,i){
@@ -6128,25 +6168,36 @@ function openSnake(cfg, onComplete) {
     // 粒子
     particles.forEach(function(p){ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
     ctx.globalAlpha=1; particles=particles.filter(function(p){return p.t<0.5;});
-    // 飘字
-    floats.forEach(function(f){ f.t+=dt; ctx.globalAlpha=Math.max(0,1-f.t/1.3); ctx.fillStyle=f.color; ctx.font='bold '+Math.round(13/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.fillText(f.txt, f.x, f.y-f.t*40); });
+    // 飘字（放大）
+    floats.forEach(function(f){ f.t+=dt; ctx.globalAlpha=Math.max(0,1-f.t/1.3); ctx.fillStyle=f.color; ctx.font='bold '+Math.round(F_FLOAT/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.fillText(f.txt, f.x, f.y-f.t*40); });
     ctx.globalAlpha=1; floats=floats.filter(function(f){return f.t<1.3;});
   }
+
+  // ================= 结算 =================
   function endGame(isWin){
-    if(ended)return; ended=true;
+    if(ended) return; ended=true;
     if(isWin){ recordGameWin('snake'); miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(function(){
       const res=document.createElement('div'); res.className='ty-result';
-      focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🐍</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'网络三件套配对完成！':'网线断了，重接一下')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">配对 <b style="color:var(--amber)">'+paired+'</b> 对 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="font-size:13px;color:var(--dim);margin-top:4px">'+'记住的术语已收录图鉴'+(isWin?'':'，配对 '+WIN+' 对即通关')+'</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.snAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.snDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     },300);
   }
-  window.snAgain=function(){ overlay.remove(); openSnake(cfg,onComplete); };
-  window.snDone=function(){ if(onComplete)onComplete(paired>=WIN); overlay.remove(); playAreaMusic(); };
-  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); overlay.remove(); if(manual){if(onComplete)onComplete(false);playAreaMusic();} }
+  function cleanup(){ document.removeEventListener('keydown', kd); }
+  window.snAgain=function(){ cleanup(); overlay.remove(); openSnake(cfg,onComplete); };
+  window.snDone=function(){ cleanup(); if(onComplete)onComplete(paired>=WIN); overlay.remove(); playAreaMusic(); };
+  function closeGame(manual){ if(ended) return; ended=true; cancelAnimationFrame(raf); cleanup(); overlay.remove(); if(manual){ if(onComplete)onComplete(false); playAreaMusic(); } }
+
+  // ================= 主循环（try/catch 防御：单点异常不再死机）=================
+  ensureFoods();
   let last=performance.now(), dt=0;
-  function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
+  function loop(now){
+    dt=Math.min(0.05,(now-last)/1000); last=now;
+    try { update(dt); draw(); }
+    catch(e){ console.error('[网线贪吃蛇] 循环异常：', e); }
+    raf=requestAnimationFrame(loop);
+  }
   let raf; raf=requestAnimationFrame(loop);
 }
 
