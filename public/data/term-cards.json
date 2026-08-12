@@ -2407,6 +2407,44 @@
      ],
      "advanced": true,
      "tip": "主动配对：把飞机炮口切到敌人的名词，才能打中它"
+    },
+    {
+     "id": "l3_maze",
+     "name": "数据迷宫 · 协议门",
+     "type": "maze",
+     "afterTask": "3-4",
+     "blockTasks": [
+      "3-4"
+     ],
+     "subtitle": "厂长：把数据包穿过车间迷宫送到服务器，遇到协议门答对才放行！",
+     "pairs": [
+      {
+       "term": "Modbus",
+       "hint": "最老最开放的工业协议"
+      },
+      {
+       "term": "ProfiNet",
+       "hint": "西门子·毫秒级实时"
+      },
+      {
+       "term": "EtherCAT",
+       "hint": "倍福·飞读飞写"
+      },
+      {
+       "term": "MQTT",
+       "hint": "发布订阅轻量协议"
+      },
+      {
+       "term": "OPC UA",
+       "hint": "跨平台安全通讯"
+      },
+      {
+       "term": "DNP3",
+       "hint": "电力行业远动协议"
+      }
+     ],
+     "timeLimit": 90,
+     "xp": 70
     }
    ],
    "bonus": null
