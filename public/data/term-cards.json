@@ -1646,6 +1646,44 @@
        "ans": 0
       }
      ]
+    },
+    {
+     "id": "l2_ll",
+     "name": "连连看 · SSH 对对碰",
+     "type": "ll",
+     "afterTask": "2-8",
+     "blockTasks": [
+      "2-8"
+     ],
+     "subtitle": "厂长：把术语和它的解释连成一条不超过两个拐弯的路，消除配对！",
+     "pairs": [
+      {
+       "term": "私钥",
+       "hint": "自己保存、绝不外传"
+      },
+      {
+       "term": "公钥",
+       "hint": "放到服务器 authorized_keys"
+      },
+      {
+       "term": "SSH 默认端口",
+       "hint": "22"
+      },
+      {
+       "term": "ssh 命令",
+       "hint": "远程登录服务器"
+      },
+      {
+       "term": "authorized_keys",
+       "hint": "存放允许登录的公钥"
+      },
+      {
+       "term": "密钥认证",
+       "hint": "无需密码的安全登录"
+      }
+     ],
+     "timeLimit": 150,
+     "xp": 70
     }
    ],
    "bonus": null

@@ -282,7 +282,20 @@ body {
 .prog-bar-fill { height: 100%; background: var(--green); width: 0; transition: width .3s; }
 
 
+
+/* ===== 连连看·对对碰 ===== */
+.ll-box { width: 620px; max-width: 96vw; background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.2); display: flex; flex-direction: column; }
+.ll-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
+.ll-stats b { color: var(--cyan); }
+.ll-grid { display: grid; gap: 6px; padding: 12px; justify-content: center; margin: 0 auto; }
+.ll-tile { width: 74px; height: 54px; border-radius: 6px; border: 2px solid var(--border); background: #1a1a24; color: var(--text); font-size: 13px; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; line-height: 1.25; transition: all .15s; }
+.ll-tile.sel { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,188,212,.5); transform: scale(1.05); }
+.ll-tile.removed { visibility: hidden; pointer-events: none; }
+.ll-tile.wrong { border-color: var(--red); animation: soShake .3s; }
+.ll-btn { background:#1a1a24; border:1px solid var(--border); color:var(--text); padding:6px 14px; border-radius:6px; cursor:pointer; font-family:inherit; font-size:13px; }
+.ll-btn:hover { border-color: var(--cyan); }
 /* ===== 数据熔炉（合成大西瓜·数据单位）===== */
+/* ===== 数据分类大师（传送带分拣）===== */
 .fg-box { width: 560px; max-width: 96vw; background: #12121a; border: 2px solid var(--red); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(255,85,85,.2); display: flex; flex-direction: column; }
 .fg-stats { display: flex; gap: 16px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; }
 .fg-stats b { color: var(--red); }
@@ -1998,10 +2011,11 @@ function renderMission() {
       const isPacman = wType === 'pacman', isTank = wType === 'tank', isBreakout = wType === 'breakout';
       const isSorter = wType === 'sorter';
       const isForge = wType === 'forge';
+      const isLl = wType === 'll';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -2019,6 +2033,7 @@ function renderMission() {
       else if (isBreakout) _meta = '消设备故障';
       else if (isSorter) _meta = (w.waves || 3) + ' 波分类';
       else if (isForge) _meta = '合成' + (w.target||'TB');
+      else if (isLl) _meta = (w.pairs||[]).length + ' 组配对';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2039,6 +2054,7 @@ function renderMission() {
         else if (isBreakout) openBreakout(w, (win) => { if (win) showToast('🧱 故障全消！', 'success'); });
         else if (isSorter) openSorter(w, (win) => { if (win) showToast('📦 全部归位！', 'success'); });
         else if (isForge) openForge(w, (win) => { if (win) showToast('🔥 合成成功！', 'success'); });
+        else if (isLl) openLianLian(w, (win) => { if (win) showToast('🔗 全部配对！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4159,6 +4175,9 @@ const ACHIEVEMENTS = [
   { id: 'forge_3', name: '熔炉熟手', desc: '数据熔炉通关 3 次', emoji: '🔥', test: c => (c.forgeWins||0) >= 3 },
   { id: 'forge_combo', name: '连炉高手', desc: '数据熔炉单局连击 15', emoji: '⚙️', test: c => (c.forgeCombo||0) >= 15 },
   { id: 'forge_score', name: '炼金术士', desc: '数据熔炉单局得分 3000', emoji: '💰', test: c => (c.forgeBest||0) >= 3000 },
+  { id: 'll_1', name: '连连看首秀', desc: '连连看通关 1 次', emoji: '🔗', test: c => (c.llWins||0) >= 1 },
+  { id: 'll_3', name: '连线熟手', desc: '连连看通关 3 次', emoji: '🔗', test: c => (c.llWins||0) >= 3 },
+  { id: 'll_score', name: '路径大师', desc: '连连看单局得分 6000', emoji: '🧭', test: c => (c.llBest||0) >= 6000 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4600,6 +4619,7 @@ function recordGameWin(type) {
   else if (t === 'breakout') gs.breakoutWins = (gs.breakoutWins || 0) + 1;
   else if (t === 'sorter') gs.sorterWins = (gs.sorterWins || 0) + 1;
   else if (t === 'forge') gs.forgeWins = (gs.forgeWins || 0) + 1;
+  else if (t === 'll') gs.llWins = (gs.llWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4634,6 +4654,8 @@ function achievementContext() {
   ctx.forgeWins = gs.forgeWins || 0;
   ctx.forgeBest = gs.forgeBest || 0;
   ctx.forgeCombo = gs.forgeCombo || 0;
+  ctx.llWins = gs.llWins || 0;
+  ctx.llBest = gs.llBest || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -5015,7 +5037,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -5034,12 +5056,13 @@ function gzMeta(w) {
   if (t==='breakout') return '消设备故障';
   if (t==='sorter') return (w.waves||3) + ' 波分类';
   if (t==='forge') return '合成' + (w.target||'TB');
+  if (t==='ll') return ((w.pairs||[]).length) + ' 组配对';
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5105,6 +5128,7 @@ function gzPlay(idx) {
   else if (t==='breakout') openBreakout(w, (win)=>{ if(win) showToast('🧱 故障全消！','success'); });
   else if (t==='sorter') openSorter(w, (win)=>{ if(win) showToast('📦 全部归位！','success'); });
   else if (t==='forge') openForge(w, (win)=>{ if(win) showToast('🔥 合成成功！','success'); });
+  else if (t==='ll') openLianLian(w, (win)=>{ if(win) showToast('🔗 全部配对！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -7243,6 +7267,155 @@ function openForge(cfg, onComplete) {
   }
   spawnDrop();
   raf = requestAnimationFrame(frame);
+}
+
+// =========================================================================
+// 9z. LIANLIAN — 连连看·对对碰（术语-解释配对，≤2拐弯路径消除）
+// =========================================================================
+function openLianLian(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('ll')) {
+    showGameTutorial('ll', '🔗 连连看·对对碰', [
+      '点一个<b>术语</b>，再点它的<b>解释</b>——若两者能用<b>不超过 2 个拐弯</b>的空路径连通，就消除',
+      '路径只能走空白格；<b>全部消除</b>即过关',
+      '卡住了点「重新洗牌」'
+    ], function(){ openLianLian(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('ll') || 'match');
+  const pairs = (cfg.pairs || []).slice(0, cfg.size || (cfg.pairs||[]).length);
+  if (!pairs.length) { showToast('没有可配对的术语', 'error'); return; }
+  const N = 2 * pairs.length;
+  let cols = Math.ceil(Math.sqrt(N));
+  while (cols > 2 && N % cols !== 0) cols--;
+  const rows = N / cols;
+  const TIME = cfg.timeLimit || 150;
+  const R = rows + 2, C = cols + 2;
+  let cells = Array.from({length: R}, () => Array(C).fill(null));
+  let score = 0, cleared = 0, timeLeft = TIME, ended = false;
+  let sel = null, timer = 0, resultWin = false;
+
+  // 生成并打乱
+  const tiles = [];
+  pairs.forEach((p, i) => { tiles.push({ pair: i, text: p.term, kind:'t' }); tiles.push({ pair: i, text: p.hint, kind:'d' }); });
+  for (let i = tiles.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [tiles[i],tiles[j]]=[tiles[j],tiles[i]]; }
+  let k = 0;
+  for (let r = 1; r <= rows; r++) for (let c = 1; c <= cols; c++) cells[r][c] = tiles[k++];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="ll-box">
+      <div class="mm-head"><div><div class="mm-title">🔗 ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="ll-stats">
+        <span>⏱ <b id="llTime">${TIME}</b>s</span>
+        <span>✅ <b id="llDone">0</b>/${pairs.length}</span>
+        <span>🎯 <b id="llScore">0</b></span>
+        <button class="ll-btn" id="llShuffle">🔀 洗牌</button>
+      </div>
+      <div class="ll-grid" id="llGrid"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const gridEl = document.getElementById('llGrid'), timeEl = document.getElementById('llTime');
+  const doneEl = document.getElementById('llDone'), scoreEl = document.getElementById('llScore');
+  gridEl.style.gridTemplateColumns = 'repeat(' + cols + ', 74px)';
+  gridEl.style.gridTemplateRows = 'repeat(' + rows + ', 54px)';
+  document.getElementById('llShuffle').onclick = shuffleRemaining;
+
+  function empty(r, c) { return r < 0 || r >= R || c < 0 || c >= C || cells[r][c] === null; }
+  function lineClear(r1,c1,r2,c2) {
+    if (r1 === r2) { const lo=Math.min(c1,c2), hi=Math.max(c1,c2); for (let c=lo+1;c<hi;c++) if (!empty(r1,c)) return false; return true; }
+    if (c1 === c2) { const lo=Math.min(r1,r2), hi=Math.max(r1,r2); for (let r=lo+1;r<hi;r++) if (!empty(r,c1)) return false; return true; }
+    return false;
+  }
+  function canConnect(a, b) {
+    const r1=a.r,c1=a.c,r2=b.r,c2=b.c;
+    if (r1===r2 && lineClear(r1,c1,r2,c2)) return true;
+    if (c1===c2 && lineClear(r1,c1,r2,c2)) return true;
+    if (empty(r1,c2) && lineClear(r1,c1,r1,c2) && lineClear(r1,c2,r2,c2)) return true;
+    if (empty(r2,c1) && lineClear(r1,c1,r2,c1) && lineClear(r2,c1,r2,c2)) return true;
+    for (let c=0;c<C;c++) if (empty(r1,c) && empty(r2,c) && lineClear(r1,c1,r1,c) && lineClear(r1,c,r2,c) && lineClear(r2,c,r2,c2)) return true;
+    for (let r=0;r<R;r++) if (empty(r,c1) && empty(r,c2) && lineClear(r1,c1,r,c1) && lineClear(r,c1,r,c2) && lineClear(r,c2,r2,c2)) return true;
+    return false;
+  }
+  function render() {
+    gridEl.innerHTML = '';
+    for (let r=1;r<=rows;r++) for (let c=1;c<=cols;c++) {
+      const cell = cells[r][c];
+      if (!cell) { gridEl.appendChild(document.createElement('div')); continue; }
+      const div = document.createElement('div');
+      div.className = 'll-tile' + (sel && sel.pair===cell.pair && sel.r===r && sel.c===c ? ' sel' : '');
+      div.dataset.r = r; div.dataset.c = c;
+      div.textContent = cell.text;
+      div.onclick = () => pick(r, c, div);
+      gridEl.appendChild(div);
+    }
+  }
+  function pick(r, c, div) {
+    if (ended) return;
+    const cell = cells[r][c];
+    if (!cell) return;
+    if (!sel) { sel = {r:r,c:c,pair:cell.pair}; render(); playSound('click'); return; }
+    if (sel.r===r && sel.c===c) { sel=null; render(); return; }
+    if (sel.pair === cell.pair) {
+      if (canConnect(sel, {r:r,c:c})) {
+        cleared++; doneEl.textContent = cleared;
+        score += 50 + Math.max(0, timeLeft) ;
+        scoreEl.textContent = score;
+        cells[sel.r][sel.c] = null; cells[r][c] = null;
+        sel = null; playSound('success');
+        render();
+        if (cleared >= pairs.length) { endGame(true); return; }
+      } else {
+        sel = null; render(); playSound('error'); shakeScreen();
+      }
+    } else {
+      sel = null; render(); playSound('click');
+    }
+  }
+  function shuffleRemaining() {
+    const rest = [];
+    for (let r=1;r<=rows;r++) for (let c=1;c<=cols;c++) if (cells[r][c]) { rest.push(cells[r][c]); cells[r][c]=null; }
+    for (let i=rest.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [rest[i],rest[j]]=[rest[j],rest[i]]; }
+    let k=0;
+    for (let r=1;r<=rows;r++) for (let c=1;c<=cols;c++) if (!cells[r][c] && k<rest.length) cells[r][c] = rest[k++];
+    render(); playSound('click');
+  }
+  function tick() {
+    if (ended) return;
+    timeLeft -= 1; timeEl.textContent = Math.max(0, timeLeft);
+    if (timeLeft <= 0) { endGame(false); return; }
+  }
+  timer = setInterval(tick, 1000);
+
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true; clearInterval(timer);
+    resultWin = isWin;
+    if (isWin) { recordGameWin('ll'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs=getGameStats(); _gs.llBest=Math.max(_gs.llBest||0, score); _gs.llWins=(_gs.llWins||0)+ (isWin?1:0); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'⏰')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'全部配对消除！':'时间到')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 配对 '+cleared+'/'+pairs.length+' 对</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.llAgain()">🔁 再来一局</button><button class="mm-btn primary" onclick="window.llDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.llAgain = () => { overlay.remove(); openLianLian(cfg, onComplete); };
+  window.llDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(resultWin); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true; clearInterval(timer);
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  render();
 }
 
 function openMemoryMatch(cfg, onComplete) {
