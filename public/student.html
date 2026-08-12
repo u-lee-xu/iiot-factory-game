@@ -282,10 +282,10 @@ body {
 .prog-bar-fill { height: 100%; background: var(--green); width: 0; transition: width .3s; }
 /* ===== Interaction: Install Wizard ===== */
 .wizard-steps { display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
-.wiz-dot { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #1a1a24; border: 2px solid var(--border); font-size: 16px; color: var(--dim); transition: all .3s; }
+.wiz-dot { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #1a1a24; border: 2px solid var(--border); font-size: 16px; color: var(--dim); transition: all .3s; }
 .wiz-dot.done { background: var(--green); border-color: var(--green); color: #000; }
 .wiz-dot.active { border-color: var(--amber); color: var(--amber); box-shadow: 0 0 8px rgba(255,176,0,.3); }
-.wiz-dot.active::after { content: ''; position: absolute; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--amber); animation: wiz-pulse 1.2s infinite; }
+.wiz-dot.active::after { content: ''; position: absolute; top: 50%; left: 50%; width: 32px; height: 32px; margin: -16px 0 0 -16px; border-radius: 50%; border: 2px solid var(--amber); animation: wiz-pulse 1.2s infinite; }
 @keyframes wiz-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
 .wizard-narrative { background: rgba(255,176,0,.06); border-left: 3px solid var(--amber); padding: 10px 14px; margin-bottom: 12px; font-size: 15px; line-height: 1.6; color: var(--text); border-radius: 0 6px 6px 0; }
 .wiz-explain { background: rgba(0,188,212,.07); border-left: 3px solid var(--cyan); padding: 8px 12px; margin-top: 10px; font-size: 14px; line-height: 1.7; color: var(--text); border-radius: 0 6px 6px 0; }
