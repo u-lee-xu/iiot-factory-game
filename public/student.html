@@ -2560,7 +2560,9 @@ registerInteraction('chain_quiz', {
       const area = document.createElement('div');
       area.id = 'chainArea';
       area.innerHTML = `
-        <div style="font-size: 14px;color:var(--dim);margin:10px 0 6px">第 ${currentQ + 1}/${questions.length} 题 — ${q.question}</div>
+        ${q.teach ? '<div style="background:rgba(0,188,212,.08);border-left:3px solid var(--cyan);padding:10px 12px;border-radius:4px;margin:8px 0 10px;font-size:14px;line-height:1.7;color:var(--text)"><span style="color:var(--cyan);font-weight:bold">🤔 厂长：</span>' + escHtml(q.teach) + '</div>' : ''}
+        <div style="font-size:15px;font-weight:bold;color:var(--text);margin:6px 0 4px">第 ${currentQ + 1}/${questions.length} 题</div>
+        <div style="font-size:14px;color:var(--text);margin:0 0 10px;line-height:1.7">${escHtml(q.question)}</div>
         <div class="quiz-options" id="chainOpts" style="opacity:0.3;transition:opacity .5s"></div>
       `;
       container.appendChild(area);
