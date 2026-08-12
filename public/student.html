@@ -4936,7 +4936,8 @@ function loadTermCards() {
     try { if (typeof evaluateAchievements === 'function') evaluateAchievements(false); } catch (e) {}
   }).catch(() => { window.TERM_CARDS = null; });
 }
-loadTermCards();
+// 提前发起加载并保存 promise，init 里 await 后再渲染关卡（避免首次刷新小游戏不显示）
+const termCardsPromise = loadTermCards();
 
 function getTermLevel(levelId) {
   if (!window.TERM_CARDS) return null;
@@ -5987,7 +5988,7 @@ function openSnake(cfg, onComplete) {
   let lives = 3, score = 0, combo = 0, paired = 0, ended = false, quizLock = false;
   let currentTerm = '';
   let snake = [{x:6,y:6},{x:5,y:6},{x:4,y:6}], dir = {x:1,y:0}, nextDir = {x:1,y:0};
-  let speed = 5, timer = 0, invuln = 0, spawnTimer = 0;
+  let speed = 4, timer = 0, invuln = 0, spawnTimer = 0;
   let foods = [], particles = [], floats = [];
 
   // ================= 界面 =================
@@ -6031,8 +6032,10 @@ function openSnake(cfg, onComplete) {
   function isOnSnake(x,y){ return snake.some(s=>s.x===x&&s.y===y); }
   function spawnFood(kind){
     // 找一个空位（避开蛇身和已有食物），最多试 60 次
+    // 避开边缘 2 格：食物上方的文字不会被顶部/两侧裁掉
+    const X_MIN=2, X_MAX=COLS-3, Y_MIN=1, Y_MAX=ROWS-2;
     let x,y,tries=0;
-    do { x=Math.floor(Math.random()*COLS); y=Math.floor(Math.random()*ROWS); tries++; }
+    do { x=X_MIN+Math.floor(Math.random()*(X_MAX-X_MIN+1)); y=Y_MIN+Math.floor(Math.random()*(Y_MAX-Y_MIN+1)); tries++; }
     while((isOnSnake(x,y) || foods.some(f=>f.x===x&&f.y===y)) && tries<60);
     // 场上不要出现两个一样的词/解释，避免配对歧义
     const busy = {}; foods.forEach(f=>{ busy[f.label]=true; });
@@ -6127,13 +6130,13 @@ function openSnake(cfg, onComplete) {
     if(!ate) snake.pop();
     // 补充食物
     spawnTimer-=dt; if(spawnTimer<=0){ ensureFoods(); spawnTimer=0.6; }
-    if(cfg._endless && paired>0 && paired%10===0) speed = 5 + paired*0.6;   // 无限战更快
+    if(cfg._endless && paired>0 && paired%10===0) speed = 4 + paired*0.4;   // 无限战更快
   }
   function update(dt){
     if(ended || quizLock) return;
     if(invuln>0) invuln-=dt;
     if(!(nextDir.x===-dir.x && nextDir.y===-dir.y)) dir=nextDir;
-    speed = 5 + paired*0.4; timer += dt; const stepT=1/speed;
+    speed = 4 + paired*0.3; timer += dt; const stepT=1/speed;
     if(timer<stepT) return; timer-=stepT;
     step();
   }
@@ -8417,6 +8420,7 @@ async function init() {
     return;
   }
   await loadState();
+  await termCardsPromise;   // 确保小游戏(term-cards)数据就绪后再渲染，一次刷新即稳定显示
   detectNewServerAchievements();
   prevRank = getRank(calcTotalXP());
   renderFactory();
