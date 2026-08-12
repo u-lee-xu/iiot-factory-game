@@ -2515,6 +2515,50 @@
      ],
      "timeLimit": 90,
      "xp": 70
+    },
+    {
+     "id": "l3_tyc",
+     "name": "工厂大亨 · 数据经营",
+     "type": "tyc",
+     "afterTask": "3-1",
+     "blockTasks": [
+      "3-1"
+     ],
+     "subtitle": "厂长：点击产出数据，按 ISA-95 层级买机器自动产出——传感器→PLC→SCADA→MES→ERP，产值达标！",
+     "tiers": [
+      {
+       "name": "传感器",
+       "emoji": "🌡️",
+       "base": 1,
+       "cost": 10
+      },
+      {
+       "name": "PLC",
+       "emoji": "⚙️",
+       "base": 6,
+       "cost": 50
+      },
+      {
+       "name": "SCADA",
+       "emoji": "🖥️",
+       "base": 35,
+       "cost": 250
+      },
+      {
+       "name": "MES",
+       "emoji": "🗂️",
+       "base": 180,
+       "cost": 1200
+      },
+      {
+       "name": "ERP",
+       "emoji": "🏢",
+       "base": 900,
+       "cost": 6000
+      }
+     ],
+     "target": 50000,
+     "xp": 80
     }
    ],
    "bonus": null

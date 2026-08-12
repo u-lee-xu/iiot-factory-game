@@ -289,7 +289,31 @@ body {
 
 
 
+
+/* ===== 工厂大亨·数据经营（放置） ===== */
+.tyc-box { width: 520px; max-width: 96vw; background: #12121a; border: 2px solid var(--amber); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(255,176,0,.2); display: flex; flex-direction: column; }
+.tyc-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
+.tyc-stats b { color: var(--amber); }
+.tyc-main { display: flex; align-items: center; justify-content: center; padding: 18px 0 10px; }
+.tyc-click { width: 130px; height: 130px; border-radius: 50%; border: 4px solid var(--amber); background: radial-gradient(circle at 35% 30%, #2a2010, #1a1408); color: var(--amber); font-size: 44px; cursor: pointer; user-select:none; box-shadow: 0 0 30px rgba(255,176,0,.25); transition: transform .08s; }
+.tyc-click:active { transform: scale(.94); }
+.tyc-data { text-align:center; font-size: 20px; font-weight:bold; color: var(--amber); margin-bottom: 6px; }
+.tyc-rate { text-align:center; font-size: 12px; color: var(--dim); margin-bottom: 10px; }
+.tyc-shop { display: flex; flex-direction: column; gap: 6px; padding: 0 14px 12px; }
+.tyc-item { display: flex; align-items: center; justify-content: space-between; background:#1a1a24; border:1px solid var(--border); border-radius:8px; padding: 8px 12px; }
+.tyc-item .nm { font-size: 13px; }
+.tyc-item .ct { color: var(--dim); font-size: 11px; }
+.tyc-item button { background:var(--amber); color:#1a1408; border:none; border-radius:6px; padding:6px 12px; cursor:pointer; font-family:inherit; font-weight:bold; }
+.tyc-item button:disabled { background:#333; color:#666; cursor:not-allowed; }
 /* ===== 黑客终端·网络溯源 ===== */
+/* ===== 数据迷宫·包到彼岸 ===== */
+/* ===== 2048·数据融合 ===== */
+/* ===== 车间防线·塔防 ===== */
+/* ===== 消消乐·三连车间 ===== */
+/* ===== 管道工·数据通路 ===== */
+/* ===== 连连看·对对碰 ===== */
+/* ===== 数据熔炉（合成大西瓜·数据单位）===== */
+/* ===== 数据分类大师（传送带分拣）===== */
 .hk-box { width: 620px; max-width: 96vw; background: #12121a; border: 2px solid var(--green); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,.18); display: flex; flex-direction: column; }
 .hk-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
 .hk-stats b { color: var(--green); }
@@ -2126,10 +2150,11 @@ function renderMission() {
       const isT48 = wType === 't48';
       const isMaze = wType === 'maze';
       const isHack = wType === 'hack';
+      const isTyc = wType === 'tyc';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : isTd ? '🛡️' : isT48 ? '🔢' : isMaze ? '🌐' : isHack ? '🕹️' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3 || isTd || isT48 || isMaze || isHack;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : isTd ? '🛡️' : isT48 ? '🔢' : isMaze ? '🌐' : isHack ? '🕹️' : isTyc ? '🏭' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3 || isTd || isT48 || isMaze || isHack || isTyc;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -2154,6 +2179,7 @@ function renderMission() {
       else if (isT48) _meta = '合成' + (w.target||'TB');
       else if (isMaze) _meta = '迷宫寻路';
       else if (isHack) _meta = (w.nodes||[]).length + ' 个节点';
+      else if (isTyc) _meta = '目标' + (w.target||50000);
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2181,6 +2207,7 @@ function renderMission() {
         else if (isT48) openTile2048(w, (win) => { if (win) showToast('🔢 合成'+ (w.target||'TB') +'！', 'success'); });
         else if (isMaze) openMaze(w, (win) => { if (win) showToast('🌐 数据包送达！', 'success'); });
         else if (isHack) openHacknet(w, (win) => { if (win) showToast('🕹️ 全网络拿下！', 'success'); });
+        else if (isTyc) openTycoon(w, (win) => { if (win) showToast('🏭 产值达标！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4320,6 +4347,8 @@ const ACHIEVEMENTS = [
   { id: 'maze_3', name: '迷宫老手', desc: '数据迷宫通关 3 次', emoji: '🌐', test: c => (c.mazeWins||0) >= 3 },
   { id: 'hack_1', name: '黑客初体验', desc: '黑客终端通关 1 次', emoji: '🕹️', test: c => (c.hackWins||0) >= 1 },
   { id: 'hack_3', name: '网络黑客', desc: '黑客终端通关 3 次', emoji: '🕹️', test: c => (c.hackWins||0) >= 3 },
+  { id: 'tyc_1', name: '工厂主', desc: '工厂大亨通关 1 次', emoji: '🏭', test: c => (c.tycWins||0) >= 1 },
+  { id: 'tyc_3', name: '工业巨头', desc: '工厂大亨通关 3 次', emoji: '🏭', test: c => (c.tycWins||0) >= 3 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4768,6 +4797,7 @@ function recordGameWin(type) {
   else if (t === 't48') gs.t48Wins = (gs.t48Wins || 0) + 1;
   else if (t === 'maze') gs.mazeWins = (gs.mazeWins || 0) + 1;
   else if (t === 'hack') gs.hackWins = (gs.hackWins || 0) + 1;
+  else if (t === 'tyc') gs.tycWins = (gs.tycWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4816,6 +4846,8 @@ function achievementContext() {
   ctx.mazeBest = gs.mazeBest || 0;
   ctx.hackWins = gs.hackWins || 0;
   ctx.hackBest = gs.hackBest || 0;
+  ctx.tycWins = gs.tycWins || 0;
+  ctx.tycBest = gs.tycBest || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -5197,7 +5229,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':t==='tyc'?'🏭':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -5223,12 +5255,13 @@ function gzMeta(w) {
   if (t==='t48') return '合成' + (w.target||'TB');
   if (t==='maze') return '迷宫寻路';
   if (t==='hack') return ((w.nodes||[]).length) + ' 个节点';
+  if (t==='tyc') return '目标' + (w.target||50000);
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td'||t==='t48'||t==='maze'||t==='hack';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td'||t==='t48'||t==='maze'||t==='hack'||t==='tyc';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5301,6 +5334,7 @@ function gzPlay(idx) {
   else if (t==='t48') openTile2048(w, (win)=>{ if(win) showToast('🔢 合成'+ (w.target||'TB') +'！','success'); });
   else if (t==='maze') openMaze(w, (win)=>{ if(win) showToast('🌐 数据包送达！','success'); });
   else if (t==='hack') openHacknet(w, (win)=>{ if(win) showToast('🕹️ 全网络拿下！','success'); });
+  else if (t==='tyc') openTycoon(w, (win)=>{ if(win) showToast('🏭 产值达标！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -8483,6 +8517,107 @@ function openHacknet(cfg, onComplete) {
   }
   renderMap(); renderPrompt();
   input.focus();
+}
+
+// =========================================================================
+// 9q. TYCOON — 工厂大亨·数据经营（放置经营，ISA-95 逐级解锁）
+// =========================================================================
+function openTycoon(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('tyc')) {
+    showGameTutorial('tyc', '🏭 工厂大亨·数据经营', [
+      '<b>点大按钮</b>产出数据；买机器让它<b>自动产出</b>',
+      '机器按 ISA-95 层级解锁：传感器→PLC→SCADA→MES→ERP，越高级产得越快',
+      '<b>数据累计到目标值即过关</b>，越高档机器越划算'
+    ], function(){ openTycoon(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('tyc') || 'match');
+  const TIERS = (cfg.tiers || [
+    {name:'传感器', emoji:'🌡️', base:1, cost:10},
+    {name:'PLC', emoji:'⚙️', base:6, cost:50},
+    {name:'SCADA', emoji:'🖥️', base:35, cost:250},
+    {name:'MES', emoji:'🗂️', base:180, cost:1200},
+    {name:'ERP', emoji:'🏢', base:900, cost:6000}
+  ]).map((t,i)=>({name:t.name, emoji:t.emoji, base:t.base, cost:t.cost}));
+  const TARGET = cfg.target || 50000;
+  let data = 0, total = 0, click = 1, ended = false, resultWin = false;
+  let levels = TIERS.map(()=>0);
+  let last = performance.now(), raf = 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="tyc-box">
+      <div class="mm-head"><div><div class="mm-title">🏭 ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="tyc-stats"><span>🎯 目标 <b>${TARGET.toLocaleString()}</b></span><span>⏱ <b id="tycTime">0</b>s</span></div>
+      <div class="tyc-main"><button class="tyc-click" id="tycClick">📊</button></div>
+      <div class="tyc-data" id="tycData">0 / ${TARGET.toLocaleString()}</div>
+      <div class="tyc-rate" id="tycRate">每秒产出 0</div>
+      <div class="tyc-shop" id="tycShop"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const dataEl = document.getElementById('tycData'), rateEl = document.getElementById('tycRate'), timeEl = document.getElementById('tycTime');
+  const clickBtn = document.getElementById('tycClick'), shopEl = document.getElementById('tycShop');
+  let elapsed = 0;
+
+  function renderShop() {
+    shopEl.innerHTML = '';
+    TIERS.forEach((t,i) => {
+      const cost = Math.ceil(t.cost * Math.pow(1.6, levels[i]));
+      const item = document.createElement('div');
+      item.className = 'tyc-item';
+      item.innerHTML = '<div><div class="nm">' + t.emoji + ' ' + escHtml(t.name) + ' <b>x'+levels[i]+'</b></div><div class="ct">每级每秒 +'+t.base+' · 成本 '+cost.toLocaleString()+'</div></div><button data-i="'+i+'" '+(data>=cost?'':'disabled')+'>买入</button>';
+      item.querySelector('button').onclick = () => { if (data>=cost){ data-=cost; levels[i]++; playSound('click'); renderShop(); } };
+      shopEl.appendChild(item);
+    });
+  }
+  clickBtn.onclick = () => { data += click; total += click; playSound('click'); flashData(); renderShop(); };
+  function flashData() {
+    dataEl.textContent = Math.floor(data).toLocaleString() + ' / ' + TARGET.toLocaleString();
+    if (total >= TARGET) endGame(true);
+  }
+  function frame(now) {
+    const dt = Math.min(0.05,(now-last)/1000); last = now;
+    if (!ended) {
+      const rate = TIERS.reduce((a,t,i)=>a + t.base*levels[i], 0);
+      data += rate*dt; total += rate*dt;
+      rateEl.textContent = '每秒产出 ' + Math.round(rate);
+      dataEl.textContent = Math.floor(data).toLocaleString() + ' / ' + TARGET.toLocaleString();
+      renderShop();
+      if (total >= TARGET) endGame(true);
+      raf = requestAnimationFrame(frame);
+    }
+  }
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true; resultWin = isWin;
+    cancelAnimationFrame(raf);
+    if (isWin) { recordGameWin('tyc'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs=getGameStats(); _gs.tycBest=Math.max(_gs.tycBest||0, Math.round(total)); _gs.tycWins=(_gs.tycWins||0)+(isWin?1:0); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'数据产值达标，工厂转起来了！':'还没达标')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">总数据 <b style="color:var(--amber)">'+Math.round(total).toLocaleString()+'</b> · 用时 <b style="color:var(--amber)">'+Math.round(elapsed)+'</b>s</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.tycAgain()">🔁 再经营一轮</button><button class="mm-btn primary" onclick="window.tycDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.tycAgain = () => { overlay.remove(); openTycoon(cfg, onComplete); };
+  window.tycDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(resultWin); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true; cancelAnimationFrame(raf);
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  renderShop();
+  raf = requestAnimationFrame(frame);
 }
 
 function openMemoryMatch(cfg, onComplete) {
