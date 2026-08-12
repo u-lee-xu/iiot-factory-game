@@ -2841,6 +2841,18 @@
      "metric": "温度",
      "unit": "℃",
      "threshold": 80
+    },
+    {
+     "id": "l4_boss",
+     "name": "愤怒的厂长 · 弹射排障",
+     "type": "boss",
+     "afterTask": "4-9",
+     "blockTasks": [
+      "4-9"
+     ],
+     "subtitle": "厂长：把故障塔里那块红色故障砸掉！选对命令弹（ping/ss/curl）更好用！",
+     "shots": 5,
+     "xp": 70
     }
    ],
    "bonus": null
