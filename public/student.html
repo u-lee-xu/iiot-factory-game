@@ -288,7 +288,32 @@ body {
 
 
 
+
+/* ===== 黑客终端·网络溯源 ===== */
+.hk-box { width: 620px; max-width: 96vw; background: #12121a; border: 2px solid var(--green); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,.18); display: flex; flex-direction: column; }
+.hk-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
+.hk-stats b { color: var(--green); }
+.hk-map { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; min-height: 70px; flex-wrap: wrap; }
+.hk-node { width: 60px; height: 46px; border-radius: 8px; background:#1a1a24; border:2px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; color:var(--dim); }
+.hk-node.done { border-color:var(--green); color:var(--green); }
+.hk-node.cur { border-color:var(--amber); color:var(--amber); box-shadow:0 0 10px rgba(255,176,0,.4); }
+.hk-node.hacked { border-color:var(--green); background:rgba(0,230,118,.1); }
+.hk-node .hk-emo { font-size:20px; }
+.hk-link { color:var(--dim); font-size:14px; }
+.hk-term { margin: 0 12px 12px; background:#050a10; border:1px solid #1c3; border-radius:6px; padding:8px; font-family:monospace; font-size:13px; color:#9fdf9f; min-height:120px; white-space:pre-wrap; overflow-y:auto; }
+.hk-term .prompt { color:#6f6; }
+.hk-term .err { color:#f66; }
+.hk-input { margin:0 12px 12px; display:flex; gap:8px; }
+.hk-input input { flex:1; background:#0a1410; border:1px solid #1c3; color:#9fdf9f; padding:8px 10px; border-radius:4px; font-family:monospace; font-size:14px; outline:none; }
+.hk-input input:focus { border-color:#6f6; }
 /* ===== 数据迷宫·包到彼岸 ===== */
+/* ===== 2048·数据融合 ===== */
+/* ===== 车间防线·塔防 ===== */
+/* ===== 消消乐·三连车间 ===== */
+/* ===== 管道工·数据通路 ===== */
+/* ===== 连连看·对对碰 ===== */
+/* ===== 数据熔炉（合成大西瓜·数据单位）===== */
+/* ===== 数据分类大师（传送带分拣）===== */
 .mz-box { width: 560px; max-width: 96vw; background: #12121a; border: 2px solid var(--green); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,.18); display: flex; flex-direction: column; }
 .mz-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
 .mz-stats b { color: var(--green); }
@@ -2100,10 +2125,11 @@ function renderMission() {
       const isTd = wType === 'td';
       const isT48 = wType === 't48';
       const isMaze = wType === 'maze';
+      const isHack = wType === 'hack';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : isTd ? '🛡️' : isT48 ? '🔢' : isMaze ? '🌐' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3 || isTd || isT48 || isMaze;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : isTd ? '🛡️' : isT48 ? '🔢' : isMaze ? '🌐' : isHack ? '🕹️' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3 || isTd || isT48 || isMaze || isHack;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -2127,6 +2153,7 @@ function renderMission() {
       else if (isTd) _meta = (w.waves||3) + ' 波防线';
       else if (isT48) _meta = '合成' + (w.target||'TB');
       else if (isMaze) _meta = '迷宫寻路';
+      else if (isHack) _meta = (w.nodes||[]).length + ' 个节点';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2153,6 +2180,7 @@ function renderMission() {
         else if (isTd) openTowerDefense(w, (win) => { if (win) showToast('🛡️ 车间防线守住！', 'success'); });
         else if (isT48) openTile2048(w, (win) => { if (win) showToast('🔢 合成'+ (w.target||'TB') +'！', 'success'); });
         else if (isMaze) openMaze(w, (win) => { if (win) showToast('🌐 数据包送达！', 'success'); });
+        else if (isHack) openHacknet(w, (win) => { if (win) showToast('🕹️ 全网络拿下！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4290,6 +4318,8 @@ const ACHIEVEMENTS = [
   { id: 't48_score', name: '数据炼金师', desc: '2048 数据融合单局得分 5000', emoji: '🧪', test: c => (c.t48Best||0) >= 5000 },
   { id: 'maze_1', name: '首达彼岸', desc: '数据迷宫通关 1 次', emoji: '🌐', test: c => (c.mazeWins||0) >= 1 },
   { id: 'maze_3', name: '迷宫老手', desc: '数据迷宫通关 3 次', emoji: '🌐', test: c => (c.mazeWins||0) >= 3 },
+  { id: 'hack_1', name: '黑客初体验', desc: '黑客终端通关 1 次', emoji: '🕹️', test: c => (c.hackWins||0) >= 1 },
+  { id: 'hack_3', name: '网络黑客', desc: '黑客终端通关 3 次', emoji: '🕹️', test: c => (c.hackWins||0) >= 3 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4737,6 +4767,7 @@ function recordGameWin(type) {
   else if (t === 'td') gs.tdWins = (gs.tdWins || 0) + 1;
   else if (t === 't48') gs.t48Wins = (gs.t48Wins || 0) + 1;
   else if (t === 'maze') gs.mazeWins = (gs.mazeWins || 0) + 1;
+  else if (t === 'hack') gs.hackWins = (gs.hackWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4783,6 +4814,8 @@ function achievementContext() {
   ctx.t48Best = gs.t48Best || 0;
   ctx.mazeWins = gs.mazeWins || 0;
   ctx.mazeBest = gs.mazeBest || 0;
+  ctx.hackWins = gs.hackWins || 0;
+  ctx.hackBest = gs.hackBest || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -5164,7 +5197,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -5189,12 +5222,13 @@ function gzMeta(w) {
   if (t==='td') return (w.waves||3) + ' 波防线';
   if (t==='t48') return '合成' + (w.target||'TB');
   if (t==='maze') return '迷宫寻路';
+  if (t==='hack') return ((w.nodes||[]).length) + ' 个节点';
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td'||t==='t48'||t==='maze';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td'||t==='t48'||t==='maze'||t==='hack';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5266,6 +5300,7 @@ function gzPlay(idx) {
   else if (t==='td') openTowerDefense(w, (win)=>{ if(win) showToast('🛡️ 车间防线守住！','success'); });
   else if (t==='t48') openTile2048(w, (win)=>{ if(win) showToast('🔢 合成'+ (w.target||'TB') +'！','success'); });
   else if (t==='maze') openMaze(w, (win)=>{ if(win) showToast('🌐 数据包送达！','success'); });
+  else if (t==='hack') openHacknet(w, (win)=>{ if(win) showToast('🕹️ 全网络拿下！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -8343,6 +8378,111 @@ function openMaze(cfg, onComplete) {
   }
   genMaze(); render();
   render();
+}
+
+// =========================================================================
+// 9r. HACKNET — 黑客终端·网络溯源（敲命令逐个攻破网络节点）
+// =========================================================================
+function openHacknet(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('hack')) {
+    showGameTutorial('hack', '🕹️ 黑客终端·网络溯源', [
+      '屏幕上是一张<b>网络地图</b>，你要逐个<b>攻破节点</b>',
+      '在下方<b>终端输入命令</b>（如 ping / ip addr / ssh…），命令对就拿下节点',
+      '输错命令会<b>掉命</b>（提示会帮你）；拿下全部节点即过关'
+    ], function(){ openHacknet(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('hack') || 'match');
+  const nodes = (cfg.nodes || []).filter(n=>n && n.name);
+  if (!nodes.length) { showToast('没有攻破目标', 'error'); return; }
+  const LIVES = cfg._hard ? 2 : (cfg.lives || 3);
+  let lives = LIVES, idx = 0, ended = false, resultWin = false;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="hk-box">
+      <div class="mm-head"><div><div class="mm-title">🕹️ ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="hk-stats"><span>❤️ <b id="hkLives">${LIVES}</b></span><span>📡 节点 <b id="hkIdx">0</b>/${nodes.length}</span></div>
+      <div class="hk-map" id="hkMap"></div>
+      <div class="hk-term" id="hkTerm"></div>
+      <div class="hk-input"><input id="hkInput" autocomplete="off" spellcheck="false" placeholder="输入命令…"><button class="ll-btn" id="hkGo">执行</button></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const mapEl = document.getElementById('hkMap'), termEl = document.getElementById('hkTerm');
+  const livesEl = document.getElementById('hkLives'), idxEl = document.getElementById('hkIdx');
+  const input = document.getElementById('hkInput');
+  function log(html){ termEl.innerHTML += html + '<br>'; termEl.scrollTop = termEl.scrollHeight; }
+  function norm(c){ return c.trim().toLowerCase().replace(/\s+/g,' '); }
+  function renderMap() {
+    mapEl.innerHTML = '';
+    nodes.forEach((n,i) => {
+      if (i>0) mapEl.insertAdjacentHTML('beforeend', '<span class="hk-link">→</span>');
+      const d = document.createElement('div');
+      d.className = 'hk-node' + (i<idx ? ' hacked' : i===idx ? ' cur' : '');
+      d.innerHTML = '<span class="hk-emo">' + (n.emoji||'🖥️') + '</span>' + escHtml(n.name);
+      mapEl.appendChild(d);
+    });
+  }
+  function renderPrompt() {
+    const n = nodes[idx];
+    log('<span class="prompt">root@nuc:~$</span> 目标 <b>' + escHtml(n.name) + '</b>：' + escHtml(n.prompt || ''));
+    log('<span style="color:var(--dim)">提示：' + escHtml(n.hint || '') + '</span>');
+    idxEl.textContent = (idx+1);
+  }
+  function check() {
+    const cmd = input.value; input.value = '';
+    if (!cmd.trim()) return;
+    log('<span class="prompt">root@nuc:~$</span> ' + escHtml(cmd));
+    const n = nodes[idx];
+    const ok = (n.expect || []).some(e => norm(e) === norm(cmd));
+    if (ok) {
+      log('<span style="color:#6f6">✅ 节点 ' + escHtml(n.name) + ' 已拿下！</span>');
+      playSound('success');
+      idx++;
+      if (idx >= nodes.length) { endGame(true); return; }
+      renderMap(); renderPrompt();
+    } else {
+      lives--; livesEl.textContent = lives;
+      log('<span class="err">❌ 命令不对，攻击被拦截（-1 命）</span>');
+      playSound('error'); shakeScreen();
+      if (lives <= 0) { endGame(false); return; }
+      log('<span style="color:var(--amber)">💡 ' + escHtml(n.tryHint || n.hint || '再想想该敲什么命令') + '</span>');
+    }
+  }
+  input.addEventListener('keydown', e => { if (e.key==='Enter'){ e.preventDefault(); if (!ended) check(); } });
+  document.getElementById('hkGo').onclick = () => { if (!ended) check(); };
+
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true; resultWin = isWin;
+    input.disabled = true;
+    if (isWin) { recordGameWin('hack'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs=getGameStats(); _gs.hackBest=Math.max(_gs.hackBest||0, idx); _gs.hackWins=(_gs.hackWins||0)+(isWin?1:0); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'全网络溯源完成！':'被反制了')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">拿下 <b style="color:var(--amber)">'+idx+'</b>/'+nodes.length+' 个节点</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.hkAgain()">🔁 再攻一轮</button><button class="mm-btn primary" onclick="window.hkDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.hkAgain = () => { overlay.remove(); openHacknet(cfg, onComplete); };
+  window.hkDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(resultWin); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true;
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  renderMap(); renderPrompt();
+  input.focus();
 }
 
 function openMemoryMatch(cfg, onComplete) {

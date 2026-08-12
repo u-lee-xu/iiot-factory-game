@@ -1720,6 +1720,76 @@
      ],
      "timeLimit": 150,
      "xp": 70
+    },
+    {
+     "id": "l2_hack",
+     "name": "黑客终端 · 网络溯源",
+     "type": "hack",
+     "afterTask": "2-7",
+     "blockTasks": [
+      "2-7"
+     ],
+     "subtitle": "厂长：用学过的命令逐个攻破网络节点——ping 探活、ip addr 摸清自己、nmap 扫端口、ssh 登录、traceroute 溯源！",
+     "nodes": [
+      {
+       "name": "网关",
+       "emoji": "🚪",
+       "prompt": "先探活：确认网关 192.168.1.1 在线",
+       "expect": [
+        "ping 192.168.1.1",
+        "ping -c 4 192.168.1.1"
+       ],
+       "hint": "ping 空格 目标IP",
+       "tryHint": "用 ping 命令试探连通性"
+      },
+      {
+       "name": "本机网卡",
+       "emoji": "💻",
+       "prompt": "看看这台机器自己的网络身份（网卡/IP/MAC）",
+       "expect": [
+        "ip addr",
+        "ip a",
+        "ip address",
+        "ip addr show"
+       ],
+       "hint": "ip addr 查看网络配置",
+       "tryHint": "ip addr 能看到网卡和IP"
+      },
+      {
+       "name": "目标服务器",
+       "emoji": "🖥️",
+       "prompt": "扫描服务器 192.168.1.100 的 SSH 端口(22)是否开放",
+       "expect": [
+        "nmap -p 22 192.168.1.100",
+        "nmap 192.168.1.100"
+       ],
+       "hint": "nmap 空格 -p 22 空格 目标IP",
+       "tryHint": "nmap 是端口扫描工具"
+      },
+      {
+       "name": "远程登录",
+       "emoji": "🔑",
+       "prompt": "SSH 登录服务器（用户名 student）",
+       "expect": [
+        "ssh student@192.168.1.100"
+       ],
+       "hint": "ssh 空格 用户名@IP",
+       "tryHint": "ssh 用户名@IP 格式"
+      },
+      {
+       "name": "溯源主机",
+       "emoji": "🌐",
+       "prompt": "最后一步：追踪数据包到 8.8.8.8 经过了哪些路由",
+       "expect": [
+        "traceroute 8.8.8.8",
+        "traceroute -n 8.8.8.8"
+       ],
+       "hint": "traceroute 空格 目标",
+       "tryHint": "traceroute 追踪路由路径"
+      }
+     ],
+     "lives": 3,
+     "xp": 80
     }
    ],
    "bonus": null
