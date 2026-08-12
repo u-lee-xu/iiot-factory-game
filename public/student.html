@@ -283,7 +283,20 @@ body {
 
 
 
+
+/* ===== 管道工·数据通路 ===== */
+.pipe-box { width: 560px; max-width: 96vw; background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.2); display: flex; flex-direction: column; }
+.pipe-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
+.pipe-stats b { color: var(--cyan); }
+.pipe-grid { display: grid; gap: 4px; padding: 12px; justify-content: center; margin: 0 auto; }
+.pipe-tile { width: 60px; height: 60px; border-radius: 6px; background: #1a1a24; border: 2px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform .2s; }
+.pipe-tile:hover { border-color: var(--cyan); }
+.pipe-tile.wrong { border-color: var(--red); }
+.pipe-tile svg { width: 100%; height: 100%; }
+.pipe-src, .pipe-dst { text-align: center; font-size: 12px; color: var(--cyan); }
 /* ===== 连连看·对对碰 ===== */
+/* ===== 数据熔炉（合成大西瓜·数据单位）===== */
+/* ===== 数据分类大师（传送带分拣）===== */
 .ll-box { width: 620px; max-width: 96vw; background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.2); display: flex; flex-direction: column; }
 .ll-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
 .ll-stats b { color: var(--cyan); }
@@ -2012,10 +2025,11 @@ function renderMission() {
       const isSorter = wType === 'sorter';
       const isForge = wType === 'forge';
       const isLl = wType === 'll';
+      const isPipe = wType === 'pipe';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -2034,6 +2048,7 @@ function renderMission() {
       else if (isSorter) _meta = (w.waves || 3) + ' 波分类';
       else if (isForge) _meta = '合成' + (w.target||'TB');
       else if (isLl) _meta = (w.pairs||[]).length + ' 组配对';
+      else if (isPipe) _meta = (w.cols||4) + '×' + (w.rows||4) + ' 管道';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2055,6 +2070,7 @@ function renderMission() {
         else if (isSorter) openSorter(w, (win) => { if (win) showToast('📦 全部归位！', 'success'); });
         else if (isForge) openForge(w, (win) => { if (win) showToast('🔥 合成成功！', 'success'); });
         else if (isLl) openLianLian(w, (win) => { if (win) showToast('🔗 全部配对！', 'success'); });
+        else if (isPipe) openPipe(w, (win) => { if (win) showToast('🔧 数据通路接通！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4178,6 +4194,9 @@ const ACHIEVEMENTS = [
   { id: 'll_1', name: '连连看首秀', desc: '连连看通关 1 次', emoji: '🔗', test: c => (c.llWins||0) >= 1 },
   { id: 'll_3', name: '连线熟手', desc: '连连看通关 3 次', emoji: '🔗', test: c => (c.llWins||0) >= 3 },
   { id: 'll_score', name: '路径大师', desc: '连连看单局得分 6000', emoji: '🧭', test: c => (c.llBest||0) >= 6000 },
+  { id: 'pipe_1', name: '首次接通', desc: '管道工通关 1 次', emoji: '🔧', test: c => (c.pipeWins||0) >= 1 },
+  { id: 'pipe_3', name: '管道工', desc: '管道工通关 3 次', emoji: '🔧', test: c => (c.pipeWins||0) >= 3 },
+  { id: 'pipe_score', name: '无瑕管线', desc: '管道工单局得分 1500', emoji: '📶', test: c => (c.pipeBest||0) >= 1500 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4620,6 +4639,7 @@ function recordGameWin(type) {
   else if (t === 'sorter') gs.sorterWins = (gs.sorterWins || 0) + 1;
   else if (t === 'forge') gs.forgeWins = (gs.forgeWins || 0) + 1;
   else if (t === 'll') gs.llWins = (gs.llWins || 0) + 1;
+  else if (t === 'pipe') gs.pipeWins = (gs.pipeWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4656,6 +4676,8 @@ function achievementContext() {
   ctx.forgeCombo = gs.forgeCombo || 0;
   ctx.llWins = gs.llWins || 0;
   ctx.llBest = gs.llBest || 0;
+  ctx.pipeWins = gs.pipeWins || 0;
+  ctx.pipeBest = gs.pipeBest || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -5037,7 +5059,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -5057,12 +5079,13 @@ function gzMeta(w) {
   if (t==='sorter') return (w.waves||3) + ' 波分类';
   if (t==='forge') return '合成' + (w.target||'TB');
   if (t==='ll') return ((w.pairs||[]).length) + ' 组配对';
+  if (t==='pipe') return (w.cols||4) + '×' + (w.rows||4) + ' 管道';
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5129,6 +5152,7 @@ function gzPlay(idx) {
   else if (t==='sorter') openSorter(w, (win)=>{ if(win) showToast('📦 全部归位！','success'); });
   else if (t==='forge') openForge(w, (win)=>{ if(win) showToast('🔥 合成成功！','success'); });
   else if (t==='ll') openLianLian(w, (win)=>{ if(win) showToast('🔗 全部配对！','success'); });
+  else if (t==='pipe') openPipe(w, (win)=>{ if(win) showToast('🔧 数据通路接通！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -7409,6 +7433,138 @@ function openLianLian(cfg, onComplete) {
   }
   window.llAgain = () => { overlay.remove(); openLianLian(cfg, onComplete); };
   window.llDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(resultWin); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true; clearInterval(timer);
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  render();
+}
+
+// =========================================================================
+// 9w. PIPE — 管道工·数据通路（旋转管道接通数据流，L7 MQTT）
+// =========================================================================
+function openPipe(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('pipe')) {
+    showGameTutorial('pipe', '🔧 管道工·数据通路', [
+      '每根管道都要<b>接通邻居</b>：开口朝邻居，邻居也得朝它开口',
+      '<b>点击管道旋转</b>，让整张图每条管道都严丝合缝、没有断头',
+      '全部接通即过关——数据就能从发布端流到 Broker 再到订阅端'
+    ], function(){ openPipe(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('pipe') || 'match');
+  const COLS = cfg.cols || 4, ROWS = cfg.rows || 4;
+  // 开口表：u/r/d/l 各边是否有开口
+  function opens(shape, rot) {
+    if (shape === 0) return rot === 0 ? {l:1,r:1,u:0,d:0} : {l:0,r:0,u:1,d:1};   // 直管
+    return [{u:1,r:1,d:0,l:0},{u:0,r:1,d:1,l:0},{u:0,r:0,d:1,l:1},{u:1,r:0,d:0,l:1}][rot]; // 弯管
+  }
+  // 贪心生成一致解
+  const shapes = Array.from({length:ROWS},()=>Array(COLS).fill(0));
+  const target = Array.from({length:ROWS},()=>Array(COLS).fill(0));
+  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+    const needL = c>0 && opens(shapes[r][c-1], target[r][c-1]).r === 1;
+    const needU = r>0 && opens(shapes[r-1][c], target[r-1][c]).d === 1;
+    // 需求 L、U 都有或都没有 → 弯管；只有一个 → 直管（保证内部开口一致）
+    if (needL === needU) { shapes[r][c] = 1; target[r][c] = needL ? 3 : 1; }
+    else { shapes[r][c] = 0; target[r][c] = needL ? 0 : 1; }
+  }
+  // 初始错位
+  const cur = Array.from({length:ROWS},()=>Array(COLS).fill(0));
+  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) cur[r][c] = Math.floor(Math.random() * (shapes[r][c]===0?2:4));
+  let moves = 0, ended = false;
+
+  function checkConsistent() {
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      const o = opens(shapes[r][c], cur[r][c]);
+      // 边界开口视为端点（数据从边缘进出），只校验内部邻居
+      if (o.u && r>0 && !opens(shapes[r-1][c],cur[r-1][c]).d) return false;
+      if (!o.u && r>0 && opens(shapes[r-1][c],cur[r-1][c]).d) return false;
+      if (o.d && r<ROWS-1 && !opens(shapes[r+1][c],cur[r+1][c]).u) return false;
+      if (!o.d && r<ROWS-1 && opens(shapes[r+1][c],cur[r+1][c]).u) return false;
+      if (o.l && c>0 && !opens(shapes[r][c-1],cur[r][c-1]).r) return false;
+      if (!o.l && c>0 && opens(shapes[r][c-1],cur[r][c-1]).r) return false;
+      if (o.r && c<COLS-1 && !opens(shapes[r][c+1],cur[r][c+1]).l) return false;
+      if (!o.r && c<COLS-1 && opens(shapes[r][c+1],cur[r][c+1]).l) return false;
+    }
+    return true;
+  }
+  function svgOf(shape, rot) {
+    const o = opens(shape, rot); let p = '';
+    if (o.l) p += '<line x1="2" y1="30" x2="30" y2="30"/>';
+    if (o.r) p += '<line x1="30" y1="30" x2="58" y2="30"/>';
+    if (o.u) p += '<line x1="30" y1="2" x2="30" y2="30"/>';
+    if (o.d) p += '<line x1="30" y1="30" x2="30" y2="58"/>';
+    p += '<circle cx="30" cy="30" r="9"/>';
+    return '<svg viewBox="0 0 60 60" fill="#7ee8fa">' + p + '</svg>';
+  }
+  function render() {
+    const grid = document.getElementById('pipeGrid');
+    grid.innerHTML = '';
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      const d = document.createElement('div');
+      d.className = 'pipe-tile';
+      d.innerHTML = svgOf(shapes[r][c], cur[r][c]);
+      d.onclick = () => {
+        if (ended) return;
+        moves++;
+        const maxRot = shapes[r][c]===0?2:4;
+        cur[r][c] = (cur[r][c]+1)%maxRot;
+        d.innerHTML = svgOf(shapes[r][c], cur[r][c]);
+        playSound('click');
+        if (checkConsistent()) { endGame(true); return; }
+        // 标记明显断头
+        const o = opens(shapes[r][c], cur[r][c]);
+        const bad = (o.u && (r===0 || !opens(shapes[r-1][c],cur[r-1][c]).d)) || (o.d && (r===ROWS-1 || !opens(shapes[r+1][c],cur[r+1][c]).u));
+        d.classList.toggle('wrong', !!bad);
+      };
+      grid.appendChild(d);
+    }
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="pipe-box">
+      <div class="mm-head"><div><div class="mm-title">🔧 ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="pipe-stats">
+        <span>👣 旋转 <b id="pipeMoves">0</b> 次</span>
+        <span>⏱ <b id="pipeTime">0</b>s</span>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--dim)">发布端 → 🧩 数据通路 → Broker → 仪表盘</div>
+      <div class="pipe-grid" id="pipeGrid"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const movesEl = document.getElementById('pipeMoves'), timeEl = document.getElementById('pipeTime');
+  const gridEl = document.getElementById('pipeGrid');
+  gridEl.style.gridTemplateColumns = 'repeat(' + COLS + ', 60px)';
+  gridEl.style.gridTemplateRows = 'repeat(' + ROWS + ', 60px)';
+  let elapsed = 0;
+  const timer = setInterval(() => { if (!ended) { elapsed++; timeEl.textContent = elapsed; } }, 1000);
+
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true; clearInterval(timer);
+    if (isWin) { recordGameWin('pipe'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs=getGameStats(); _gs.pipeBest=Math.max(_gs.pipeBest||0, 2000 - moves*20 - elapsed*5); _gs.pipeWins=(_gs.pipeWins||0)+(isWin?1:0); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'⏰')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'数据通路全部接通！':'还没接完')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">旋转 <b style="color:var(--amber)">'+moves+'</b> 次 · 用时 <b style="color:var(--amber)">'+elapsed+'</b>s</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.piAgain()">🔁 再接一程</button><button class="mm-btn primary" onclick="window.piDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.piAgain = () => { overlay.remove(); openPipe(cfg, onComplete); };
+  window.piDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(ended && checkConsistent()); };
   function closeGame(manual) {
     if (ended) return;
     ended = true; clearInterval(timer);

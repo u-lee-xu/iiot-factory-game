@@ -2922,6 +2922,19 @@
       "factory/+/vib",
       "factory/+/pres"
      ]
+    },
+    {
+     "id": "l7_pipe",
+     "name": "管道工 · MQTT 数据通路",
+     "type": "pipe",
+     "afterTask": "7-4",
+     "blockTasks": [
+      "7-4"
+     ],
+     "subtitle": "厂长：旋转管道，把发布端→Broker→订阅端的数据通路接得严丝合缝！",
+     "cols": 4,
+     "rows": 4,
+     "xp": 70
     }
    ]
   },
