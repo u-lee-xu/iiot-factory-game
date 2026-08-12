@@ -280,6 +280,23 @@ body {
 .prog-step .step-num { display: block; font-size: 16px; margin-bottom: 4px; }
 .prog-bar-bg { height: 4px; background: #1a1a24; margin: 12px 0; overflow: hidden; }
 .prog-bar-fill { height: 100%; background: var(--green); width: 0; transition: width .3s; }
+
+/* ===== 数据分类大师（传送带分拣）===== */
+.so-box { width: 680px; max-width: 96vw; background: #12121a; border: 2px solid var(--amber); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(255,176,0,.2); display: flex; flex-direction: column; }
+.so-stats { display: flex; gap: 16px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; }
+.so-stats b { color: var(--amber); }
+.so-belt { position: relative; height: 130px; margin: 10px 12px; background: repeating-linear-gradient(90deg,#15151f 0 24px,#12121a 24px 48px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.so-item { position: absolute; top: 30px; background: #1e2a3a; border: 2px solid #4db6ff; color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 15px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+.so-item.so-urgent { border-color: var(--amber); box-shadow: 0 0 12px rgba(255,176,0,.5); }
+.so-item.so-wrong { border-color: var(--red); background: rgba(255,85,85,.15); animation: soShake .3s; }
+.so-item.so-leak { border-color: var(--red); opacity: .5; }
+.so-bins { display: flex; gap: 10px; justify-content: center; padding: 12px; flex-wrap: wrap; }
+.so-bin { background: #1a1a24; border: 2px solid var(--border); border-radius: 8px; padding: 10px 12px; cursor: pointer; color: var(--text); font-size: 14px; display: flex; align-items: center; gap: 6px; transition: all .2s; font-family: inherit; }
+.so-bin:hover { border-color: var(--amber); transform: translateY(-2px); }
+.so-bin-icon { font-size: 18px; }
+@keyframes soShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+@keyframes soHit { 0%{ box-shadow:0 0 0 rgba(255,85,85,0);} 50%{ box-shadow:0 0 24px rgba(255,85,85,.5);} 100%{ box-shadow:0 0 0 rgba(255,85,85,0);} }
+.so-belt.so-hit { animation: soHit .4s; }
 /* ===== Interaction: Install Wizard ===== */
 .wizard-steps { display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
 .wiz-dot { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #1a1a24; border: 2px solid var(--border); font-size: 16px; color: var(--dim); transition: all .3s; }
@@ -1970,10 +1987,11 @@ function renderMission() {
       const isRacing = wType === 'racing';
       const isSnake = wType === 'snake', isFlappy = wType === 'flappy', isMole = wType === 'mole';
       const isPacman = wType === 'pacman', isTank = wType === 'tank', isBreakout = wType === 'breakout';
+      const isSorter = wType === 'sorter';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -1989,6 +2007,7 @@ function renderMission() {
       else if (isPacman) _meta = '吃镜像层';
       else if (isTank) _meta = '守卫 Broker';
       else if (isBreakout) _meta = '消设备故障';
+      else if (isSorter) _meta = (w.waves || 3) + ' 波分类';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2007,6 +2026,7 @@ function renderMission() {
         else if (isPacman) openPacman(w, (win) => { if (win) showToast('👾 镜像吃光！', 'success'); });
         else if (isTank) openTank(w, (win) => { if (win) showToast('🎯 Broker 保住了！', 'success'); });
         else if (isBreakout) openBreakout(w, (win) => { if (win) showToast('🧱 故障全消！', 'success'); });
+        else if (isSorter) openSorter(w, (win) => { if (win) showToast('📦 全部归位！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4118,6 +4138,11 @@ const ACHIEVEMENTS = [
   { id: 'l3_flip3', name: '三关翻牌·熟客', desc: '第 3 关翻牌游戏累计完成 3 次', emoji: '🔬', test: c => (c.lvlWins['3'] || 0) >= 3 },
   // —— 小游戏·累计 ——
   { id: 'game_20', name: '游戏厅常客', desc: '累计完成 20 个小游戏', emoji: '🕹️', test: c => c.gamesWin >= 20 },
+  { id: 'sorter_1', name: '分拣新手', desc: '数据分类大师通关 1 次', emoji: '📦', test: c => (c.sorterWins||0) >= 1 },
+  { id: 'sorter_3', name: '分拣熟手', desc: '数据分类大师通关 3 次', emoji: '📦', test: c => (c.sorterWins||0) >= 3 },
+  { id: 'sorter_5', name: '分拣大师', desc: '数据分类大师通关 5 次', emoji: '🏅', test: c => (c.sorterWins||0) >= 5 },
+  { id: 'sorter_combo', name: '连对如飞', desc: '数据分类大师单局连击 20', emoji: '⚡', test: c => (c.sorterCombo||0) >= 20 },
+  { id: 'sorter_score', name: '高分分拣', desc: '数据分类大师单局得分 1500', emoji: '💯', test: c => (c.sorterBest||0) >= 1500 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4557,6 +4582,7 @@ function recordGameWin(type) {
   else if (t === 'pacman') gs.pacmanWins = (gs.pacmanWins || 0) + 1;
   else if (t === 'tank') gs.tankWins = (gs.tankWins || 0) + 1;
   else if (t === 'breakout') gs.breakoutWins = (gs.breakoutWins || 0) + 1;
+  else if (t === 'sorter') gs.sorterWins = (gs.sorterWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4585,6 +4611,9 @@ function achievementContext() {
   ctx.shooterWins = gs.shooterWins || 0;
   ctx.shooterMaxLevel = gs.shooterMaxLevel || 0;
   ctx.shooterPickups = gs.shooterPickups || 0;
+  ctx.sorterWins = gs.sorterWins || 0;
+  ctx.sorterCombo = gs.sorterCombo || 0;
+  ctx.sorterBest = gs.sorterBest || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -4966,7 +4995,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -4983,12 +5012,13 @@ function gzMeta(w) {
   if (t==='pacman') return '吃镜像层';
   if (t==='tank') return '守卫 Broker';
   if (t==='breakout') return '消设备故障';
+  if (t==='sorter') return (w.waves||3) + ' 波分类';
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5052,6 +5082,7 @@ function gzPlay(idx) {
   else if (t==='pacman') openPacman(w, (win)=>{ if(win) showToast('👾 镜像吃光！','success'); });
   else if (t==='tank') openTank(w, (win)=>{ if(win) showToast('🎯 Broker 保住了！','success'); });
   else if (t==='breakout') openBreakout(w, (win)=>{ if(win) showToast('🧱 故障全消！','success'); });
+  else if (t==='sorter') openSorter(w, (win)=>{ if(win) showToast('📦 全部归位！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -6789,6 +6820,200 @@ function openBreakout(cfg, onComplete) {
   let last=performance.now(), dt=0;
   function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
   let raf; raf=requestAnimationFrame(loop);
+}
+
+// =========================================================================
+// 9x. SORTER — 数据分类大师（传送带分拣）
+// 传送带送物品，点下方正确的分类筐归位；点错或溜到尽头掉命，速度越来越快
+// =========================================================================
+function openSorter(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('sorter')) {
+    showGameTutorial('sorter', '📦 数据分类大师', [
+      '传送带送来带标签的物品，<b>点下方正确的分类筐</b>让它归位',
+      '点错筐，或让它溜到传送带尽头，都会 <b>-1 命</b>',
+      '<b>连续点对</b>有连击加分；清完一波过关，越来越快'
+    ], function(){ openSorter(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('sorter') || 'match');
+  const cats = (cfg.categories || []).map(c => ({ name: String(c.name||''), icon: c.icon||'📦' }));
+  const items = (cfg.items || []).filter(it => it && it.label && typeof it.cat === 'number').map(it => ({ label: String(it.label), cat: it.cat }));
+  if (!cats.length || !items.length) { showToast('没有可分类的数据', 'error'); return; }
+  const WAVES = cfg._endless ? 999 : (cfg.waves || 3);
+  const PER = cfg.perWave || 10;
+  const LIVES = cfg._hard ? 2 : (cfg.lives || 3);
+
+  let lives = LIVES, score = 0, combo = 0, wave = 1, done = 0, processed = 0, totalSorted = 0, ended = false;
+  let belt = [], queue = [], spawnT = 0, last = 0, raf = 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="so-box">
+      <div class="mm-head"><div><div class="mm-title">📦 ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="so-stats">
+        <span>❤️ <b id="soLives">${LIVES}</b></span>
+        <span>🌊 第 <b id="soWave">1</b>/${WAVES} 波</span>
+        <span>📦 <b id="soDone">0</b>/${PER}</span>
+        <span>🎯 <b id="soScore">0</b></span>
+        <span>🔥 <b id="soCombo" style="color:#ff7a00"></b></span>
+      </div>
+      <div class="so-belt" id="soBelt"></div>
+      <div class="so-bins" id="soBins"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const beltEl = document.getElementById('soBelt');
+  const livesEl = document.getElementById('soLives');
+  const scoreEl = document.getElementById('soScore');
+  const comboEl = document.getElementById('soCombo');
+  const waveEl = document.getElementById('soWave');
+  const doneEl = document.getElementById('soDone');
+  const binsEl = document.getElementById('soBins');
+  const END_X = Math.max(120, (beltEl.clientWidth || 620) - 96);
+
+  // 分类筐
+  cats.forEach((c, ci) => {
+    const b = document.createElement('button');
+    b.className = 'so-bin';
+    b.innerHTML = '<span class="so-bin-icon">' + (c.icon||'') + '</span><span class="so-bin-name">' + escHtml(c.name) + '</span>';
+    b.onclick = () => sortTo(ci, b);
+    binsEl.appendChild(b);
+  });
+
+  function pickItem(ci) {
+    const pool = items.filter(it => it.cat === ci);
+    return (pool[Math.floor(Math.random()*pool.length)] || {label:'?'}).label;
+  }
+  function newWave() {
+    done = 0; processed = 0; doneEl.textContent = '0';
+    waveEl.textContent = wave;
+    queue = [];
+    cats.forEach((c, ci) => { queue.push({ label: pickItem(ci), cat: ci }); });
+    while (queue.length < PER) {
+      const it = items[Math.floor(Math.random()*items.length)];
+      queue.push({ label: it.label, cat: it.cat });
+    }
+    for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [queue[i],queue[j]]=[queue[j],queue[i]]; }
+  }
+  function itemSpeed() { return (60 + wave*14) * (cfg._hard ? 1.25 : 1); }   // px/s
+  function spawnGap() { return Math.max(350, 1500 - wave*220); }             // ms
+  function removeFromBelt(it) { const i = belt.indexOf(it); if (i >= 0) belt.splice(i,1); }
+
+  function refreshUrgent() {
+    let best = null;
+    belt.forEach(it => { if (!best || it.x > best.x) best = it; });
+    belt.forEach(it => { it.el.classList.toggle('so-urgent', it === best); });
+  }
+  function spawnItem() {
+    if (ended || !queue.length) return;
+    const q = queue.shift();
+    const el = document.createElement('div');
+    el.className = 'so-item';
+    el.textContent = q.label;
+    el.style.left = '8px';
+    beltEl.appendChild(el);
+    belt.push({ el: el, label: q.label, cat: q.cat, x: 8, speed: itemSpeed() });
+    refreshUrgent();
+  }
+  function flyTo(it, btn) {
+    const r = btn.getBoundingClientRect(), be = beltEl.getBoundingClientRect();
+    it.el.style.transition = 'all .3s ease';
+    it.el.style.left = (r.left - be.left + r.width/2 - it.el.offsetWidth/2) + 'px';
+    it.el.style.top = (r.top - be.top + r.height/2 - it.el.offsetHeight/2) + 'px';
+    it.el.style.opacity = '0';
+    setTimeout(() => { if (it.el.parentNode) it.el.parentNode.removeChild(it.el); }, 320);
+  }
+  function sortTo(ci, btn) {
+    if (ended) return;
+    let best = null;
+    belt.forEach(it => { if (!best || it.x > best.x) best = it; });
+    if (!best) { playSound('click'); return; }
+    if (best.cat === ci) {
+      combo++; totalSorted++; processed++;
+      score += 10 * (1 + Math.floor(combo/5));
+      scoreEl.textContent = score;
+      comboEl.textContent = combo >= 2 ? 'x'+combo : '';
+      done++; doneEl.textContent = Math.min(done, PER);
+      playSound('success');
+      removeFromBelt(best); flyTo(best, btn);
+      refreshUrgent();
+      if (processed >= PER) onWaveClear();
+    } else {
+      combo = 0; if (comboEl) comboEl.textContent='';
+      processed++; lives--; livesEl.textContent = lives;   // 点错也算处理过（扣命）
+      best.el.classList.add('so-wrong');
+      playSound('error');
+      beltEl.classList.remove('so-hit'); void beltEl.offsetWidth; beltEl.classList.add('so-hit');
+      removeFromBelt(best);
+      setTimeout(() => { if (best.el.parentNode) best.el.parentNode.removeChild(best.el); }, 240);
+      refreshUrgent();
+      if (lives <= 0) endGame(false);
+    }
+  }
+  function onWaveClear() {
+    if (ended) return;
+    belt.forEach(it => { if (it.el.parentNode) it.el.parentNode.removeChild(it.el); });
+    belt = [];
+    if (wave >= WAVES && !cfg._endless) { endGame(true); return; }
+    wave++; newWave();
+    spawnT = 600;
+    showToast('🌊 第 '+wave+' 波！更快了', 'success');
+  }
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true;
+    cancelAnimationFrame(raf);
+    if (isWin) { recordGameWin('sorter'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs = getGameStats(); _gs.sorterBest = Math.max(_gs.sorterBest||0, score); _gs.sorterCombo = Math.max(_gs.sorterCombo||0, combo); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'全部归位，产线顺畅！':'分拣超载，流水线停了')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">分类 <b style="color:var(--amber)">'+totalSorted+'</b> 个 · 得分 <b style="color:var(--amber)">'+score+'</b> · 到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.soAgain()">🔁 再玩一次</button><button class="mm-btn primary" onclick="window.soDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.soAgain = () => { overlay.remove(); openSorter(cfg, onComplete); };
+  window.soDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(!ended ? false : (wave > WAVES && !cfg._endless ? true : false)); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true; cancelAnimationFrame(raf);
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last)/1000); last = now;
+    if (!ended) {
+      spawnT -= dt*1000;
+      if (spawnT <= 0 && queue.length) { spawnItem(); spawnT = spawnGap(); }
+      for (let i = belt.length - 1; i >= 0; i--) {
+        const it = belt[i];
+        it.x += it.speed * dt;
+        it.el.style.left = it.x + 'px';
+        if (it.x >= END_X) {
+          combo = 0; if (comboEl) comboEl.textContent='';
+          processed++; lives--; livesEl.textContent = lives;
+          it.el.classList.add('so-leak');
+          playSound('error');
+          removeFromBelt(it);
+          setTimeout(() => { if (it.el.parentNode) it.el.parentNode.removeChild(it.el); }, 260);
+          if (lives <= 0) { endGame(false); return; }
+        }
+      }
+      if (!ended && processed >= PER) onWaveClear();
+      refreshUrgent();
+    }
+    raf = requestAnimationFrame(loop);
+  }
+  newWave();
+  spawnT = 400;
+  raf = requestAnimationFrame(loop);
 }
 
 function openMemoryMatch(cfg, onComplete) {

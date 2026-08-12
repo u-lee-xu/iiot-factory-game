@@ -607,6 +607,93 @@
      ],
      "win": 6,
      "lives": 3
+    },
+    {
+     "id": "l1_sorter",
+     "name": "数据分类大师 · 端口分拣",
+     "type": "sorter",
+     "afterTask": "1-13",
+     "blockTasks": [
+      "1-12",
+      "1-13"
+     ],
+     "subtitle": "厂长：传送带上送来各种服务，把它们送回正确的端口号筐里！",
+     "categories": [
+      {
+       "name": "SSH · 22",
+       "icon": "🔌"
+      },
+      {
+       "name": "HTTP · 80",
+       "icon": "🌐"
+      },
+      {
+       "name": "HTTPS · 443",
+       "icon": "🔒"
+      },
+      {
+       "name": "DNS · 53",
+       "icon": "📞"
+      }
+     ],
+     "items": [
+      {
+       "label": "ssh 远程登录",
+       "cat": 0
+      },
+      {
+       "label": "scp 传文件",
+       "cat": 0
+      },
+      {
+       "label": "sftp 传输",
+       "cat": 0
+      },
+      {
+       "label": "远程管理服务器",
+       "cat": 0
+      },
+      {
+       "label": "http 访问网页",
+       "cat": 1
+      },
+      {
+       "label": "明文网页传输",
+       "cat": 1
+      },
+      {
+       "label": "nginx 网页服务",
+       "cat": 1
+      },
+      {
+       "label": "https 加密网页",
+       "cat": 2
+      },
+      {
+       "label": "网银/支付 https",
+       "cat": 2
+      },
+      {
+       "label": "加密访问网站",
+       "cat": 2
+      },
+      {
+       "label": "nslookup 查域名",
+       "cat": 3
+      },
+      {
+       "label": "域名→IP 解析",
+       "cat": 3
+      },
+      {
+       "label": "DNS 服务器",
+       "cat": 3
+      }
+     ],
+     "waves": 3,
+     "perWave": 10,
+     "lives": 3,
+     "xp": 70
     }
    ],
    "bonus": {
