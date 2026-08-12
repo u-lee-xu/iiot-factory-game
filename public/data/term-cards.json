@@ -729,6 +729,28 @@
      "subtitle": "厂长：恶意数据从外网打进来了！在空地部署防火墙/IDS，守住车间！",
      "waves": 3,
      "xp": 70
+    },
+    {
+     "id": "l1_t48",
+     "name": "2048 · 数据融合",
+     "type": "t48",
+     "afterTask": "1-4",
+     "blockTasks": [
+      "1-4"
+     ],
+     "subtitle": "厂长：滑动让相同数据单位合并成更大的——bit→Byte→KB→MB…合成 TB 过关！",
+     "units": [
+      "bit",
+      "Byte",
+      "KB",
+      "MB",
+      "GB",
+      "TB"
+     ],
+     "target": "TB",
+     "cols": 4,
+     "rows": 4,
+     "xp": 70
     }
    ],
    "bonus": {
