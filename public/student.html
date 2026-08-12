@@ -285,7 +285,21 @@ body {
 
 
 
+
+/* ===== 车间防线·塔防 ===== */
+.td-box { width: 620px; max-width: 96vw; background: #12121a; border: 2px solid var(--red); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(255,85,85,.2); display: flex; flex-direction: column; }
+.td-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
+.td-stats b { color: var(--red); }
+#tdCanvas { width: 100%; display: block; background: #0a0d14; cursor: crosshair; touch-action: none; }
+.td-toolbar { display: flex; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--border); flex-wrap: wrap; justify-content: center; }
+.td-tower-btn { background:#1a1a24; border:2px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; }
+.td-tower-btn.active { border-color: var(--amber); }
+.td-tower-btn:hover { border-color: var(--amber); }
 /* ===== 消消乐·三连车间 ===== */
+/* ===== 管道工·数据通路 ===== */
+/* ===== 连连看·对对碰 ===== */
+/* ===== 数据熔炉（合成大西瓜·数据单位）===== */
+/* ===== 数据分类大师（传送带分拣）===== */
 .m3-box { width: 520px; max-width: 96vw; background: #12121a; border: 2px solid var(--green); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,.18); display: flex; flex-direction: column; }
 .m3-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
 .m3-stats b { color: var(--green); }
@@ -2043,10 +2057,11 @@ function renderMission() {
       const isLl = wType === 'll';
       const isPipe = wType === 'pipe';
       const isM3 = wType === 'm3';
+      const isTd = wType === 'td';
       const row = document.createElement('li');
       row.className = 'review-inline' + (unlocked ? ' unlocked' : ' locked') + (isTyping ? ' ty-only-desktop' : '') + (isShooter && w.advanced ? ' pc-only' : '');
-      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : '🃏';
-      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3;
+      const _emoji = isQuick ? '⚡' : isMatch ? '🔗' : isStorm ? '🌪️' : isAlarm ? '🚨' : isTyping ? '🔫' : isShooter ? '🛸' : isRacing ? '🏎️' : isSnake ? '🐍' : isFlappy ? '🦅' : isMole ? '🔨' : isPacman ? '👾' : isTank ? '🎯' : isBreakout ? '🧱' : isSorter ? '📦' : isForge ? '🔥' : isLl ? '🔗' : isPipe ? '🔧' : isM3 ? '🍬' : isTd ? '🛡️' : '🃏';
+      const _special = isQuick || isMatch || isStorm || isAlarm || isTyping || isShooter || isRacing || isSnake || isFlappy || isMole || isPacman || isTank || isBreakout || isSorter || isForge || isLl || isPipe || isM3 || isTd;
       const _name = _special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
       let _meta;
       if (isQuick) _meta = w.size + ' 题';
@@ -2067,6 +2082,7 @@ function renderMission() {
       else if (isLl) _meta = (w.pairs||[]).length + ' 组配对';
       else if (isPipe) _meta = (w.cols||4) + '×' + (w.rows||4) + ' 管道';
       else if (isM3) _meta = (w.waves||3) + ' 波消消乐';
+      else if (isTd) _meta = (w.waves||3) + ' 波防线';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
       row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
@@ -2090,6 +2106,7 @@ function renderMission() {
         else if (isLl) openLianLian(w, (win) => { if (win) showToast('🔗 全部配对！', 'success'); });
         else if (isPipe) openPipe(w, (win) => { if (win) showToast('🔧 数据通路接通！', 'success'); });
         else if (isM3) openMatch3(w, (win) => { if (win) showToast('🍬 三连清场！', 'success'); });
+        else if (isTd) openTowerDefense(w, (win) => { if (win) showToast('🛡️ 车间防线守住！', 'success'); });
         else openMemoryMatch(w, (win) => { if (win) showToast('🧠 翻牌完成', 'success'); });
       };
       list.appendChild(row);
@@ -4219,6 +4236,9 @@ const ACHIEVEMENTS = [
   { id: 'm3_1', name: '首消三连', desc: '消消乐通关 1 次', emoji: '🍬', test: c => (c.m3Wins||0) >= 1 },
   { id: 'm3_3', name: '连消熟手', desc: '消消乐通关 3 次', emoji: '🍬', test: c => (c.m3Wins||0) >= 3 },
   { id: 'm3_score', name: '清场大师', desc: '消消乐单局得分 3000', emoji: '✨', test: c => (c.m3Best||0) >= 3000 },
+  { id: 'td_1', name: '第一道防线', desc: '车间防线通关 1 次', emoji: '🛡️', test: c => (c.tdWins||0) >= 1 },
+  { id: 'td_3', name: '防线工事', desc: '车间防线通关 3 次', emoji: '🛡️', test: c => (c.tdWins||0) >= 3 },
+  { id: 'td_waves', name: '坚不可摧', desc: '车间防线单局守到第 5 波', emoji: '🏰', test: c => (c.tdBest||0) >= 5 },
   // —— 图鉴收藏 ——
   { id: 'pedia_20', name: '图鉴小成', desc: '术语图鉴收集 20 个', emoji: '📖', test: c => c.pediaCount >= 20 },
   { id: 'pedia_40', name: '图鉴达人', desc: '术语图鉴收集 40 个', emoji: '📚', test: c => c.pediaCount >= 40 },
@@ -4663,6 +4683,7 @@ function recordGameWin(type) {
   else if (t === 'll') gs.llWins = (gs.llWins || 0) + 1;
   else if (t === 'pipe') gs.pipeWins = (gs.pipeWins || 0) + 1;
   else if (t === 'm3') gs.m3Wins = (gs.m3Wins || 0) + 1;
+  else if (t === 'td') gs.tdWins = (gs.tdWins || 0) + 1;
   const lv = currentLevelId;
   if (lv) {
     gs.lvlWins = gs.lvlWins || {};
@@ -4703,6 +4724,8 @@ function achievementContext() {
   ctx.pipeBest = gs.pipeBest || 0;
   ctx.m3Wins = gs.m3Wins || 0;
   ctx.m3Best = gs.m3Best || 0;
+  ctx.tdWins = gs.tdWins || 0;
+  ctx.tdBest = gs.tdBest || 0;
   ctx.gameTypes = countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
   ctx.pediaCount = getPediaCount();
@@ -5084,7 +5107,7 @@ function countUnlockedGameTypes() {
 let gzList = [];
 function gzEmoji(w) {
   const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':'🃏';
+  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':'🃏';
 }
 function gzMeta(w) {
   const t = w.type || 'memory';
@@ -5106,12 +5129,13 @@ function gzMeta(w) {
   if (t==='ll') return ((w.pairs||[]).length) + ' 组配对';
   if (t==='pipe') return (w.cols||4) + '×' + (w.rows||4) + ' 管道';
   if (t==='m3') return (w.waves||3) + ' 波消消乐';
+  if (t==='td') return (w.waves||3) + ' 波防线';
   if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
   return (w.size*2) + ' 张';
 }
 function gzName(w) {
   const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3';
+  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td';
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 function renderGameZone(body) {
@@ -5180,6 +5204,7 @@ function gzPlay(idx) {
   else if (t==='ll') openLianLian(w, (win)=>{ if(win) showToast('🔗 全部配对！','success'); });
   else if (t==='pipe') openPipe(w, (win)=>{ if(win) showToast('🔧 数据通路接通！','success'); });
   else if (t==='m3') openMatch3(w, (win)=>{ if(win) showToast('🍬 三连清场！','success'); });
+  else if (t==='td') openTowerDefense(w, (win)=>{ if(win) showToast('🛡️ 车间防线守住！','success'); });
   else openMemoryMatch(w, (win)=>{ if(win) showToast('🧠 翻牌完成','success'); });
 }
 function buildGameZone() {
@@ -7781,6 +7806,184 @@ function openMatch3(cfg, onComplete) {
     if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
   }
   newWave();
+}
+
+// =========================================================================
+// 9u. TOWER DEFENSE — 车间防线（部署防线拦攻击数据，L1 攻防）
+// =========================================================================
+function openTowerDefense(cfg, onComplete) {
+  applyMiniTier(cfg);
+  if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  if (!tutSeen('td')) {
+    showGameTutorial('td', '🛡️ 车间防线', [
+      '恶意数据（DDoS/端口扫描/ARP欺骗…）从左侧入侵，沿着<b>通路</b>冲向车间',
+      '点击空地<b>部署防线</b>（防火墙/IDS），拦下它们别让到达终点',
+      '<b>守住 N 波</b>即过关；生命归零失败'
+    ], function(){ openTowerDefense(cfg, onComplete); });
+    return;
+  }
+  playMusic(gameSong('td') || 'boss');
+  const CELL = 40, COLS = 13, ROWS = 13;
+  const W = COLS*CELL, H = ROWS*CELL;
+  const PATH = [[0,6],[3,6],[3,3],[6,3],[6,9],[9,9],[9,2],[12,2]];
+  const TOWERS = [
+    { id:'fw', name:'防火墙', emoji:'🧱', cost:50, range:110, dmg:14, cd:0.5, color:'#ffb300' },
+    { id:'ids', name:'IDS', emoji:'🕵️', cost:90, range:150, dmg:24, cd:0.9, color:'#4d96ff' }
+  ];
+  const ENEMIES = [
+    { name:'DDoS', hp:30, speed:1.6, gold:12, color:'#ff6b6b', r:9 },
+    { name:'端口扫描', hp:55, speed:1.0, gold:20, color:'#ff9f43', r:10 },
+    { name:'ARP欺骗', hp:95, speed:0.7, gold:32, color:'#c07bd6', r:11 }
+  ];
+  const WAVES = cfg.waves || 3;
+  let wave = 0, lives = 10, money = 120, ended = false;
+  let enemies = [], towers = [], bullets = [];
+  let selTower = 0, spawnQ = [], spawnT = 0, waveActive = false, last = 0, raf = 0;
+  const pathPts = PATH.map(p => [p[0]*CELL+CELL/2, p[1]*CELL+CELL/2]);
+  const occupied = {};
+  PATH.forEach(p => { occupied[p[0]+','+p[1]] = true; });
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mm-overlay';
+  overlay.innerHTML = `
+    <div class="td-box">
+      <div class="mm-head"><div><div class="mm-title">🛡️ ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
+      <div class="td-stats">
+        <span>🌊 第 <b id="tdWave">0</b>/${WAVES} 波</span>
+        <span>❤️ <b id="tdLives">${lives}</b></span>
+        <span>💰 <b id="tdMoney">${money}</b></span>
+        <span>👾 <b id="tdLeft">0</b></span>
+      </div>
+      <canvas id="tdCanvas" width="${W}" height="${H}"></canvas>
+      <div class="td-toolbar" id="tdToolbar"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.mm-close').onclick = () => closeGame(false);
+  const cv = document.getElementById('tdCanvas'), ctx = cv.getContext('2d');
+  const livesEl=document.getElementById('tdLives'), moneyEl=document.getElementById('tdMoney'), waveEl=document.getElementById('tdWave'), leftEl=document.getElementById('tdLeft');
+
+  // 工具栏
+  const tb = document.getElementById('tdToolbar');
+  TOWERS.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.className = 'td-tower-btn' + (i===0?' active':'');
+    b.innerHTML = t.emoji + ' ' + t.name + ' <b style="color:var(--amber)">'+t.cost+'</b>';
+    b.onclick = () => { selTower = i; tb.querySelectorAll('.td-tower-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); };
+    tb.appendChild(b);
+  });
+  cv.addEventListener('click', e => {
+    if (ended) return;
+    const r = cv.getBoundingClientRect();
+    const cx = Math.floor((e.clientX - r.left) * (W/r.width) / CELL);
+    const cy = Math.floor((e.clientY - r.top) * (H/r.height) / CELL);
+    const key = cx+','+cy;
+    if (cx<0||cx>=COLS||cy<0||cy>=ROWS||occupied[key]) { playSound('error'); return; }
+    const t = TOWERS[selTower];
+    if (money < t.cost) { showToast('钱不够', 'error'); return; }
+    money -= t.cost; moneyEl.textContent = money;
+    occupied[key] = true;
+    towers.push({ x: cx*CELL+CELL/2, y: cy*CELL+CELL/2, cx, cy, type: selTower, cd: 0 });
+    playSound('click');
+  });
+
+  function startWave() {
+    wave++; waveEl.textContent = wave;
+    waveActive = true;
+    const n = 3 + wave;
+    spawnQ = [];
+    for (let i=0;i<n;i++) spawnQ.push(Math.floor(Math.random()*ENEMIES.length));
+    spawnT = 0.6;
+  }
+  function endWave() {
+    waveActive = false;
+    if (wave >= WAVES) { endGame(true); return; }
+    startWave();
+  }
+  function update(dt) {
+    // 生成
+    if (waveActive && spawnQ.length) {
+      spawnT -= dt;
+      if (spawnT <= 0) { const ti = spawnQ.shift(); const en = ENEMIES[ti];
+        enemies.push({ x:pathPts[0][0], y:pathPts[0][1], hp:en.hp*(1+wave*0.2), max:en.hp*(1+wave*0.2), speed:en.speed, gold:en.gold, color:en.color, r:en.r, wp:1, t:ti }); spawnT = Math.max(0.35, 1.1 - wave*0.15); }
+    }
+    // 敌人移动
+    for (let i=enemies.length-1;i>=0;i--) {
+      const e = enemies[i];
+      const tx = pathPts[e.wp][0], ty = pathPts[e.wp][1];
+      const dx = tx-e.x, dy = ty-e.y, d = Math.hypot(dx,dy);
+      if (d < 2) { e.wp++; if (e.wp >= pathPts.length) { enemies.splice(i,1); lives--; livesEl.textContent=lives; if (lives<=0) { endGame(false); return; } } }
+      else { e.x += dx/d*e.speed*CELL*0.28; e.y += dy/d*e.speed*CELL*0.28; }
+    }
+    // 塔射击
+    towers.forEach(t => {
+      t.cd -= dt;
+      if (t.cd > 0) return;
+      let best=null, bd=99999;
+      enemies.forEach(e => { const d2=(e.x-t.x)**2+(e.y-t.y)**2; if (d2 < TOWERS[t.type].range**2 && d2 < bd) { bd=d2; best=e; } });
+      if (best) { t.cd = TOWERS[t.type].cd; bullets.push({ x:t.x, y:t.y, tx:best.x, ty:best.y, tgt:best, dmg:TOWERS[t.type].dmg, color:TOWERS[t.type].color }); playSound('click'); }
+    });
+    // 子弹
+    for (let i=bullets.length-1;i>=0;i--) {
+      const b = bullets[i];
+      if (!b.tgt || !enemies.includes(b.tgt)) { bullets.splice(i,1); continue; }
+      const dx=b.tgt.x-b.x, dy=b.tgt.y-b.y, d=Math.hypot(dx,dy);
+      if (d < 6) { b.tgt.hp -= b.dmg; bullets.splice(i,1); if (b.tgt.hp<=0) { const idx=enemies.indexOf(b.tgt); if(idx>=0) enemies.splice(idx,1); money += b.tgt.gold; moneyEl.textContent=money; playSound('success'); } }
+      else { b.x += dx/d*400*dt; b.y += dy/d*400*dt; }
+    }
+    leftEl.textContent = enemies.length + spawnQ.length;
+    if (waveActive && !spawnQ.length && !enemies.length) endWave();
+  }
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    // 网格
+    ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
+    for (let x=0;x<=W;x+=CELL){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for (let y=0;y<=H;y+=CELL){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    // 通路
+    ctx.strokeStyle='rgba(255,176,0,.35)'; ctx.lineWidth=CELL*0.8; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(pathPts[0][0],pathPts[0][1]); for (let i=1;i<pathPts.length;i++) ctx.lineTo(pathPts[i][0],pathPts[i][1]); ctx.stroke();
+    // 起点/终点
+    ctx.fillStyle='#00e676'; ctx.fillText('🏭', pathPts[0][0]-8, pathPts[0][1]+6);
+    ctx.fillStyle='#ff5252'; ctx.fillText('🚪', pathPts[pathPts.length-1][0]-8, pathPts[pathPts.length-1][1]+6);
+    // 塔
+    towers.forEach(t => { ctx.beginPath(); ctx.arc(t.x,t.y,CELL*0.35,0,Math.PI*2); ctx.fillStyle=TOWERS[t.type].color; ctx.fill(); ctx.fillStyle='#0a0d14'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(TOWERS[t.type].emoji, t.x, t.y); });
+    // 敌人
+    enemies.forEach(e => { ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,Math.PI*2); ctx.fillStyle=e.color; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle='#fff'; ctx.font='9px sans-serif'; ctx.textAlign='center'; ctx.fillText(e.name, e.x, e.y-e.r-3);
+      ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(e.x-e.r, e.y+e.r+1, e.r*2, 3); ctx.fillStyle='#00e676'; ctx.fillRect(e.x-e.r, e.y+e.r+1, e.r*2*Math.max(0,e.hp/e.max), 3); });
+    // 子弹
+    bullets.forEach(b => { ctx.beginPath(); ctx.arc(b.x,b.y,3,0,Math.PI*2); ctx.fillStyle=b.color; ctx.fill(); });
+  }
+  function frame(now) {
+    const dt = Math.min(0.033,(now-last)/1000); last = now;
+    if (!ended) { update(dt); draw(); raf = requestAnimationFrame(frame); }
+  }
+  function endGame(isWin) {
+    if (ended) return;
+    ended = true;
+    if (isWin) { recordGameWin('td'); miniMarkClear(cfg.id); playSound('fanfare'); }
+    try { const _gs=getGameStats(); _gs.tdBest=Math.max(_gs.tdBest||0, wave); _gs.tdWins=(_gs.tdWins||0)+(isWin?1:0); saveGameStats(_gs); } catch(e){}
+    setTimeout(() => {
+      const res = document.createElement('div');
+      res.className = 'ty-result';
+      res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
+        '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'车间防线守住！':'防线被攻破')+'</div>'+
+        '<div style="font-size:15px;color:var(--dim);margin-top:6px">守到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波 · 剩余 💰 '+money+'</div>'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.tdAgain()">🔁 再守一轮</button><button class="mm-btn primary" onclick="window.tdDone()">收下奖励</button></div>';
+      focusResultPrimary(overlay);
+      overlay.innerHTML=''; overlay.appendChild(res);
+    }, 300);
+  }
+  window.tdAgain = () => { overlay.remove(); openTowerDefense(cfg, onComplete); };
+  window.tdDone = () => { overlay.remove(); playAreaMusic(); if (onComplete) onComplete(ended && wave>=WAVES); };
+  function closeGame(manual) {
+    if (ended) return;
+    ended = true; cancelAnimationFrame(raf);
+    overlay.remove();
+    if (manual) { if (onComplete) onComplete(false); playAreaMusic(); }
+  }
+  startWave();
+  raf = requestAnimationFrame(frame);
 }
 
 function openMemoryMatch(cfg, onComplete) {
