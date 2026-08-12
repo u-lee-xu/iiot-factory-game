@@ -6819,7 +6819,6 @@ function openMemoryMatch(cfg, onComplete) {
         size: sizes[ri],
         name: base.name + (sizes.length > 1 ? ' · 第 ' + (ri + 1) + '/' + sizes.length + ' 关' : ''),
         _noRecord: ri < sizes.length - 1,
-        _autoNext: ri < sizes.length - 1,
         _doneText: ri < sizes.length - 1 ? '下一关…' : undefined
       });
       if (cfg._endless) { sub.timed = true; sub.timeLimit = Math.max(18, 55 - ri * 3); }   // 无限战：逐关缩时
@@ -7078,7 +7077,7 @@ function openMemoryMatch(cfg, onComplete) {
         overlay.querySelector('[data-act="again"]').onclick = () => { playAreaMusic(); overlay.remove(); openMemoryMatch(cfg, onComplete); };
         const _done = () => { playAreaMusic(); overlay.remove(); if (!cfg._noRecord) { recordGameWin('mm'); miniMarkClear(cfg.id); } if (onComplete) onComplete(true); };
         overlay.querySelector('[data-act="done"]').onclick = _done;
-        if (cfg._autoNext) { setTimeout(_done, 1600); }
+        // 连续关卡：过关后不再自动弹下一关，玩家点「下一关…」按钮手动继续
       }, 700);
     } else {
       playSound('fail');
