@@ -1,2819 +1,2820 @@
 {
-  "levels": [
+ "levels": [
+  {
+   "levelId": 1,
+   "name": "中控室",
+   "emoji": "🖥️",
+   "warmups": [
     {
-      "levelId": 1,
-      "name": "中控室",
-      "emoji": "🖥️",
-      "warmups": [
-        {
-          "id": "l1_a",
-          "name": "开箱装系统",
-          "afterTask": "1-2",
-          "blockTasks": [
-            "1-0",
-            "1-1",
-            "1-2"
-          ],
-          "subtitle": "厂长：系统装起来了，把刚认识的那几个\"家伙\"认牢。",
-          "tip": "刚学完就考，记不住也没关系，混个脸熟。",
-          "size": 4,
-          "timed": false,
-          "xp": 60,
-          "pairs": [
-            {
-              "id": "vm",
-              "term": "虚拟机",
-              "hint": "在一台电脑里\"装\"出的另一台电脑",
-              "emoji": "🖥️",
-              "cmd": "VMware Workstation",
-              "cat": "基础"
-            },
-            {
-              "id": "os",
-              "term": "操作系统",
-              "hint": "管硬件、跑程序的\"大管家\"（如 Ubuntu）",
-              "emoji": "🧠",
-              "cmd": "Ubuntu Server",
-              "cat": "基础"
-            },
-            {
-              "id": "shell",
-              "term": "Shell",
-              "hint": "黑底白字的命令行窗口，Linux 的操作台",
-              "emoji": "💻",
-              "cmd": "bash",
-              "cat": "基础"
-            },
-            {
-              "id": "apt",
-              "term": "apt",
-              "hint": "Ubuntu 的包管理命令，装软件靠它",
-              "emoji": "📦",
-              "cmd": "apt install openssh-server",
-              "cat": "命令"
-            },
-            {
-              "id": "iso",
-              "term": "ISO 镜像",
-              "hint": "系统的安装光盘文件，如 ubuntu-24.04-server.iso",
-              "emoji": "💿",
-              "cat": "基础",
-              "cmd": "wget xxx.iso"
-            },
-            {
-              "id": "root",
-              "term": "root",
-              "hint": "系统最高权限的超级用户",
-              "emoji": "👑",
-              "cat": "基础",
-              "cmd": "sudo -i"
-            },
-            {
-              "id": "sudo",
-              "term": "sudo",
-              "hint": "临时以管理员身份执行命令",
-              "emoji": "🛡️",
-              "cat": "基础",
-              "cmd": "sudo apt update"
-            },
-            {
-              "id": "kernel",
-              "term": "内核 Kernel",
-              "hint": "系统核心，总管硬件资源",
-              "emoji": "⚙️",
-              "cat": "基础",
-              "cmd": "uname -r"
-            }
-          ],
-          "rounds": [
-            2,
-            3,
-            4
-          ]
-        },
-        {
-          "id": "l1_b",
-          "name": "看清你的网卡",
-          "afterTask": "1-4",
-          "blockTasks": [
-            "1-3",
-            "1-4"
-          ],
-          "subtitle": "厂长：ip addr 敲过了吧？这些数字和名字都得认住。",
-          "tip": "都是 ip 命令里能看到的东西，认个脸熟。",
-          "size": 5,
-          "timed": false,
-          "xp": 70,
-          "pairs": [
-            {
-              "id": "nic",
-              "term": "网卡",
-              "hint": "设备上网的接口",
-              "emoji": "🔌",
-              "cmd": "ip a",
-              "cat": "硬件"
-            },
-            {
-              "id": "ip",
-              "term": "IP 地址",
-              "hint": "设备的门牌号",
-              "emoji": "🏠",
-              "cmd": "ip addr",
-              "cat": "网络"
-            },
-            {
-              "id": "mac",
-              "term": "MAC 地址",
-              "hint": "设备出厂身份证",
-              "emoji": "🪪",
-              "cmd": "ip link",
-              "cat": "网络"
-            },
-            {
-              "id": "subnet",
-              "term": "子网掩码",
-              "hint": "划清\"自己人\"和\"外人\"",
-              "emoji": "🎭",
-              "cmd": "255.255.255.0",
-              "cat": "网络"
-            },
-            {
-              "id": "cidr",
-              "term": "CIDR 前缀",
-              "hint": "用 /24 简写子网掩码",
-              "emoji": "📐",
-              "cmd": "192.168.1.100/24",
-              "cat": "网络"
-            },
-            {
-              "id": "broadcast",
-              "term": "广播地址",
-              "hint": "网段内「喊一嗓子」全都能收到的地址",
-              "emoji": "📢",
-              "cat": "基础"
-            }
-          ],
-          "rounds": [
-            2,
-            3,
-            4
-          ]
-        },
-        {
-          "id": "l1_c",
-          "name": "网络互联三件套",
-          "afterTask": "1-8",
-          "blockTasks": [
-            "1-5",
-            "1-6",
-            "1-7",
-            "1-8"
-          ],
-          "subtitle": "厂长：连不通、排障、找出口，这套流程里的词都得刻脑子里。",
-          "tip": "排障流程里全用得上，记住位置就赢了。",
-          "size": 6,
-          "timed": true,
-          "timeLimit": 90,
-          "xp": 90,
-          "pairs": [
-            {
-              "id": "osi",
-              "term": "OSI 七层模型",
-              "hint": "网络世界的分工手册",
-              "emoji": "📚",
-              "cat": "概念"
-            },
-            {
-              "id": "ping",
-              "term": "ping",
-              "hint": "喊一声，看对方应不应",
-              "emoji": "📡",
-              "cmd": "ping 8.8.8.8",
-              "cat": "命令"
-            },
-            {
-              "id": "gateway",
-              "term": "网关",
-              "hint": "通往别的网络的城门",
-              "emoji": "🚪",
-              "cmd": "ip route",
-              "cat": "网络"
-            },
-            {
-              "id": "ipv4",
-              "term": "IPv4",
-              "hint": "32 位的门牌号",
-              "emoji": "📇",
-              "cat": "网络"
-            },
-            {
-              "id": "loopback",
-              "term": "回环地址",
-              "hint": "127.0.0.1，自己跟自己通信",
-              "emoji": "🔁",
-              "cmd": "ping 127.0.0.1",
-              "cat": "网络"
-            },
-            {
-              "id": "routetab",
-              "term": "路由表",
-              "hint": "设备里\"去哪走哪条路\"的说明书",
-              "emoji": "🧭",
-              "cmd": "ip route",
-              "cat": "网络"
-            },
-            {
-              "id": "l1_phy",
-              "term": "物理层",
-              "hint": "网线、电信号，负责传「比特」",
-              "emoji": "🔌",
-              "cat": "网络"
-            },
-            {
-              "id": "l2_dl",
-              "term": "数据链路层",
-              "hint": "交换机按 MAC 地址转发帧",
-              "emoji": "🔀",
-              "cat": "网络"
-            },
-            {
-              "id": "l3_net",
-              "term": "网络层",
-              "hint": "路由器按 IP 地址寻路",
-              "emoji": "🗺️",
-              "cat": "网络"
-            },
-            {
-              "id": "l4_tr",
-              "term": "传输层",
-              "hint": "TCP/UDP，靠端口区分不同应用",
-              "emoji": "🚪",
-              "cat": "网络"
-            }
-          ],
-          "rounds": [
-            2,
-            3,
-            4
-          ],
-          "events": [
-            "time",
-            "shield"
-          ]
-        },
-        {
-          "id": "l1_ty",
-          "name": "术语防御战",
-          "type": "typing",
-          "afterTask": "1-8",
-          "blockTasks": [
-            "1-5",
-            "1-6",
-            "1-7",
-            "1-8"
-          ],
-          "subtitle": "厂长：关键词往下掉，敲出完整命令把它打下来！输错就重新开始。",
-          "xp": 90,
-          "lives": 5,
-          "duration": 75,
-          "words": [
-            "ping",
-            "ip",
-            "ls",
-            "cat",
-            "cd",
-            "sudo",
-            "uname",
-            "hostname",
-            "apt",
-            "curl",
-            "nslookup",
-            "traceroute",
-            "grep",
-            "ss",
-            "iptables",
-            "nano",
-            "whoami",
-            "reboot"
-          ],
-          "waves": 3,
-          "perWave": 4
-        },
-        {
-          "id": "l1_d",
-          "name": "上网寻路",
-          "afterTask": "1-11",
-          "blockTasks": [
-            "1-9",
-            "1-10",
-            "1-11"
-          ],
-          "subtitle": "厂长：数据怎么走、网址怎么变 IP，这条链路你得门儿清。",
-          "tip": "traceroute 看路、nslookup 查号，都是刚练过的。",
-          "size": 6,
-          "timed": true,
-          "timeLimit": 70,
-          "xp": 90,
-          "pairs": [
-            {
-              "id": "tracert",
-              "term": "tracert",
-              "hint": "沿数据走的路，一站一站报数",
-              "emoji": "🧭",
-              "cmd": "tracert baidu.com",
-              "cat": "命令"
-            },
-            {
-              "id": "route",
-              "term": "路由",
-              "hint": "给数据选路的路牌",
-              "emoji": "🛣️",
-              "cmd": "ip route",
-              "cat": "网络"
-            },
-            {
-              "id": "dns",
-              "term": "DNS",
-              "hint": "把网址翻译成 IP 的电话簿",
-              "emoji": "📖",
-              "cmd": "nslookup baidu.com",
-              "cat": "网络"
-            },
-            {
-              "id": "domain",
-              "term": "域名",
-              "hint": "好记的名字，如 baidu.com",
-              "emoji": "🌐",
-              "cat": "网络"
-            },
-            {
-              "id": "nslookup",
-              "term": "nslookup",
-              "hint": "查域名对应 IP 的命令",
-              "emoji": "🔍",
-              "cmd": "nslookup www.baidu.com",
-              "cat": "命令"
-            },
-            {
-              "id": "reverse",
-              "term": "反向解析",
-              "hint": "从 IP 反查域名",
-              "emoji": "🔄",
-              "cat": "网络"
-            },
-            {
-              "id": "http",
-              "term": "HTTP",
-              "hint": "浏览器看网页用的传输协议",
-              "emoji": "🌐",
-              "cat": "网络",
-              "cmd": "http://baidu.com"
-            },
-            {
-              "id": "url",
-              "term": "网址",
-              "hint": "网页地址，如 www.baidu.com",
-              "emoji": "🔗",
-              "cat": "网络"
-            }
-          ],
-          "rounds": [
-            2,
-            3,
-            4
-          ]
-        },
-        {
-          "id": "l1_e",
-          "name": "守住大门",
-          "afterTask": "1-14",
-          "blockTasks": [
-            "1-12",
-            "1-13",
-            "1-14"
-          ],
-          "subtitle": "厂长：门卫和门牌号守好了，再把地址那些老伙计认一遍。",
-          "tip": "防火墙管进出、端口认服务，都是安全第一课。",
-          "size": 6,
-          "timed": true,
-          "timeLimit": 70,
-          "xp": 90,
-          "pairs": [
-            {
-              "id": "firewall",
-              "term": "防火墙",
-              "hint": "门卫，决定放行还是拦截",
-              "emoji": "🛡️",
-              "cmd": "ufw enable",
-              "cat": "安全"
-            },
-            {
-              "id": "port",
-              "term": "端口",
-              "hint": "设备里每个服务的\"窗口\"",
-              "emoji": "🚪",
-              "cmd": "ss -tln",
-              "cat": "网络"
-            },
-            {
-              "id": "iptables",
-              "term": "iptables",
-              "hint": "Linux 的防火墙规则工具",
-              "emoji": "⛓️",
-              "cmd": "iptables -L",
-              "cat": "安全"
-            },
-            {
-              "id": "ipv6",
-              "term": "IPv6",
-              "hint": "更长门牌号，地址用不完",
-              "emoji": "🆕",
-              "cat": "网络"
-            },
-            {
-              "id": "nat",
-              "term": "NAT",
-              "hint": "一个公网 IP 供多台设备共用",
-              "emoji": "🔀",
-              "cat": "网络"
-            },
-            {
-              "id": "ddos",
-              "term": "DDoS 攻击",
-              "hint": "海量请求把服务器塞瘫",
-              "emoji": "💥",
-              "cat": "安全"
-            },
-            {
-              "id": "scan",
-              "term": "端口扫描",
-              "hint": "攻击者挨个探测你开了哪些端口",
-              "emoji": "🕵️",
-              "cat": "安全"
-            },
-            {
-              "id": "vm",
-              "term": "虚拟机",
-              "hint": "在一台电脑里\"装\"出的另一台电脑",
-              "emoji": "🖥️",
-              "cmd": "VMware Workstation",
-              "cat": "基础"
-            },
-            {
-              "id": "ip",
-              "term": "IP 地址",
-              "hint": "设备的门牌号",
-              "emoji": "🏠",
-              "cmd": "ip addr",
-              "cat": "网络"
-            },
-            {
-              "id": "osi",
-              "term": "OSI 七层模型",
-              "hint": "网络世界的分工手册",
-              "emoji": "📚",
-              "cat": "概念"
-            },
-            {
-              "id": "ping",
-              "term": "ping",
-              "hint": "喊一声，看对方应不应",
-              "emoji": "📡",
-              "cmd": "ping 8.8.8.8",
-              "cat": "命令"
-            },
-            {
-              "id": "gateway",
-              "term": "网关",
-              "hint": "通往别的网络的城门",
-              "emoji": "🚪",
-              "cmd": "ip route",
-              "cat": "网络"
-            },
-            {
-              "id": "dns",
-              "term": "DNS",
-              "hint": "把网址翻译成 IP 的电话簿",
-              "emoji": "📖",
-              "cmd": "nslookup baidu.com",
-              "cat": "网络"
-            }
-          ],
-          "rounds": [
-            2,
-            3,
-            4
-          ]
-        },
-        {
-          "id": "l1_ty2",
-          "name": "术语防御战·进阶",
-          "type": "typing",
-          "afterTask": "1-14",
-          "blockTasks": [
-            "1-12",
-            "1-13",
-            "1-14"
-          ],
-          "subtitle": "厂长：安全区的词也上来了，敲快一点，别让它们漏过去！",
-          "xp": 120,
-          "lives": 5,
-          "duration": 110,
-          "words": [
-            "iptables",
-            "ss",
-            "grep",
-            "nc",
-            "route",
-            "ip",
-            "ping",
-            "curl",
-            "nslookup",
-            "traceroute",
-            "ssh",
-            "apt",
-            "sudo",
-            "ls",
-            "cat",
-            "systemctl",
-            "docker",
-            "nano",
-            "hostname",
-            "whoami"
-          ],
-          "waves": 5,
-          "perWave": 5
-        },
-        {
-          "id": "l1_sn1",
-          "name": "网线贪吃蛇",
-          "type": "snake",
-          "afterTask": "1-14",
-          "blockTasks": [
-            "1-9",
-            "1-10",
-            "1-11",
-            "1-12",
-            "1-13",
-            "1-14"
-          ],
-          "xp": 90,
-          "food": [
-            "IP 地址",
-            "子网掩码",
-            "网关",
-            "MAC 地址",
-            "ping",
-            "路由"
-          ],
-          "wall": [
-            "断网",
-            "防火墙",
-            "漏洞"
-          ],
-          "subtitle": "吃掉网络三件套变长，别撞断网/防火墙",
-          "pairs": [
-            {
-              "id": "ip",
-              "t": "IP 地址",
-              "h": "设备的门牌号"
-            },
-            {
-              "id": "mask",
-              "t": "子网掩码",
-              "h": "划分网段的记号"
-            },
-            {
-              "id": "gateway",
-              "t": "网关",
-              "h": "通往别的网络的城门"
-            },
-            {
-              "id": "mac",
-              "t": "MAC 地址",
-              "h": "网卡出厂身份证"
-            },
-            {
-              "id": "ping",
-              "t": "ping",
-              "h": "喊一声看对方应不应"
-            },
-            {
-              "id": "dns",
-              "t": "DNS",
-              "h": "域名翻译成 IP"
-            }
-          ],
-          "win": 6,
-          "lives": 3
-        }
-      ],
-      "bonus": {
-        "id": "bonus-1",
-        "name": "记忆大师挑战",
-        "subtitle": "厂长：从 4 张开始，一层比一层多，全对才配叫记忆大师。",
-        "tip": "五层牌堆，一层层揭开，卡片越来越多，冲全对！",
-        "xp": 400,
-        "levels": [
-          {
-            "name": "第一层 · 装机基础",
-            "subtitle": "刚开箱的那两个家伙",
-            "pairs": [
-              {
-                "id": "vm",
-                "term": "虚拟机",
-                "hint": "在一台电脑里\"装\"出的另一台电脑",
-                "emoji": "🖥️",
-                "cmd": "VMware Workstation",
-                "cat": "基础"
-              },
-              {
-                "id": "os",
-                "term": "操作系统",
-                "hint": "管硬件、跑程序的\"大管家\"（如 Ubuntu）",
-                "emoji": "🧠",
-                "cmd": "Ubuntu Server",
-                "cat": "基础"
-              }
-            ]
-          },
-          {
-            "name": "第二层 · 装机进阶",
-            "subtitle": "装软件、管权限、认网卡",
-            "pairs": [
-              {
-                "id": "shell",
-                "term": "Shell",
-                "hint": "黑底白字的命令行窗口，Linux 的操作台",
-                "emoji": "💻",
-                "cmd": "bash",
-                "cat": "基础"
-              },
-              {
-                "id": "apt",
-                "term": "apt",
-                "hint": "Ubuntu 的包管理命令，装软件靠它",
-                "emoji": "📦",
-                "cmd": "apt install openssh-server",
-                "cat": "命令"
-              },
-              {
-                "id": "nic",
-                "term": "网卡",
-                "hint": "设备上网的接口",
-                "emoji": "🔌",
-                "cmd": "ip a",
-                "cat": "硬件"
-              }
-            ]
-          },
-          {
-            "name": "第三层 · 网络基础",
-            "subtitle": "ip 命令里的那些名字",
-            "pairs": [
-              {
-                "id": "ip",
-                "term": "IP 地址",
-                "hint": "设备的门牌号",
-                "emoji": "🏠",
-                "cmd": "ip addr",
-                "cat": "网络"
-              },
-              {
-                "id": "mac",
-                "term": "MAC 地址",
-                "hint": "设备出厂身份证",
-                "emoji": "🪪",
-                "cmd": "ip link",
-                "cat": "网络"
-              },
-              {
-                "id": "ping",
-                "term": "ping",
-                "hint": "喊一声，看对方应不应",
-                "emoji": "📡",
-                "cmd": "ping 8.8.8.8",
-                "cat": "命令"
-              },
-              {
-                "id": "gateway",
-                "term": "网关",
-                "hint": "通往别的网络的城门",
-                "emoji": "🚪",
-                "cmd": "ip route",
-                "cat": "网络"
-              }
-            ]
-          },
-          {
-            "name": "第四层 · 网络进阶",
-            "subtitle": "域名、防火墙、端口、路由",
-            "pairs": [
-              {
-                "id": "dns",
-                "term": "DNS",
-                "hint": "把网址翻译成 IP 的电话簿",
-                "emoji": "📖",
-                "cmd": "nslookup baidu.com",
-                "cat": "网络"
-              },
-              {
-                "id": "domain",
-                "term": "域名",
-                "hint": "好记的名字，如 baidu.com",
-                "emoji": "🌐",
-                "cat": "网络"
-              },
-              {
-                "id": "firewall",
-                "term": "防火墙",
-                "hint": "门卫，决定放行还是拦截",
-                "emoji": "🛡️",
-                "cmd": "ufw enable",
-                "cat": "安全"
-              },
-              {
-                "id": "port",
-                "term": "端口",
-                "hint": "设备里每个服务的\"窗口\"",
-                "emoji": "🚪",
-                "cmd": "ss -tln",
-                "cat": "网络"
-              },
-              {
-                "id": "tracert",
-                "term": "tracert",
-                "hint": "沿数据走的路，一站一站报数",
-                "emoji": "🧭",
-                "cmd": "tracert baidu.com",
-                "cat": "命令"
-              }
-            ]
-          },
-          {
-            "name": "第五层 · 核心实战",
-            "subtitle": "协议、地址、掩码、NAT 大杂烩",
-            "pairs": [
-              {
-                "id": "route",
-                "term": "路由",
-                "hint": "给数据选路的路牌",
-                "emoji": "🛣️",
-                "cmd": "ip route",
-                "cat": "网络"
-              },
-              {
-                "id": "ipv4",
-                "term": "IPv4",
-                "hint": "32 位的门牌号",
-                "emoji": "📇",
-                "cat": "网络"
-              },
-              {
-                "id": "tcp",
-                "term": "TCP",
-                "hint": "先握手再传数据，可靠",
-                "emoji": "🤝",
-                "cat": "协议"
-              },
-              {
-                "id": "udp",
-                "term": "UDP",
-                "hint": "发出就走，不管收没收到",
-                "emoji": "✉️",
-                "cat": "协议"
-              },
-              {
-                "id": "subnet",
-                "term": "子网掩码",
-                "hint": "划清\"自己人\"和\"外人\"",
-                "emoji": "🎭",
-                "cmd": "255.255.255.0",
-                "cat": "网络"
-              },
-              {
-                "id": "nat",
-                "term": "NAT",
-                "hint": "一个公网 IP 供多台设备共用",
-                "emoji": "🔀",
-                "cat": "网络"
-              }
-            ]
-          }
-        ]
+     "id": "l1_a",
+     "name": "开箱装系统",
+     "afterTask": "1-2",
+     "blockTasks": [
+      "1-0",
+      "1-1",
+      "1-2"
+     ],
+     "subtitle": "厂长：系统装起来了，把刚认识的那几个\"家伙\"认牢。",
+     "tip": "刚学完就考，记不住也没关系，混个脸熟。",
+     "size": 4,
+     "timed": false,
+     "xp": 60,
+     "pairs": [
+      {
+       "id": "vm",
+       "term": "虚拟机",
+       "hint": "在一台电脑里\"装\"出的另一台电脑",
+       "emoji": "🖥️",
+       "cmd": "VMware Workstation",
+       "cat": "基础"
+      },
+      {
+       "id": "os",
+       "term": "操作系统",
+       "hint": "管硬件、跑程序的\"大管家\"（如 Ubuntu）",
+       "emoji": "🧠",
+       "cmd": "Ubuntu Server",
+       "cat": "基础"
+      },
+      {
+       "id": "shell",
+       "term": "Shell",
+       "hint": "黑底白字的命令行窗口，Linux 的操作台",
+       "emoji": "💻",
+       "cmd": "bash",
+       "cat": "基础"
+      },
+      {
+       "id": "apt",
+       "term": "apt",
+       "hint": "Ubuntu 的包管理命令，装软件靠它",
+       "emoji": "📦",
+       "cmd": "apt install openssh-server",
+       "cat": "命令"
+      },
+      {
+       "id": "iso",
+       "term": "ISO 镜像",
+       "hint": "系统的安装光盘文件，如 ubuntu-24.04-server.iso",
+       "emoji": "💿",
+       "cat": "基础",
+       "cmd": "wget xxx.iso"
+      },
+      {
+       "id": "root",
+       "term": "root",
+       "hint": "系统最高权限的超级用户",
+       "emoji": "👑",
+       "cat": "基础",
+       "cmd": "sudo -i"
+      },
+      {
+       "id": "sudo",
+       "term": "sudo",
+       "hint": "临时以管理员身份执行命令",
+       "emoji": "🛡️",
+       "cat": "基础",
+       "cmd": "sudo apt update"
+      },
+      {
+       "id": "kernel",
+       "term": "内核 Kernel",
+       "hint": "系统核心，总管硬件资源",
+       "emoji": "⚙️",
+       "cat": "基础",
+       "cmd": "uname -r"
       }
+     ],
+     "rounds": [
+      2,
+      3,
+      4
+     ]
     },
     {
-      "levelId": 2,
-      "name": "操作台",
-      "emoji": "🎛️",
-      "warmups": [
-        {
-          "id": "l2_a",
-          "name": "SSH 入门快打",
-          "afterTask": "2-1",
-          "blockTasks": [
-            "2-0",
-            "2-1"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：先把远程登录的几把\"钥匙\"认熟，反应要快。",
-          "tip": "看提示点对的命令，点错了会告诉你怎么连。",
-          "size": 5,
-          "xp": 60,
-          "pairs": [
-            {
-              "id": "ssh",
-              "term": "ssh",
-              "hint": "远程登录另一台服务器",
-              "emoji": "🔑",
-              "q": "厂长：远程连进五号车间的服务器，敲哪个命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "apt",
-              "term": "apt install",
-              "hint": "装软件（如 SSH 服务）",
-              "emoji": "📦",
-              "q": "厂长：服务器上还没有 SSH 服务，用什么命令安装它？",
-              "cat": "命令"
-            },
-            {
-              "id": "sysctl",
-              "term": "systemctl start",
-              "hint": "启动系统服务",
-              "emoji": "🚀",
-              "q": "SSH 服务装好了，用什么命令启动它？",
-              "cat": "命令"
-            },
-            {
-              "id": "p22",
-              "term": "22",
-              "hint": "SSH 默认端口",
-              "emoji": "🚪",
-              "q": "SSH 远程连接默认走哪个端口？",
-              "cat": "网络",
-              "distractors": [
-                "80",
-                "443",
-                "3389",
-                "53"
-              ]
-            },
-            {
-              "id": "pkgssh",
-              "term": "openssh-server",
-              "hint": "SSH 服务的软件包名",
-              "emoji": "📦",
-              "q": "厂长：服务器上还没有 SSH 服务，先装什么软件包？",
-              "cat": "命令"
-            }
-          ],
-          "distractors": [
-            "ls",
-            "cat",
-            "curl",
-            "pwd"
-          ]
-        },
-        {
-          "id": "l2_b",
-          "name": "Linux 命令快打",
-          "afterTask": "2-3",
-          "blockTasks": [
-            "2-2",
-            "2-3"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：ls、cat、curl 这些家伙认熟了，手速也要跟上。",
-          "tip": "看提示点对的命令，第一幕也学过。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "ls",
-              "term": "ls",
-              "hint": "列出目录内容",
-              "emoji": "📂",
-              "q": "厂长：查看 /home 目录里有什么，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "cat",
-              "term": "cat",
-              "hint": "查看文本文件内容",
-              "emoji": "📄",
-              "q": "厂长：要查看一个文本文件的内容，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "curl",
-              "term": "curl",
-              "hint": "命令行访问网站/查公网 IP",
-              "emoji": "🌐",
-              "q": "厂长：用命令行访问网站或查公网 IP，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "hostname",
-              "term": "hostname -I",
-              "hint": "显示本机 IP 地址",
-              "emoji": "🖧",
-              "q": "厂长：要看本机所有 IP 地址（hostname -I），用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "pwd",
-              "term": "pwd",
-              "hint": "显示当前所在目录",
-              "emoji": "📍",
-              "q": "厂长：想知道当前在哪个目录，用什么命令？",
-              "cat": "命令"
-            }
-          ],
-          "distractors": [
-            "vim",
-            "mkdir",
-            "rm",
-            "nano"
-          ]
-        },
-        {
-          "id": "l2_c",
-          "name": "云服务器快打",
-          "afterTask": "2-6",
-          "blockTasks": [
-            "2-4",
-            "2-5",
-            "2-6"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：云服务器和安全组，几把钥匙认熟。",
-          "tip": "都在这几关学过，混个脸熟。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "p22",
-              "term": "22",
-              "hint": "SSH 默认端口",
-              "emoji": "🚪",
-              "q": "厂长：SSH 远程登录默认用哪个端口？",
-              "cat": "网络"
-            },
-            {
-              "id": "secgrp",
-              "term": "安全组",
-              "hint": "云服务器的防火墙，控制端口开放",
-              "emoji": "🛡️",
-              "q": "厂长：控制云服务器哪些端口对外开放，靠什么？",
-              "cat": "安全"
-            },
-            {
-              "id": "pubip",
-              "term": "公网 IP",
-              "hint": "云服务器分配，能外网访问",
-              "emoji": "🌍",
-              "q": "厂长：云服务器启动后平台分配什么，能外网访问？",
-              "cat": "网络"
-            },
-            {
-              "id": "oss",
-              "term": "openssh-server",
-              "hint": "SSH 服务端软件包",
-              "emoji": "📦",
-              "q": "厂长：要装 SSH 服务端，装哪个软件包？",
-              "cat": "命令"
-            },
-            {
-              "id": "key",
-              "term": "密钥",
-              "hint": "更安全的登录方式",
-              "emoji": "🔑",
-              "q": "厂长：云服务器登录，工控环境更推荐哪种方式？",
-              "cat": "安全"
-            }
-          ],
-          "distractors": [
-            "80",
-            "443",
-            "端口转发",
-            "网卡"
-          ]
-        },
-        {
-          "id": "l2_d",
-          "name": "SSH 密钥快打",
-          "afterTask": "2-8",
-          "blockTasks": [
-            "2-7",
-            "2-8"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：免密登录的密钥一套，认熟它。",
-          "tip": "密钥对、白名单文件，都在这两关。",
-          "size": 4,
-          "xp": 70,
-          "timeLimit": 45,
-          "pairs": [
-            {
-              "id": "skgen",
-              "term": "ssh-keygen",
-              "hint": "生成 SSH 密钥对",
-              "emoji": "🎹",
-              "q": "厂长：生成 SSH 密钥对用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "skcopy",
-              "term": "ssh-copy-id",
-              "hint": "把公钥装到服务器",
-              "emoji": "📤",
-              "q": "厂长：把公钥装到服务器实现免密，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "authk",
-              "term": "authorized_keys",
-              "hint": "服务器上免密公钥白名单",
-              "emoji": "📋",
-              "q": "厂长：服务器上存放免密公钥的文件是？",
-              "cat": "文件"
-            },
-            {
-              "id": "priv",
-              "term": "私钥",
-              "hint": "自己保密，绝不外传",
-              "emoji": "🔒",
-              "q": "厂长：密钥对里哪个必须自己留着不能外传？",
-              "cat": "安全"
-            }
-          ],
-          "distractors": [
-            "ssh-add",
-            "id_rsa.pub",
-            "/etc/passwd",
-            "hostname"
-          ]
-        },
-        {
-          "id": "l2_e",
-          "name": "SSH 安全快打",
-          "afterTask": "2-11",
-          "blockTasks": [
-            "2-9",
-            "2-10",
-            "2-11"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：SSH 安全加固三板斧，认熟它。",
-          "tip": "安全配置、端口转发，都在最后这几关。",
-          "size": 4,
-          "xp": 70,
-          "timeLimit": 45,
-          "pairs": [
-            {
-              "id": "systl",
-              "term": "systemctl",
-              "hint": "管理系统服务（启动/自启）",
-              "emoji": "🎛️",
-              "q": "厂长：启动、看状态、设开机自启系统服务，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "fwdL",
-              "term": "-L",
-              "hint": "SSH 本地端口转发参数",
-              "emoji": "🔀",
-              "q": "厂长：SSH 本地端口转发用哪个参数？",
-              "cat": "命令"
-            },
-            {
-              "id": "proot",
-              "term": "PermitRootLogin",
-              "hint": "控制是否允许 root 登录",
-              "emoji": "🚫",
-              "q": "厂长：SSH 配置里禁止 root 直接登录，改哪一项？",
-              "cat": "安全"
-            },
-            {
-              "id": "nport",
-              "term": "改用非默认端口",
-              "hint": "别用默认 22，改成不常见的端口防扫描爆破",
-              "emoji": "🎯",
-              "q": "厂长：SSH 安全加固，端口应该怎么处理？",
-              "cat": "安全",
-              "distractors": [
-                "继续用默认 22",
-                "关闭 SSH 端口",
-                "端口随便设",
-                "不设登录密码"
-              ]
-            }
-          ],
-          "distractors": [
-            "-R",
-            "-D",
-            "systemd-analyze",
-            "ufw enable"
-          ]
-        },
-        {
-          "id": "l2_a2",
-          "name": "SSH 入门快打·进阶",
-          "afterTask": "2-1",
-          "blockTasks": [
-            "2-0",
-            "2-1"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：SSH 再来一轮，这轮要认得登录地址的写法。",
-          "tip": "看提示点对的命令。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "syslogin",
-              "term": "用户名@IP",
-              "hint": "远程登录地址格式，如 student@192.168.1.10",
-              "emoji": "👤",
-              "q": "厂长：要远程登录 192.168.1.10 这台服务器，用户名是 student，命令怎么写？",
-              "cat": "命令"
-            },
-            {
-              "id": "ssh",
-              "term": "ssh",
-              "hint": "远程登录另一台服务器",
-              "emoji": "🔑",
-              "q": "厂长：远程连进五号车间的服务器，敲哪个命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "p22",
-              "term": "22",
-              "hint": "SSH 默认端口",
-              "emoji": "🚪",
-              "q": "SSH 远程连接默认走哪个端口？",
-              "cat": "网络",
-              "distractors": [
-                "80",
-                "443",
-                "3389",
-                "53"
-              ]
-            },
-            {
-              "id": "pkgssh",
-              "term": "openssh-server",
-              "hint": "SSH 服务的软件包名",
-              "emoji": "📦",
-              "q": "厂长：服务器上还没有 SSH 服务，先装什么软件包？",
-              "cat": "命令"
-            },
-            {
-              "id": "sysctl",
-              "term": "systemctl start",
-              "hint": "启动系统服务",
-              "emoji": "🚀",
-              "q": "SSH 服务装好了，用什么命令启动它？",
-              "cat": "命令"
-            }
-          ],
-          "distractors": [
-            "ls",
-            "cat",
-            "curl",
-            "pwd"
-          ]
-        },
-        {
-          "id": "l2_b2",
-          "name": "Linux 命令快打·进阶",
-          "afterTask": "2-3",
-          "blockTasks": [
-            "2-2",
-            "2-3"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：常用命令再打一轮，这轮加了「搜内容」的 grep。",
-          "tip": "看提示点对的命令。",
-          "size": 6,
-          "xp": 80,
-          "timeLimit": 60,
-          "pairs": [
-            {
-              "id": "grep",
-              "term": "grep",
-              "hint": "在文件里搜索关键字",
-              "emoji": "🔍",
-              "q": "厂长：想在传感器日志里搜「温度」两个字，用哪个命令？",
-              "cat": "命令",
-              "cmd": "grep 温度 temp.log"
-            },
-            {
-              "id": "ls",
-              "term": "ls",
-              "hint": "列出目录内容",
-              "emoji": "📂",
-              "q": "厂长：查看 /home 目录里有什么，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "cat",
-              "term": "cat",
-              "hint": "查看文本文件内容",
-              "emoji": "📄",
-              "q": "厂长：要查看一个文本文件的内容，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "curl",
-              "term": "curl",
-              "hint": "命令行访问网站/查公网 IP",
-              "emoji": "🌐",
-              "q": "厂长：用命令行访问网站或查公网 IP，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "pwd",
-              "term": "pwd",
-              "hint": "显示当前所在目录",
-              "emoji": "📍",
-              "q": "厂长：想知道当前在哪个目录，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "hostname",
-              "term": "hostname -I",
-              "hint": "显示本机 IP 地址",
-              "emoji": "🖧",
-              "q": "厂长：要看本机所有 IP 地址（hostname -I），用什么命令？",
-              "cat": "命令"
-            }
-          ],
-          "distractors": [
-            "rm",
-            "cd",
-            "mkdir",
-            "top"
-          ]
-        },
-        {
-          "id": "l2_c2",
-          "name": "云服务器快打·进阶",
-          "afterTask": "2-6",
-          "blockTasks": [
-            "2-4",
-            "2-5",
-            "2-6"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：云服务器那套再打一遍，熟能生巧。",
-          "tip": "看提示点对的词。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "secgrp",
-              "term": "安全组",
-              "hint": "云服务器的防火墙，控制端口开放",
-              "emoji": "🛡️",
-              "q": "厂长：控制云服务器哪些端口对外开放，靠什么？",
-              "cat": "安全"
-            },
-            {
-              "id": "pubip",
-              "term": "公网 IP",
-              "hint": "云服务器分配，能外网访问",
-              "emoji": "🌍",
-              "q": "厂长：云服务器启动后平台分配什么，能外网访问？",
-              "cat": "网络"
-            },
-            {
-              "id": "key",
-              "term": "密钥",
-              "hint": "更安全的登录方式",
-              "emoji": "🔑",
-              "q": "厂长：云服务器登录，工控环境更推荐哪种方式？",
-              "cat": "安全"
-            },
-            {
-              "id": "oss",
-              "term": "openssh-server",
-              "hint": "SSH 服务端软件包",
-              "emoji": "📦",
-              "q": "厂长：要装 SSH 服务端，装哪个软件包？",
-              "cat": "命令"
-            },
-            {
-              "id": "p22",
-              "term": "22",
-              "hint": "SSH 默认端口",
-              "emoji": "🚪",
-              "q": "SSH 远程连接默认走哪个端口？",
-              "cat": "网络",
-              "distractors": [
-                "80",
-                "443",
-                "3389",
-                "53"
-              ]
-            }
-          ],
-          "distractors": [
-            "内存",
-            "CPU",
-            "带宽",
-            "地域"
-          ]
-        },
-        {
-          "id": "l2_d2",
-          "name": "SSH 密钥快打·进阶",
-          "afterTask": "2-8",
-          "blockTasks": [
-            "2-7",
-            "2-8"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：密钥这一套再打一遍，公钥私钥别搞混。",
-          "tip": "看提示点对的词。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "pubkey",
-              "term": "公钥",
-              "hint": "交给服务器的那把「锁」，不怕公开",
-              "emoji": "🔐",
-              "q": "服务器上白名单里放的是哪一把钥匙？",
-              "cat": "安全"
-            },
-            {
-              "id": "skgen",
-              "term": "ssh-keygen",
-              "hint": "生成 SSH 密钥对",
-              "emoji": "🎹",
-              "q": "厂长：生成 SSH 密钥对用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "skcopy",
-              "term": "ssh-copy-id",
-              "hint": "把公钥装到服务器",
-              "emoji": "📤",
-              "q": "厂长：把公钥装到服务器实现免密，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "authk",
-              "term": "authorized_keys",
-              "hint": "服务器上免密公钥白名单",
-              "emoji": "📋",
-              "q": "厂长：服务器上存放免密公钥的文件是？",
-              "cat": "文件"
-            },
-            {
-              "id": "priv",
-              "term": "私钥",
-              "hint": "自己保密，绝不外传",
-              "emoji": "🔒",
-              "q": "厂长：密钥对里哪个必须自己留着不能外传？",
-              "cat": "安全"
-            }
-          ],
-          "distractors": [
-            "密码",
-            "验证码",
-            "指纹",
-            "口令"
-          ]
-        },
-        {
-          "id": "l2_e2",
-          "name": "SSH 安全快打·进阶",
-          "afterTask": "2-11",
-          "blockTasks": [
-            "2-9",
-            "2-10",
-            "2-11"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：安全配置再打一轮，顺便认「暴力破解」这个敌人。",
-          "tip": "看提示点对的词。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "bruteforce",
-              "term": "暴力破解",
-              "hint": "不断试密码，撞开你的大门",
-              "emoji": "💥",
-              "q": "攻击者拿字典不停试密码，这种攻击叫什么？",
-              "cat": "安全"
-            },
-            {
-              "id": "systl",
-              "term": "systemctl",
-              "hint": "管理系统服务（启动/自启）",
-              "emoji": "🎛️",
-              "q": "厂长：启动、看状态、设开机自启系统服务，用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "nport",
-              "term": "改用非默认端口",
-              "hint": "别用默认 22，改成不常见的端口防扫描爆破",
-              "emoji": "🎯",
-              "q": "厂长：SSH 安全加固，端口应该怎么处理？",
-              "cat": "安全",
-              "distractors": [
-                "继续用默认 22",
-                "关闭 SSH 端口",
-                "端口随便设",
-                "不设登录密码"
-              ]
-            },
-            {
-              "id": "proot",
-              "term": "PermitRootLogin",
-              "hint": "控制是否允许 root 登录",
-              "emoji": "🚫",
-              "q": "厂长：SSH 配置里禁止 root 直接登录，改哪一项？",
-              "cat": "安全"
-            },
-            {
-              "id": "fwdL",
-              "term": "-L",
-              "hint": "SSH 本地端口转发参数",
-              "emoji": "🔀",
-              "q": "厂长：SSH 本地端口转发用哪个参数？",
-              "cat": "命令"
-            }
-          ],
-          "distractors": [
-            "正常登录",
-            "断网",
-            "重启",
-            "杀毒"
-          ]
-        },
-        {
-          "id": "l2_j1",
-          "name": "云端跳跃",
-          "type": "flappy",
-          "afterTask": "2-8",
-          "blockTasks": [
-            "2-4",
-            "2-5",
-            "2-6",
-            "2-7",
-            "2-8"
-          ],
-          "xp": 90,
-          "platforms": [
-            "云服务器",
-            "公网 IP",
-            "SSH 隧道",
-            "容器",
-            "弹性 IP"
-          ],
-          "holes": [
-            "断线黑洞",
-            "超时",
-            "连接失败"
-          ],
-          "subtitle": "在云服务器间跳跃，躲开断线黑洞",
-          "questions": [
-            {
-              "q": "SSH 登录命令是？",
-              "opts": [
-                "ssh user@ip",
-                "apt install",
-                "nslookup"
-              ],
-              "ans": 0
-            },
-            {
-              "q": "查看当前目录？",
-              "opts": [
-                "pwd",
-                "cd",
-                "ls"
-              ],
-              "ans": 2
-            },
-            {
-              "q": "安装软件包？",
-              "opts": [
-                "apt install",
-                "rm -rf",
-                "cat"
-              ],
-              "ans": 0
-            },
-            {
-              "q": "查看本机 IP？",
-              "opts": [
-                "ip addr",
-                "whoami",
-                "date"
-              ],
-              "ans": 0
-            },
-            {
-              "q": "追踪网络路由？",
-              "opts": [
-                "traceroute",
-                "ping",
-                "hostname"
-              ],
-              "ans": 0
-            }
-          ]
-        }
-      ],
-      "bonus": null
+     "id": "l1_b",
+     "name": "看清你的网卡",
+     "afterTask": "1-4",
+     "blockTasks": [
+      "1-3",
+      "1-3b",
+      "1-4"
+     ],
+     "subtitle": "厂长：ip addr 敲过了吧？这些数字和名字都得认住。",
+     "tip": "都是 ip 命令里能看到的东西，认个脸熟。",
+     "size": 5,
+     "timed": false,
+     "xp": 70,
+     "pairs": [
+      {
+       "id": "nic",
+       "term": "网卡",
+       "hint": "设备上网的接口",
+       "emoji": "🔌",
+       "cmd": "ip a",
+       "cat": "硬件"
+      },
+      {
+       "id": "ip",
+       "term": "IP 地址",
+       "hint": "设备的门牌号",
+       "emoji": "🏠",
+       "cmd": "ip addr",
+       "cat": "网络"
+      },
+      {
+       "id": "mac",
+       "term": "MAC 地址",
+       "hint": "设备出厂身份证",
+       "emoji": "🪪",
+       "cmd": "ip link",
+       "cat": "网络"
+      },
+      {
+       "id": "subnet",
+       "term": "子网掩码",
+       "hint": "划清\"自己人\"和\"外人\"",
+       "emoji": "🎭",
+       "cmd": "255.255.255.0",
+       "cat": "网络"
+      },
+      {
+       "id": "cidr",
+       "term": "CIDR 前缀",
+       "hint": "用 /24 简写子网掩码",
+       "emoji": "📐",
+       "cmd": "192.168.1.100/24",
+       "cat": "网络"
+      },
+      {
+       "id": "broadcast",
+       "term": "广播地址",
+       "hint": "网段内「喊一嗓子」全都能收到的地址",
+       "emoji": "📢",
+       "cat": "基础"
+      }
+     ],
+     "rounds": [
+      2,
+      3,
+      4
+     ]
     },
     {
-      "levelId": 3,
-      "name": "车间",
-      "emoji": "⚙️",
-      "warmups": [
-        {
-          "id": "l3_a",
-          "name": "华山论剑·协议鉴别",
-          "afterTask": "3-4",
-          "blockTasks": [
-            "3-3",
-            "3-4"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：八大协议各显神通，看你能不能认准。",
-          "tip": "记住每个协议的那句「一句话」，就能认出来。",
-          "size": 6,
-          "xp": 80,
-          "timeLimit": 60,
-          "pairs": [
-            {
-              "id": "profinet",
-              "term": "ProfiNet",
-              "hint": "西门子 · 毫秒级实时控制",
-              "emoji": "🔵",
-              "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "ethercat",
-              "term": "EtherCAT",
-              "hint": "倍福 · 快到极致的「飞读飞写」",
-              "emoji": "⚡",
-              "q": "厂长：倍福的伺服运动控制快到极致，是哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "cclink",
-              "term": "CC-Link IE",
-              "hint": "三菱 · 环形冗余断线不中断",
-              "emoji": "🔗",
-              "q": "厂长：三菱厂区断了线网络也不中断，靠哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "modbus",
-              "term": "Modbus",
-              "hint": "最老最开放 · 变频仪表都支持",
-              "emoji": "📡",
-              "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
-              "cat": "协议"
-            },
-            {
-              "id": "powerlink",
-              "term": "Powerlink",
-              "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
-              "emoji": "🖧",
-              "q": "厂长：贝加莱用标准硬件跑的工业以太网协议是？",
-              "cat": "协议"
-            },
-            {
-              "id": "ethernetip",
-              "term": "EtherNet/IP",
-              "hint": "罗克韦尔 · 基于以太网+TCP/IP",
-              "emoji": "🌐",
-              "q": "厂长：罗克韦尔主推、基于标准以太网的协议是？",
-              "cat": "协议"
-            }
-          ],
-          "distractors": [
-            "TCP/IP",
-            "HTTP",
-            "OPC UA",
-            "MQTT"
-          ]
-        },
-        {
-          "id": "l3_b",
-          "name": "ISA-95 分层鉴别",
-          "afterTask": "3-1",
-          "blockTasks": [
-            "3-0",
-            "3-1"
-          ],
-          "type": "match",
-          "subtitle": "厂长：五层金字塔，每层管一摊，认准设备该站哪层。",
-          "tip": "记住：设备层采集、控制层指挥、监控层看全局、运营层管订单、业务层管公司。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 45,
-          "pairs": [
-            {
-              "id": "l0",
-              "left": "传感器 / 执行器",
-              "right": "L0 现场设备层",
-              "hint": "采集现场数据"
-            },
-            {
-              "id": "l1",
-              "left": "PLC",
-              "right": "L1 控制层",
-              "hint": "做逻辑控制"
-            },
-            {
-              "id": "l2",
-              "left": "SCADA 监控屏",
-              "right": "L2 监控层",
-              "hint": "看整条产线状态"
-            },
-            {
-              "id": "l3",
-              "left": "MES 生产执行",
-              "right": "L3 制造运营层",
-              "hint": "管订单进度"
-            },
-            {
-              "id": "l4",
-              "left": "ERP 企业资源",
-              "right": "L4 业务层",
-              "hint": "管财务采购销售"
-            }
-          ],
-          "leftTitle": "设备 / 系统",
-          "rightTitle": "ISA-95 层"
-        },
-        {
-          "id": "l3_c",
-          "name": "Modbus 寄存器鉴别",
-          "afterTask": "3-6",
-          "blockTasks": [
-            "3-5",
-            "3-6"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：Modbus 靠四种寄存器组织数据，认准哪个装什么。",
-          "tip": "口诀：保持=设定值可写、输入=测量值只读、线圈=开关可写、离散=开关只读。",
-          "size": 4,
-          "xp": 70,
-          "timeLimit": 45,
-          "pairs": [
-            {
-              "id": "holding",
-              "term": "保持寄存器",
-              "hint": "16 位可读可写，存设定值",
-              "emoji": "📝",
-              "q": "厂长：要存温度上限这个「设定值」，用哪种寄存器？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "inputreg",
-              "term": "输入寄存器",
-              "hint": "16 位只读，存测量值",
-              "emoji": "📊",
-              "q": "厂长：要读传感器当前温度这个「测量值」，用哪种寄存器？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "coil",
-              "term": "线圈",
-              "hint": "1 位可读可写，开关状态",
-              "emoji": "🔘",
-              "q": "厂长：控制电机启动/停止的「开关状态」，用哪种？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "discrete",
-              "term": "离散输入",
-              "hint": "1 位只读，限位开关",
-              "emoji": "🚧",
-              "q": "厂长：限位开关这种「只读的开关信号」，用哪种？",
-              "cat": "Modbus"
-            }
-          ],
-          "distractors": [
-            "数据帧",
-            "功能码",
-            "波特率",
-            "报文"
-          ]
-        },
-        {
-          "id": "l3_f1",
-          "name": "协议翻牌",
-          "type": "memory",
-          "afterTask": "3-4",
-          "blockTasks": [
-            "3-3",
-            "3-4"
-          ],
-          "subtitle": "厂长：把六大协议和它们的特点对上号。",
-          "tip": "记住每家的'一句话'，翻牌就快了。",
-          "size": 6,
-          "xp": 70,
-          "pairs": [
-            {
-              "id": "profinet",
-              "term": "ProfiNet",
-              "hint": "西门子 · 毫秒级实时控制",
-              "emoji": "🔵",
-              "cat": "协议"
-            },
-            {
-              "id": "ethercat",
-              "term": "EtherCAT",
-              "hint": "倍福 · 快到极致（飞读飞写）",
-              "emoji": "⚡",
-              "cat": "协议"
-            },
-            {
-              "id": "cclink",
-              "term": "CC-Link IE",
-              "hint": "三菱 · 环形冗余断线不中断",
-              "emoji": "🔗",
-              "cat": "协议"
-            },
-            {
-              "id": "modbus",
-              "term": "Modbus",
-              "hint": "最老最开放 · 变频仪表都支持",
-              "emoji": "📡",
-              "cat": "协议"
-            },
-            {
-              "id": "powerlink",
-              "term": "Powerlink",
-              "hint": "贝加莱/ABB · 标准硬件",
-              "emoji": "🖧",
-              "cat": "协议"
-            },
-            {
-              "id": "ethernetip",
-              "term": "EtherNet/IP",
-              "hint": "罗克韦尔 · 基于以太网+TCP/IP",
-              "emoji": "🌐",
-              "cat": "协议"
-            }
-          ]
-        },
-        {
-          "id": "l3_f2",
-          "name": "寄存器翻牌",
-          "type": "memory",
-          "afterTask": "3-6",
-          "blockTasks": [
-            "3-5",
-            "3-6"
-          ],
-          "subtitle": "厂长：四种寄存器和它们的用途，翻牌记住。",
-          "tip": "保持=设定值、输入=测量值、线圈=开关可写、离散=开关只读。",
-          "size": 4,
-          "xp": 60,
-          "pairs": [
-            {
-              "id": "holding",
-              "term": "保持寄存器",
-              "hint": "16 位可读写 · 存设定值",
-              "emoji": "📝",
-              "cat": "Modbus"
-            },
-            {
-              "id": "inputreg",
-              "term": "输入寄存器",
-              "hint": "16 位只读 · 存测量值",
-              "emoji": "📊",
-              "cat": "Modbus"
-            },
-            {
-              "id": "coil",
-              "term": "线圈",
-              "hint": "1 位可读写 · 开关状态",
-              "emoji": "🔘",
-              "cat": "Modbus"
-            },
-            {
-              "id": "discrete",
-              "term": "离散输入",
-              "hint": "1 位只读 · 限位开关",
-              "emoji": "🚧",
-              "cat": "Modbus"
-            }
-          ]
-        },
-        {
-          "id": "l3_a2",
-          "name": "协议快打·进阶",
-          "afterTask": "3-4",
-          "blockTasks": [
-            "3-3",
-            "3-4"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：六大协议再来一轮，手速要跟上！",
-          "tip": "看提示点对的协议，点错了会告诉你是谁。",
-          "size": 6,
-          "xp": 80,
-          "timeLimit": 60,
-          "pairs": [
-            {
-              "id": "profinet",
-              "term": "ProfiNet",
-              "hint": "西门子 · 毫秒级实时控制",
-              "emoji": "🔵",
-              "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "ethercat",
-              "term": "EtherCAT",
-              "hint": "倍福 · 快到极致的「飞读飞写」",
-              "emoji": "⚡",
-              "q": "厂长：倍福的伺服运动控制快到极致，是哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "cclink",
-              "term": "CC-Link IE",
-              "hint": "三菱 · 环形冗余断线不中断",
-              "emoji": "🔗",
-              "q": "厂长：三菱厂区断了线网络也不中断，靠哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "modbus",
-              "term": "Modbus",
-              "hint": "最老最开放 · 变频仪表都支持",
-              "emoji": "📡",
-              "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
-              "cat": "协议"
-            },
-            {
-              "id": "powerlink",
-              "term": "Powerlink",
-              "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
-              "emoji": "🖧",
-              "q": "厂长：贝加莱用标准硬件跑的工业以太网协议是？",
-              "cat": "协议"
-            },
-            {
-              "id": "ethernetip",
-              "term": "EtherNet/IP",
-              "hint": "罗克韦尔 · 基于以太网+TCP/IP",
-              "emoji": "🌐",
-              "q": "厂长：罗克韦尔主推、基于标准以太网的协议是？",
-              "cat": "协议"
-            }
-          ],
-          "distractors": [
-            "WiFi",
-            "蓝牙",
-            "ZigBee",
-            "LoRa"
-          ]
-        },
-        {
-          "id": "l3_c2",
-          "name": "寄存器快打·进阶",
-          "afterTask": "3-6",
-          "blockTasks": [
-            "3-5",
-            "3-6"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：四种寄存器再来一轮，位和 16 位别记反。",
-          "tip": "看提示点对的寄存器。",
-          "size": 4,
-          "xp": 60,
-          "timeLimit": 40,
-          "pairs": [
-            {
-              "id": "holding",
-              "term": "保持寄存器",
-              "hint": "16 位可读可写，存设定值",
-              "emoji": "📝",
-              "q": "厂长：要存温度上限这个「设定值」，用哪种寄存器？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "inputreg",
-              "term": "输入寄存器",
-              "hint": "16 位只读，存测量值",
-              "emoji": "📊",
-              "q": "厂长：要读传感器当前温度这个「测量值」，用哪种寄存器？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "coil",
-              "term": "线圈",
-              "hint": "1 位可读可写，开关状态",
-              "emoji": "🔘",
-              "q": "厂长：控制电机启动/停止的「开关状态」，用哪种？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "discrete",
-              "term": "离散输入",
-              "hint": "1 位只读，限位开关",
-              "emoji": "🚧",
-              "q": "厂长：限位开关这种「只读的开关信号」，用哪种？",
-              "cat": "Modbus"
-            }
-          ],
-          "distractors": [
-            "布尔寄存器",
-            "浮点寄存器",
-            "文本寄存器",
-            "数组寄存器"
-          ]
-        },
-        {
-          "id": "l3_f1b",
-          "name": "协议翻牌·进阶",
-          "afterTask": "3-4",
-          "blockTasks": [
-            "3-3",
-            "3-4"
-          ],
-          "type": "memory",
-          "subtitle": "厂长：六大协议翻牌再来一轮，把名字和厂家对上。",
-          "tip": "混个脸熟，认住谁是谁家的。",
-          "size": 6,
-          "xp": 70,
-          "pairs": [
-            {
-              "id": "profinet",
-              "term": "ProfiNet",
-              "hint": "西门子 · 毫秒级实时控制",
-              "emoji": "🔵",
-              "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "ethercat",
-              "term": "EtherCAT",
-              "hint": "倍福 · 快到极致的「飞读飞写」",
-              "emoji": "⚡",
-              "q": "厂长：倍福的伺服运动控制快到极致，是哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "cclink",
-              "term": "CC-Link IE",
-              "hint": "三菱 · 环形冗余断线不中断",
-              "emoji": "🔗",
-              "q": "厂长：三菱厂区断了线网络也不中断，靠哪种协议？",
-              "cat": "协议"
-            },
-            {
-              "id": "modbus",
-              "term": "Modbus",
-              "hint": "最老最开放 · 变频仪表都支持",
-              "emoji": "📡",
-              "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
-              "cat": "协议"
-            },
-            {
-              "id": "powerlink",
-              "term": "Powerlink",
-              "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
-              "emoji": "🖧",
-              "q": "厂长：贝加莱用标准硬件跑的工业以太网协议是？",
-              "cat": "协议"
-            },
-            {
-              "id": "ethernetip",
-              "term": "EtherNet/IP",
-              "hint": "罗克韦尔 · 基于以太网+TCP/IP",
-              "emoji": "🌐",
-              "q": "厂长：罗克韦尔主推、基于标准以太网的协议是？",
-              "cat": "协议"
-            }
-          ]
-        },
-        {
-          "id": "l3_f2b",
-          "name": "寄存器翻牌·进阶",
-          "afterTask": "3-6",
-          "blockTasks": [
-            "3-5",
-            "3-6"
-          ],
-          "type": "memory",
-          "subtitle": "厂长：四种寄存器翻牌再来一轮，位/16位、读写/只读要分清。",
-          "tip": "混个脸熟，认住四种柜子。",
-          "size": 4,
-          "xp": 60,
-          "pairs": [
-            {
-              "id": "holding",
-              "term": "保持寄存器",
-              "hint": "16 位可读可写，存设定值",
-              "emoji": "📝",
-              "q": "厂长：要存温度上限这个「设定值」，用哪种寄存器？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "inputreg",
-              "term": "输入寄存器",
-              "hint": "16 位只读，存测量值",
-              "emoji": "📊",
-              "q": "厂长：要读传感器当前温度这个「测量值」，用哪种寄存器？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "coil",
-              "term": "线圈",
-              "hint": "1 位可读可写，开关状态",
-              "emoji": "🔘",
-              "q": "厂长：控制电机启动/停止的「开关状态」，用哪种？",
-              "cat": "Modbus"
-            },
-            {
-              "id": "discrete",
-              "term": "离散输入",
-              "hint": "1 位只读，限位开关",
-              "emoji": "🚧",
-              "q": "厂长：限位开关这种「只读的开关信号」，用哪种？",
-              "cat": "Modbus"
-            }
-          ]
-        },
-        {
-          "id": "l3_g1",
-          "name": "巴别塔·车间语言",
-          "afterTask": "3-2",
-          "blockTasks": [
-            "3-0",
-            "3-1",
-            "3-2"
-          ],
-          "type": "memory",
-          "subtitle": "厂长：还记得巴别塔吗？这轮认认让车间「说同一种话」的关键词。",
-          "tip": "巴别塔故事 + 协议概念，混个脸熟。",
-          "size": 6,
-          "xp": 70,
-          "pairs": [
-            {
-              "id": "babel",
-              "term": "巴别塔",
-              "hint": "各设备各说各话，谁也听不懂谁",
-              "emoji": "🗼",
-              "cat": "概念"
-            },
-            {
-              "id": "protocol",
-              "term": "协议",
-              "hint": "设备通信的「共同语言」规则",
-              "emoji": "🤝",
-              "cat": "概念"
-            },
-            {
-              "id": "slave",
-              "term": "从站",
-              "hint": "Modbus 里听主机指挥的下位设备",
-              "emoji": "🛠️",
-              "cat": "概念"
-            },
-            {
-              "id": "nodered",
-              "term": "Node-RED",
-              "hint": "图形化「搭积木」式编程工具",
-              "emoji": "🧩",
-              "cat": "工具",
-              "cmd": "node-red"
-            },
-            {
-              "id": "modbus",
-              "term": "Modbus",
-              "hint": "最老最开放 · 变频仪表都支持",
-              "emoji": "📡",
-              "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
-              "cat": "协议"
-            },
-            {
-              "id": "profinet",
-              "term": "ProfiNet",
-              "hint": "西门子 · 毫秒级实时控制",
-              "emoji": "🔵",
-              "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
-              "cat": "协议"
-            }
-          ]
-        },
-        {
-          "id": "l3_sh3",
-          "name": "数据蜂群·保卫工厂",
-          "type": "shooter",
-          "afterTask": "3-4",
-          "blockTasks": [
-            "3-3",
-            "3-4"
-          ],
-          "subtitle": "厂长：协议数据包成群冲过来了，看飞机上的解释，打对应的名词！",
-          "xp": 130,
-          "lives": 5,
-          "waves": 4,
-          "cols": 6,
-          "rows": 4,
-          "pairs": [
-            {
-              "term": "Modbus",
-              "hint": "最老最开放，变频器仪表几乎都支持"
-            },
-            {
-              "term": "ProfiNet",
-              "hint": "西门子，毫秒级实时工业以太网"
-            },
-            {
-              "term": "EtherCAT",
-              "hint": "倍福，快到极致的飞读飞写"
-            },
-            {
-              "term": "CC-Link IE",
-              "hint": "三菱，环形冗余断线不中断"
-            },
-            {
-              "term": "ModbusTCP",
-              "hint": "Modbus 走 TCP/IP 网络"
-            },
-            {
-              "term": "Node-RED",
-              "hint": "低代码拖拽的数据流工具"
-            },
-            {
-              "term": "EtherNet/IP",
-              "hint": "罗克韦尔，基于以太网的工业协议"
-            },
-            {
-              "term": "Powerlink",
-              "hint": "贝加莱，标准硬件上的实时协议"
-            }
-          ]
-        },
-        {
-          "id": "l3_sh3b",
-          "name": "数据蜂群·进阶（手动选炮）",
-          "type": "shooter",
-          "afterTask": "3-4",
-          "blockTasks": [
-            "3-3",
-            "3-4"
-          ],
-          "subtitle": "PC 进阶：↑/↓ 切换炮口文字，对准对应名词再打",
-          "xp": 120,
-          "lives": 5,
-          "waves": 4,
-          "cols": 6,
-          "rows": 4,
-          "pairs": [
-            {
-              "term": "Modbus",
-              "hint": "最老最开放，变频器仪表几乎都支持"
-            },
-            {
-              "term": "ProfiNet",
-              "hint": "西门子，毫秒级实时工业以太网"
-            },
-            {
-              "term": "EtherCAT",
-              "hint": "倍福，快到极致的飞读飞写"
-            },
-            {
-              "term": "CC-Link IE",
-              "hint": "三菱，环形冗余断线不中断"
-            },
-            {
-              "term": "ModbusTCP",
-              "hint": "Modbus 走 TCP/IP 网络"
-            },
-            {
-              "term": "Node-RED",
-              "hint": "低代码拖拽的数据流工具"
-            },
-            {
-              "term": "EtherNet/IP",
-              "hint": "罗克韦尔，基于以太网的工业协议"
-            },
-            {
-              "term": "Powerlink",
-              "hint": "贝加莱，标准硬件上的实时协议"
-            }
-          ],
-          "advanced": true,
-          "tip": "主动配对：把飞机炮口切到敌人的名词，才能打中它"
-        }
-      ],
-      "bonus": null
+     "id": "l1_c",
+     "name": "网络互联三件套",
+     "afterTask": "1-8",
+     "blockTasks": [
+      "1-5",
+      "1-6",
+      "1-7",
+      "1-8"
+     ],
+     "subtitle": "厂长：连不通、排障、找出口，这套流程里的词都得刻脑子里。",
+     "tip": "排障流程里全用得上，记住位置就赢了。",
+     "size": 6,
+     "timed": true,
+     "timeLimit": 90,
+     "xp": 90,
+     "pairs": [
+      {
+       "id": "osi",
+       "term": "OSI 七层模型",
+       "hint": "网络世界的分工手册",
+       "emoji": "📚",
+       "cat": "概念"
+      },
+      {
+       "id": "ping",
+       "term": "ping",
+       "hint": "喊一声，看对方应不应",
+       "emoji": "📡",
+       "cmd": "ping 8.8.8.8",
+       "cat": "命令"
+      },
+      {
+       "id": "gateway",
+       "term": "网关",
+       "hint": "通往别的网络的城门",
+       "emoji": "🚪",
+       "cmd": "ip route",
+       "cat": "网络"
+      },
+      {
+       "id": "ipv4",
+       "term": "IPv4",
+       "hint": "32 位的门牌号",
+       "emoji": "📇",
+       "cat": "网络"
+      },
+      {
+       "id": "loopback",
+       "term": "回环地址",
+       "hint": "127.0.0.1，自己跟自己通信",
+       "emoji": "🔁",
+       "cmd": "ping 127.0.0.1",
+       "cat": "网络"
+      },
+      {
+       "id": "routetab",
+       "term": "路由表",
+       "hint": "设备里\"去哪走哪条路\"的说明书",
+       "emoji": "🧭",
+       "cmd": "ip route",
+       "cat": "网络"
+      },
+      {
+       "id": "l1_phy",
+       "term": "物理层",
+       "hint": "网线、电信号，负责传「比特」",
+       "emoji": "🔌",
+       "cat": "网络"
+      },
+      {
+       "id": "l2_dl",
+       "term": "数据链路层",
+       "hint": "交换机按 MAC 地址转发帧",
+       "emoji": "🔀",
+       "cat": "网络"
+      },
+      {
+       "id": "l3_net",
+       "term": "网络层",
+       "hint": "路由器按 IP 地址寻路",
+       "emoji": "🗺️",
+       "cat": "网络"
+      },
+      {
+       "id": "l4_tr",
+       "term": "传输层",
+       "hint": "TCP/UDP，靠端口区分不同应用",
+       "emoji": "🚪",
+       "cat": "网络"
+      }
+     ],
+     "rounds": [
+      2,
+      3,
+      4
+     ],
+     "events": [
+      "time",
+      "shield"
+     ]
     },
     {
-      "levelId": 4,
-      "name": "边缘柜",
-      "emoji": "📦",
-      "warmups": [
-        {
-          "id": "l4_a",
-          "name": "边缘处理快打",
-          "afterTask": "4-4",
-          "blockTasks": [
-            "4-0",
-            "4-1",
-            "4-2",
-            "4-3",
-            "4-4"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：边缘处理的核心词，认熟它。",
-          "tip": "数据源头处理、筛选、报警，都在这几关。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "edge",
-              "term": "边缘计算",
-              "hint": "数据在源头就地处理",
-              "emoji": "📦",
-              "q": "厂长：数据在设备旁边就地处理、不过度依赖云端，叫什么？",
-              "cat": "边缘"
-            },
-            {
-              "id": "filter",
-              "term": "数据筛选",
-              "hint": "只传有用的，过滤正常值",
-              "emoji": "🔍",
-              "q": "厂长：把异常和变化的数据挑出来上传，过滤掉大量正常值，叫什么？",
-              "cat": "边缘"
-            },
-            {
-              "id": "thr",
-              "term": "报警阈值",
-              "hint": "超限就报警的设定值",
-              "emoji": "🚨",
-              "q": "厂长：温度超过 80℃ 就报警，这个 80℃ 是什么？",
-              "cat": "边缘"
-            },
-            {
-              "id": "fn",
-              "term": "Function 节点",
-              "hint": "Node-RED 里写逻辑的节点",
-              "emoji": "🧩",
-              "q": "厂长：Node-RED 里用代码写数据处理逻辑的节点叫什么？",
-              "cat": "Node-RED"
-            },
-            {
-              "id": "sma",
-              "term": "滑动均值",
-              "hint": "取最近 N 个值的平均",
-              "emoji": "📉",
-              "q": "厂长：取最近几个数据求平均来平滑波动，叫什么？",
-              "cat": "边缘"
-            }
-          ],
-          "distractors": [
-            "云端计算",
-            "大数据分析",
-            "数据库",
-            "网关"
-          ]
-        },
-        {
-          "id": "l4_b",
-          "name": "软 PLC 快打",
-          "afterTask": "4-8",
-          "blockTasks": [
-            "4-5",
-            "4-6",
-            "4-7",
-            "4-8"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：软 PLC 和边缘分工，认熟它。",
-          "tip": "软 PLC、边缘三层，都在后面几关。",
-          "size": 4,
-          "xp": 70,
-          "timeLimit": 45,
-          "pairs": [
-            {
-              "id": "softplc",
-              "term": "软 PLC",
-              "hint": "用软件实现 PLC 逻辑控制",
-              "emoji": "🖥️",
-              "q": "厂长：用软件在普通 PC 上实现 PLC 逻辑控制，叫什么？",
-              "cat": "PLC"
-            },
-            {
-              "id": "openplc",
-              "term": "OpenPLC",
-              "hint": "开源软 PLC 平台",
-              "emoji": "🔓",
-              "q": "厂长：开源的软 PLC 平台叫什么？",
-              "cat": "PLC"
-            },
-            {
-              "id": "edgecloud",
-              "term": "边缘 vs 云",
-              "hint": "边缘管实时、云端管趋势",
-              "emoji": "⚖️",
-              "q": "厂长：实时判断用边缘、长期趋势分析用云端，这叫什么分工？",
-              "cat": "架构"
-            },
-            {
-              "id": "3layer",
-              "term": "边缘三层",
-              "hint": "感知层/计算层/网络层",
-              "emoji": "🏗️",
-              "q": "厂长：边缘计算三层架构是感知层、计算层和什么？",
-              "cat": "架构"
-            }
-          ],
-          "distractors": [
-            "硬 PLC",
-            "虚拟机",
-            "数据库",
-            "防火墙"
-          ]
-        },
-        {
-          "id": "l4_s1",
-          "name": "数据风暴·守住管道",
-          "type": "storm",
-          "afterTask": "4-9",
-          "blockTasks": [
-            "4-2",
-            "4-4",
-            "4-9"
-          ],
-          "subtitle": "厂长：数据风暴来了！掂量着手里的过滤器，别让管道崩了。",
-          "tip": "滑动均值滤噪声、阈值截断压异常、降采样减流量、丢弃异常最猛但可能误伤关键数据——边缘算力有限，不能全开。",
-          "waves": 5,
-          "duration": 60,
-          "xp": 120,
-          "filters": [
-            {
-              "id": "smooth",
-              "name": "滑动均值",
-              "emoji": "📉",
-              "desc": "滤噪声·压波动（关键数据略滞后）",
-              "cost": 8
-            },
-            {
-              "id": "clamp",
-              "name": "阈值截断",
-              "emoji": "🎚️",
-              "desc": "压异常尖峰·压噪声",
-              "cost": 10
-            },
-            {
-              "id": "drop",
-              "name": "丢弃异常",
-              "emoji": "🗑️",
-              "desc": "直接丢异常·可能误伤关键",
-              "cost": 14
-            },
-            {
-              "id": "down",
-              "name": "降采样",
-              "emoji": "⏳",
-              "desc": "流量减半·可能漏关键",
-              "cost": 6
-            }
-          ],
-          "pairs": [
-            {
-              "id": "smooth",
-              "term": "滑动均值",
-              "hint": "取最近 N 个值平均，滤掉噪声、压平波动（会滞后）",
-              "emoji": "📉",
-              "cat": "边缘"
-            },
-            {
-              "id": "clamp",
-              "term": "阈值截断",
-              "hint": "超限数据截断/报警，压住异常尖峰",
-              "emoji": "🎚️",
-              "cat": "边缘"
-            },
-            {
-              "id": "drop",
-              "term": "丢弃异常",
-              "hint": "把异常数据直接扔掉，最省流量但可能误伤关键数据",
-              "emoji": "🗑️",
-              "cat": "边缘"
-            },
-            {
-              "id": "down",
-              "term": "降采样",
-              "hint": "只保留一部分采样，流量减半",
-              "emoji": "⏳",
-              "cat": "边缘"
-            }
-          ]
-        },
-        {
-          "id": "l4_s2",
-          "name": "值班抢险·别让产线烧了",
-          "type": "alarm",
-          "afterTask": "4-11",
-          "blockTasks": [
-            "4-1",
-            "4-7",
-            "4-11"
-          ],
-          "subtitle": "厂长：盯紧边缘盒子，温度爆表冒烟就点它报警处理，别让产线烧了！",
-          "tip": "盒子变红冒烟=过热，快点点它；没冒烟别乱点，误报会扣分；连击越多分越高。",
-          "devices": 4,
-          "duration": 40,
-          "waves": 4,
-          "xp": 110,
-          "pairs": [
-            {
-              "id": "thr",
-              "term": "报警阈值",
-              "hint": "超限就报警的设定值，比如 80℃",
-              "emoji": "🎚️",
-              "cat": "边缘"
-            },
-            {
-              "id": "alarm",
-              "term": "报警处理",
-              "hint": "温度爆表立即告警处置，防止设备宕机",
-              "emoji": "🚨",
-              "cat": "边缘"
-            },
-            {
-              "id": "devstat",
-              "term": "设备状态",
-              "hint": "边缘设备的健康/负载状态，异常要盯",
-              "emoji": "📟",
-              "cat": "边缘"
-            },
-            {
-              "id": "edgebox",
-              "term": "边缘盒子",
-              "hint": "就地处理数据的边缘设备，实时监控温度",
-              "emoji": "📦",
-              "cat": "边缘"
-            }
-          ]
-        },
-        {
-          "id": "l4_m1",
-          "name": "边缘打地鼠",
-          "type": "mole",
-          "afterTask": "4-4",
-          "blockTasks": [
-            "4-1",
-            "4-2",
-            "4-3",
-            "4-4"
-          ],
-          "xp": 90,
-          "bad": [
-            "超温",
-            "爆振",
-            "超压",
-            "毛刺"
-          ],
-          "good": [
-            "正常",
-            "均值",
-            "阈值内"
-          ],
-          "subtitle": "传感器冒出异常就点掉（滑动均值/阈值过滤）",
-          "metric": "温度",
-          "unit": "℃",
-          "threshold": 80
-        }
-      ],
-      "bonus": null
+     "id": "l1_ty",
+     "name": "术语防御战",
+     "type": "typing",
+     "afterTask": "1-8",
+     "blockTasks": [
+      "1-5",
+      "1-6",
+      "1-7",
+      "1-8"
+     ],
+     "subtitle": "厂长：关键词往下掉，敲出完整命令把它打下来！输错就重新开始。",
+     "xp": 90,
+     "lives": 5,
+     "duration": 75,
+     "words": [
+      "ping",
+      "ip",
+      "ls",
+      "cat",
+      "cd",
+      "sudo",
+      "uname",
+      "hostname",
+      "apt",
+      "curl",
+      "nslookup",
+      "traceroute",
+      "grep",
+      "ss",
+      "iptables",
+      "nano",
+      "whoami",
+      "reboot"
+     ],
+     "waves": 3,
+     "perWave": 4
     },
     {
-      "levelId": 5,
-      "name": "云平台",
-      "emoji": "☁️",
-      "warmups": [
-        {
-          "id": "l5_a",
-          "name": "Docker 基础快打",
-          "afterTask": "5-3",
-          "blockTasks": [
-            "5-1",
-            "5-2",
-            "5-3"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：镜像、容器、命令，认熟它。",
-          "tip": "Docker 三概念和常用命令，都在前几关。",
-          "size": 5,
-          "xp": 70,
-          "timeLimit": 50,
-          "pairs": [
-            {
-              "id": "image",
-              "term": "镜像",
-              "hint": "应用的模板/图纸",
-              "emoji": "📦",
-              "q": "厂长：Docker 里'应用的模板/图纸'叫什么？",
-              "cat": "Docker"
-            },
-            {
-              "id": "container",
-              "term": "容器",
-              "hint": "镜像的运行实例",
-              "emoji": "📦",
-              "q": "厂长：Docker 里镜像跑起来的实例叫什么？",
-              "cat": "Docker"
-            },
-            {
-              "id": "drun",
-              "term": "docker run",
-              "hint": "运行一个容器",
-              "emoji": "▶️",
-              "q": "厂长：运行一个容器用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "dps",
-              "term": "docker ps",
-              "hint": "查看运行中的容器",
-              "emoji": "👀",
-              "q": "厂长：查看运行中的容器用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "hub",
-              "term": "Docker Hub",
-              "hint": "存放镜像的仓库",
-              "emoji": "🏪",
-              "q": "厂长：Docker Hub 是干什么的？",
-              "cat": "Docker"
-            }
-          ],
-          "distractors": [
-            "docker stop",
-            "docker rm",
-            "虚拟机",
-            "docker build"
-          ]
-        },
-        {
-          "id": "l5_b",
-          "name": "容器化部署快打",
-          "afterTask": "5-6",
-          "blockTasks": [
-            "5-4",
-            "5-5",
-            "5-6"
-          ],
-          "type": "quick",
-          "subtitle": "厂长：Compose、数据卷，认熟它。",
-          "tip": "编排、持久化，都在后面几关。",
-          "size": 4,
-          "xp": 70,
-          "timeLimit": 45,
-          "pairs": [
-            {
-              "id": "compose",
-              "term": "Docker Compose",
-              "hint": "用 YAML 编排多个容器",
-              "emoji": "📜",
-              "q": "厂长：用 YAML 文件编排多个容器的工具叫什么？",
-              "cat": "Docker"
-            },
-            {
-              "id": "vm",
-              "term": "容器 vs 虚拟机",
-              "hint": "容器共享内核，更轻量",
-              "emoji": "⚖️",
-              "q": "厂长：容器比虚拟机轻，因为共享主机的什么？",
-              "cat": "概念"
-            },
-            {
-              "id": "dbuild",
-              "term": "docker build",
-              "hint": "从 Dockerfile 构建镜像",
-              "emoji": "🔨",
-              "q": "厂长：从 Dockerfile 构建镜像用什么命令？",
-              "cat": "命令"
-            },
-            {
-              "id": "vol",
-              "term": "数据卷",
-              "hint": "容器数据持久化",
-              "emoji": "💾",
-              "q": "厂长：让容器数据不随容器删除而丢失，用什么？",
-              "cat": "Docker"
-            }
-          ],
-          "distractors": [
-            "docker ps",
-            "docker run",
-            "镜像",
-            "网络"
-          ]
-        },
-        {
-          "id": "l5_p1",
-          "name": "容器吃豆人",
-          "type": "pacman",
-          "afterTask": "5-4",
-          "blockTasks": [
-            "5-1",
-            "5-2",
-            "5-3",
-            "5-4"
-          ],
-          "xp": 100,
-          "pellets": [
-            "镜像层",
-            "端口映射",
-            "数据卷",
-            "环境变量"
-          ],
-          "ghosts": [
-            "清理进程",
-            "镜像冲突",
-            "端口占用"
-          ],
-          "subtitle": "吃掉镜像层，躲开清理进程",
-          "pairs": [
-            {
-              "t": "docker run",
-              "h": "启动一个容器"
-            },
-            {
-              "t": "docker ps",
-              "h": "查看运行中的容器"
-            },
-            {
-              "t": "docker rm",
-              "h": "删除容器"
-            },
-            {
-              "t": "docker pull",
-              "h": "下载镜像"
-            }
-          ]
-        }
-      ],
-      "bonus": null
+     "id": "l1_d",
+     "name": "上网寻路",
+     "afterTask": "1-11",
+     "blockTasks": [
+      "1-9",
+      "1-10",
+      "1-11"
+     ],
+     "subtitle": "厂长：数据怎么走、网址怎么变 IP，这条链路你得门儿清。",
+     "tip": "traceroute 看路、nslookup 查号，都是刚练过的。",
+     "size": 6,
+     "timed": true,
+     "timeLimit": 70,
+     "xp": 90,
+     "pairs": [
+      {
+       "id": "tracert",
+       "term": "tracert",
+       "hint": "沿数据走的路，一站一站报数",
+       "emoji": "🧭",
+       "cmd": "tracert baidu.com",
+       "cat": "命令"
+      },
+      {
+       "id": "route",
+       "term": "路由",
+       "hint": "给数据选路的路牌",
+       "emoji": "🛣️",
+       "cmd": "ip route",
+       "cat": "网络"
+      },
+      {
+       "id": "dns",
+       "term": "DNS",
+       "hint": "把网址翻译成 IP 的电话簿",
+       "emoji": "📖",
+       "cmd": "nslookup baidu.com",
+       "cat": "网络"
+      },
+      {
+       "id": "domain",
+       "term": "域名",
+       "hint": "好记的名字，如 baidu.com",
+       "emoji": "🌐",
+       "cat": "网络"
+      },
+      {
+       "id": "nslookup",
+       "term": "nslookup",
+       "hint": "查域名对应 IP 的命令",
+       "emoji": "🔍",
+       "cmd": "nslookup www.baidu.com",
+       "cat": "命令"
+      },
+      {
+       "id": "reverse",
+       "term": "反向解析",
+       "hint": "从 IP 反查域名",
+       "emoji": "🔄",
+       "cat": "网络"
+      },
+      {
+       "id": "http",
+       "term": "HTTP",
+       "hint": "浏览器看网页用的传输协议",
+       "emoji": "🌐",
+       "cat": "网络",
+       "cmd": "http://baidu.com"
+      },
+      {
+       "id": "url",
+       "term": "网址",
+       "hint": "网页地址，如 www.baidu.com",
+       "emoji": "🔗",
+       "cat": "网络"
+      }
+     ],
+     "rounds": [
+      2,
+      3,
+      4
+     ]
     },
     {
-      "levelId": 6,
-      "name": "驾驶舱",
-      "emoji": "📊",
-      "warmups": [
-        {
-          "id": "l6_r1",
-          "name": "数据狂飙",
-          "type": "racing",
-          "afterTask": "6-6",
-          "blockTasks": [
-            "6-1",
-            "6-2",
-            "6-3",
-            "6-4",
-            "6-5",
-            "6-6"
-          ],
-          "lives": 3,
-          "lanes": 4,
-          "good": [
-            "温度正常",
-            "振动正常",
-            "压力正常",
-            "能耗正常"
-          ],
-          "bad": [
-            "超温🔥",
-            "爆振⚡",
-            "超压💢",
-            "断链⛓️"
-          ],
-          "xp": 100,
-          "subtitle": "躲开异常数据块，吃正常数据加分，越跑越快",
-          "metric": "温度",
-          "unit": "℃",
-          "max": 80
-        }
-      ]
+     "id": "l1_e",
+     "name": "守住大门",
+     "afterTask": "1-14",
+     "blockTasks": [
+      "1-12",
+      "1-13",
+      "1-14"
+     ],
+     "subtitle": "厂长：门卫和门牌号守好了，再把地址那些老伙计认一遍。",
+     "tip": "防火墙管进出、端口认服务，都是安全第一课。",
+     "size": 6,
+     "timed": true,
+     "timeLimit": 70,
+     "xp": 90,
+     "pairs": [
+      {
+       "id": "firewall",
+       "term": "防火墙",
+       "hint": "门卫，决定放行还是拦截",
+       "emoji": "🛡️",
+       "cmd": "ufw enable",
+       "cat": "安全"
+      },
+      {
+       "id": "port",
+       "term": "端口",
+       "hint": "设备里每个服务的\"窗口\"",
+       "emoji": "🚪",
+       "cmd": "ss -tln",
+       "cat": "网络"
+      },
+      {
+       "id": "iptables",
+       "term": "iptables",
+       "hint": "Linux 的防火墙规则工具",
+       "emoji": "⛓️",
+       "cmd": "iptables -L",
+       "cat": "安全"
+      },
+      {
+       "id": "ipv6",
+       "term": "IPv6",
+       "hint": "更长门牌号，地址用不完",
+       "emoji": "🆕",
+       "cat": "网络"
+      },
+      {
+       "id": "nat",
+       "term": "NAT",
+       "hint": "一个公网 IP 供多台设备共用",
+       "emoji": "🔀",
+       "cat": "网络"
+      },
+      {
+       "id": "ddos",
+       "term": "DDoS 攻击",
+       "hint": "海量请求把服务器塞瘫",
+       "emoji": "💥",
+       "cat": "安全"
+      },
+      {
+       "id": "scan",
+       "term": "端口扫描",
+       "hint": "攻击者挨个探测你开了哪些端口",
+       "emoji": "🕵️",
+       "cat": "安全"
+      },
+      {
+       "id": "vm",
+       "term": "虚拟机",
+       "hint": "在一台电脑里\"装\"出的另一台电脑",
+       "emoji": "🖥️",
+       "cmd": "VMware Workstation",
+       "cat": "基础"
+      },
+      {
+       "id": "ip",
+       "term": "IP 地址",
+       "hint": "设备的门牌号",
+       "emoji": "🏠",
+       "cmd": "ip addr",
+       "cat": "网络"
+      },
+      {
+       "id": "osi",
+       "term": "OSI 七层模型",
+       "hint": "网络世界的分工手册",
+       "emoji": "📚",
+       "cat": "概念"
+      },
+      {
+       "id": "ping",
+       "term": "ping",
+       "hint": "喊一声，看对方应不应",
+       "emoji": "📡",
+       "cmd": "ping 8.8.8.8",
+       "cat": "命令"
+      },
+      {
+       "id": "gateway",
+       "term": "网关",
+       "hint": "通往别的网络的城门",
+       "emoji": "🚪",
+       "cmd": "ip route",
+       "cat": "网络"
+      },
+      {
+       "id": "dns",
+       "term": "DNS",
+       "hint": "把网址翻译成 IP 的电话簿",
+       "emoji": "📖",
+       "cmd": "nslookup baidu.com",
+       "cat": "网络"
+      }
+     ],
+     "rounds": [
+      2,
+      3,
+      4
+     ]
     },
     {
-      "levelId": 7,
-      "name": "数据贯通",
-      "emoji": "🔗",
-      "warmups": [
-        {
-          "id": "l7_t1",
-          "name": "消息守卫战",
-          "type": "tank",
-          "afterTask": "7-4",
-          "blockTasks": [
-            "7-1",
-            "7-2",
-            "7-3",
-            "7-4"
-          ],
-          "xp": 100,
-          "enemies": [
-            {
-              "topic": "factory/a/temp",
-              "name": "温度消息"
-            },
-            {
-              "topic": "factory/b/temp",
-              "name": "温度消息"
-            },
-            {
-              "topic": "factory/a/vib",
-              "name": "振动消息"
-            },
-            {
-              "topic": "factory/b/vib",
-              "name": "振动消息"
-            },
-            {
-              "topic": "factory/a/pres",
-              "name": "压力消息"
-            },
-            {
-              "topic": "factory/b/pres",
-              "name": "压力消息"
-            }
-          ],
-          "drops": [
-            "⚡火力",
-            "❤护盾",
-            "💣爆破"
-          ],
-          "subtitle": "坦克守卫 Broker，打掉垃圾消息",
-          "topics": [
-            "factory/+/temp",
-            "factory/+/vib",
-            "factory/+/pres"
-          ]
-        }
-      ]
+     "id": "l1_ty2",
+     "name": "术语防御战·进阶",
+     "type": "typing",
+     "afterTask": "1-14",
+     "blockTasks": [
+      "1-12",
+      "1-13",
+      "1-14"
+     ],
+     "subtitle": "厂长：安全区的词也上来了，敲快一点，别让它们漏过去！",
+     "xp": 120,
+     "lives": 5,
+     "duration": 110,
+     "words": [
+      "iptables",
+      "ss",
+      "grep",
+      "nc",
+      "route",
+      "ip",
+      "ping",
+      "curl",
+      "nslookup",
+      "traceroute",
+      "ssh",
+      "apt",
+      "sudo",
+      "ls",
+      "cat",
+      "systemctl",
+      "docker",
+      "nano",
+      "hostname",
+      "whoami"
+     ],
+     "waves": 5,
+     "perWave": 5
     },
     {
-      "levelId": 8,
-      "name": "展望未来",
-      "emoji": "🤖",
-      "warmups": [
-        {
-          "id": "l8_b1",
-          "name": "AI 打砖块",
-          "type": "breakout",
-          "afterTask": "8-4",
-          "blockTasks": [
-            "8-1",
-            "8-2",
-            "8-3",
-            "8-4"
-          ],
-          "xp": 100,
-          "bricks": [
-            "设备故障",
-            "模型漂移",
-            "数据偏差",
-            "能耗超标"
-          ],
-          "subtitle": "弹球消掉设备故障砖块，板=你的 AI 决策",
-          "fault": [
-            "模型漂移",
-            "数据偏差",
-            "能耗超标"
-          ],
-          "normal": [
-            "正常样本",
-            "冗余备份",
-            "历史数据"
-          ]
-        }
-      ]
+     "id": "l1_sn1",
+     "name": "网线贪吃蛇",
+     "type": "snake",
+     "afterTask": "1-14",
+     "blockTasks": [
+      "1-9",
+      "1-10",
+      "1-11",
+      "1-12",
+      "1-13",
+      "1-14"
+     ],
+     "xp": 90,
+     "food": [
+      "IP 地址",
+      "子网掩码",
+      "网关",
+      "MAC 地址",
+      "ping",
+      "路由"
+     ],
+     "wall": [
+      "断网",
+      "防火墙",
+      "漏洞"
+     ],
+     "subtitle": "吃掉网络三件套变长，别撞断网/防火墙",
+     "pairs": [
+      {
+       "id": "ip",
+       "t": "IP 地址",
+       "h": "设备的门牌号"
+      },
+      {
+       "id": "mask",
+       "t": "子网掩码",
+       "h": "划分网段的记号"
+      },
+      {
+       "id": "gateway",
+       "t": "网关",
+       "h": "通往别的网络的城门"
+      },
+      {
+       "id": "mac",
+       "t": "MAC 地址",
+       "h": "网卡出厂身份证"
+      },
+      {
+       "id": "ping",
+       "t": "ping",
+       "h": "喊一声看对方应不应"
+      },
+      {
+       "id": "dns",
+       "t": "DNS",
+       "h": "域名翻译成 IP"
+      }
+     ],
+     "win": 6,
+     "lives": 3
     }
-  ]
+   ],
+   "bonus": {
+    "id": "bonus-1",
+    "name": "记忆大师挑战",
+    "subtitle": "厂长：从 4 张开始，一层比一层多，全对才配叫记忆大师。",
+    "tip": "五层牌堆，一层层揭开，卡片越来越多，冲全对！",
+    "xp": 400,
+    "levels": [
+     {
+      "name": "第一层 · 装机基础",
+      "subtitle": "刚开箱的那两个家伙",
+      "pairs": [
+       {
+        "id": "vm",
+        "term": "虚拟机",
+        "hint": "在一台电脑里\"装\"出的另一台电脑",
+        "emoji": "🖥️",
+        "cmd": "VMware Workstation",
+        "cat": "基础"
+       },
+       {
+        "id": "os",
+        "term": "操作系统",
+        "hint": "管硬件、跑程序的\"大管家\"（如 Ubuntu）",
+        "emoji": "🧠",
+        "cmd": "Ubuntu Server",
+        "cat": "基础"
+       }
+      ]
+     },
+     {
+      "name": "第二层 · 装机进阶",
+      "subtitle": "装软件、管权限、认网卡",
+      "pairs": [
+       {
+        "id": "shell",
+        "term": "Shell",
+        "hint": "黑底白字的命令行窗口，Linux 的操作台",
+        "emoji": "💻",
+        "cmd": "bash",
+        "cat": "基础"
+       },
+       {
+        "id": "apt",
+        "term": "apt",
+        "hint": "Ubuntu 的包管理命令，装软件靠它",
+        "emoji": "📦",
+        "cmd": "apt install openssh-server",
+        "cat": "命令"
+       },
+       {
+        "id": "nic",
+        "term": "网卡",
+        "hint": "设备上网的接口",
+        "emoji": "🔌",
+        "cmd": "ip a",
+        "cat": "硬件"
+       }
+      ]
+     },
+     {
+      "name": "第三层 · 网络基础",
+      "subtitle": "ip 命令里的那些名字",
+      "pairs": [
+       {
+        "id": "ip",
+        "term": "IP 地址",
+        "hint": "设备的门牌号",
+        "emoji": "🏠",
+        "cmd": "ip addr",
+        "cat": "网络"
+       },
+       {
+        "id": "mac",
+        "term": "MAC 地址",
+        "hint": "设备出厂身份证",
+        "emoji": "🪪",
+        "cmd": "ip link",
+        "cat": "网络"
+       },
+       {
+        "id": "ping",
+        "term": "ping",
+        "hint": "喊一声，看对方应不应",
+        "emoji": "📡",
+        "cmd": "ping 8.8.8.8",
+        "cat": "命令"
+       },
+       {
+        "id": "gateway",
+        "term": "网关",
+        "hint": "通往别的网络的城门",
+        "emoji": "🚪",
+        "cmd": "ip route",
+        "cat": "网络"
+       }
+      ]
+     },
+     {
+      "name": "第四层 · 网络进阶",
+      "subtitle": "域名、防火墙、端口、路由",
+      "pairs": [
+       {
+        "id": "dns",
+        "term": "DNS",
+        "hint": "把网址翻译成 IP 的电话簿",
+        "emoji": "📖",
+        "cmd": "nslookup baidu.com",
+        "cat": "网络"
+       },
+       {
+        "id": "domain",
+        "term": "域名",
+        "hint": "好记的名字，如 baidu.com",
+        "emoji": "🌐",
+        "cat": "网络"
+       },
+       {
+        "id": "firewall",
+        "term": "防火墙",
+        "hint": "门卫，决定放行还是拦截",
+        "emoji": "🛡️",
+        "cmd": "ufw enable",
+        "cat": "安全"
+       },
+       {
+        "id": "port",
+        "term": "端口",
+        "hint": "设备里每个服务的\"窗口\"",
+        "emoji": "🚪",
+        "cmd": "ss -tln",
+        "cat": "网络"
+       },
+       {
+        "id": "tracert",
+        "term": "tracert",
+        "hint": "沿数据走的路，一站一站报数",
+        "emoji": "🧭",
+        "cmd": "tracert baidu.com",
+        "cat": "命令"
+       }
+      ]
+     },
+     {
+      "name": "第五层 · 核心实战",
+      "subtitle": "协议、地址、掩码、NAT 大杂烩",
+      "pairs": [
+       {
+        "id": "route",
+        "term": "路由",
+        "hint": "给数据选路的路牌",
+        "emoji": "🛣️",
+        "cmd": "ip route",
+        "cat": "网络"
+       },
+       {
+        "id": "ipv4",
+        "term": "IPv4",
+        "hint": "32 位的门牌号",
+        "emoji": "📇",
+        "cat": "网络"
+       },
+       {
+        "id": "tcp",
+        "term": "TCP",
+        "hint": "先握手再传数据，可靠",
+        "emoji": "🤝",
+        "cat": "协议"
+       },
+       {
+        "id": "udp",
+        "term": "UDP",
+        "hint": "发出就走，不管收没收到",
+        "emoji": "✉️",
+        "cat": "协议"
+       },
+       {
+        "id": "subnet",
+        "term": "子网掩码",
+        "hint": "划清\"自己人\"和\"外人\"",
+        "emoji": "🎭",
+        "cmd": "255.255.255.0",
+        "cat": "网络"
+       },
+       {
+        "id": "nat",
+        "term": "NAT",
+        "hint": "一个公网 IP 供多台设备共用",
+        "emoji": "🔀",
+        "cat": "网络"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "levelId": 2,
+   "name": "操作台",
+   "emoji": "🎛️",
+   "warmups": [
+    {
+     "id": "l2_a",
+     "name": "SSH 入门快打",
+     "afterTask": "2-1",
+     "blockTasks": [
+      "2-0",
+      "2-1"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：先把远程登录的几把\"钥匙\"认熟，反应要快。",
+     "tip": "看提示点对的命令，点错了会告诉你怎么连。",
+     "size": 5,
+     "xp": 60,
+     "pairs": [
+      {
+       "id": "ssh",
+       "term": "ssh",
+       "hint": "远程登录另一台服务器",
+       "emoji": "🔑",
+       "q": "厂长：远程连进五号车间的服务器，敲哪个命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "apt",
+       "term": "apt install",
+       "hint": "装软件（如 SSH 服务）",
+       "emoji": "📦",
+       "q": "厂长：服务器上还没有 SSH 服务，用什么命令安装它？",
+       "cat": "命令"
+      },
+      {
+       "id": "sysctl",
+       "term": "systemctl start",
+       "hint": "启动系统服务",
+       "emoji": "🚀",
+       "q": "SSH 服务装好了，用什么命令启动它？",
+       "cat": "命令"
+      },
+      {
+       "id": "p22",
+       "term": "22",
+       "hint": "SSH 默认端口",
+       "emoji": "🚪",
+       "q": "SSH 远程连接默认走哪个端口？",
+       "cat": "网络",
+       "distractors": [
+        "80",
+        "443",
+        "3389",
+        "53"
+       ]
+      },
+      {
+       "id": "pkgssh",
+       "term": "openssh-server",
+       "hint": "SSH 服务的软件包名",
+       "emoji": "📦",
+       "q": "厂长：服务器上还没有 SSH 服务，先装什么软件包？",
+       "cat": "命令"
+      }
+     ],
+     "distractors": [
+      "ls",
+      "cat",
+      "curl",
+      "pwd"
+     ]
+    },
+    {
+     "id": "l2_b",
+     "name": "Linux 命令快打",
+     "afterTask": "2-3",
+     "blockTasks": [
+      "2-2",
+      "2-3"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：ls、cat、curl 这些家伙认熟了，手速也要跟上。",
+     "tip": "看提示点对的命令，第一幕也学过。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "ls",
+       "term": "ls",
+       "hint": "列出目录内容",
+       "emoji": "📂",
+       "q": "厂长：查看 /home 目录里有什么，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "cat",
+       "term": "cat",
+       "hint": "查看文本文件内容",
+       "emoji": "📄",
+       "q": "厂长：要查看一个文本文件的内容，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "curl",
+       "term": "curl",
+       "hint": "命令行访问网站/查公网 IP",
+       "emoji": "🌐",
+       "q": "厂长：用命令行访问网站或查公网 IP，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "hostname",
+       "term": "hostname -I",
+       "hint": "显示本机 IP 地址",
+       "emoji": "🖧",
+       "q": "厂长：要看本机所有 IP 地址（hostname -I），用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "pwd",
+       "term": "pwd",
+       "hint": "显示当前所在目录",
+       "emoji": "📍",
+       "q": "厂长：想知道当前在哪个目录，用什么命令？",
+       "cat": "命令"
+      }
+     ],
+     "distractors": [
+      "vim",
+      "mkdir",
+      "rm",
+      "nano"
+     ]
+    },
+    {
+     "id": "l2_c",
+     "name": "云服务器快打",
+     "afterTask": "2-6",
+     "blockTasks": [
+      "2-4",
+      "2-5",
+      "2-6"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：云服务器和安全组，几把钥匙认熟。",
+     "tip": "都在这几关学过，混个脸熟。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "p22",
+       "term": "22",
+       "hint": "SSH 默认端口",
+       "emoji": "🚪",
+       "q": "厂长：SSH 远程登录默认用哪个端口？",
+       "cat": "网络"
+      },
+      {
+       "id": "secgrp",
+       "term": "安全组",
+       "hint": "云服务器的防火墙，控制端口开放",
+       "emoji": "🛡️",
+       "q": "厂长：控制云服务器哪些端口对外开放，靠什么？",
+       "cat": "安全"
+      },
+      {
+       "id": "pubip",
+       "term": "公网 IP",
+       "hint": "云服务器分配，能外网访问",
+       "emoji": "🌍",
+       "q": "厂长：云服务器启动后平台分配什么，能外网访问？",
+       "cat": "网络"
+      },
+      {
+       "id": "oss",
+       "term": "openssh-server",
+       "hint": "SSH 服务端软件包",
+       "emoji": "📦",
+       "q": "厂长：要装 SSH 服务端，装哪个软件包？",
+       "cat": "命令"
+      },
+      {
+       "id": "key",
+       "term": "密钥",
+       "hint": "更安全的登录方式",
+       "emoji": "🔑",
+       "q": "厂长：云服务器登录，工控环境更推荐哪种方式？",
+       "cat": "安全"
+      }
+     ],
+     "distractors": [
+      "80",
+      "443",
+      "端口转发",
+      "网卡"
+     ]
+    },
+    {
+     "id": "l2_d",
+     "name": "SSH 密钥快打",
+     "afterTask": "2-8",
+     "blockTasks": [
+      "2-7",
+      "2-8"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：免密登录的密钥一套，认熟它。",
+     "tip": "密钥对、白名单文件，都在这两关。",
+     "size": 4,
+     "xp": 70,
+     "timeLimit": 45,
+     "pairs": [
+      {
+       "id": "skgen",
+       "term": "ssh-keygen",
+       "hint": "生成 SSH 密钥对",
+       "emoji": "🎹",
+       "q": "厂长：生成 SSH 密钥对用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "skcopy",
+       "term": "ssh-copy-id",
+       "hint": "把公钥装到服务器",
+       "emoji": "📤",
+       "q": "厂长：把公钥装到服务器实现免密，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "authk",
+       "term": "authorized_keys",
+       "hint": "服务器上免密公钥白名单",
+       "emoji": "📋",
+       "q": "厂长：服务器上存放免密公钥的文件是？",
+       "cat": "文件"
+      },
+      {
+       "id": "priv",
+       "term": "私钥",
+       "hint": "自己保密，绝不外传",
+       "emoji": "🔒",
+       "q": "厂长：密钥对里哪个必须自己留着不能外传？",
+       "cat": "安全"
+      }
+     ],
+     "distractors": [
+      "ssh-add",
+      "id_rsa.pub",
+      "/etc/passwd",
+      "hostname"
+     ]
+    },
+    {
+     "id": "l2_e",
+     "name": "SSH 安全快打",
+     "afterTask": "2-11",
+     "blockTasks": [
+      "2-9",
+      "2-10",
+      "2-11"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：SSH 安全加固三板斧，认熟它。",
+     "tip": "安全配置、端口转发，都在最后这几关。",
+     "size": 4,
+     "xp": 70,
+     "timeLimit": 45,
+     "pairs": [
+      {
+       "id": "systl",
+       "term": "systemctl",
+       "hint": "管理系统服务（启动/自启）",
+       "emoji": "🎛️",
+       "q": "厂长：启动、看状态、设开机自启系统服务，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "fwdL",
+       "term": "-L",
+       "hint": "SSH 本地端口转发参数",
+       "emoji": "🔀",
+       "q": "厂长：SSH 本地端口转发用哪个参数？",
+       "cat": "命令"
+      },
+      {
+       "id": "proot",
+       "term": "PermitRootLogin",
+       "hint": "控制是否允许 root 登录",
+       "emoji": "🚫",
+       "q": "厂长：SSH 配置里禁止 root 直接登录，改哪一项？",
+       "cat": "安全"
+      },
+      {
+       "id": "nport",
+       "term": "改用非默认端口",
+       "hint": "别用默认 22，改成不常见的端口防扫描爆破",
+       "emoji": "🎯",
+       "q": "厂长：SSH 安全加固，端口应该怎么处理？",
+       "cat": "安全",
+       "distractors": [
+        "继续用默认 22",
+        "关闭 SSH 端口",
+        "端口随便设",
+        "不设登录密码"
+       ]
+      }
+     ],
+     "distractors": [
+      "-R",
+      "-D",
+      "systemd-analyze",
+      "ufw enable"
+     ]
+    },
+    {
+     "id": "l2_a2",
+     "name": "SSH 入门快打·进阶",
+     "afterTask": "2-1",
+     "blockTasks": [
+      "2-0",
+      "2-1"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：SSH 再来一轮，这轮要认得登录地址的写法。",
+     "tip": "看提示点对的命令。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "syslogin",
+       "term": "用户名@IP",
+       "hint": "远程登录地址格式，如 student@192.168.1.10",
+       "emoji": "👤",
+       "q": "厂长：要远程登录 192.168.1.10 这台服务器，用户名是 student，命令怎么写？",
+       "cat": "命令"
+      },
+      {
+       "id": "ssh",
+       "term": "ssh",
+       "hint": "远程登录另一台服务器",
+       "emoji": "🔑",
+       "q": "厂长：远程连进五号车间的服务器，敲哪个命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "p22",
+       "term": "22",
+       "hint": "SSH 默认端口",
+       "emoji": "🚪",
+       "q": "SSH 远程连接默认走哪个端口？",
+       "cat": "网络",
+       "distractors": [
+        "80",
+        "443",
+        "3389",
+        "53"
+       ]
+      },
+      {
+       "id": "pkgssh",
+       "term": "openssh-server",
+       "hint": "SSH 服务的软件包名",
+       "emoji": "📦",
+       "q": "厂长：服务器上还没有 SSH 服务，先装什么软件包？",
+       "cat": "命令"
+      },
+      {
+       "id": "sysctl",
+       "term": "systemctl start",
+       "hint": "启动系统服务",
+       "emoji": "🚀",
+       "q": "SSH 服务装好了，用什么命令启动它？",
+       "cat": "命令"
+      }
+     ],
+     "distractors": [
+      "ls",
+      "cat",
+      "curl",
+      "pwd"
+     ]
+    },
+    {
+     "id": "l2_b2",
+     "name": "Linux 命令快打·进阶",
+     "afterTask": "2-3",
+     "blockTasks": [
+      "2-2",
+      "2-3"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：常用命令再打一轮，这轮加了「搜内容」的 grep。",
+     "tip": "看提示点对的命令。",
+     "size": 6,
+     "xp": 80,
+     "timeLimit": 60,
+     "pairs": [
+      {
+       "id": "grep",
+       "term": "grep",
+       "hint": "在文件里搜索关键字",
+       "emoji": "🔍",
+       "q": "厂长：想在传感器日志里搜「温度」两个字，用哪个命令？",
+       "cat": "命令",
+       "cmd": "grep 温度 temp.log"
+      },
+      {
+       "id": "ls",
+       "term": "ls",
+       "hint": "列出目录内容",
+       "emoji": "📂",
+       "q": "厂长：查看 /home 目录里有什么，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "cat",
+       "term": "cat",
+       "hint": "查看文本文件内容",
+       "emoji": "📄",
+       "q": "厂长：要查看一个文本文件的内容，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "curl",
+       "term": "curl",
+       "hint": "命令行访问网站/查公网 IP",
+       "emoji": "🌐",
+       "q": "厂长：用命令行访问网站或查公网 IP，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "pwd",
+       "term": "pwd",
+       "hint": "显示当前所在目录",
+       "emoji": "📍",
+       "q": "厂长：想知道当前在哪个目录，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "hostname",
+       "term": "hostname -I",
+       "hint": "显示本机 IP 地址",
+       "emoji": "🖧",
+       "q": "厂长：要看本机所有 IP 地址（hostname -I），用什么命令？",
+       "cat": "命令"
+      }
+     ],
+     "distractors": [
+      "rm",
+      "cd",
+      "mkdir",
+      "top"
+     ]
+    },
+    {
+     "id": "l2_c2",
+     "name": "云服务器快打·进阶",
+     "afterTask": "2-6",
+     "blockTasks": [
+      "2-4",
+      "2-5",
+      "2-6"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：云服务器那套再打一遍，熟能生巧。",
+     "tip": "看提示点对的词。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "secgrp",
+       "term": "安全组",
+       "hint": "云服务器的防火墙，控制端口开放",
+       "emoji": "🛡️",
+       "q": "厂长：控制云服务器哪些端口对外开放，靠什么？",
+       "cat": "安全"
+      },
+      {
+       "id": "pubip",
+       "term": "公网 IP",
+       "hint": "云服务器分配，能外网访问",
+       "emoji": "🌍",
+       "q": "厂长：云服务器启动后平台分配什么，能外网访问？",
+       "cat": "网络"
+      },
+      {
+       "id": "key",
+       "term": "密钥",
+       "hint": "更安全的登录方式",
+       "emoji": "🔑",
+       "q": "厂长：云服务器登录，工控环境更推荐哪种方式？",
+       "cat": "安全"
+      },
+      {
+       "id": "oss",
+       "term": "openssh-server",
+       "hint": "SSH 服务端软件包",
+       "emoji": "📦",
+       "q": "厂长：要装 SSH 服务端，装哪个软件包？",
+       "cat": "命令"
+      },
+      {
+       "id": "p22",
+       "term": "22",
+       "hint": "SSH 默认端口",
+       "emoji": "🚪",
+       "q": "SSH 远程连接默认走哪个端口？",
+       "cat": "网络",
+       "distractors": [
+        "80",
+        "443",
+        "3389",
+        "53"
+       ]
+      }
+     ],
+     "distractors": [
+      "内存",
+      "CPU",
+      "带宽",
+      "地域"
+     ]
+    },
+    {
+     "id": "l2_d2",
+     "name": "SSH 密钥快打·进阶",
+     "afterTask": "2-8",
+     "blockTasks": [
+      "2-7",
+      "2-8"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：密钥这一套再打一遍，公钥私钥别搞混。",
+     "tip": "看提示点对的词。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "pubkey",
+       "term": "公钥",
+       "hint": "交给服务器的那把「锁」，不怕公开",
+       "emoji": "🔐",
+       "q": "服务器上白名单里放的是哪一把钥匙？",
+       "cat": "安全"
+      },
+      {
+       "id": "skgen",
+       "term": "ssh-keygen",
+       "hint": "生成 SSH 密钥对",
+       "emoji": "🎹",
+       "q": "厂长：生成 SSH 密钥对用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "skcopy",
+       "term": "ssh-copy-id",
+       "hint": "把公钥装到服务器",
+       "emoji": "📤",
+       "q": "厂长：把公钥装到服务器实现免密，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "authk",
+       "term": "authorized_keys",
+       "hint": "服务器上免密公钥白名单",
+       "emoji": "📋",
+       "q": "厂长：服务器上存放免密公钥的文件是？",
+       "cat": "文件"
+      },
+      {
+       "id": "priv",
+       "term": "私钥",
+       "hint": "自己保密，绝不外传",
+       "emoji": "🔒",
+       "q": "厂长：密钥对里哪个必须自己留着不能外传？",
+       "cat": "安全"
+      }
+     ],
+     "distractors": [
+      "密码",
+      "验证码",
+      "指纹",
+      "口令"
+     ]
+    },
+    {
+     "id": "l2_e2",
+     "name": "SSH 安全快打·进阶",
+     "afterTask": "2-11",
+     "blockTasks": [
+      "2-9",
+      "2-10",
+      "2-11"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：安全配置再打一轮，顺便认「暴力破解」这个敌人。",
+     "tip": "看提示点对的词。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "bruteforce",
+       "term": "暴力破解",
+       "hint": "不断试密码，撞开你的大门",
+       "emoji": "💥",
+       "q": "攻击者拿字典不停试密码，这种攻击叫什么？",
+       "cat": "安全"
+      },
+      {
+       "id": "systl",
+       "term": "systemctl",
+       "hint": "管理系统服务（启动/自启）",
+       "emoji": "🎛️",
+       "q": "厂长：启动、看状态、设开机自启系统服务，用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "nport",
+       "term": "改用非默认端口",
+       "hint": "别用默认 22，改成不常见的端口防扫描爆破",
+       "emoji": "🎯",
+       "q": "厂长：SSH 安全加固，端口应该怎么处理？",
+       "cat": "安全",
+       "distractors": [
+        "继续用默认 22",
+        "关闭 SSH 端口",
+        "端口随便设",
+        "不设登录密码"
+       ]
+      },
+      {
+       "id": "proot",
+       "term": "PermitRootLogin",
+       "hint": "控制是否允许 root 登录",
+       "emoji": "🚫",
+       "q": "厂长：SSH 配置里禁止 root 直接登录，改哪一项？",
+       "cat": "安全"
+      },
+      {
+       "id": "fwdL",
+       "term": "-L",
+       "hint": "SSH 本地端口转发参数",
+       "emoji": "🔀",
+       "q": "厂长：SSH 本地端口转发用哪个参数？",
+       "cat": "命令"
+      }
+     ],
+     "distractors": [
+      "正常登录",
+      "断网",
+      "重启",
+      "杀毒"
+     ]
+    },
+    {
+     "id": "l2_j1",
+     "name": "云端跳跃",
+     "type": "flappy",
+     "afterTask": "2-8",
+     "blockTasks": [
+      "2-4",
+      "2-5",
+      "2-6",
+      "2-7",
+      "2-8"
+     ],
+     "xp": 90,
+     "platforms": [
+      "云服务器",
+      "公网 IP",
+      "SSH 隧道",
+      "容器",
+      "弹性 IP"
+     ],
+     "holes": [
+      "断线黑洞",
+      "超时",
+      "连接失败"
+     ],
+     "subtitle": "在云服务器间跳跃，躲开断线黑洞",
+     "questions": [
+      {
+       "q": "SSH 登录命令是？",
+       "opts": [
+        "ssh user@ip",
+        "apt install",
+        "nslookup"
+       ],
+       "ans": 0
+      },
+      {
+       "q": "查看当前目录？",
+       "opts": [
+        "pwd",
+        "cd",
+        "ls"
+       ],
+       "ans": 2
+      },
+      {
+       "q": "安装软件包？",
+       "opts": [
+        "apt install",
+        "rm -rf",
+        "cat"
+       ],
+       "ans": 0
+      },
+      {
+       "q": "查看本机 IP？",
+       "opts": [
+        "ip addr",
+        "whoami",
+        "date"
+       ],
+       "ans": 0
+      },
+      {
+       "q": "追踪网络路由？",
+       "opts": [
+        "traceroute",
+        "ping",
+        "hostname"
+       ],
+       "ans": 0
+      }
+     ]
+    }
+   ],
+   "bonus": null
+  },
+  {
+   "levelId": 3,
+   "name": "车间",
+   "emoji": "⚙️",
+   "warmups": [
+    {
+     "id": "l3_a",
+     "name": "华山论剑·协议鉴别",
+     "afterTask": "3-4",
+     "blockTasks": [
+      "3-3",
+      "3-4"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：八大协议各显神通，看你能不能认准。",
+     "tip": "记住每个协议的那句「一句话」，就能认出来。",
+     "size": 6,
+     "xp": 80,
+     "timeLimit": 60,
+     "pairs": [
+      {
+       "id": "profinet",
+       "term": "ProfiNet",
+       "hint": "西门子 · 毫秒级实时控制",
+       "emoji": "🔵",
+       "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "ethercat",
+       "term": "EtherCAT",
+       "hint": "倍福 · 快到极致的「飞读飞写」",
+       "emoji": "⚡",
+       "q": "厂长：倍福的伺服运动控制快到极致，是哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "cclink",
+       "term": "CC-Link IE",
+       "hint": "三菱 · 环形冗余断线不中断",
+       "emoji": "🔗",
+       "q": "厂长：三菱厂区断了线网络也不中断，靠哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "modbus",
+       "term": "Modbus",
+       "hint": "最老最开放 · 变频仪表都支持",
+       "emoji": "📡",
+       "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
+       "cat": "协议"
+      },
+      {
+       "id": "powerlink",
+       "term": "Powerlink",
+       "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
+       "emoji": "🖧",
+       "q": "厂长：贝加莱用标准硬件跑的工业以太网协议是？",
+       "cat": "协议"
+      },
+      {
+       "id": "ethernetip",
+       "term": "EtherNet/IP",
+       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "emoji": "🌐",
+       "q": "厂长：罗克韦尔主推、基于标准以太网的协议是？",
+       "cat": "协议"
+      }
+     ],
+     "distractors": [
+      "TCP/IP",
+      "HTTP",
+      "OPC UA",
+      "MQTT"
+     ]
+    },
+    {
+     "id": "l3_b",
+     "name": "ISA-95 分层鉴别",
+     "afterTask": "3-1",
+     "blockTasks": [
+      "3-0",
+      "3-1"
+     ],
+     "type": "match",
+     "subtitle": "厂长：五层金字塔，每层管一摊，认准设备该站哪层。",
+     "tip": "记住：设备层采集、控制层指挥、监控层看全局、运营层管订单、业务层管公司。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 45,
+     "pairs": [
+      {
+       "id": "l0",
+       "left": "传感器 / 执行器",
+       "right": "L0 现场设备层",
+       "hint": "采集现场数据"
+      },
+      {
+       "id": "l1",
+       "left": "PLC",
+       "right": "L1 控制层",
+       "hint": "做逻辑控制"
+      },
+      {
+       "id": "l2",
+       "left": "SCADA 监控屏",
+       "right": "L2 监控层",
+       "hint": "看整条产线状态"
+      },
+      {
+       "id": "l3",
+       "left": "MES 生产执行",
+       "right": "L3 制造运营层",
+       "hint": "管订单进度"
+      },
+      {
+       "id": "l4",
+       "left": "ERP 企业资源",
+       "right": "L4 业务层",
+       "hint": "管财务采购销售"
+      }
+     ],
+     "leftTitle": "设备 / 系统",
+     "rightTitle": "ISA-95 层"
+    },
+    {
+     "id": "l3_c",
+     "name": "Modbus 寄存器鉴别",
+     "afterTask": "3-6",
+     "blockTasks": [
+      "3-5",
+      "3-6"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：Modbus 靠四种寄存器组织数据，认准哪个装什么。",
+     "tip": "口诀：保持=设定值可写、输入=测量值只读、线圈=开关可写、离散=开关只读。",
+     "size": 4,
+     "xp": 70,
+     "timeLimit": 45,
+     "pairs": [
+      {
+       "id": "holding",
+       "term": "保持寄存器",
+       "hint": "16 位可读可写，存设定值",
+       "emoji": "📝",
+       "q": "厂长：要存温度上限这个「设定值」，用哪种寄存器？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "inputreg",
+       "term": "输入寄存器",
+       "hint": "16 位只读，存测量值",
+       "emoji": "📊",
+       "q": "厂长：要读传感器当前温度这个「测量值」，用哪种寄存器？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "coil",
+       "term": "线圈",
+       "hint": "1 位可读可写，开关状态",
+       "emoji": "🔘",
+       "q": "厂长：控制电机启动/停止的「开关状态」，用哪种？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "discrete",
+       "term": "离散输入",
+       "hint": "1 位只读，限位开关",
+       "emoji": "🚧",
+       "q": "厂长：限位开关这种「只读的开关信号」，用哪种？",
+       "cat": "Modbus"
+      }
+     ],
+     "distractors": [
+      "数据帧",
+      "功能码",
+      "波特率",
+      "报文"
+     ]
+    },
+    {
+     "id": "l3_f1",
+     "name": "协议翻牌",
+     "type": "memory",
+     "afterTask": "3-4",
+     "blockTasks": [
+      "3-3",
+      "3-4"
+     ],
+     "subtitle": "厂长：把六大协议和它们的特点对上号。",
+     "tip": "记住每家的'一句话'，翻牌就快了。",
+     "size": 6,
+     "xp": 70,
+     "pairs": [
+      {
+       "id": "profinet",
+       "term": "ProfiNet",
+       "hint": "西门子 · 毫秒级实时控制",
+       "emoji": "🔵",
+       "cat": "协议"
+      },
+      {
+       "id": "ethercat",
+       "term": "EtherCAT",
+       "hint": "倍福 · 快到极致（飞读飞写）",
+       "emoji": "⚡",
+       "cat": "协议"
+      },
+      {
+       "id": "cclink",
+       "term": "CC-Link IE",
+       "hint": "三菱 · 环形冗余断线不中断",
+       "emoji": "🔗",
+       "cat": "协议"
+      },
+      {
+       "id": "modbus",
+       "term": "Modbus",
+       "hint": "最老最开放 · 变频仪表都支持",
+       "emoji": "📡",
+       "cat": "协议"
+      },
+      {
+       "id": "powerlink",
+       "term": "Powerlink",
+       "hint": "贝加莱/ABB · 标准硬件",
+       "emoji": "🖧",
+       "cat": "协议"
+      },
+      {
+       "id": "ethernetip",
+       "term": "EtherNet/IP",
+       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "emoji": "🌐",
+       "cat": "协议"
+      }
+     ]
+    },
+    {
+     "id": "l3_f2",
+     "name": "寄存器翻牌",
+     "type": "memory",
+     "afterTask": "3-6",
+     "blockTasks": [
+      "3-5",
+      "3-6"
+     ],
+     "subtitle": "厂长：四种寄存器和它们的用途，翻牌记住。",
+     "tip": "保持=设定值、输入=测量值、线圈=开关可写、离散=开关只读。",
+     "size": 4,
+     "xp": 60,
+     "pairs": [
+      {
+       "id": "holding",
+       "term": "保持寄存器",
+       "hint": "16 位可读写 · 存设定值",
+       "emoji": "📝",
+       "cat": "Modbus"
+      },
+      {
+       "id": "inputreg",
+       "term": "输入寄存器",
+       "hint": "16 位只读 · 存测量值",
+       "emoji": "📊",
+       "cat": "Modbus"
+      },
+      {
+       "id": "coil",
+       "term": "线圈",
+       "hint": "1 位可读写 · 开关状态",
+       "emoji": "🔘",
+       "cat": "Modbus"
+      },
+      {
+       "id": "discrete",
+       "term": "离散输入",
+       "hint": "1 位只读 · 限位开关",
+       "emoji": "🚧",
+       "cat": "Modbus"
+      }
+     ]
+    },
+    {
+     "id": "l3_a2",
+     "name": "协议快打·进阶",
+     "afterTask": "3-4",
+     "blockTasks": [
+      "3-3",
+      "3-4"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：六大协议再来一轮，手速要跟上！",
+     "tip": "看提示点对的协议，点错了会告诉你是谁。",
+     "size": 6,
+     "xp": 80,
+     "timeLimit": 60,
+     "pairs": [
+      {
+       "id": "profinet",
+       "term": "ProfiNet",
+       "hint": "西门子 · 毫秒级实时控制",
+       "emoji": "🔵",
+       "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "ethercat",
+       "term": "EtherCAT",
+       "hint": "倍福 · 快到极致的「飞读飞写」",
+       "emoji": "⚡",
+       "q": "厂长：倍福的伺服运动控制快到极致，是哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "cclink",
+       "term": "CC-Link IE",
+       "hint": "三菱 · 环形冗余断线不中断",
+       "emoji": "🔗",
+       "q": "厂长：三菱厂区断了线网络也不中断，靠哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "modbus",
+       "term": "Modbus",
+       "hint": "最老最开放 · 变频仪表都支持",
+       "emoji": "📡",
+       "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
+       "cat": "协议"
+      },
+      {
+       "id": "powerlink",
+       "term": "Powerlink",
+       "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
+       "emoji": "🖧",
+       "q": "厂长：贝加莱用标准硬件跑的工业以太网协议是？",
+       "cat": "协议"
+      },
+      {
+       "id": "ethernetip",
+       "term": "EtherNet/IP",
+       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "emoji": "🌐",
+       "q": "厂长：罗克韦尔主推、基于标准以太网的协议是？",
+       "cat": "协议"
+      }
+     ],
+     "distractors": [
+      "WiFi",
+      "蓝牙",
+      "ZigBee",
+      "LoRa"
+     ]
+    },
+    {
+     "id": "l3_c2",
+     "name": "寄存器快打·进阶",
+     "afterTask": "3-6",
+     "blockTasks": [
+      "3-5",
+      "3-6"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：四种寄存器再来一轮，位和 16 位别记反。",
+     "tip": "看提示点对的寄存器。",
+     "size": 4,
+     "xp": 60,
+     "timeLimit": 40,
+     "pairs": [
+      {
+       "id": "holding",
+       "term": "保持寄存器",
+       "hint": "16 位可读可写，存设定值",
+       "emoji": "📝",
+       "q": "厂长：要存温度上限这个「设定值」，用哪种寄存器？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "inputreg",
+       "term": "输入寄存器",
+       "hint": "16 位只读，存测量值",
+       "emoji": "📊",
+       "q": "厂长：要读传感器当前温度这个「测量值」，用哪种寄存器？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "coil",
+       "term": "线圈",
+       "hint": "1 位可读可写，开关状态",
+       "emoji": "🔘",
+       "q": "厂长：控制电机启动/停止的「开关状态」，用哪种？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "discrete",
+       "term": "离散输入",
+       "hint": "1 位只读，限位开关",
+       "emoji": "🚧",
+       "q": "厂长：限位开关这种「只读的开关信号」，用哪种？",
+       "cat": "Modbus"
+      }
+     ],
+     "distractors": [
+      "布尔寄存器",
+      "浮点寄存器",
+      "文本寄存器",
+      "数组寄存器"
+     ]
+    },
+    {
+     "id": "l3_f1b",
+     "name": "协议翻牌·进阶",
+     "afterTask": "3-4",
+     "blockTasks": [
+      "3-3",
+      "3-4"
+     ],
+     "type": "memory",
+     "subtitle": "厂长：六大协议翻牌再来一轮，把名字和厂家对上。",
+     "tip": "混个脸熟，认住谁是谁家的。",
+     "size": 6,
+     "xp": 70,
+     "pairs": [
+      {
+       "id": "profinet",
+       "term": "ProfiNet",
+       "hint": "西门子 · 毫秒级实时控制",
+       "emoji": "🔵",
+       "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "ethercat",
+       "term": "EtherCAT",
+       "hint": "倍福 · 快到极致的「飞读飞写」",
+       "emoji": "⚡",
+       "q": "厂长：倍福的伺服运动控制快到极致，是哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "cclink",
+       "term": "CC-Link IE",
+       "hint": "三菱 · 环形冗余断线不中断",
+       "emoji": "🔗",
+       "q": "厂长：三菱厂区断了线网络也不中断，靠哪种协议？",
+       "cat": "协议"
+      },
+      {
+       "id": "modbus",
+       "term": "Modbus",
+       "hint": "最老最开放 · 变频仪表都支持",
+       "emoji": "📡",
+       "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
+       "cat": "协议"
+      },
+      {
+       "id": "powerlink",
+       "term": "Powerlink",
+       "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
+       "emoji": "🖧",
+       "q": "厂长：贝加莱用标准硬件跑的工业以太网协议是？",
+       "cat": "协议"
+      },
+      {
+       "id": "ethernetip",
+       "term": "EtherNet/IP",
+       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "emoji": "🌐",
+       "q": "厂长：罗克韦尔主推、基于标准以太网的协议是？",
+       "cat": "协议"
+      }
+     ]
+    },
+    {
+     "id": "l3_f2b",
+     "name": "寄存器翻牌·进阶",
+     "afterTask": "3-6",
+     "blockTasks": [
+      "3-5",
+      "3-6"
+     ],
+     "type": "memory",
+     "subtitle": "厂长：四种寄存器翻牌再来一轮，位/16位、读写/只读要分清。",
+     "tip": "混个脸熟，认住四种柜子。",
+     "size": 4,
+     "xp": 60,
+     "pairs": [
+      {
+       "id": "holding",
+       "term": "保持寄存器",
+       "hint": "16 位可读可写，存设定值",
+       "emoji": "📝",
+       "q": "厂长：要存温度上限这个「设定值」，用哪种寄存器？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "inputreg",
+       "term": "输入寄存器",
+       "hint": "16 位只读，存测量值",
+       "emoji": "📊",
+       "q": "厂长：要读传感器当前温度这个「测量值」，用哪种寄存器？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "coil",
+       "term": "线圈",
+       "hint": "1 位可读可写，开关状态",
+       "emoji": "🔘",
+       "q": "厂长：控制电机启动/停止的「开关状态」，用哪种？",
+       "cat": "Modbus"
+      },
+      {
+       "id": "discrete",
+       "term": "离散输入",
+       "hint": "1 位只读，限位开关",
+       "emoji": "🚧",
+       "q": "厂长：限位开关这种「只读的开关信号」，用哪种？",
+       "cat": "Modbus"
+      }
+     ]
+    },
+    {
+     "id": "l3_g1",
+     "name": "巴别塔·车间语言",
+     "afterTask": "3-2",
+     "blockTasks": [
+      "3-0",
+      "3-1",
+      "3-2"
+     ],
+     "type": "memory",
+     "subtitle": "厂长：还记得巴别塔吗？这轮认认让车间「说同一种话」的关键词。",
+     "tip": "巴别塔故事 + 协议概念，混个脸熟。",
+     "size": 6,
+     "xp": 70,
+     "pairs": [
+      {
+       "id": "babel",
+       "term": "巴别塔",
+       "hint": "各设备各说各话，谁也听不懂谁",
+       "emoji": "🗼",
+       "cat": "概念"
+      },
+      {
+       "id": "protocol",
+       "term": "协议",
+       "hint": "设备通信的「共同语言」规则",
+       "emoji": "🤝",
+       "cat": "概念"
+      },
+      {
+       "id": "slave",
+       "term": "从站",
+       "hint": "Modbus 里听主机指挥的下位设备",
+       "emoji": "🛠️",
+       "cat": "概念"
+      },
+      {
+       "id": "nodered",
+       "term": "Node-RED",
+       "hint": "图形化「搭积木」式编程工具",
+       "emoji": "🧩",
+       "cat": "工具",
+       "cmd": "node-red"
+      },
+      {
+       "id": "modbus",
+       "term": "Modbus",
+       "hint": "最老最开放 · 变频仪表都支持",
+       "emoji": "📡",
+       "q": "厂长：变频器和仪表几乎都支持、最老最开放的协议是？",
+       "cat": "协议"
+      },
+      {
+       "id": "profinet",
+       "term": "ProfiNet",
+       "hint": "西门子 · 毫秒级实时控制",
+       "emoji": "🔵",
+       "q": "厂长：西门子的 PLC 要毫秒级实时控制，用哪种协议？",
+       "cat": "协议"
+      }
+     ]
+    },
+    {
+     "id": "l3_sh3",
+     "name": "数据蜂群·保卫工厂",
+     "type": "shooter",
+     "afterTask": "3-4",
+     "blockTasks": [
+      "3-3",
+      "3-4"
+     ],
+     "subtitle": "厂长：协议数据包成群冲过来了，看飞机上的解释，打对应的名词！",
+     "xp": 130,
+     "lives": 5,
+     "waves": 4,
+     "cols": 6,
+     "rows": 4,
+     "pairs": [
+      {
+       "term": "Modbus",
+       "hint": "最老最开放，变频器仪表几乎都支持"
+      },
+      {
+       "term": "ProfiNet",
+       "hint": "西门子，毫秒级实时工业以太网"
+      },
+      {
+       "term": "EtherCAT",
+       "hint": "倍福，快到极致的飞读飞写"
+      },
+      {
+       "term": "CC-Link IE",
+       "hint": "三菱，环形冗余断线不中断"
+      },
+      {
+       "term": "ModbusTCP",
+       "hint": "Modbus 走 TCP/IP 网络"
+      },
+      {
+       "term": "Node-RED",
+       "hint": "低代码拖拽的数据流工具"
+      },
+      {
+       "term": "EtherNet/IP",
+       "hint": "罗克韦尔，基于以太网的工业协议"
+      },
+      {
+       "term": "Powerlink",
+       "hint": "贝加莱，标准硬件上的实时协议"
+      }
+     ]
+    },
+    {
+     "id": "l3_sh3b",
+     "name": "数据蜂群·进阶（手动选炮）",
+     "type": "shooter",
+     "afterTask": "3-4",
+     "blockTasks": [
+      "3-3",
+      "3-4"
+     ],
+     "subtitle": "PC 进阶：↑/↓ 切换炮口文字，对准对应名词再打",
+     "xp": 120,
+     "lives": 5,
+     "waves": 4,
+     "cols": 6,
+     "rows": 4,
+     "pairs": [
+      {
+       "term": "Modbus",
+       "hint": "最老最开放，变频器仪表几乎都支持"
+      },
+      {
+       "term": "ProfiNet",
+       "hint": "西门子，毫秒级实时工业以太网"
+      },
+      {
+       "term": "EtherCAT",
+       "hint": "倍福，快到极致的飞读飞写"
+      },
+      {
+       "term": "CC-Link IE",
+       "hint": "三菱，环形冗余断线不中断"
+      },
+      {
+       "term": "ModbusTCP",
+       "hint": "Modbus 走 TCP/IP 网络"
+      },
+      {
+       "term": "Node-RED",
+       "hint": "低代码拖拽的数据流工具"
+      },
+      {
+       "term": "EtherNet/IP",
+       "hint": "罗克韦尔，基于以太网的工业协议"
+      },
+      {
+       "term": "Powerlink",
+       "hint": "贝加莱，标准硬件上的实时协议"
+      }
+     ],
+     "advanced": true,
+     "tip": "主动配对：把飞机炮口切到敌人的名词，才能打中它"
+    }
+   ],
+   "bonus": null
+  },
+  {
+   "levelId": 4,
+   "name": "边缘柜",
+   "emoji": "📦",
+   "warmups": [
+    {
+     "id": "l4_a",
+     "name": "边缘处理快打",
+     "afterTask": "4-4",
+     "blockTasks": [
+      "4-0",
+      "4-1",
+      "4-2",
+      "4-3",
+      "4-4"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：边缘处理的核心词，认熟它。",
+     "tip": "数据源头处理、筛选、报警，都在这几关。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "edge",
+       "term": "边缘计算",
+       "hint": "数据在源头就地处理",
+       "emoji": "📦",
+       "q": "厂长：数据在设备旁边就地处理、不过度依赖云端，叫什么？",
+       "cat": "边缘"
+      },
+      {
+       "id": "filter",
+       "term": "数据筛选",
+       "hint": "只传有用的，过滤正常值",
+       "emoji": "🔍",
+       "q": "厂长：把异常和变化的数据挑出来上传，过滤掉大量正常值，叫什么？",
+       "cat": "边缘"
+      },
+      {
+       "id": "thr",
+       "term": "报警阈值",
+       "hint": "超限就报警的设定值",
+       "emoji": "🚨",
+       "q": "厂长：温度超过 80℃ 就报警，这个 80℃ 是什么？",
+       "cat": "边缘"
+      },
+      {
+       "id": "fn",
+       "term": "Function 节点",
+       "hint": "Node-RED 里写逻辑的节点",
+       "emoji": "🧩",
+       "q": "厂长：Node-RED 里用代码写数据处理逻辑的节点叫什么？",
+       "cat": "Node-RED"
+      },
+      {
+       "id": "sma",
+       "term": "滑动均值",
+       "hint": "取最近 N 个值的平均",
+       "emoji": "📉",
+       "q": "厂长：取最近几个数据求平均来平滑波动，叫什么？",
+       "cat": "边缘"
+      }
+     ],
+     "distractors": [
+      "云端计算",
+      "大数据分析",
+      "数据库",
+      "网关"
+     ]
+    },
+    {
+     "id": "l4_b",
+     "name": "软 PLC 快打",
+     "afterTask": "4-8",
+     "blockTasks": [
+      "4-5",
+      "4-6",
+      "4-7",
+      "4-8"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：软 PLC 和边缘分工，认熟它。",
+     "tip": "软 PLC、边缘三层，都在后面几关。",
+     "size": 4,
+     "xp": 70,
+     "timeLimit": 45,
+     "pairs": [
+      {
+       "id": "softplc",
+       "term": "软 PLC",
+       "hint": "用软件实现 PLC 逻辑控制",
+       "emoji": "🖥️",
+       "q": "厂长：用软件在普通 PC 上实现 PLC 逻辑控制，叫什么？",
+       "cat": "PLC"
+      },
+      {
+       "id": "openplc",
+       "term": "OpenPLC",
+       "hint": "开源软 PLC 平台",
+       "emoji": "🔓",
+       "q": "厂长：开源的软 PLC 平台叫什么？",
+       "cat": "PLC"
+      },
+      {
+       "id": "edgecloud",
+       "term": "边缘 vs 云",
+       "hint": "边缘管实时、云端管趋势",
+       "emoji": "⚖️",
+       "q": "厂长：实时判断用边缘、长期趋势分析用云端，这叫什么分工？",
+       "cat": "架构"
+      },
+      {
+       "id": "3layer",
+       "term": "边缘三层",
+       "hint": "感知层/计算层/网络层",
+       "emoji": "🏗️",
+       "q": "厂长：边缘计算三层架构是感知层、计算层和什么？",
+       "cat": "架构"
+      }
+     ],
+     "distractors": [
+      "硬 PLC",
+      "虚拟机",
+      "数据库",
+      "防火墙"
+     ]
+    },
+    {
+     "id": "l4_s1",
+     "name": "数据风暴·守住管道",
+     "type": "storm",
+     "afterTask": "4-9",
+     "blockTasks": [
+      "4-2",
+      "4-4",
+      "4-9"
+     ],
+     "subtitle": "厂长：数据风暴来了！掂量着手里的过滤器，别让管道崩了。",
+     "tip": "滑动均值滤噪声、阈值截断压异常、降采样减流量、丢弃异常最猛但可能误伤关键数据——边缘算力有限，不能全开。",
+     "waves": 5,
+     "duration": 60,
+     "xp": 120,
+     "filters": [
+      {
+       "id": "smooth",
+       "name": "滑动均值",
+       "emoji": "📉",
+       "desc": "滤噪声·压波动（关键数据略滞后）",
+       "cost": 8
+      },
+      {
+       "id": "clamp",
+       "name": "阈值截断",
+       "emoji": "🎚️",
+       "desc": "压异常尖峰·压噪声",
+       "cost": 10
+      },
+      {
+       "id": "drop",
+       "name": "丢弃异常",
+       "emoji": "🗑️",
+       "desc": "直接丢异常·可能误伤关键",
+       "cost": 14
+      },
+      {
+       "id": "down",
+       "name": "降采样",
+       "emoji": "⏳",
+       "desc": "流量减半·可能漏关键",
+       "cost": 6
+      }
+     ],
+     "pairs": [
+      {
+       "id": "smooth",
+       "term": "滑动均值",
+       "hint": "取最近 N 个值平均，滤掉噪声、压平波动（会滞后）",
+       "emoji": "📉",
+       "cat": "边缘"
+      },
+      {
+       "id": "clamp",
+       "term": "阈值截断",
+       "hint": "超限数据截断/报警，压住异常尖峰",
+       "emoji": "🎚️",
+       "cat": "边缘"
+      },
+      {
+       "id": "drop",
+       "term": "丢弃异常",
+       "hint": "把异常数据直接扔掉，最省流量但可能误伤关键数据",
+       "emoji": "🗑️",
+       "cat": "边缘"
+      },
+      {
+       "id": "down",
+       "term": "降采样",
+       "hint": "只保留一部分采样，流量减半",
+       "emoji": "⏳",
+       "cat": "边缘"
+      }
+     ]
+    },
+    {
+     "id": "l4_s2",
+     "name": "值班抢险·别让产线烧了",
+     "type": "alarm",
+     "afterTask": "4-11",
+     "blockTasks": [
+      "4-1",
+      "4-7",
+      "4-11"
+     ],
+     "subtitle": "厂长：盯紧边缘盒子，温度爆表冒烟就点它报警处理，别让产线烧了！",
+     "tip": "盒子变红冒烟=过热，快点点它；没冒烟别乱点，误报会扣分；连击越多分越高。",
+     "devices": 4,
+     "duration": 40,
+     "waves": 4,
+     "xp": 110,
+     "pairs": [
+      {
+       "id": "thr",
+       "term": "报警阈值",
+       "hint": "超限就报警的设定值，比如 80℃",
+       "emoji": "🎚️",
+       "cat": "边缘"
+      },
+      {
+       "id": "alarm",
+       "term": "报警处理",
+       "hint": "温度爆表立即告警处置，防止设备宕机",
+       "emoji": "🚨",
+       "cat": "边缘"
+      },
+      {
+       "id": "devstat",
+       "term": "设备状态",
+       "hint": "边缘设备的健康/负载状态，异常要盯",
+       "emoji": "📟",
+       "cat": "边缘"
+      },
+      {
+       "id": "edgebox",
+       "term": "边缘盒子",
+       "hint": "就地处理数据的边缘设备，实时监控温度",
+       "emoji": "📦",
+       "cat": "边缘"
+      }
+     ]
+    },
+    {
+     "id": "l4_m1",
+     "name": "边缘打地鼠",
+     "type": "mole",
+     "afterTask": "4-4",
+     "blockTasks": [
+      "4-1",
+      "4-2",
+      "4-3",
+      "4-4"
+     ],
+     "xp": 90,
+     "bad": [
+      "超温",
+      "爆振",
+      "超压",
+      "毛刺"
+     ],
+     "good": [
+      "正常",
+      "均值",
+      "阈值内"
+     ],
+     "subtitle": "传感器冒出异常就点掉（滑动均值/阈值过滤）",
+     "metric": "温度",
+     "unit": "℃",
+     "threshold": 80
+    }
+   ],
+   "bonus": null
+  },
+  {
+   "levelId": 5,
+   "name": "云平台",
+   "emoji": "☁️",
+   "warmups": [
+    {
+     "id": "l5_a",
+     "name": "Docker 基础快打",
+     "afterTask": "5-3",
+     "blockTasks": [
+      "5-1",
+      "5-2",
+      "5-3"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：镜像、容器、命令，认熟它。",
+     "tip": "Docker 三概念和常用命令，都在前几关。",
+     "size": 5,
+     "xp": 70,
+     "timeLimit": 50,
+     "pairs": [
+      {
+       "id": "image",
+       "term": "镜像",
+       "hint": "应用的模板/图纸",
+       "emoji": "📦",
+       "q": "厂长：Docker 里'应用的模板/图纸'叫什么？",
+       "cat": "Docker"
+      },
+      {
+       "id": "container",
+       "term": "容器",
+       "hint": "镜像的运行实例",
+       "emoji": "📦",
+       "q": "厂长：Docker 里镜像跑起来的实例叫什么？",
+       "cat": "Docker"
+      },
+      {
+       "id": "drun",
+       "term": "docker run",
+       "hint": "运行一个容器",
+       "emoji": "▶️",
+       "q": "厂长：运行一个容器用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "dps",
+       "term": "docker ps",
+       "hint": "查看运行中的容器",
+       "emoji": "👀",
+       "q": "厂长：查看运行中的容器用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "hub",
+       "term": "Docker Hub",
+       "hint": "存放镜像的仓库",
+       "emoji": "🏪",
+       "q": "厂长：Docker Hub 是干什么的？",
+       "cat": "Docker"
+      }
+     ],
+     "distractors": [
+      "docker stop",
+      "docker rm",
+      "虚拟机",
+      "docker build"
+     ]
+    },
+    {
+     "id": "l5_b",
+     "name": "容器化部署快打",
+     "afterTask": "5-6",
+     "blockTasks": [
+      "5-4",
+      "5-5",
+      "5-6"
+     ],
+     "type": "quick",
+     "subtitle": "厂长：Compose、数据卷，认熟它。",
+     "tip": "编排、持久化，都在后面几关。",
+     "size": 4,
+     "xp": 70,
+     "timeLimit": 45,
+     "pairs": [
+      {
+       "id": "compose",
+       "term": "Docker Compose",
+       "hint": "用 YAML 编排多个容器",
+       "emoji": "📜",
+       "q": "厂长：用 YAML 文件编排多个容器的工具叫什么？",
+       "cat": "Docker"
+      },
+      {
+       "id": "vm",
+       "term": "容器 vs 虚拟机",
+       "hint": "容器共享内核，更轻量",
+       "emoji": "⚖️",
+       "q": "厂长：容器比虚拟机轻，因为共享主机的什么？",
+       "cat": "概念"
+      },
+      {
+       "id": "dbuild",
+       "term": "docker build",
+       "hint": "从 Dockerfile 构建镜像",
+       "emoji": "🔨",
+       "q": "厂长：从 Dockerfile 构建镜像用什么命令？",
+       "cat": "命令"
+      },
+      {
+       "id": "vol",
+       "term": "数据卷",
+       "hint": "容器数据持久化",
+       "emoji": "💾",
+       "q": "厂长：让容器数据不随容器删除而丢失，用什么？",
+       "cat": "Docker"
+      }
+     ],
+     "distractors": [
+      "docker ps",
+      "docker run",
+      "镜像",
+      "网络"
+     ]
+    },
+    {
+     "id": "l5_p1",
+     "name": "容器吃豆人",
+     "type": "pacman",
+     "afterTask": "5-4",
+     "blockTasks": [
+      "5-1",
+      "5-2",
+      "5-3",
+      "5-4"
+     ],
+     "xp": 100,
+     "pellets": [
+      "镜像层",
+      "端口映射",
+      "数据卷",
+      "环境变量"
+     ],
+     "ghosts": [
+      "清理进程",
+      "镜像冲突",
+      "端口占用"
+     ],
+     "subtitle": "吃掉镜像层，躲开清理进程",
+     "pairs": [
+      {
+       "t": "docker run",
+       "h": "启动一个容器"
+      },
+      {
+       "t": "docker ps",
+       "h": "查看运行中的容器"
+      },
+      {
+       "t": "docker rm",
+       "h": "删除容器"
+      },
+      {
+       "t": "docker pull",
+       "h": "下载镜像"
+      }
+     ]
+    }
+   ],
+   "bonus": null
+  },
+  {
+   "levelId": 6,
+   "name": "驾驶舱",
+   "emoji": "📊",
+   "warmups": [
+    {
+     "id": "l6_r1",
+     "name": "数据狂飙",
+     "type": "racing",
+     "afterTask": "6-6",
+     "blockTasks": [
+      "6-1",
+      "6-2",
+      "6-3",
+      "6-4",
+      "6-5",
+      "6-6"
+     ],
+     "lives": 3,
+     "lanes": 4,
+     "good": [
+      "温度正常",
+      "振动正常",
+      "压力正常",
+      "能耗正常"
+     ],
+     "bad": [
+      "超温🔥",
+      "爆振⚡",
+      "超压💢",
+      "断链⛓️"
+     ],
+     "xp": 100,
+     "subtitle": "躲开异常数据块，吃正常数据加分，越跑越快",
+     "metric": "温度",
+     "unit": "℃",
+     "max": 80
+    }
+   ]
+  },
+  {
+   "levelId": 7,
+   "name": "数据贯通",
+   "emoji": "🔗",
+   "warmups": [
+    {
+     "id": "l7_t1",
+     "name": "消息守卫战",
+     "type": "tank",
+     "afterTask": "7-4",
+     "blockTasks": [
+      "7-1",
+      "7-2",
+      "7-3",
+      "7-4"
+     ],
+     "xp": 100,
+     "enemies": [
+      {
+       "topic": "factory/a/temp",
+       "name": "温度消息"
+      },
+      {
+       "topic": "factory/b/temp",
+       "name": "温度消息"
+      },
+      {
+       "topic": "factory/a/vib",
+       "name": "振动消息"
+      },
+      {
+       "topic": "factory/b/vib",
+       "name": "振动消息"
+      },
+      {
+       "topic": "factory/a/pres",
+       "name": "压力消息"
+      },
+      {
+       "topic": "factory/b/pres",
+       "name": "压力消息"
+      }
+     ],
+     "drops": [
+      "⚡火力",
+      "❤护盾",
+      "💣爆破"
+     ],
+     "subtitle": "坦克守卫 Broker，打掉垃圾消息",
+     "topics": [
+      "factory/+/temp",
+      "factory/+/vib",
+      "factory/+/pres"
+     ]
+    }
+   ]
+  },
+  {
+   "levelId": 8,
+   "name": "展望未来",
+   "emoji": "🤖",
+   "warmups": [
+    {
+     "id": "l8_b1",
+     "name": "AI 打砖块",
+     "type": "breakout",
+     "afterTask": "8-4",
+     "blockTasks": [
+      "8-1",
+      "8-2",
+      "8-3",
+      "8-4"
+     ],
+     "xp": 100,
+     "bricks": [
+      "设备故障",
+      "模型漂移",
+      "数据偏差",
+      "能耗超标"
+     ],
+     "subtitle": "弹球消掉设备故障砖块，板=你的 AI 决策",
+     "fault": [
+      "模型漂移",
+      "数据偏差",
+      "能耗超标"
+     ],
+     "normal": [
+      "正常样本",
+      "冗余备份",
+      "历史数据"
+     ]
+    }
+   ]
+  }
+ ]
 }
