@@ -6803,26 +6803,61 @@ function openMemoryMatch(cfg, onComplete) {
   playMusic(gameSong('memory'));
   // 堆叠式（cfg.levels 存在时）
   if (cfg.levels) { openStackedMatch(cfg, onComplete); return; }
-  // 多关递进（cfg.rounds = 每关卡片对数，如 [2,3,4] → 4/6/8 张）：一关通过自动进下一关
+  // 多关递进（cfg.rounds = 每关卡片对数，如 [2,3,4] → 4/6/8 张）：
+  // 中途自动进下一关、不弹结算；失败或全部通关后统一出整场总结算
   if (cfg.rounds && cfg.rounds.length) {
     let sizes = cfg.rounds.slice();
     if (cfg._hard) sizes = sizes.map(function(r){ return Math.min(r + 1, 6); });   // 二周目：每关加一档
     const base = Object.assign({}, cfg);
     delete base.rounds;
     let ri = 0;
+    const run = { rounds: [], totalMoves: 0, totalMatches: 0, failed: false, failRound: 0 };
+    function showRunSummary(allWin) {
+      playAreaMusic();
+      const totalPairsAll = sizes.reduce(function(a, b){ return a + b; }, 0);
+      const ov = document.createElement('div');
+      ov.className = 'mm-overlay';
+      ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
+      const rowsHtml = run.rounds.map(function(r){
+        return '<div style="font-size:14px;color:var(--dim);margin-top:5px">第 ' + r.index + ' 关（' + r.size * 2 + ' 张）：' + (r.win ? '✅ 用 ' + r.moves + ' 步 · ' + '★'.repeat(r.stars) + '☆'.repeat(3 - r.stars) : '❌ 失败') + '</div>';
+      }).join('');
+      const headHtml = allWin
+        ? '<div class="big">🎉</div><div style="font-size:22px;font-weight:bold;color:var(--green);margin-top:6px">全部 ' + sizes.length + ' 关通关！</div>'
+        : '<div class="big">💥</div><div style="font-size:22px;font-weight:bold;color:var(--red);margin-top:6px">第 ' + run.failRound + '/' + sizes.length + ' 关失败</div>';
+      const statHtml = allWin
+        ? '<div style="font-size:15px;color:var(--dim);margin-top:8px">总步数 <b style="color:var(--amber)">' + run.totalMoves + '</b> · 配对 <b style="color:var(--amber)">' + run.totalMatches + '/' + totalPairsAll + '</b> 对</div>'
+        : '<div style="font-size:15px;color:var(--dim);margin-top:8px">已通过 ' + (run.failRound - 1) + ' 关 · 配对 ' + run.totalMatches + ' 对</div>';
+      const btns = allWin
+        ? '<button class="mm-btn" data-act="again">🔁 再来一次</button><button class="mm-btn primary" data-act="done">收下奖励</button>'
+        : '<button class="mm-btn primary" data-act="retry">🔁 再来一次</button><button class="mm-btn" data-act="skip">跳过，先干正事</button>';
+      ov.innerHTML = '<div class="mm-box" style="width:min(480px,92vw)"><div class="mm-head"><div><div class="mm-title">🧠 ' + escHtml(base.name) + '</div><div class="mm-sub">连续 ' + sizes.length + ' 关 · 共 ' + totalPairsAll * 2 + ' 张卡</div></div></div><div class="pd-body" style="text-align:center">' + headHtml + statHtml + rowsHtml + '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">' + btns + '</div></div></div>';
+      document.body.appendChild(ov);
+      if (allWin) { recordGameWin('mm'); miniMarkClear(base.id); }
+      const bind = function(act, fn){ const el = ov.querySelector('[data-act="' + act + '"]'); if (el) el.onclick = fn; };
+      bind('done', () => { playAreaMusic(); ov.remove(); if (onComplete) onComplete(true); });
+      bind('again', () => { ov.remove(); openMemoryMatch(cfg, onComplete); });
+      bind('retry', () => { ov.remove(); openMemoryMatch(cfg, onComplete); });
+      bind('skip', () => { playAreaMusic(); ov.remove(); if (onComplete) onComplete(false); });
+      focusResultPrimary(ov);
+    }
     (function go() {
       if (ri >= sizes.length) {
-        if (cfg._endless) { sizes.push(sizes[sizes.length - 1] + 1); }   // 无限战：继续加牌
-        else { if (onComplete) onComplete(true); return; }
+        if (cfg._endless) { sizes.push(sizes[sizes.length - 1] + 1); run.rounds = []; run.totalMoves = 0; run.totalMatches = 0; }   // 无限战：继续加牌，重新累计
+        else { showRunSummary(true); return; }
       }
       const sub = Object.assign({}, base, {
         size: sizes[ri],
         name: base.name + (sizes.length > 1 ? ' · 第 ' + (ri + 1) + '/' + sizes.length + ' 关' : ''),
-        _noRecord: ri < sizes.length - 1,
-        _doneText: ri < sizes.length - 1 ? '下一关…' : undefined
+        _silent: true   // 中途不弹结算，过关自动进下一关
       });
       if (cfg._endless) { sub.timed = true; sub.timeLimit = Math.max(18, 55 - ri * 3); }   // 无限战：逐关缩时
-      openMemoryMatch(sub, function(win){ if (win) { ri++; go(); } else if (onComplete) onComplete(false); });
+      openMemoryMatch(sub, function(win, stats){
+        const st = stats || { moves: 0, matched: 0, stars: 0 };
+        run.rounds.push({ index: ri + 1, size: sizes[ri], win: !!win, moves: st.moves, matched: st.matched, stars: st.stars });
+        run.totalMoves += st.moves; run.totalMatches += st.matched;
+        if (win) { ri++; go(); }
+        else { run.failed = true; run.failRound = ri + 1; showRunSummary(false); }
+      });
     })();
     return;
   }
@@ -7046,6 +7081,8 @@ function openMemoryMatch(cfg, onComplete) {
     if (finished) return;
     finished = true;
     clearInterval(timer);
+    const stars = win ? (moves <= totalPairs ? 3 : moves <= totalPairs * 1.5 ? 2 : 1) : 0;
+    const stats = { moves: moves, matched: matched, totalPairs: totalPairs, stars: stars };
     if (win) {
       // 配对成功即收入图鉴
       const ids = cfg.pairs.map(pr => pr.id).filter(Boolean);
@@ -7055,11 +7092,15 @@ function openMemoryMatch(cfg, onComplete) {
         setTimeout(() => c.classList.add('celebrate'), i * 45);
       });
       playSound('fanfare');
+      if (cfg._silent) {
+        // 连续关卡中途：简短庆祝后直接进下一关，不弹结算
+        setTimeout(() => { overlay.remove(); if (onComplete) onComplete(true, stats); }, 600);
+        return;
+      }
       setTimeout(() => {
         grid.style.display = 'none';
         const foot = overlay.querySelector('.mm-foot');
         if (foot) foot.style.display = 'none';
-        const stars = moves <= totalPairs ? 3 : moves <= totalPairs * 1.5 ? 2 : 1;
         const res = document.createElement('div');
         res.className = 'mm-result';
         res.innerHTML = `
@@ -7075,12 +7116,16 @@ function openMemoryMatch(cfg, onComplete) {
           </div>`;
         overlay.appendChild(res);
         overlay.querySelector('[data-act="again"]').onclick = () => { playAreaMusic(); overlay.remove(); openMemoryMatch(cfg, onComplete); };
-        const _done = () => { playAreaMusic(); overlay.remove(); if (!cfg._noRecord) { recordGameWin('mm'); miniMarkClear(cfg.id); } if (onComplete) onComplete(true); };
+        const _done = () => { playAreaMusic(); overlay.remove(); if (!cfg._noRecord) { recordGameWin('mm'); miniMarkClear(cfg.id); } if (onComplete) onComplete(true, stats); };
         overlay.querySelector('[data-act="done"]').onclick = _done;
-        // 连续关卡：过关后不再自动弹下一关，玩家点「下一关…」按钮手动继续
       }, 700);
     } else {
       playSound('fail');
+      if (cfg._silent) {
+        // 连续关卡中途失败：交回结果，由外层统一出整场总结算
+        setTimeout(() => { overlay.remove(); if (onComplete) onComplete(false, stats); }, 350);
+        return;
+      }
       // 超时/未完成
       const res = document.createElement('div');
       res.className = 'mm-result';
@@ -7094,7 +7139,7 @@ function openMemoryMatch(cfg, onComplete) {
         </div>`;
       overlay.appendChild(res);
       overlay.querySelector('[data-act="retry"]').onclick = () => { playAreaMusic(); overlay.remove(); openMemoryMatch(cfg, onComplete); };
-      overlay.querySelector('[data-act="skip"]').onclick = () => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false); };
+      overlay.querySelector('[data-act="skip"]').onclick = () => { playAreaMusic(); overlay.remove(); if (onComplete) onComplete(false, stats); };
     }
   }
 }
