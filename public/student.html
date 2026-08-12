@@ -4200,16 +4200,16 @@ function openTypingDefense(cfg, onComplete) {
   const _diff = cfg._hard ? 2 : Math.min(_tw, 2);   // 二周目直接上高手场
   const switchEnabled = _diff >= 1;   // 进阶/高手场开放 TAB 切词
   const LV = [
-    { name:'新手场', waves:2, perWave:3, lives:6, wt:20, spd:10, acc:0.3, max:38, s0:3300, smin:1200 },
-    { name:'进阶场', waves:3, perWave:4, lives:5, wt:18, spd:13, acc:0.45,max:46, s0:3000, smin:1000 },
-    { name:'高手场', waves:4, perWave:5, lives:5, wt:15, spd:16, acc:0.6, max:55, s0:2800, smin:850  }
+    { name:'新手场', waves:2, perWave:3, lives:6, wt:20, spd:5, acc:0.12, max:18, s0:3300, smin:1200 },
+    { name:'进阶场', waves:3, perWave:4, lives:5, wt:18, spd:6, acc:0.16, max:22, s0:3000, smin:1000 },
+    { name:'高手场', waves:4, perWave:5, lives:5, wt:15, spd:7, acc:0.2,  max:26, s0:2800, smin:850  }
   ][_diff];
   const LIVES = LV.lives;
   const WAVES = LV.waves;
   const WAVE_TIME = LV.wt;             // 每波秒数
   const BASE_SPEED = LV.spd, ACCEL = LV.acc, SPAWN0 = LV.s0, SPAWN_MIN = LV.smin, MAX_SPEED = LV.max;
 
-  function tier(text){ const n=text.length; return n>=8 ? {mul:1.25, pt:14} : n>=5 ? {mul:1.0, pt:10} : {mul:0.85, pt:8}; }
+  function tier(text){ const n=text.length; return n>=8 ? {mul:1.15, pt:14} : n>=5 ? {mul:1.0, pt:10} : {mul:0.92, pt:8}; }
   const bossPool = words.filter(w=>w.length>=7).length>=3 ? words.filter(w=>w.length>=7) : words.slice().sort((a,b)=>b.length-a.length).slice(0, Math.min(6, words.length));
 
   let lives = LIVES, score = 0, combo = 0, win = false;
@@ -4263,7 +4263,7 @@ function openTypingDefense(cfg, onComplete) {
   box.addEventListener('mousedown', e => e.preventDefault());
 
   function waveNeed(w){ return LV.perWave + w - 1; }
-  function waveSpeedMul(){ return 1 + (wave - 1) * 0.16; }
+  function waveSpeedMul(){ return 1 + (wave - 1) * 0.08; }
   function wordSpeed(){ const el=(Date.now()-t0)/1000; return Math.min(BASE_SPEED + ACCEL*el, MAX_SPEED) * waveSpeedMul(); }
 
   // 爆炸特效
@@ -4284,7 +4284,11 @@ function openTypingDefense(cfg, onComplete) {
 
   function spawnWord() {
     if (ended || paused) return;
-    const text = words[Math.floor(Math.random() * words.length)];
+    let text = words[Math.floor(Math.random() * words.length)];
+    let _g = 0;
+    while (bossActive && active.some(function(w){ return w.boss && w.text === text; }) && _g++ < 8) {
+      text = words[Math.floor(Math.random() * words.length)];   // 场上已有 BOSS 同名，重抽普通词
+    }
     const t = tier(text);
     const el = document.createElement('div');
     el.className = 'ty-word';
@@ -4293,13 +4297,16 @@ function openTypingDefense(cfg, onComplete) {
     el.style.left = (10 + Math.random() * maxX) + 'px';
     el.style.top = '0px';
     field.appendChild(el);
-    active.push({ text, y:0, el, disp: text, speed: wordSpeed() * t.mul * (0.92 + Math.random()*0.2), pt: t.pt, boss:false });
+    active.push({ text, y:0, el, disp: text, speed: wordSpeed() * t.mul * (0.95 + Math.random()*0.1), pt: t.pt, boss:false });
     const gap = Math.max(SPAWN_MIN, SPAWN0 - (wave-1)*120);
     spawnTimer = setTimeout(spawnWord, gap);
   }
   function spawnBoss() {
     bossActive = true;
     const text = bossPool[Math.floor(Math.random()*bossPool.length)];
+    // 场上若有同名普通词，先清掉——只留 BOSS 这一个，锁词不会打错目标
+    const _dups = active.filter(function(w){ return !w.boss && w.text === text; });
+    _dups.forEach(function(w){ try{ w.el.remove(); }catch(e){} var i=active.indexOf(w); if(i>=0) active.splice(i,1); });
     const el = document.createElement('div');
     el.className = 'ty-word ty-boss';
     el.textContent = '👑 ' + text;
