@@ -610,10 +610,15 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 @keyframes al{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
 @keyframes ar{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
 /* 楼梯 */
-.sx-stairs{position:absolute;z-index:7;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;background:#1a2140;border:2px solid #5a6a9a;border-radius:2px;box-shadow:5px 5px 0 rgba(0,0,0,.45)}
+.sx-stairs{position:absolute;z-index:7;width:44px;height:64px;cursor:pointer;background:#5a3a2a;border:4px solid #3a2418;border-radius:2px;box-shadow:4px 4px 0 rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.sx-stairs::before{content:"";position:absolute;left:4px;right:4px;top:4px;bottom:4px;border:2px solid #8a6a4a;border-radius:1px;background:repeating-linear-gradient(0deg,#7a5a3a 0 6px,#6a4a30 6px 12px)}
+.sx-stairs::after{content:"🚪";position:absolute;font-size:20px;filter:drop-shadow(0 0 2px rgba(0,0,0,.6))}
 .sx-stairs.locked{opacity:.4;cursor:not-allowed}
-.sx-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.6),5px 5px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
-.sx-stairs.open::after{content:"上楼";position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);white-space:nowrap}
+.sx-stairs.locked::after{content:"🔒"}
+.sx-stairs.open{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.65),4px 4px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
+.sx-stairs.open::before{box-shadow:0 0 10px rgba(255,179,64,.5)}
+.sx-stairs.open::after{content:"🚪"}
+.sx-door-tip{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);white-space:nowrap;text-shadow:0 1px 0 #000}
 .sx-rotate{position:absolute;top:36px;left:50%;transform:translateX(-50%);z-index:13;font-size:11px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:4px 12px;border-radius:3px;display:none;white-space:nowrap;pointer-events:none}
 .sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
 /* 竖屏/窄屏：场景保持较高 */
@@ -1150,7 +1155,7 @@ function openRoom(id){
       ${decoHTML}
       <div class="sx-stage" id="sxStage" style="width:${stageW}px">
         <div class="sx-ground"></div>${propHTML}${platHTML}${taskElsHTML}
-        <div class="sx-stairs" id="sxStairs">🪜</div>
+        <div class="sx-stairs" id="sxStairs"></div>
         <div class="sx-player" id="sxPlayer">
           <span class="pl hair"></span>
           <span class="pl face"></span><span class="pl eye"></span>
@@ -1293,8 +1298,12 @@ function sxStart(){
     const sCls=sx.flrDone&&sx.hasNext?'open':'locked';
     stairsEl.className='sx-stairs '+sCls;
     stairsEl.style.left=(baseX+taskEls.length*gap+70)+'px';
-    stairsEl.style.top=(groundTop-48)+'px';
-    if(sx.flrDone&&sx.hasNext) stairsEl.onclick=function(){ nextRoomFloor(); };
+    stairsEl.style.top=(groundTop-64)+'px';
+    if(sx.flrDone&&sx.hasNext){
+      stairsEl.onclick=function(){ nextRoomFloor(); };
+      const tip=document.createElement('div'); tip.className='sx-door-tip'; tip.textContent='出门 · 下一层';
+      stairsEl.appendChild(tip);
+    }
   }
   const rw=scene.clientWidth, stageW=stage.clientWidth;
   // 点哪儿走哪儿：点击场景（非设备/楼梯/按钮）→ 小人走到该水平位置
