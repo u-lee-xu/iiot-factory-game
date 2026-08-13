@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>锐智工厂 · 像素地图（原型）</title>
+<style>
+:root{
+  --bg:#0b0e1a; --floor:#141a2e; --road:#232c47; --roadline:#3a4568;
+  --text:#e8eaf0; --dim:#9aa3bd; --amber:#ffb340; --green:#00e676; --red:#ff5252;
+  --border:#2c3552;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospace,Menlo,Consolas,monospace;min-height:100vh;overflow-x:hidden}
+/* ===== 登录 ===== */
+#loginBox{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:50;background:var(--bg)}
+#loginBox.hide{display:none}
+.login-card{width:min(340px,90vw);background:#121830;border:2px solid var(--border);padding:26px 22px;border-radius:4px;box-shadow:0 0 40px rgba(0,0,0,.5)}
+.login-card h1{font-size:20px;color:var(--amber);letter-spacing:2px;text-align:center;margin-bottom:4px}
+.login-card .sub{font-size:12px;color:var(--dim);text-align:center;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--dim);margin-bottom:5px}
+.field input{width:100%;background:#0a0e1c;border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:15px;padding:9px 11px;outline:none}
+.field input:focus{border-color:var(--amber)}
+.btn{width:100%;padding:11px;font-size:15px;font-family:inherit;background:var(--amber);color:#1a1206;border:none;cursor:pointer;font-weight:bold;letter-spacing:2px}
+.btn:hover{filter:brightness(1.1)}
+.err{color:var(--red);font-size:12px;min-height:16px;margin-top:8px;text-align:center}
+.hint{font-size:11px;color:var(--dim);text-align:center;margin-top:14px}
+/* ===== 主界面 ===== */
+#mapApp{display:none}
+#mapApp.show{display:block}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 14px;background:#10162a;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:20}
+.brand{font-size:17px;color:var(--amber);letter-spacing:2px;font-weight:bold}
+.brand small{font-size:10px;color:var(--dim);display:block;letter-spacing:0}
+.player{display:flex;align-items:center;gap:10px;font-size:13px;flex-wrap:wrap}
+.pill{background:#0a0e1c;border:1px solid var(--border);padding:4px 10px;border-radius:3px;color:var(--text)}
+.pill b{color:var(--amber)}
+.back{font-size:12px;color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:5px 9px;border-radius:3px}
+.back:hover{color:var(--amber);border-color:var(--amber)}
+/* ===== 地图 ===== */
+#map{max-width:980px;margin:0 auto;padding:14px 10px 30px}
+/* 顶部设施 */
+.top-fac{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}
+.fac{flex:1;min-width:0}
+.npc{flex:0 0 auto;text-align:center;padding-top:6px}
+.npc .npc-sprite{font-size:34px;filter:drop-shadow(0 0 8px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
+.npc .bubble{position:relative;background:#121830;border:2px solid var(--border);border-radius:4px;padding:7px 10px;font-size:12px;color:var(--amber);max-width:190px;margin-top:6px;line-height:1.5}
+.npc .bubble::before{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);border:7px solid transparent;border-bottom:7px solid var(--border)}
+@keyframes npcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+/* 建筑通用 */
+.building{--c:#00bcd4;text-align:center;cursor:pointer;position:relative;user-select:none;-webkit-tap-highlight-color:transparent}
+.building .b-sprite{position:relative;width:84px;height:74px;margin:0 auto;image-rendering:pixelated}
+/* 楼体 */
+.b-body{position:absolute;left:8px;right:8px;bottom:0;height:44px;background:linear-gradient(180deg,var(--c),#0000 0%),#151b2e;border:2px solid #0a0d18;box-shadow:inset 0 0 0 2px rgba(255,255,255,.06)}
+.b-windows{position:absolute;top:6px;left:7px;right:7px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.b-win{height:8px;background:#0c101e;border:1px solid #0a0d18}
+.b-win.on{background:#ffe9a8;box-shadow:0 0 6px rgba(255,233,168,.7)}
+.b-door{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:16px;height:12px;background:#0a0d18;border:2px solid var(--c)}
+/* 屋顶类型 */
+.roof-flat{position:absolute;top:-8px;left:12px;right:12px;height:8px;background:var(--c);border:2px solid #0a0d18}
+.roof-tri{position:absolute;top:-14px;left:4px;right:4px;height:14px;background:var(--c);clip-path:polygon(50% 0,100% 100%,0 100%);border:2px solid #0a0d18;border-bottom:none}
+.roof-peak{position:absolute;top:-22px;left:16px;right:16px;height:20px;background:var(--c);clip-path:polygon(50% 0,100% 100%,0 100%);border:2px solid #0a0d18}
+.chimney{position:absolute;top:-26px;left:22px;width:12px;height:18px;background:var(--c);border:2px solid #0a0d18}
+.chimney::after{content:"";position:absolute;top:-9px;left:-2px;width:12px;height:9px;background:rgba(200,200,200,.4);border:1px solid #0a0d18}
+.dome{position:absolute;top:-16px;left:8px;right:8px;height:16px;background:var(--c);border-radius:50% 50% 0 0;border:2px solid #0a0d18}
+.antenna{position:absolute;top:-26px;left:50%;transform:translateX(-50%);width:3px;height:22px;background:var(--c);border:1px solid #0a0d18}
+.antenna::after{content:"";position:absolute;top:-5px;left:-3px;width:7px;height:5px;background:var(--red);border:1px solid #0a0d18;animation:blink 1.1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.pipe{position:absolute;top:-18px;left:8px;right:8px;height:18px;background:var(--c);border:2px solid #0a0d18}
+.pipe::after{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:rgba(255,255,255,.25);border-bottom:1px solid #0a0d18}
+/* 状态 */
+.building.locked .b-sprite{filter:grayscale(1) brightness(.55)}
+.building.locked .b-label{opacity:.55}
+.building.locked::after{content:"🔒";position:absolute;top:-2px;right:calc(50% - 52px);font-size:16px;z-index:3;filter:none}
+.building.current .b-sprite{animation:glow 1.6s ease-in-out infinite}
+.building.current .b-label{color:var(--amber);font-weight:bold}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 3px var(--c))}50%{filter:drop-shadow(0 0 12px var(--c))}}
+.building.completed .b-label{color:var(--green)}
+.building.completed::after{content:"✓";position:absolute;top:-4px;right:calc(50% - 50px);color:var(--green);font-size:15px;font-weight:bold;z-index:3}
+.building:hover .b-sprite{transform:translateY(-3px)}
+.building:active .b-sprite{transform:translateY(0)}
+/* 标签 */
+.b-label{margin-top:6px;font-size:13px;line-height:1.2;color:var(--text)}
+.b-label .icon{display:block;font-size:15px;margin-bottom:1px}
+.b-stars{font-size:11px;color:var(--dim);margin-top:2px}
+/* 道路 */
+.roads{position:relative;margin:6px 0;height:26px}
+.road-h{position:absolute;top:50%;left:0;right:0;height:14px;background:var(--road);border-top:2px solid var(--roadline);border-bottom:2px solid var(--roadline);transform:translateY(-50%)}
+.road-h::before{content:"";position:absolute;top:50%;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,var(--amber) 0 12px,transparent 12px 24px);transform:translateY(-50%);opacity:.5}
+.roads.done .road-h::before{opacity:1}
+/* 主干网格 */
+.main-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 8px}
+/* ===== 信息弹窗 ===== */
+#popup{position:fixed;inset:0;background:rgba(4,6,12,.7);display:none;align-items:center;justify-content:center;z-index:60;padding:16px}
+#popup.show{display:flex}
+.pop-card{width:min(380px,92vw);background:#121830;border:2px solid var(--border);border-radius:6px;padding:20px;max-height:82vh;overflow:auto}
+.pop-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pop-head .big{font-size:36px}
+.pop-head .t{flex:1}
+.pop-head .t h2{font-size:18px;color:var(--text);margin-bottom:2px}
+.pop-head .t .lvl{font-size:12px;color:var(--dim)}
+.pop-close{margin-left:auto;background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer}
+.pop-narr{font-size:13px;color:var(--dim);line-height:1.6;border-left:3px solid var(--amber);padding-left:10px;margin:10px 0}
+.prog{font-size:12px;color:var(--dim);margin:10px 0}
+.prog-bar{height:10px;background:#0a0e1c;border:1px solid var(--border);margin-top:4px}
+.prog-fill{height:100%;background:var(--c,var(--amber));width:0%}
+.stars-row{font-size:13px;color:var(--dim);margin:8px 0}
+.stars-row b{color:var(--amber)}
+.games{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.game-chip{font-size:12px;background:#0a0e1c;border:1px solid var(--border);padding:4px 9px;border-radius:3px;color:var(--text)}
+.pop-enter{width:100%;padding:12px;font-size:15px;font-family:inherit;background:var(--c,var(--amber));color:#111;border:none;cursor:pointer;font-weight:bold;letter-spacing:2px;margin-top:6px}
+.pop-enter:hover{filter:brightness(1.12)}
+.pop-tip{font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
+/* ===== 底部提示 ===== */
+.foot{text-align:center;font-size:11px;color:var(--dim);padding:14px 0 20px;letter-spacing:1px}
+/* 移动端 */
+@media (max-width:700px){
+  .brand{font-size:14px}
+  .player{font-size:11px}
+  .building .b-sprite{width:66px;height:60px}
+  .b-body{height:38px}
+  .b-windows .b-win{height:7px}
+  .npc .npc-sprite{font-size:26px}
+  .npc .bubble{font-size:11px;max-width:150px}
+  #map{max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<div id="loginBox">
+  <div class="login-card">
+    <h1>🏭 锐智工厂</h1>
+    <div class="sub">像素地图 · 原型验证版</div>
+    <div class="field"><label>姓名</label><input id="inpName" placeholder="学生姓名" maxlength="20"></div>
+    <div class="field"><label>密码</label><input id="inpPw" type="password" placeholder="初始 123456" maxlength="30"></div>
+    <button class="btn" onclick="doLogin()">进入工厂</button>
+    <div class="err" id="err"></div>
+    <div class="hint">测试账号：张三 / 123456 · 这是独立原型页，不影响正式版</div>
+  </div>
+</div>
+
+<div id="mapApp">
+  <header>
+    <div class="brand">🏭 锐智工厂<small>PIXEL MAP · 原型</small></div>
+    <div class="player">
+      <span class="pill">👤 <b id="pName">-</b></span>
+      <span class="pill">🏅 <b id="pRank">-</b></span>
+      <span class="pill">XP <b id="pXp">0</b></span>
+      <span class="pill">💰 <b id="pCoins">0</b></span>
+      <a class="back" href="student.html" target="_blank">旧版 →</a>
+    </div>
+  </header>
+  <div id="map">
+    <div class="top-fac">
+      <div class="fac" id="gameRoomSlot"></div>
+      <div class="npc">
+        <div class="npc-sprite">👷</div>
+        <div class="bubble" id="npcBubble">厂长：挑一栋楼开工吧！</div>
+      </div>
+      <div class="fac" id="researchSlot"></div>
+    </div>
+    <div class="roads" id="roadTop"></div>
+    <div class="main-grid" id="grid"></div>
+    <div class="roads" id="roadMid"></div>
+    <div class="main-grid" id="grid2"></div>
+    <div class="foot">— 锐智工厂 · 工业互联网实训 · 像素地图原型 —</div>
+  </div>
+</div>
+
+<div id="popup" onclick="if(event.target===this)closePop()">
+  <div class="pop-card" id="popCard"></div>
+</div>
+
+<script>
+const API = location.origin;
+const RANKS=[{min:0,t:'实习生',e:'🔰'},{min:1000,t:'学徒',e:'🔧'},{min:2500,t:'技工',e:'⚙️'},{min:4500,t:'工程师',e:'🛠️'},{min:7000,t:'专家',e:'🏆'}];
+let content=null, me=null, token='';
+const $=id=>document.getElementById(id);
+
+async function doLogin(){
+  const name=$('inpName').value.trim(), pw=$('inpPw').value;
+  $('err').textContent='';
+  if(!name){ $('err').textContent='请输入姓名'; return; }
+  try{
+    const r=await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,password:pw})});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'登录失败');
+    token=j.token;
+    await loadAll();
+    $('loginBox').classList.add('hide');
+    $('mapApp').classList.add('show');
+  }catch(e){ $('err').textContent=e.message; }
+}
+
+async function loadAll(){
+  const [cr, mr]=await Promise.all([
+    fetch(API+'/api/game/content').then(r=>r.json()),
+    fetch(API+'/api/student/me',{headers:{Authorization:'Bearer '+token}}).then(r=>r.json())
+  ]);
+  content=cr.data||cr; me=mr.data;
+  if(!content||!content.levels){ throw new Error('内容加载失败'); }
+  render();
+}
+
+function isTaskDone(tid){ return !!(me.check && me.check[''+tid]); }
+function levelProgress(lv){
+  let done=0,total=0;
+  (lv.tasks||[]).forEach(t=>{ if(t.auto)return; total++; if(isTaskDone(t.id))done++; });
+  return {done,total,pct:total?Math.round(done/total*100):0,completed:total>0&&done>=total};
+}
+function accessOf(lv,idx){
+  if(idx===0) return 'open';
+  const prev=content.levels[idx-1];
+  return levelProgress(prev).completed ? 'open' : 'locked';
+}
+function areaStars(lv){
+  const st=(me.stars&&me.stars[lv.id])||{};
+  return {self:st.self||0, peer:st.peer||0, teacher:st.teacher||0};
+}
+function starStr(v){ let s=''; for(let i=0;i<5;i++) s+= i<v?'★':'☆'; return s; }
+
+// ===== 建筑造型 =====
+const SHAPES={
+  control_room:{roof:'roof-flat',h:'tall'},
+  console:{roof:'roof-peak',h:'mid'},
+  workshop:{roof:'roof-flat',h:'wide',chimney:true},
+  edge_cabinet:{roof:'roof-flat',h:'short'},
+  cloud_platform:{roof:'roof-flat',h:'tall'},
+  big_screen:{roof:'roof-flat',h:'tall',antenna:true},
+  data_pipe:{roof:'pipe',h:'mid'},
+  ai_lab:{roof:'dome',h:'mid'}
+};
+
+function buildingHTML(lv, idx){
+  const prog=levelProgress(lv);
+  const acc=accessOf(lv,idx);
+  const state= prog.completed?'completed':(acc==='open'?'current':'locked');
+  const st=areaStars(lv);
+  const shape=SHAPES[lv.factoryArea]||{roof:'roof-flat',h:'mid'};
+  const winCount=9;
+  const lit=Math.round(winCount*(prog.completed?1:(prog.pct/100)));
+  let wins='';
+  for(let i=0;i<winCount;i++) wins+=`<div class="b-win ${i<lit?'on':''}"></div>`;
+  const roof = shape.roof==='pipe' ? '<div class="pipe"></div>'
+    : shape.roof==='dome' ? '<div class="dome"></div>'
+    : shape.roof==='roof-peak' ? '<div class="roof-peak"></div>'
+    : '<div class="roof-flat"></div>';
+  const extra = shape.chimney?'<div class="chimney"></div>':'';
+  const ant = shape.antenna?'<div class="antenna"></div>':'';
+  const totalStar = Math.max(st.self||0, st.teacher||0);
+  return `<div class="building ${state}" style="--c:${lv.color}" onclick="openPop('${lv.id}')">
+    <div class="b-sprite">${ant}${extra}${roof}<div class="b-body"><div class="b-windows">${wins}</div><div class="b-door"></div></div></div>
+    <div class="b-label"><span class="icon">${lv.areaIcon}</span>${lv.areaName}</div>
+    <div class="b-stars">${starStr(totalStar)}</div>
+  </div>`;
+}
+
+function facilityHTML(kind){
+  if(kind==='game'){
+    return `<div class="building current" style="--c:#ff8ac2" onclick="facPop('game')">
+      <div class="b-sprite"><div class="roof-flat"></div><div class="b-body"><div class="b-windows">
+        ${'<div class="b-win on"></div>'.repeat(9)}</div><div class="b-door"></div></div></div>
+      <div class="b-label"><span class="icon">🕹️</span>游戏房</div><div class="b-stars">已解锁的小游戏</div>
+    </div>`;
+  }
+  return `<div class="building current" style="--c:#64b5f6" onclick="facPop('research')">
+    <div class="b-sprite"><div class="roof-flat"></div><div class="b-body"><div class="b-windows">
+      ${'<div class="b-win on"></div>'.repeat(9)}</div><div class="b-door"></div></div></div>
+    <div class="b-label"><span class="icon">📖</span>研发中心</div><div class="b-stars">术语 · 图鉴 · 排行榜</div>
+  </div>`;
+}
+
+function render(){
+  const player=me.name;
+  const xp=me.salaryInfo?me.salaryInfo.xp:0;
+  let rank=RANKS[0];
+  for(const r of RANKS) if(xp>=r.min) rank=r;
+  $('pName').textContent=player;
+  $('pRank').textContent=rank.e+' '+rank.t;
+  $('pXp').textContent=xp;
+  $('pCoins').textContent=me.coins||0;
+
+  // 建筑
+  const rows=content.factory.rows;
+  const g1=rows[0]?rows[0].areas:[], g2=rows[1]?rows[1].areas:[];
+  const b1=g1.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx):''; }).join('');
+  const b2=g2.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx+4):''; }).join('');
+  $('grid').innerHTML=b1;
+  $('grid2').innerHTML=b2;
+
+  // 设施
+  $('gameRoomSlot').innerHTML=facilityHTML('game');
+  $('researchSlot').innerHTML=facilityHTML('research');
+
+  // 厂长台词: 根据进度
+  const doneCount=content.levels.filter(l=>levelProgress(l).completed).length;
+  if(doneCount===0) $('npcBubble').textContent='厂长：小伙子/姑娘，从①中控室开始你的第一间工位吧！';
+  else if(doneCount<8) $('npcBubble').textContent=`厂长：干得不错！已完成 ${doneCount}/8 幕，继续推进！`;
+  else $('npcBubble').textContent='厂长：全厂通关！你已经是数字化大师了！🎉';
+}
+
+// ===== 信息弹窗 =====
+function openPop(id){
+  const lv=content.levels.find(l=>l.id==id);
+  if(!lv) return;
+  const prog=levelProgress(lv); const st=areaStars(lv);
+  const acc=content.levels.indexOf(lv);
+  const locked=acc>0&&!levelProgress(content.levels[acc-1]).completed;
+  // 该幕的任务主题(取任务名)
+  const tasks=(lv.tasks||[]).filter(t=>!t.auto).map(t=>t.title||t.name||t.label).filter(Boolean).slice(0,5);
+  const games=GAME_TAGS[lv.factoryArea]||[];
+  const narr = (lv.narrative && typeof lv.narrative==='object' && lv.narrative.intro)
+    ? lv.narrative.intro
+    : (typeof lv.narrative==='string' ? lv.narrative : '');
+  const card=`
+    <div class="pop-head">
+      <span class="big">${lv.areaIcon}</span>
+      <div class="t"><h2>${lv.areaName}</h2><div class="lvl">${lv.name}</div></div>
+      <button class="pop-close" onclick="closePop()">✕</button>
+    </div>
+    <div class="pop-narr">${narr}</div>
+    <div class="prog">任务进度 ${prog.done}/${prog.total}（${prog.pct}%）
+      <div class="prog-bar"><div class="prog-fill" style="width:${prog.pct}%;--c:${lv.color}"></div></div>
+    </div>
+    <div class="stars-row">🏆 星级：自己 <b>${starStr(st.self)}</b> · 老师 <b>${starStr(st.teacher)}</b></div>
+    ${tasks.length?`<div class="stars-row">📋 任务：${tasks.join(' / ')}</div>`:''}
+    ${games.length?`<div class="stars-row">🎮 关联小游戏：</div><div class="games">${games.map(g=>`<span class="game-chip">${g}</span>`).join('')}</div>`:''}
+    <button class="pop-enter" style="--c:${lv.color}" onclick="enterLevel('${lv.id}')">${locked?'🔒 未解锁':'🚪 进入 '+lv.areaName}</button>
+    <div class="pop-tip">原型版：正式版点击后将进入该幕任务</div>`;
+  $('popCard').innerHTML=card;
+  $('popup').classList.add('show');
+}
+function facPop(kind){
+  const info = kind==='game'
+    ? {icon:'🕹️',name:'游戏房',desc:'集中放置已解锁的小游戏：翻牌、快打、防御战、小蜜蜂、贪吃蛇…'}
+    : {icon:'📖',name:'研发中心',desc:'术语卡、图鉴、排行榜、成就都在这里查看'};
+  $('popCard').innerHTML=`
+    <div class="pop-head"><span class="big">${info.icon}</span>
+      <div class="t"><h2>${info.name}</h2><div class="lvl">地图设施</div></div>
+      <button class="pop-close" onclick="closePop()">✕</button></div>
+    <div class="pop-narr">${info.desc}</div>
+    <button class="pop-enter" onclick="closePop()">好的，了解</button>
+    <div class="pop-tip">正式版：游戏房聚合所有小游戏入口，研发中心聚合术语/图鉴/排行榜</div>`;
+  $('popup').classList.add('show');
+}
+function enterLevel(id){
+  closePop();
+  showToast('🚪 原型版：点击进入 L'+id+' 关卡（正式版将跳转任务）');
+}
+function closePop(){ $('popup').classList.remove('show'); }
+
+// ===== 轻提示 =====
+function showToast(msg){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#121830;border:2px solid var(--amber);color:var(--text);padding:10px 16px;font-size:13px;z-index:80;border-radius:4px;font-family:inherit;animation:toastIn .25s ease';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+
+// 关卡→小游戏映射(原型展示用, 大致对应)
+const GAME_TAGS={
+  control_room:['翻牌·看清你的网卡','2048·数据融合','术语防御战'],
+  console:['快打·指令','连连看','黑客终端'],
+  workshop:['翻牌·车间术语','工厂大亨','数据迷宫'],
+  edge_cabinet:['快打·边缘计算','愤怒的厂长'],
+  cloud_platform:['快打·云平台','消消乐'],
+  big_screen:['快打·监控','数据蜂群'],
+  data_pipe:['快打·管道','激光反射','管道工'],
+  ai_lab:['快打·AI','数据蜂群']
+};
+
+$('inpName').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+$('inpPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>
