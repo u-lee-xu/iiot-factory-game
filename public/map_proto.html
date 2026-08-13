@@ -490,11 +490,12 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 /* 厂长 NPC（站在门口） */
 .rs-npc{position:absolute;left:120px;top:34px;font-size:24px;z-index:6;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
 /* 俯视玩家小人：从头顶往下看——只看到 头顶头发/肩部/两侧手臂/脚，没有脸和眼睛 */
+/* 4 方向：dir-down(朝下·默认露双手) / dir-up(朝上·手藏身后) / dir-side(朝侧·露一侧手,左右用flip镜像) */
 .rs-player{position:absolute;z-index:9;width:22px;height:26px;pointer-events:none;transition:left .18s linear,top .18s linear}
 .rs-player .pl{position:absolute;image-rendering:pixelated}
 /* 头顶：头发覆盖整个头部（俯视只能看到头发） */
 .rs-player .hair{left:3px;top:0;width:16px;height:14px;background:#3a2a20;border-radius:50% 50% 45% 45%;box-shadow:inset 0 -3px 0 #241a12, inset 3px 0 0 #4a3a2c}
-/* 发旋（俯视头顶中心的小高光） */
+/* 发旋（俯视头顶中心的小高光）——朝上时是后脑，看不到发旋 */
 .rs-player .hair::after{content:"";position:absolute;left:50%;top:6px;width:3px;height:3px;background:#5a4a3a;transform:translateX(-50%);border-radius:50%}
 /* 肩部：工装，比头稍宽，从上看是身体块 */
 .rs-player .body{left:0;top:13px;width:22px;height:8px;background:#3d6df2;border-radius:4px 4px 2px 2px;box-shadow:inset 0 -2px 0 #2748b0}
@@ -507,6 +508,12 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 /* 脚 */
 .rs-player .leg.l{left:4px;top:23px;width:6px;height:3px;background:#2a3852}
 .rs-player .leg.r{left:12px;top:23px;width:6px;height:3px;background:#22304a}
+/* 朝向控制：默认朝下(露双手)；朝上→手藏身后、无发旋；朝侧→只露右侧手 */
+.rs-player.dir-up .hand.l,.rs-player.dir-up .hand.r{display:none}
+.rs-player.dir-up .hair::after{display:none}
+.rs-player.dir-side .hand.l{display:none}
+.rs-player.dir-side.flip .hand.l{display:block}
+.rs-player.dir-side.flip .hand.r{display:none}
 .rs-player.flip{transform:scaleX(-1)}
 .rs-player::after{content:"";position:absolute;left:1px;right:1px;top:26px;height:3px;background:rgba(0,0,0,.45);filter:blur(1px)}
 /* 任务/小游戏区（场景下方） */
@@ -1268,21 +1275,35 @@ function rsStart(){
     ty=Math.max(6, Math.min(e.clientY-rect.top, stageH-30));
     rsGo=null;
   }, true);
+  function setDir(dx, dy){
+    // 俯视 4 方向：|dx|>=|dy| 朝侧(左右)，否则按 dy 分上下；flip 控制左右镜像
+    if(Math.abs(dx)>=Math.abs(dy)){
+      player.classList.remove('dir-up','dir-down');
+      player.classList.add('dir-side');
+      player.classList.toggle('flip', dx<0);
+    } else if(dy<0){
+      player.classList.remove('dir-side','dir-down');
+      player.classList.add('dir-up');
+    } else {
+      player.classList.remove('dir-side','dir-up');
+      player.classList.add('dir-down');
+    }
+  }
   function frame(){
-    let moving=false;
+    let moving=false, ldx=0, ldy=0;
     // 走动：朝目标(x,y)移动
     if(tx!==null&&ty!==null){
       const dx=tx-px, dy=ty-py, dist=Math.hypot(dx,dy);
       if(dist<=speed){ px=tx; py=ty; tx=null; ty=null; }
-      else { px+=dx/dist*speed; py+=dy/dist*speed; moving=true; }
-      player.classList.toggle('flip', dx<0);
+      else { px+=dx/dist*speed; py+=dy/dist*speed; moving=true; ldx=dx; ldy=dy; }
     }
     // 走到设备跟前 → 自动进任务
     if(rsGo){
       const dx=rsGo.x-px, dy=rsGo.y-py, dist=Math.hypot(dx,dy);
       if(dist<=speed+1){ enterLevel(rsGo.lvId, rsGo.taskId); rsGo=null; tx=null; ty=null; return; }
-      else { px+=dx/dist*speed; py+=dy/dist*speed; moving=true; player.classList.toggle('flip', dx<0); }
+      else { px+=dx/dist*speed; py+=dy/dist*speed; moving=true; ldx=dx; ldy=dy; }
     }
+    if(moving) setDir(ldx, ldy);
     player.classList.toggle('walk', moving);
     player.style.left=px+'px'; player.style.top=py+'px';
     // 摄像机跟随：stage 平移使小人居中（x/y 双向）
