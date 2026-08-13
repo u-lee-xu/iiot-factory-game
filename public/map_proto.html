@@ -68,6 +68,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .walker{position:absolute;top:50%;z-index:5;font-size:16px;transform:translateY(-50%);animation:walkX 16s linear infinite}
 .walker.w2{animation-duration:20s;animation-delay:3s;font-size:14px}
 @keyframes walkX{0%{left:2%;transform:translateY(-50%) scaleX(1)}48%{left:96%;transform:translateY(-50%) scaleX(1)}50%{left:96%;transform:translateY(-50%) scaleX(-1)}98%{left:2%;transform:translateY(-50%) scaleX(-1)}100%{left:2%;transform:translateY(-50%) scaleX(1)}}
+.walker.w3{animation-duration:24s;animation-delay:5s;font-size:13px}
 .forklift{position:absolute;top:50%;z-index:5;font-size:18px;transform:translateY(-50%);animation:forkX 34s linear infinite}
 @keyframes forkX{0%{left:-4%;transform:translateY(-50%) scaleX(1)}45%{left:96%;transform:translateY(-50%) scaleX(1)}50%{left:96%;transform:translateY(-50%) scaleX(-1)}95%{left:-4%;transform:translateY(-50%) scaleX(-1)}100%{left:-4%;transform:translateY(-50%) scaleX(1)}}
 /* 生产区 */
@@ -76,27 +77,80 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .zone-tag b{color:var(--amber)}
 .row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 8px}
 /* 中心广场 */
-.plaza{display:flex;align-items:center;justify-content:center;gap:26px;margin:4px 0 8px;padding:6px 0;background:linear-gradient(180deg,transparent,rgba(0,229,118,.04),transparent);border-radius:8px}
-.fountain{font-size:30px;animation:npcBob 3s ease-in-out infinite}
-.ptree{font-size:22px}
-.flag{font-size:22px;animation:flagWave 2.4s ease-in-out infinite}
+.plaza{display:flex;align-items:flex-end;justify-content:center;gap:22px;margin:4px 0 8px;padding:12px 0;background:linear-gradient(180deg,transparent,rgba(0,229,118,.04),transparent);border-radius:8px}
+.flag{font-size:24px;animation:flagWave 2.4s ease-in-out infinite}
 @keyframes flagWave{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
-/* 配套设施 */
-.facilities{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
-.fac-card{background:rgba(10,14,28,.5);border:1px solid #223050;border-radius:8px;padding:8px;text-align:center;cursor:pointer}
-.fac-card:hover{border-color:var(--amber)}
-.fac-card .fc-icon{font-size:24px;margin-bottom:4px}
-.fac-card .fc-name{font-size:13px;color:var(--text)}
-.fac-card .fc-sub{font-size:10px;color:var(--dim);margin-top:2px;line-height:1.4}
-.fac-card .fc-sub em{color:var(--green);font-style:normal}
-/* 绿化/装饰 */
-.decor{position:absolute;pointer-events:none;z-index:3}
-.d-tree{position:absolute;font-size:18px;filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}
-.d-lamp{position:absolute;font-size:14px;animation:blink 2.4s infinite}
-.d-lamp::after{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:6px;height:3px;background:#ffe9a8;border-radius:50%;box-shadow:0 0 6px #ffe9a8}
-.utility{display:flex;align-items:center;gap:16px;margin:8px 0;padding:8px 14px;background:rgba(10,14,28,.35);border:1px dashed #2a3852;border-radius:8px}
-.utility .tank,.utility .water{font-size:20px}
-.utility .ut-label{font-size:10px;color:var(--dim);letter-spacing:2px}
+/* 配套设施区（像素风设施楼） */
+.fac-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;align-items:start}
+.fac-cell{text-align:center;cursor:pointer;padding:8px 2px;border-radius:8px;background:rgba(10,14,28,.35);border:1px solid transparent}
+.fac-cell:hover{border-color:var(--amber)}
+.fac-cell .fac-sub{font-size:9px;color:var(--dim);margin-top:3px;line-height:1.5}
+.fac-cell .fac-sub em{color:var(--green);font-style:normal}
+/* 游戏房：门前条纹雨棚 */
+.b-awning{position:absolute;left:-2px;right:-2px;top:2px;height:6px;z-index:2;background:repeating-linear-gradient(90deg,#ff5252 0 6px,#f2f2f2 6px 12px);border:1px solid #04060c;border-bottom:none;box-shadow:0 0 6px rgba(255,82,82,.4)}
+/* 休息区 · 凉亭 */
+.pavilion{position:relative;width:88px;height:54px;margin:0 auto}
+.pv-roof{position:absolute;left:8px;right:8px;top:0;height:12px;background:linear-gradient(180deg,#2b3454,#181e36);border:2px solid #04060c;clip-path:polygon(2% 0,98% 0,86% 100%,14% 100%)}
+.pv-roof::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:#00e676;box-shadow:0 0 6px rgba(0,230,118,.5)}
+.pv-post{position:absolute;top:10px;bottom:8px;width:3px;background:#3a4560;border:1px solid #04060c}
+.pv-post.p1{left:16px}
+.pv-post.p2{right:16px}
+.pv-bench{position:absolute;left:26px;right:26px;bottom:4px;height:5px;background:#5a5f6e;border:1px solid #04060c;border-radius:2px}
+.pv-bench::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:-6px;width:10px;height:6px;background:#6b7180;border:1px solid #04060c;border-radius:2px 2px 0 0}
+.pv-bench::after{content:"";position:absolute;left:-8px;top:-11px;width:9px;height:11px;background:radial-gradient(circle at 35% 30%,#3fd97f,#1f9d57 75%);border:1px solid #04140b;border-radius:50% 50% 4px 4px}
+/* 停车场 */
+.parking{position:relative;width:88px;height:54px;margin:0 auto;background:#151b2e;border:2px solid #2a3852;border-radius:4px}
+.parking::before{content:"";position:absolute;inset:8px 6px;background:repeating-linear-gradient(90deg,transparent 0 14px,#3a4568 14px 16px,transparent 16px 30px);opacity:.4}
+.parking .pk-pole{position:absolute;left:8px;top:8px;width:2px;height:12px;background:#3a4560;border:1px solid #04060c}
+.parking .pk-arm{position:absolute;left:10px;top:8px;width:14px;height:2px;background:#ff5252;transform-origin:left;animation:armUp 4s ease-in-out infinite}
+@keyframes armUp{0%,60%,100%{transform:rotate(0)}75%,95%{transform:rotate(60deg)}}
+.pk-car{position:absolute;bottom:4px;font-size:15px}
+.pk-car.c1{left:8px}
+.pk-car.c2{right:6px;font-size:13px}
+/* 像素树 */
+.p-tree{position:relative;display:inline-block;width:18px;height:22px}
+.p-tree .pt-trunk{position:absolute;left:7px;bottom:0;width:4px;height:8px;background:#6b4a2b;border:1px solid #04060c}
+.p-tree .pt-top{position:absolute;left:2px;top:0;width:14px;height:14px;background:radial-gradient(circle at 35% 30%,#3fd97f,#1f9d57 72%);border:1px solid #04140b;border-radius:50% 50% 45% 45%;box-shadow:0 0 6px rgba(31,157,87,.3)}
+/* 路灯 */
+.p-lamp{position:relative;display:inline-block;width:8px;height:26px}
+.p-lamp .pl-pole{position:absolute;left:3px;top:0;bottom:0;width:2px;background:#3a4560;border:1px solid #04060c}
+.p-lamp .pl-head{position:absolute;left:0;top:0;width:8px;height:4px;background:#ffd98a;border-radius:4px 4px 1px 1px;box-shadow:0 0 9px #ffd98a;animation:blink 2.6s ease-in-out infinite}
+.road .p-lamp{position:absolute;top:1px;z-index:4}
+.road .lamp-l{left:14px}
+.road .lamp-r{right:14px}
+/* 水塔 */
+.water-tower{position:relative;width:34px;height:46px;display:inline-block}
+.wt-legs{position:absolute;left:4px;right:4px;bottom:0;height:16px;background:repeating-linear-gradient(90deg,#2a3040 0 4px,transparent 4px 6px)}
+.wt-tank{position:absolute;left:6px;right:6px;top:10px;height:20px;background:linear-gradient(180deg,#465170,#2a3248);border:2px solid #04060c;border-radius:6px 6px 2px 2px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.05)}
+.wt-tank::after{content:"";position:absolute;left:2px;right:2px;top:8px;height:2px;background:#ff9800;opacity:.55}
+.wt-roof{position:absolute;left:4px;right:4px;top:0;height:12px;background:linear-gradient(180deg,#2b3454,#181e36);border:2px solid #04060c;clip-path:polygon(50% 0,100% 100%,0 100%)}
+/* 储罐 */
+.tanks{display:inline-flex;gap:6px;align-items:flex-end}
+.tk{position:relative;width:16px;height:24px;background:linear-gradient(180deg,#3a4560,#1c2438);border:2px solid #04060c;border-radius:8px 8px 2px 2px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.05)}
+.tk::after{content:"";position:absolute;left:2px;right:2px;top:8px;height:2px;background:#ff9800;opacity:.5}
+.tk.tk2{height:19px}
+/* 喷泉 */
+.fountain{position:relative;width:48px;height:36px;display:inline-block}
+.f-basin{position:absolute;left:0;right:0;bottom:0;height:12px;background:linear-gradient(180deg,#1e2a4a,#0e1428);border:2px solid #2a3852;border-radius:50%}
+.f-basin::after{content:"";position:absolute;left:8px;right:8px;top:3px;height:2px;background:#4fd6ff;opacity:.7;border-radius:50%}
+.f-spout{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:4px;height:16px;background:#2a3852;border:1px solid #04060c}
+.f-water{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;width:3px;height:8px;background:linear-gradient(180deg,#7deaff,#4fd6ff);border-radius:50% 50% 0 0;opacity:.85;animation:fountain 2.2s ease-in-out infinite}
+@keyframes fountain{0%,100%{height:6px;opacity:.5}50%{height:12px;opacity:1}}
+/* 花坛 */
+.flowerbed{position:relative;display:inline-block;width:18px;height:9px;background:linear-gradient(180deg,#7a5a2e,#4a3416);border:1px solid #04060c;border-radius:2px}
+.flowerbed::before{content:"";position:absolute;left:3px;top:-4px;width:4px;height:4px;background:#ff6d9c;border-radius:50%}
+.flowerbed::after{content:"";position:absolute;right:4px;top:-3px;width:3px;height:3px;background:#ffd400;border-radius:50%}
+/* 动力站区 */
+.utility-zone{display:flex;align-items:center;justify-content:center;gap:20px;margin:10px 0 4px;padding:10px 14px;background:rgba(10,14,28,.35);border:1px dashed #2a3852;border-radius:8px}
+.utility-zone .ut-label{font-size:10px;color:var(--dim);letter-spacing:3px}
+/* 设施 Logo */
+.lg-ctrl .lgc-body{position:absolute;left:1px;top:2px;width:18px;height:4px;background:var(--c);border-radius:2px;box-shadow:0 0 6px var(--cg)}
+.lg-ctrl .lgc-btn{position:absolute;width:2px;height:2px;border-radius:50%;background:#0a0e1c}
+.lg-ctrl .lgc-btn.b1{left:5px;top:3px}
+.lg-ctrl .lgc-btn.b2{right:5px;top:3px}
+.lg-flask .lgf-neck{position:absolute;left:9px;top:0;width:3px;height:3px;border:1px solid var(--c);border-bottom:none}
+.lg-flask .lgf-body{position:absolute;left:6px;top:2px;width:10px;height:6px;border:1px solid var(--c);border-radius:0 0 5px 5px}
+.lg-flask .lgf-liquid{position:absolute;left:7px;bottom:1px;width:8px;height:3px;background:var(--c);box-shadow:0 0 4px var(--cg);border-radius:0 0 4px 4px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 /* ===== 新建筑（工业骨架+赛博皮肤）===== */
 .building{--c:#00bcd4;--cg:rgba(0,188,212,.5);--sh:74px;--bh:56px;
@@ -263,7 +317,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
   .building .b-sprite{zoom:.8}
   .row{gap:4px}
   .b-label{font-size:11px}
-  .facilities{grid-template-columns:repeat(2,1fr)}
+  .fac-row{grid-template-columns:repeat(2,1fr)}
   .npc .bubble{max-width:160px}
 }
 </style>
@@ -314,7 +368,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       <div class="gate"><div class="bar"></div><div class="guard"></div></div>
 
       <!-- 主干道 A -->
-      <div class="road road-a"><div class="road-h"></div><div class="walker">🛵</div><div class="walker w2">👷</div></div>
+      <div class="road road-a"><div class="road-h"></div><i class="p-lamp lamp-l"></i><i class="p-lamp lamp-r"></i><div class="walker">🛵</div><div class="walker w2">👷</div><div class="walker w3">🧑‍🏭</div></div>
 
       <!-- 生产一区 -->
       <div class="zone">
@@ -324,7 +378,10 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 
       <!-- 中心广场 -->
       <div class="plaza">
-        <div class="ptree">🌳</div><div class="fountain">⛲</div><div class="flag">🚩</div><div class="fountain" style="font-size:20px">🌱</div><div class="ptree">🌳</div>
+        <div class="p-tree"></div><div class="flowerbed"></div>
+        <div class="fountain"><i class="f-basin"></i><i class="f-spout"></i><i class="f-water"></i></div>
+        <div class="flag">🚩</div>
+        <div class="flowerbed"></div><div class="p-tree"></div>
       </div>
 
       <!-- 生产二区 -->
@@ -334,14 +391,16 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       </div>
 
       <!-- 主干道 B -->
-      <div class="road road-b"><div class="road-h"></div><div class="forklift">🏗️</div></div>
+      <div class="road road-b"><div class="road-h"></div><i class="p-lamp lamp-l"></i><i class="p-lamp lamp-r"></i><div class="forklift">🏗️</div></div>
 
-      <!-- 配套设施 -->
-      <div class="facilities" id="facRow"></div>
+      <!-- 配套设施（像素风设施楼） -->
+      <div class="fac-row" id="facRow"></div>
 
-      <!-- 辅助设施 -->
-      <div class="utility">
-        <span class="tank">🛢️</span><span class="water">🏭</span><span class="ut-label">储罐区 · 冷却水塔 · 动力站</span><span class="water" style="margin-left:auto">🔦</span>
+      <!-- 动力站区 -->
+      <div class="utility-zone">
+        <span class="ut-label">动力站 · 储罐区</span>
+        <div class="water-tower"><i class="wt-legs"></i><i class="wt-tank"></i><i class="wt-roof"></i></div>
+        <div class="tanks"><i class="tk"></i><i class="tk tk2"></i></div>
       </div>
 
     </div>
@@ -481,10 +540,38 @@ function buildingHTML(lv, idx){
   </div>`;
 }
 
-function facilityCard(kind){
-  if(kind==='game') return `<div class="fac-card" onclick="facPop('game')"><div class="fc-icon">🕹️</div><div class="fc-name">游戏房</div><div class="fc-sub">已解锁小游戏<br><em>翻牌·快打·防御战·小蜜蜂</em></div></div>`;
-  if(kind==='research') return `<div class="fac-card" onclick="facPop('research')"><div class="fc-icon">📖</div><div class="fc-name">研发中心</div><div class="fc-sub">术语·图鉴·排行榜·成就</div></div>`;
-  return `<div class="fac-card" onclick="facPop('rest')"><div class="fc-icon">🌳</div><div class="fc-name">休息区</div><div class="fc-sub">长椅·树荫<br>放松一下再战</div></div>`;
+const FAC_LOGOS={
+  game:'<span class="b-logo lg-ctrl"><i class="lgc-body"></i><i class="lgc-btn b1"></i><i class="lgc-btn b2"></i></span>',
+  research:'<span class="b-logo lg-flask"><i class="lgf-neck"></i><i class="lgf-body"></i><i class="lgf-liquid"></i></span>'
+};
+function facLogo(kind){
+  const color=kind==='game'?'#ff8ac2':'#64b5f6';
+  const [r,g,b]=hex2rgb(color);
+  return `<span style="--c:${color};--cg:rgba(${r},${g},${b},.5);display:inline-block">${FAC_LOGOS[kind]||''}</span>`;
+}
+function facilityHTML(kind){
+  const gameFac=[{x:16,y:11,w:20,h:16,t:'screen',l:'glow',a:'breath'},{x:11,y:32,w:5,h:5,t:'round',l:'glow',a:'flick'},{x:19,y:32,w:5,h:5,t:'round',l:'glow',a:'flick'},{x:27,y:32,w:5,h:5,t:'round',l:'glow',a:'flick'},{x:35,y:32,w:5,h:5,t:'round',l:'warm',a:'tw'},{x:43,y:32,w:5,h:5,t:'round',l:'warm',a:'tw'},{x:51,y:32,w:5,h:5,t:'round',l:'dark',a:''}];
+  const resFac=[{x:16,y:12,w:16,h:10,t:'screen',l:'glow',a:'breath'},{x:9,y:29,w:11,h:8,t:'sq',l:'warm',a:'tw'},{x:22,y:29,w:11,h:8,t:'sq',l:'cy',a:'tw'},{x:35,y:29,w:11,h:8,t:'sq',l:'warm',a:'tw'},{x:48,y:29,w:11,h:8,t:'sq',l:'dark',a:''}];
+  if(kind==='rest') return `<div class="fac-cell" onclick="facPop('rest')"><div class="pavilion"><i class="pv-roof"></i><i class="pv-post p1"></i><i class="pv-post p2"></i><i class="pv-bench"></i></div><div class="fac-sub">凉亭 · 长椅 · 树荫</div></div>`;
+  if(kind==='park') return `<div class="fac-cell" onclick="facPop('park')"><div class="parking"><i class="pk-pole"></i><i class="pk-arm"></i><span class="pk-car c1">🚙</span><span class="pk-car c2">🚗</span></div><div class="fac-sub">叉车 · 货车 · 班车</div></div>`;
+  const c= kind==='game' ? {name:'游戏房',color:'#ff8ac2',facade:gameFac,awn:true,sub:'<em>翻牌·快打·防御战·小蜜蜂</em>'}
+    : {name:'研发中心',color:'#64b5f6',facade:resFac,awn:false,sub:'术语 · 图鉴 · 排行榜 · 成就'};
+  const [r,g,b]=hex2rgb(c.color); const cg=`rgba(${r},${g},${b},.5)`;
+  const wins=c.facade.map(winHTML).join('');
+  const roof= kind==='research' ? '<div class="b-roof roof-dome"></div>' : '<div class="b-roof roof-flat"></div>';
+  return `<div class="fac-cell" onclick="facPop('${kind}')">
+    <div class="building" style="--c:${c.color};--cg:${cg};--bh:56px">
+      <div class="b-sprite">
+        <div class="b-shadow"></div>${roof}
+        ${c.awn?'<div class="b-awning"></div>':''}
+        <div class="b-sign">${facLogo(kind)}</div>
+        <div class="b-body"><div class="b-wall"></div><div class="b-ribs"></div>${wins}<div class="b-base"></div><div class="b-door"></div></div>
+        <div class="b-scan"></div><div class="b-baseglow"></div>
+      </div>
+      <div class="b-label"><span class="icon">${facLogo(kind)}</span>${c.name}</div>
+    </div>
+    <div class="fac-sub">${c.sub}</div>
+  </div>`;
 }
 
 function render(){
@@ -500,7 +587,7 @@ function render(){
   const g1=rows[0]?rows[0].areas:[], g2=rows[1]?rows[1].areas:[];
   $('grid1').innerHTML=g1.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx):''; }).join('');
   $('grid2').innerHTML=g2.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx+4):''; }).join('');
-  $('facRow').innerHTML=facilityCard('game')+facilityCard('research')+facilityCard('rest')+`<div class="fac-card" onclick="facPop('park')"><div class="fc-icon">🅿️</div><div class="fc-name">停车场</div><div class="fc-sub">叉车·货车·班车</div></div>`;
+  $('facRow').innerHTML=facilityHTML('game')+facilityHTML('research')+facilityHTML('rest')+facilityHTML('park');
 
   const doneCount=content.levels.filter(l=>levelProgress(l).completed).length;
   if(doneCount===0) $('npcBubble').textContent='厂长：小伙子/姑娘，从①中控室开始你的第一间工位吧！';
