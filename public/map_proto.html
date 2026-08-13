@@ -888,11 +888,9 @@ function closePop(){ $('popup').classList.remove('show'); }
 function doLogout(){
   try{ sessionStorage.removeItem('token'); sessionStorage.removeItem('role'); sessionStorage.removeItem('name');
     sessionStorage.removeItem('mapFlow'); sessionStorage.removeItem('lastCompleted'); }catch(e){}
-  token=''; content=null; me=null;
   try{ if(musOn&&musSrc){ musSrc.stop(); musSrc=null; } }catch(e){}
-  $('loginBox').classList.remove('hide');
-  $('mapApp').classList.remove('show');
-  $('inpName').value=''; $('inpPw').value='';
+  // 退出 = 回标准登录页（index.html），不再停留在地图自带登录框
+  location.href = 'index.html';
 }
 function showToast(msg){
   const t=document.createElement('div');
