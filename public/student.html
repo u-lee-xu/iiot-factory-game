@@ -1146,7 +1146,7 @@ body:has(.mm-overlay) { overflow: hidden; }
     <button class="btn-icon" id="musicToggle" onclick="toggleMusic()" title="背景音乐开关">🎵</button>
     <button class="btn-icon" onclick="nextMusic()" title="切换背景曲">⏭</button>
     <span class="director-avatar" id="directorAvatar" style="font-size:20px;margin-left:8px;cursor:default;transition:transform .2s">👨‍💼</span>
-    <button class="btn-icon" id="backMapBtn" onclick="location.href='map_proto.html'" title="返回厂区地图" style="display:none">🗺️</button>
+    <button class="btn-icon" id="backMapBtn" onclick="location.href='map_proto.html'" title="返回厂区地图" style="display:none;color:var(--amber);border-color:var(--amber);font-size:13px;padding:3px 9px">🗺️ 返回厂区</button>
     <button class="btn-logout" onclick="logout()">退出</button>
   </div>
 </div>
@@ -4287,7 +4287,7 @@ function buildWallet() {
   document.body.appendChild(ov);
 }
 function openWallet(){ buildWallet(); renderWallet(); document.getElementById('walletOverlay').classList.add('show'); }
-function closeWallet(){ var o=document.getElementById('walletOverlay'); if(o) o.classList.remove('show'); }
+function closeWallet(){ if (_mapFlowFeature) { location.href='map_proto.html'; return; } var o=document.getElementById('walletOverlay'); if(o) o.classList.remove('show'); }
 function renderWallet() {
   var body=document.getElementById('walletBody'); if(!body) return;
   var si=gameState.salaryInfo||{}, inv=gameState.inventory||{}, coins=gameState.coins||0;
@@ -5176,6 +5176,7 @@ function openAchievements() {
 }
 
 function closeLb() {
+  if (_mapFlowFeature) { location.href = 'map_proto.html'; return; }
   document.getElementById('lbOverlay').classList.remove('show');
 }
 
@@ -5362,7 +5363,7 @@ function countUnlockedGameTypes() {
 }
 // ===== 游戏专区：解锁后直接选玩 =====
 let gzList = [];
-let _gzFromMap = false;   // 本次是否由厂区地图 ?open=game 进入（关闭时回地图，避免露旧界面）
+let _mapFlowFeature = null;   // 本次由厂区地图 ?open=xxx 进入的功能（关闭时回地图，避免露旧界面）
 function gzEmoji(w) {
   const t = w.type || 'memory';
   return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':t==='tyc'?'🏭':t==='lzr'?'🔦':t==='boss'?'🎯':'🃏';
@@ -5501,8 +5502,8 @@ function openGameZone() {
   document.getElementById('gzOverlay').classList.add('show');
 }
 function closeGameZone() {
-  // 仅当本次由厂区地图 ?open=game 进入：关闭=回厂区地图，避免露出旧版页面
-  if (_gzFromMap) { location.href = 'map_proto.html'; return; }
+  // 地图流程：关闭=回厂区地图，避免露出旧版页面
+  if (_mapFlowFeature) { location.href = 'map_proto.html'; return; }
   const ov = document.getElementById('gzOverlay');
   if (ov) ov.classList.remove('show');
 }
@@ -10359,6 +10360,7 @@ function openPedia() {
   renderPedia();
 }
 function closePedia() {
+  if (_mapFlowFeature) { location.href = 'map_proto.html'; return; }
   document.getElementById('pdOverlay').classList.remove('show');
 }
 function renderPedia() {
@@ -10745,7 +10747,7 @@ init().then(() => {
   if (openFeat) {
     const featMap = { game: openGameZone, pedia: openPedia, leaderboard: openLeaderboard, achievements: openAchievements, wallet: openWallet };
     const fn = featMap[openFeat];
-    if (openFeat === 'game') _gzFromMap = true;
+    if (openFeat) _mapFlowFeature = openFeat;
     if (fn) setTimeout(() => { try { fn(); } catch(e){} }, 600);
   }
   if (taskId || levelId || openFeat) {
