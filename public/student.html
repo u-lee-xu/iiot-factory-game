@@ -2443,6 +2443,11 @@ function completeTask(taskId, xp) {
     saveState();
     evaluateAchievements(true);
     refreshLeaderboard().then(() => evaluateAchievements(true));
+    // 地图流程：本层全部打完 → 立刻弹通关庆祝 + 回厂区
+    if (sessionStorage.getItem('mapFlow') === '1') {
+      const lv = content.levels.find(l => l.tasks.some(t => t.id === taskId));
+      if (lv && levelProgress(lv.id).completed) showLevelComplete(lv, null);
+    }
   } catch (e) {
     console.error('completeTask error:', e);
     showToast('保存失败，请重试', 'error');
@@ -10501,12 +10506,17 @@ function showLevelComplete(lv, done) {
     playSound('success');
   });
   
-  btn.onclick = () => {
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (done) setTimeout(done, 50); }, 300);
-    playSound('click');
-  };
+  if (sessionStorage.getItem('mapFlow') === '1') {
+    btn.textContent = '🗺️ 回厂区继续';
+    btn.onclick = () => { playSound('click'); location.href = 'map_proto.html'; };
+  } else {
+    btn.onclick = () => {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity .3s';
+      setTimeout(() => { overlay.remove(); if (done) setTimeout(done, 50); }, 300);
+      playSound('click');
+    };
+  }
 }
 
 function calculateLevelXP(levelId) {
@@ -10666,6 +10676,7 @@ init().then(() => {
   const levelId = p.get('level');
   const backBtn = document.getElementById('backMapBtn');
   if (backBtn && (taskId || levelId)) backBtn.style.display = '';
+  if (taskId || levelId) { try { sessionStorage.setItem('mapFlow', '1'); } catch(e){} }
   if (taskId || levelId) {
     let lv = null;
     if (taskId) lv = content.levels.find(l => (l.tasks || []).some(t => String(t.id) === taskId));

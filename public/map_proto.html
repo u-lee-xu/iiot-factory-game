@@ -437,6 +437,8 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .room-go{flex:1.6;padding:11px;font-size:14px;font-family:inherit;background:var(--rc);color:#0a0e1c;border:none;cursor:pointer;font-weight:bold;letter-spacing:1px;border-radius:6px}
 .room-go:hover{filter:brightness(1.12)}
 .room-go.locked{background:#2a3852;color:#9aa3bd}
+.room-panel.done{border-color:var(--rc);box-shadow:0 0 30px var(--rcg)}
+.room-cleared{display:inline-block;font-size:11px;color:#04140b;background:var(--green);padding:2px 10px;border-radius:10px;font-weight:bold;animation:startPulse 1.8s ease-in-out infinite;margin-top:3px}
 /* ===== 移动端 ===== */
 @media (max-width:700px){
   .brand{font-size:14px}
@@ -791,6 +793,8 @@ function openRoom(id){
   const locked=idx>0&&!levelProgress(content.levels[idx-1]).completed;
   const layer=ISA_LAYERS.find(L=>L.areas.includes(lv.factoryArea));
   const tasks=(lv.tasks||[]).filter(t=>!t.auto);
+  const totalXP=tasks.reduce((s,t)=>s+(t.xp||0),0);
+  const earnedXP=tasks.filter(t=>isTaskDone(t.id)).reduce((s,t)=>s+(t.xp||0),0);
   let cur=null; tasks.forEach(t=>{ if(cur===null&&!isTaskDone(t.id)) cur=t; });
   const taskHTML=tasks.map(t=>{
     const done=isTaskDone(t.id), next=(!done&&t===cur);
@@ -803,13 +807,13 @@ function openRoom(id){
   const narr=(lv.narrative&&typeof lv.narrative==='object'&&lv.narrative.intro)?lv.narrative.intro:(typeof lv.narrative==='string'?lv.narrative:'');
   const room=$('room');
   room.style.setProperty('--rc',rc); room.style.setProperty('--rcg',rcg); room.style.setProperty('--rcg2',rcg2);
-  room.innerHTML=`<div class="room-panel">
+  room.innerHTML=`<div class="room-panel ${prog.completed?'done':''}">
     <div class="room-head">
       <div class="room-logo">${logoHTML(lv.factoryArea,color)}</div>
-      <div class="room-title"><div class="rt-name">${lv.areaName}</div><div class="rt-sub">${lv.name} · ${layer?layer.level+' '+layer.name:'厂区'}</div></div>
+      <div class="room-title"><div class="rt-name">${lv.areaName} ${prog.completed?'<span class="room-cleared">🎉 全通关</span>':''}</div><div class="rt-sub">${lv.name} · ${layer?layer.level+' '+layer.name:'厂区'}</div></div>
       <button class="room-close" onclick="closeRoom()">✕</button>
     </div>
-    <div class="room-progress"><div class="rp-bar"><div class="rp-fill" style="width:${prog.pct}%"></div></div><div class="rp-txt">已完成 ${prog.done}/${prog.total}（${prog.pct}%） · 🏆 ${starStr(Math.max(st.self||0,st.teacher||0))}</div></div>
+    <div class="room-progress"><div class="rp-bar"><div class="rp-fill" style="width:${prog.pct}%"></div></div><div class="rp-txt">已完成 ${prog.done}/${prog.total}（${prog.pct}%） · ⚡ ${earnedXP}/${totalXP} XP · 🏆 ${starStr(Math.max(st.self||0,st.teacher||0))}</div></div>
     <div class="room-narr"><div class="rt-who">👷 厂长</div>${narr||'加油，把这一层的任务打通！'}</div>
     <div class="room-tasks">
       <div class="rt-sec">📋 任务清单（${prog.done}/${prog.total}）</div>
