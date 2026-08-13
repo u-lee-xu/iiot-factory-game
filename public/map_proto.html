@@ -154,28 +154,28 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .gate .bar{animation:gateSlide 9s ease-in-out infinite}
 @keyframes gateSlide{0%,55%,100%{transform:translateY(-50%) scaleX(1);opacity:.65}64%,88%{transform:translateY(-50%) scaleX(.25);opacity:1}}
 /* 信号灯塔：红白条纹圆锥塔 + 玻璃灯房 + 旋转光束 + 红信标 */
-.signal-tower{position:absolute;left:-30px;bottom:-24px;width:30px;height:104px;pointer-events:none;z-index:3}
+.signal-tower{position:absolute;left:-22px;bottom:-2px;width:24px;height:72px;pointer-events:none;z-index:3}
 /* 塔身：圆锥台（上窄下宽），红白条纹 */
-.st-body{position:absolute;left:5px;right:5px;top:44px;bottom:0;
+.st-body{position:absolute;left:4px;right:4px;top:28px;bottom:0;
   background:repeating-linear-gradient(0deg,#f0f0f0 0 9px,#e04848 9px 18px);
   clip-path:polygon(22% 0, 78% 0, 100% 100%, 0 100%);
   border:1px solid #04060c;
   box-shadow:inset 0 0 0 2px rgba(0,0,0,.14)}
 /* 玻璃灯房：带发光灯泡 */
-.st-lantern{position:absolute;left:7px;right:7px;top:30px;height:17px;
+.st-lantern{position:absolute;left:6px;right:6px;top:19px;height:12px;
   background:linear-gradient(180deg,#30384e,#1a2238);
   border:2px solid #04060c;
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.06)}
-.st-lantern::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:9px;height:9px;border-radius:50%;background:#fff3c4;box-shadow:0 0 14px #ffe9a8;animation:blink 1.2s infinite}
+.st-lantern::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:7px;height:7px;border-radius:50%;background:#fff3c4;box-shadow:0 0 12px #ffe9a8;animation:blink 1.2s infinite}
 /* 灯房锥顶 */
-.st-roof{position:absolute;left:4px;right:4px;top:22px;height:10px;background:linear-gradient(180deg,#3a4560,#20283c);border:2px solid #04060c;clip-path:polygon(0 100%,50% 0,100% 100%)}
+.st-roof{position:absolute;left:3px;right:3px;top:13px;height:8px;background:linear-gradient(180deg,#3a4560,#20283c);border:2px solid #04060c;clip-path:polygon(0 100%,50% 0,100% 100%)}
 /* 旋转光束（从灯房射出） */
-.st-beam{position:absolute;left:50%;top:38px;width:60px;height:62px;transform-origin:50% 0;
+.st-beam{position:absolute;left:50%;top:25px;width:44px;height:46px;transform-origin:50% 0;
   background:conic-gradient(from 90deg at 50% 0,transparent 10deg,rgba(255,230,120,.15) 40deg,transparent 70deg);
   animation:stSweep 6s ease-in-out infinite}
 @keyframes stSweep{0%,100%{transform:rotate(-34deg);opacity:.7}50%{transform:rotate(34deg);opacity:1}}
 /* 塔尖红信标 */
-.st-beacon{position:absolute;left:50%;transform:translateX(-50%);top:14px;width:5px;height:5px;border-radius:50%;background:#ff5252;box-shadow:0 0 10px #ff5252;animation:blink 1s infinite}
+.st-beacon{position:absolute;left:50%;transform:translateX(-50%);top:7px;width:4px;height:4px;border-radius:50%;background:#ff5252;box-shadow:0 0 9px #ff5252;animation:blink 1s infinite}
 /* 水塔滴水 + 警示灯 */
 .water-tower .wt-drop{position:absolute;left:50%;top:30px;width:2px;height:3px;background:#7deaff;border-radius:50% 50% 2px 2px;opacity:0;animation:wtDrip 3s ease-in infinite}
 @keyframes wtDrip{0%{transform:translateY(0);opacity:0}12%{opacity:.85}100%{transform:translateY(16px);opacity:0}}
