@@ -1122,8 +1122,13 @@ body:has(.mm-overlay) { overflow: hidden; }
 /* 分数徽章：方块感 */
 .mm-stats b, .gz-meta b { color: var(--amber); }
 
-/* 地图流程(?open=xxx)：隐藏旧版关卡页，只显示功能浮层 */
+/* 地图流程(?task/?level/?open)：隐藏旧版关卡页+旧头部，只显示功能浮层+返回厂区+面包屑 */
 body.map-flow .factory-wrap, body.map-flow .mission-wrap { display: none !important; }
+body.map-flow .header .xp-wrap,
+body.map-flow .header .rank-badge,
+body.map-flow .header .btn-icon:not(#backMapBtn),
+body.map-flow .header .btn-logout,
+body.map-flow .header .director-avatar { display: none !important; }
 </style>
 </head>
 <body>
