@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 背景音乐试听</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background:#0b0b13; color:#cfd3e0; font-family:"PingFang SC","Microsoft YaHei",monospace; margin:0; padding:28px 0; }
+  .wrap { max-width:680px; width:94%; margin:0 auto; }
+  h1 { font-size:20px; color:#ffd27d; margin:0 0 4px; letter-spacing:2px; }
+  .sub { font-size:12px; color:#6a7085; margin-bottom:20px; }
+  .grp { margin:18px 0 8px; font-size:13px; color:#00bcd4; font-weight:bold; border-left:3px solid #00bcd4; padding-left:8px; }
+  .song { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; background:#14141e; margin-bottom:8px; border:1px solid #22222e; cursor:pointer; transition:all .15s; }
+  .song:hover { background:#1a1a28; border-color:#ffd27d55; }
+  .song.playing { border-color:#ffd27d; background:#1e1a10; }
+  .emoji { font-size:22px; width:36px; text-align:center; }
+  .meta { flex:1; min-width:0; }
+  .name { font-size:14px; color:#e8ebf5; }
+  .info { font-size:11px; color:#6a7085; margin-top:2px; }
+  .badge { font-size:10px; padding:2px 7px; border-radius:20px; background:#22222e; color:#9aa0b5; white-space:nowrap; }
+  .status { font-size:12px; color:#8b91a6; min-height:16px; text-align:center; margin-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎵 全场景背景音乐试听</h1>
+  <div class="sub">ZzFXM 纯合成 · 点击即播（循环）· 21 首</div>
+  <div id="list"></div>
+  <div class="status" id="status"></div>
+</div>
+<script>
+zzfxV=.3; zzfxR=44100;
+zzfxG=(q=1,k=.05,c=220,e=0,t=0,u=.1,r=0,F=1,v=0,z=0,w=0,A=0,l=0,B=0,x=0,G=0,d=0,y=1,m=0,C=0)=>{let b=2*Math.PI,H=v*=500*b/zzfxR**2,I=(0<x?1:-1)*b/4,D=c*=(1+2*k*Math.random()-k)*b/zzfxR,Z=[],g=0,E=0,a=0,n=1,J=0,K=0,f=0,p,h;e=99+zzfxR*e;m*=zzfxR;t*=zzfxR;u*=zzfxR;d*=zzfxR;z*=500*b/zzfxR**3;x*=b/zzfxR;w*=b/zzfxR;A*=zzfxR;l=zzfxR*l|0;for(h=e+m+t+u+d|0;a<h;Z[a++]=f)++K%(100*G|0)||(f=r?1<r?2<r?3<r?Math.sin((g%b)**3):Math.max(Math.min(Math.tan(g),1),-1):1-(2*g/b%2+2)%2:1-4*Math.abs(Math.round(g/b)-g/b):Math.sin(g),f=(l?1-C+C*Math.sin(2*Math.PI*a/l):1)*(0<f?1:-1)*Math.abs(f)**F*q*zzfxV*(a<e?a/e:a<e+m?1-(a-e)/m*(1-y):a<e+m+t?y:a<h-d?(h-a-d)/u*y:0),f=d?f/2+(d>a?0:(a<h-d?1:(h-a)/d)*Z[a-d|0]/2):f),p=(c+=v+=z)*Math.sin(E*x-I),g+=p-p*B*(1-1E9*(Math.sin(a)+1)%2),E+=p-p*B*(1-1E9*(Math.sin(a)**2+1)%2),n&&++n>A&&(c+=w,D+=w,n=0),!l||++J%l||(c=D,v=H,n=n||1);return Z}
+zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q=0,s=1,v={},w=zzfxR/e*60>>2;for(;s;k++)R=[s=a=d=m=0],t.map((e,d)=>{for(x=f[e][k]||[0,0,0],s|=!!f[e][k],G=m+(f[e][0].length-2-!a)*w,p=d==t.length-1,o=2,r=m;o<x.length+p;a=++o){for(g=x[o],u=o==x.length+p-1&&p||c!=(x[0]||0)|g|0,z=0;z<w&&a;z++>w-99&&u?i+=(i<1)/99:0)h=(1-i)*R[M++]/2||0,b[r]=(b[r]||0)-h*q+h,j[r]=(j[r++]||0)+h*q+h;g&&(i=g%1,q=x[1]||0,(g|=0)&&(R=v[[c=x[M=0]||0,g]]=v[[c,g]]||(l=[...n[c]],l[2]*=2**((g-12)/12),g>0?zzfxG(...l):[])))}m=G});return[b,j]}
+</script>
+<script src="/data/music.js"></script>
+<script>
+const GROUPS = [
+  { title:'登录页', items:[ ['login','🏠','登录页 · 柔和邀请','G大调 · 92BPM · 空灵'] ] },
+  { title:'工厂背景 · 每幕一首（循环有起伏：主奏→变奏→留白→高潮）', items:[
+    ['control_room','🖥️','L1 中控室 · 明亮好奇','C大调 · 112BPM · 轻快'],
+    ['console','⌨️','L2 操作台 · 稳健技术','A小调 · 120BPM · 工位'],
+    ['workshop','⚙️','L3 车间 · 机械律动','D小调 · 128BPM · 驱动'],
+    ['edge_cabinet','📦','L4 边缘柜 · 科技脉冲','E小调 · 132BPM · 合成器'],
+    ['cloud_platform','☁️','L5 云平台 · 空灵开阔','G大调 · 104BPM · 飘'],
+    ['big_screen','📺','L6 监控大屏 · 数据流动','C小调 · 120BPM · 脉冲'],
+    ['data_pipe','🛤️','L7 数据管道 · 川流','A小调 · 116BPM · 流动'],
+    ['ai_lab','🤖','L8 AI实验室 · 神秘氛围','D小调 · 100BPM · 氛围'],
+  ]},
+  { title:'民歌·名曲复刻（完整原曲 / 反复改编）', items:[
+    ['mlh_full_sq','🪷','茉莉花 · 方波','完整'],
+    ['mlh_full_tri','🪷','茉莉花 · 三角','完整'],
+    ['mlh_full_saw','🪷','茉莉花 · 锯齿','完整'],
+    ['ode_full_sq','🎶','欢乐颂 · 方波','完整原曲'],
+    ['ode_full_tri','🎶','欢乐颂 · 三角','完整原曲'],
+    ['ode_full_saw','🎶','欢乐颂 · 锯齿','完整原曲'],
+    ['twinkle_full_sq','✨','小星星 · 方波','完整原曲'],
+    ['twinkle_full_tri','✨','小星星 · 三角','完整原曲'],
+    ['twinkle_full_saw','✨','小星星 · 锯齿','完整原曲'],
+    ['turk_full_sq','🕌','土耳其进行曲 · 方波','完整原曲'],
+    ['turk_full_tri','🕌','土耳其进行曲 · 三角','完整原曲'],
+    ['turk_full_saw','🕌','土耳其进行曲 · 锯齿','完整原曲'],
+    ['elise_full_sq','🎼','献给爱丽丝 · 方波','完整原曲'],
+    ['elise_full_tri','🎼','献给爱丽丝 · 三角','完整原曲'],
+    ['elise_full_saw','🎼','献给爱丽丝 · 锯齿','完整原曲'],
+  ]},
+  { title:'名曲复刻（公有领域）', items:[
+    ['tetris','🧱','俄罗斯方块 · 渐进版','144BPM · 单音→低音→鼓→和声→高八度'],
+    ['tetris_arp','🎹','俄罗斯方块 · 琶音第二声部','移动低音+加花鼓+琶音对位'],
+    ['tetris_echo','🔊','俄罗斯方块 · 回声第二声部','移动低音+加花鼓+回声应答'],
+    ['tetris_sus','🎻','俄罗斯方块 · 长音第二声部','移动低音+加花鼓+悬置长音'],
+    ['tetris_ost','🥁','俄罗斯方块 · 固定音型第二声部','移动低音+加花鼓+节奏固定音型'],
+  ]},
+
+  { title:'任天堂经典 8-bit（仅学习/内网教学用）', items:[
+    ['mario','🍄','马里奥·大地图','105'],
+    ['zelda','🗡️','塞尔达·大地图','130'],
+    ['metroid','🛰️','银河战士·Brinstar','132'],
+  ]},
+  { title:'小游戏（按幕配曲）', items:[
+    ['match','🧠','L1 翻牌 · 记忆','iamback · 125BPM · 已认可'],
+    ['memory_L3','🃏','L3 车间翻牌','D小调 · 116BPM'],
+    ['match_L3','🔗','L3 ISA-95 连线','C大调 · 120BPM'],
+    ['quick_L2','⚡','L2 快打','A小调 · 172BPM · 驱动'],
+    ['quick_L3','⚡','L3 快打','D小调 · 168BPM · 硬核'],
+    ['quick_L4','⚡','L4 快打','E小调 · 176BPM · 脉冲'],
+    ['quick_L5','⚡','L5 快打','G大调 · 168BPM · 明亮'],
+    ['storm','🌪️','L4 风暴防御','D小调 · 140BPM · 风声'],
+    ['alarm','🚨','L4 警报冲锋','C小调 · 158BPM · 警笛'],
+    ['boss','🏆','记忆大师挑战 · Boss','D小调 · 146BPM · 已认可'],
+  ]},
+];
+let currentKey=null, src=null, gain=null, ctx=null;
+const statusEl=document.getElementById('status');
+const listEl=document.getElementById('list');
+GROUPS.forEach(g=>{
+  const h=document.createElement('div'); h.className='grp'; h.textContent=g.title; listEl.appendChild(h);
+  g.items.forEach(([key,emoji,name,info])=>{
+    const row=document.createElement('div'); row.className='song'; row.id='song-'+key;
+    row.innerHTML=`<div class="emoji">${emoji}</div><div class="meta"><div class="name">${name}</div><div class="info">${info}</div></div><div class="badge">${key}</div>`;
+    row.onclick=()=>play(key); listEl.appendChild(row);
+  });
+});
+function ensureCtx(){ if(!ctx){ ctx=new(window.AudioContext||window.webkitAudioContext)(); } if(ctx.state==='suspended')ctx.resume(); return ctx; }
+function stopCurrent(){ if(src){ try{src.stop();}catch(e){} src=null; } document.querySelectorAll('.song').forEach(r=>r.classList.remove('playing')); }
+function play(key){
+  const c=ensureCtx();
+  if(currentKey===key&&src){ stopCurrent(); currentKey=null; statusEl.textContent='已停止'; return; }
+  stopCurrent(); currentKey=key;
+  statusEl.textContent='⏳ 正在合成 '+key+' ...';
+  setTimeout(()=>{
+    try{
+      const song=window.MUSIC_SONGS[key];
+      if(!song){ statusEl.textContent='❌ 无此曲: '+key; return; }
+      const t0=performance.now();
+      const data=zzfxM.apply(null,song);
+      const ms=Math.round(performance.now()-t0);
+      const buf=c.createBuffer(data.length,data[0].length,zzfxR);
+      for(let i=0;i<data.length;i++) buf.getChannelData(i).set(data[i]);
+      if(!gain){ gain=c.createGain(); gain.gain.value=0.7; gain.connect(c.destination); }
+      const s=c.createBufferSource(); s.buffer=buf; s.loop=true; s.connect(gain); s.start();
+      src=s;
+      document.getElementById('song-'+key).classList.add('playing');
+      statusEl.textContent='🎵 '+key+' · 渲染 '+ms+'ms · 单圈 '+buf.duration.toFixed(1)+'s';
+    }catch(e){ statusEl.textContent='❌ 播放失败: '+e.message; }
+  },30);
+}
+</script>
+</body>
+</html>
