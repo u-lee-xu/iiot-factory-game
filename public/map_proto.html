@@ -68,6 +68,8 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .walker.w3{animation-duration:24s;animation-delay:5s;font-size:13px}
 .forklift{position:absolute;top:50%;z-index:5;font-size:18px;transform:translateY(-50%);animation:forkX 34s linear infinite}
 @keyframes forkX{0%{left:-4%;transform:translateY(-50%) scaleX(1)}45%{left:96%;transform:translateY(-50%) scaleX(1)}50%{left:96%;transform:translateY(-50%) scaleX(-1)}95%{left:-4%;transform:translateY(-50%) scaleX(-1)}100%{left:-4%;transform:translateY(-50%) scaleX(1)}}
+.wcar{position:absolute;top:50%;z-index:5;font-size:15px;transform:translateY(-50%);animation:wcarX 18s linear infinite}
+@keyframes wcarX{0%{left:96%;transform:translateY(-50%) scaleX(1)}46%{left:2%;transform:translateY(-50%) scaleX(1)}50%{left:2%;transform:translateY(-50%) scaleX(-1)}96%{left:96%;transform:translateY(-50%) scaleX(-1)}100%{left:96%;transform:translateY(-50%) scaleX(1)}}
 /* 生产区 */
 .zone{position:relative;background:rgba(10,14,28,.42);border:1px solid #223050;border-radius:8px;padding:14px 10px 10px;margin:0 0 8px}
 .zone-tag{position:absolute;top:-9px;left:14px;font-size:10px;color:var(--dim);background:#0b0e1a;border:1px solid var(--border);padding:2px 10px;border-radius:10px;letter-spacing:2px}
@@ -78,7 +80,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .flag{font-size:24px;animation:flagWave 2.4s ease-in-out infinite}
 @keyframes flagWave{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
 /* 配套设施区（像素风设施楼） */
-.fac-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px;align-items:start}
+.fac-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;align-items:start}
 .fac-cell{text-align:center;cursor:pointer;padding:8px 2px;border-radius:8px;background:rgba(10,14,28,.35);border:1px solid transparent}
 .fac-cell:hover{border-color:var(--amber)}
 .fac-cell .fac-sub{font-size:9px;color:var(--dim);margin-top:3px;line-height:1.5}
@@ -559,7 +561,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       </div>
 
       <!-- 主干道 B -->
-      <div class="road road-b"><div class="road-h"></div><i class="p-lamp lamp-l"></i><i class="p-lamp lamp-r"></i><div class="forklift">🏗️</div></div>
+      <div class="road road-b"><div class="road-h"></div><i class="p-lamp lamp-l"></i><i class="p-lamp lamp-r"></i><div class="forklift">🏗️</div><div class="wcar">🚙</div></div>
 
       <!-- 配套设施（像素风设施楼） -->
       <div class="fac-row" id="facRow"></div>
@@ -795,7 +797,7 @@ function render(){
     const flow=i<ISA_LAYERS.length-1 ? `<div class="dataflow"><span class="df-label">↑ ${L.flow}</span><i class="df-pack p1"></i><i class="df-pack p2"></i><i class="df-pack p3"></i></div>` : '';
     return `<div class="isa-layer"><div class="isa-tag"><span class="ilv">${L.level}</span><b>${L.name}</b><em>${L.sub}</em></div><div class="row">${body}</div></div>${flow}`;
   }).join('');
-  $('facRow').innerHTML=facilityHTML('game')+facilityHTML('research')+facilityHTML('shop')+facilityHTML('rest')+facilityHTML('park');
+  $('facRow').innerHTML=facilityHTML('game')+facilityHTML('research')+facilityHTML('shop')+facilityHTML('rest');
 
   // 闯关路线条
   const nums=['①','②','③','④','⑤','⑥','⑦','⑧'];
