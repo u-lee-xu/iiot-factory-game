@@ -422,26 +422,51 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .rb-step.cur{color:var(--amber);border-color:var(--amber);font-weight:bold;animation:startPulse 1.8s ease-in-out infinite}
 .rb-step.done{color:var(--green);border-color:var(--green)}
 .rb-arrow{font-size:9px;color:#4a5570}
-/* ===== RPG 室内场景（俯视房间地图） ===== */
-.room-scene{position:relative;height:340px;margin:0 18px 12px;border-radius:6px;overflow:hidden;
-  border:8px solid #1c2440;box-shadow:inset 0 0 0 2px #0a0d18}
-/* 地板 */
+/* ===== RPG 室内场景（俯视工坊风 · 8bit） ===== */
+.room-scene{position:relative;height:340px;margin:0 18px 12px;border-radius:2px;overflow:hidden;
+  border:10px solid #2a3352;box-shadow:inset 0 0 0 2px #0a0d18, 0 4px 0 rgba(0,0,0,.35)}
+/* 地板：8bit 木板像素格 */
 .rs-floor{position:absolute;inset:0;background:
-  repeating-linear-gradient(90deg,#151b33 0 22px,#131828 22px 44px),
-  repeating-linear-gradient(0deg,#141930 0 22px,#121627 22px 44px)}
-.rs-floor::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 100% at 50% 0%, rgba(255,179,64,.04), transparent 60%)}
-/* 门（顶部墙的开口） */
-.rs-door{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:52px;height:14px;background:#2a3852;border:2px solid #0a0d18;z-index:5}
-.rs-door::after{content:"🚪";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px}
+  repeating-linear-gradient(90deg,#1c2340 0 16px,#19203a 16px 32px),
+  repeating-linear-gradient(0deg,#1b223d 0 16px,#182039 16px 32px)}
+.rs-floor::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(120% 90% at 50% 0%, rgba(255,179,64,.07), transparent 55%),
+  radial-gradient(80% 60% at 12% 88%, rgba(255,120,40,.10), transparent 60%)}
+/* 四周像素砖墙 */
+.rs-wall{position:absolute;background:
+  repeating-linear-gradient(90deg,#3a4568 0 12px,#313c5c 12px 24px);z-index:3}
+.rs-wall.t{top:0;left:0;right:0;height:12px}
+.rs-wall.b{bottom:0;left:0;right:0;height:12px;background:
+  repeating-linear-gradient(90deg,#313c5c 0 12px,#3a4568 12px 24px)}
+.rs-wall.l{left:0;top:12px;bottom:12px;width:12px;background:
+  repeating-linear-gradient(180deg,#3a4568 0 12px,#313c5c 12px 24px)}
+.rs-wall.r{right:0;top:12px;bottom:12px;width:12px;background:
+  repeating-linear-gradient(180deg,#313c5c 0 12px,#3a4568 12px 24px)}
+/* 门（顶部墙开口） */
+.rs-door{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:56px;height:16px;background:#2a3852;border:2px solid #0a0d18;z-index:6}
+.rs-door::after{content:"🚪";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px}
 /* 楼层标牌 */
-.rs-label{position:absolute;top:10px;left:12px;font-size:11px;color:var(--amber);background:rgba(11,14,26,.8);border:1px solid var(--amber);padding:2px 9px;border-radius:8px;z-index:5;letter-spacing:1px}
-/* 中央控制台（装饰） */
-.rs-console{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);width:150px;height:52px;z-index:2;
-  background:linear-gradient(180deg,#1d2542,#121830);border:2px solid #0a0d18;box-shadow:inset 0 0 0 3px rgba(255,255,255,.04)}
-.rs-console::before{content:"🖥️";position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.85}
-.rs-console::after{content:"· 控制台 ·";position:absolute;left:34px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--dim);letter-spacing:1px}
+.rs-label{position:absolute;top:16px;left:18px;font-size:11px;color:var(--amber);background:rgba(11,14,26,.85);border:1px solid var(--amber);padding:2px 9px;border-radius:2px;z-index:6;letter-spacing:1px}
+/* 工坊家具（装饰，不可交互） */
+.rs-furn{position:absolute;z-index:2;background:#151b33;border:2px solid #0a0d18;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.rs-furnace{left:20px;bottom:26px;width:64px;height:56px;border-radius:2px;background:linear-gradient(180deg,#2a1a14,#1a100c);box-shadow:3px 3px 0 rgba(0,0,0,.4),0 0 18px rgba(255,110,30,.35)}
+.rs-furnace::before{content:"🔥";position:absolute;left:50%;top:8px;transform:translateX(-50%);font-size:20px;animation:furnFire 1.4s ease-in-out infinite}
+.rs-furnace::after{content:"熔炉";position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:9px;color:#e8b88a;letter-spacing:2px}
+.rs-bench{left:50%;transform:translateX(-50%);bottom:30px;width:150px;height:44px;border-radius:2px;background:
+  repeating-linear-gradient(90deg,#3a2f1e 0 10px,#33291a 10px 20px);box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.rs-bench::before{content:"🛠️🔧";position:absolute;left:50%;top:5px;transform:translateX(-50%);font-size:15px;letter-spacing:6px}
+.rs-bench::after{content:"工作台";position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:9px;color:#cbb98a;letter-spacing:3px}
+.rs-shelf{right:20px;bottom:30px;width:54px;height:62px;border-radius:2px;background:linear-gradient(180deg,#241c14,#1a140e)}
+.rs-shelf::before{content:"📦";position:absolute;left:50%;top:8px;transform:translateX(-50%);font-size:16px}
+.rs-shelf::after{content:"货架";position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:9px;color:#cbb98a;letter-spacing:2px}
+.rs-crate{width:26px;height:24px;border-radius:2px;background:#3a2f1e}
+.rs-crate.c1{left:96px;bottom:30px}
+.rs-crate.c2{right:90px;bottom:30px}
+.rs-crate::after{content:"🪵";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;opacity:.9}
+@keyframes furnFire{0%,100%{filter:drop-shadow(0 0 3px rgba(255,150,60,.8));transform:translateX(-50%) scale(1)}50%{filter:drop-shadow(0 0 10px rgba(255,180,80,1));transform:translateX(-50%) scale(1.15)}}
 /* 任务设备（房间里的交互点） */
-.rs-task{position:absolute;width:56px;height:48px;z-index:4;background:#0a0e1c;border:2px solid #2a3852;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.rs-task{position:absolute;width:56px;height:48px;z-index:4;background:#0a0e1c;border:2px solid #2a3852;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.rs-task::before{content:"";position:absolute;left:-3px;right:-3px;top:-3px;bottom:-3px;border:1px solid rgba(255,255,255,.05);border-radius:2px;pointer-events:none}
 .rs-task:hover{border-color:var(--amber);transform:translateY(-2px)}
 .rs-task .rt-icon{font-size:20px;line-height:1}
 .rs-task .rt-name{font-size:8px;color:#9aa3bd;margin-top:3px;max-width:52px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -455,17 +480,55 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .rs-task.todo{opacity:.55}
 .rs-task.todo:hover{opacity:1}
 /* 楼梯（上楼） */
-.rs-stairs{position:absolute;right:14px;bottom:12px;width:38px;height:38px;z-index:5;display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:3px;cursor:pointer;background:#0a0e1c;border:2px solid #2a3852}
+.rs-stairs{position:absolute;right:14px;bottom:12px;width:38px;height:38px;z-index:5;display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:2px;cursor:pointer;background:#0a0e1c;border:2px solid #2a3852;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
 .rs-stairs.locked{opacity:.4;cursor:not-allowed}
 .rs-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.55);animation:stNext 1.6s ease-in-out infinite}
 .rs-stairs.open::after{content:"↑ 上楼";position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);white-space:nowrap;text-shadow:0 0 5px rgba(255,179,64,.6)}
-/* 厂长 NPC */
-.rs-npc{position:absolute;left:16px;bottom:14px;font-size:26px;z-index:5;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
+/* 厂长 NPC（站在门口右侧） */
+.rs-npc{position:absolute;left:18px;top:16px;font-size:24px;z-index:6;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
 /* 任务/小游戏区（场景下方） */
 .rs-foot{margin:0 18px 12px}
 @keyframes stNext{0%,100%{box-shadow:0 0 8px rgba(255,179,64,.35)}50%{box-shadow:0 0 20px rgba(255,179,64,.75)}}
 @keyframes stArrow{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
 @keyframes stPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+/* ===== 横版过关场景（side-scroll） ===== */
+.sx-scene{position:relative;height:300px;margin:0 18px 12px;border-radius:2px;overflow:hidden;
+  border:8px solid #2a3352;box-shadow:inset 0 0 0 2px #0a0d18,0 4px 0 rgba(0,0,0,.35);background:#0b0f1f;touch-action:none}
+.sx-stage{position:absolute;top:0;left:0;height:100%;will-change:transform}
+.sx-bg{position:absolute;inset:0;background:linear-gradient(180deg,#131a35 0%,#0e1428 60%,#0b0f1f 100%)}
+.sx-bg::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#3a4568 0 12px,#313c5c 12px 24px)}
+.sx-ground{position:absolute;left:0;right:0;bottom:0;height:26px;background:
+  repeating-linear-gradient(90deg,#2a3352 0 18px,#232b49 18px 36px);border-top:3px solid #3a4568}
+.sx-platform{position:absolute;height:14px;background:
+  repeating-linear-gradient(90deg,#3a4568 0 10px,#313c5c 10px 20px);border:2px solid #0a0d18;border-radius:1px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.sx-task{position:absolute;width:52px;height:44px;z-index:5;background:#0a0e1c;border:2px solid #2a3852;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,.35);transition:transform .15s,border-color .2s}
+.sx-task .rt-icon{font-size:20px;line-height:1}
+.sx-task .rt-name{font-size:8px;color:#9aa3bd;margin-top:3px;max-width:50px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sx-task.done{border-color:var(--green);background:rgba(0,230,118,.10)}
+.sx-task.done .rt-name{color:var(--green)}
+.sx-task.done::after{content:"✓";position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--green);color:#04140b;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
+.sx-task.next{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6);animation:stNext 1.6s ease-in-out infinite}
+.sx-task.next .rt-name{color:var(--amber);font-weight:bold}
+.sx-task.todo{opacity:.6}
+.sx-task.todo:hover{opacity:1}
+.sx-task.near{border-color:var(--amber);transform:scale(1.12);z-index:7}
+.sx-task.near::before{content:"点击进入";position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);background:rgba(11,14,26,.92);border:1px solid var(--amber);padding:1px 6px;border-radius:8px;white-space:nowrap}
+.sx-player{position:absolute;z-index:8;width:26px;height:26px;font-size:24px;line-height:26px;text-align:center;filter:drop-shadow(0 0 6px rgba(255,179,64,.5))}
+.sx-player.flip{transform:scaleX(-1)}
+.sx-stairs{position:absolute;z-index:6;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;background:#0a0e1c;border:2px solid #2a3852;border-radius:2px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.sx-stairs.locked{opacity:.4;cursor:not-allowed}
+.sx-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.55);animation:stNext 1.6s ease-in-out infinite}
+.sx-stairs.open::after{content:"上楼";position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);white-space:nowrap}
+.sx-hud{position:absolute;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:space-between;align-items:flex-end;padding:0 6px 6px;pointer-events:none}
+.sx-hint{font-size:10px;color:var(--dim);background:rgba(11,14,26,.85);border:1px solid #223050;padding:3px 8px;border-radius:2px}
+.sx-btns{display:none;gap:8px;pointer-events:auto}
+.sx-btn{width:52px;height:52px;font-size:20px;border-radius:2px;background:rgba(11,14,26,.85);border:2px solid var(--border);color:var(--amber);cursor:pointer;user-select:none;touch-action:none;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.sx-btn:active{background:#2a3852}
+@media (hover:none),(pointer:coarse){
+  .sx-btns{display:flex}
+}
+.sx-rotate{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:12;font-size:11px;color:var(--amber);background:rgba(11,14,26,.92);border:1px solid var(--amber);padding:4px 12px;border-radius:2px;display:none;white-space:nowrap;pointer-events:none}
+.sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
 /* ===== 房间界面 ===== */
 #room{position:fixed;inset:0;background:rgba(4,6,12,.84);display:none;align-items:center;justify-content:center;z-index:70;padding:14px}
 #room.show{display:flex}
@@ -895,6 +958,8 @@ function facPop(kind){
     <div class="pop-tip">正式版：游戏房聚合所有小游戏入口，研发中心聚合术语/图鉴/排行榜</div>`;
   $('popup').classList.add('show');
 }
+const ROOM_VIEW={workshop:'top',edge_cabinet:'top',control_room:'top',console:'top',
+  data_pipe:'side',big_screen:'side',cloud_platform:'top',ai_lab:'top'};
 const TASK_ICON={install_wizard:'🖥️',terminal:'⌨️',chain_quiz:'💬',quiz:'💬',fill_blank:'✍️',sort:'🔀',diagnosis_tree:'🩺',progress_bar:'📊',scenario_match:'🔗',code_review:'📝',ethics:'⚖️',drag_classify:'🗂️',boss_fight:'💥'};
 function openRoom(id){
   if(currentRoomId!==id){ currentRoomId=id; try{ window._roomFlr=0; }catch(e){} }
@@ -938,15 +1003,52 @@ function openRoom(id){
   const stairsCls = (flrDone&&hasNext)?'open':'locked';
   const stairsHTML = hasNext ? `<div class="rs-stairs ${stairsCls}" ${flrDone&&hasNext?'onclick="nextRoomFloor()"':''}>🪜</div>` : '';
   const doneCnt=ft.filter(t=>isTaskDone(t.id)).length;
-  const sceneHTML = `<div class="room-scene">
-    <div class="rs-floor"></div>
-    <div class="rs-door"></div>
-    <div class="rs-label">${fi+1}F · ${flrDone?'✅ 本层完成':doneCnt+'/'+ft.length}</div>
-    <div class="rs-console"></div>
-    ${ftHTML}
-    ${stairsHTML}
-    <div class="rs-npc">👷</div>
-  </div>`;
+  const viewType = ROOM_VIEW[lv.factoryArea]||'top';
+  let sceneHTML;
+  if(viewType==='side'){
+    // 横版过关：横向长廊，任务设备分散在长廊各处，小人左右移动
+    const groundTop=274, gap=240, baseX=120;
+    const stageW=Math.max(760, ft.length*gap+240);
+    let platHTML='', taskElsHTML='';
+    ft.forEach((t,i)=>{
+      const done=isTaskDone(t.id), next=(!done&&t===cur);
+      const cls=done?'done':(next?'next':'todo');
+      const x=baseX+i*gap, onPlat=(i%2===1);
+      const tTop=onPlat?106:(groundTop-44);
+      taskElsHTML+=`<div class="sx-task ${cls}" style="left:${x}px;top:${tTop}px" onclick="enterLevel('${lv.id}','${t.id}')" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}">
+        <span class="rt-icon">${TASK_ICON[t.type]||'📌'}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
+      </div>`;
+      if(onPlat) platHTML+=`<div class="sx-platform" style="left:${x-14}px;top:150px;width:84px"></div>`;
+    });
+    const stairsX=baseX+ft.length*gap+70;
+    const stairsCls2=(flrDone&&hasNext)?'open':'locked';
+    const stairsHTML2=hasNext?`<div class="sx-stairs ${stairsCls2}" style="left:${stairsX}px;top:${groundTop-44}px" ${flrDone&&hasNext?'onclick="nextRoomFloor()"':''}>🪜</div>`:'';
+    sceneHTML=`<div class="sx-scene" id="sxScene">
+      <div class="sx-bg"></div>
+      <div class="sx-stage" id="sxStage" style="width:${stageW}px">
+        <div class="sx-ground"></div>${platHTML}${taskElsHTML}${stairsHTML2}
+        <div class="sx-player" id="sxPlayer">👷</div>
+      </div>
+      <div class="sx-hud"><div class="sx-hint">← → 移动 · ↑ 跳跃 · 靠近设备点击进入</div><div class="sx-btns">
+        <button class="sx-btn" data-k="left">◀</button><button class="sx-btn" data-k="jump">⬆</button><button class="sx-btn" data-k="right">▶</button></div></div>
+      <div class="sx-rotate">📱 建议横屏游玩</div>
+    </div>`;
+  } else {
+    // 俯视工坊风：墙+地板+家具+任务设备
+    sceneHTML = `<div class="room-scene">
+      <div class="rs-wall t"></div><div class="rs-wall b"></div><div class="rs-wall l"></div><div class="rs-wall r"></div>
+      <div class="rs-floor"></div>
+      <div class="rs-door"></div>
+      <div class="rs-label">${fi+1}F · ${flrDone?'✅ 本层完成':doneCnt+'/'+ft.length}</div>
+      <div class="rs-furn rs-furnace"></div>
+      <div class="rs-furn rs-bench"></div>
+      <div class="rs-furn rs-crate c1"></div>
+      <div class="rs-furn rs-crate c2"></div>
+      ${ftHTML}
+      ${stairsHTML}
+      <div class="rs-npc">👷</div>
+    </div>`;
+  }
   const rfHint = flrDone&&hasNext ? '本层任务完成，点击🪜楼梯上楼 →' : (cur?'点发光的设备开始任务':'本层已完成');
   const games=GAME_TAGS[lv.factoryArea]||[];
   const narr=(lv.narrative&&typeof lv.narrative==='object'&&lv.narrative.intro)?lv.narrative.intro:(typeof lv.narrative==='string'?lv.narrative:'');
@@ -972,9 +1074,78 @@ function openRoom(id){
     </div>
   </div>`;
   room.classList.add('show');
+  if(viewType==='side'){ sxStop(); setTimeout(()=>sxStart(),60); }
 }
-function closeRoom(){ $('room').classList.remove('show'); if(musOn){ try{ musPlay('hub'); }catch(e){} } }
+function closeRoom(){ sxStop(); $('room').classList.remove('show'); if(musOn){ try{ musPlay('hub'); }catch(e){} } }
 function nextRoomFloor(){ if(typeof window._roomFlr==='number') window._roomFlr++; openRoom(currentRoomId); }
+/* ===== 横版过关：物理与交互 ===== */
+let sxGame=null, sxKeys=null;
+function sxStart(){
+  const scene=document.getElementById('sxScene'); if(!scene) return;
+  const stage=document.getElementById('sxStage'); if(!stage) return;
+  const player=document.getElementById('sxPlayer'); if(!player) return;
+  const groundTop=274, g=0.45, jumpV=-11, speed=3.5, ph=26;
+  let x=40, y=groundTop-ph, vy=0, onGround=true;
+  const keys={left:false,right:false,jump:false};
+  const plats=[]; scene.querySelectorAll('.sx-platform').forEach(el=>{
+    plats.push({x:parseFloat(el.style.left)||0, y:parseFloat(el.style.top)||150, w:parseFloat(el.style.width)||84});
+  });
+  const taskEls=[].slice.call(scene.querySelectorAll('.sx-task'));
+  const rw=scene.clientWidth, stageW=stage.clientWidth;
+  const jumphold=()=>{};
+  function frame(){
+    if(keys.left) x-=speed;
+    if(keys.right) x+=speed;
+    if(keys.jump&&onGround){ vy=jumpV; onGround=false; }
+    vy+=g; y+=vy;
+    if(y+ph>=groundTop){ y=groundTop-ph; vy=0; onGround=true; }
+    for(const p of plats){
+      if(vy>=0 && x+10<p.x+p.w && x+16>p.x && y+ph>=p.y-6 && y+ph<=p.y+16){ y=p.y-ph; vy=0; onGround=true; }
+    }
+    if(x<4) x=4; if(x>stageW-30) x=stageW-30;
+    player.style.left=x+'px'; player.style.top=y+'px';
+    if(keys.left) player.classList.add('flip'); else if(keys.right) player.classList.remove('flip');
+    let cam=x-rw/2+13; cam=Math.max(0,Math.min(cam,stageW-rw));
+    stage.style.transform='translateX('+(-cam)+'px)';
+    taskEls.forEach(el=>{
+      const tx=parseFloat(el.style.left)+26, ty=parseFloat(el.style.top)+22;
+      const dx=Math.abs(tx-(x+13)), dy=Math.abs(ty-(y+13));
+      const near=dx<46&&dy<62;
+      el.classList.toggle('near',near);
+    });
+    sxGame=requestAnimationFrame(frame);
+  }
+  function kd(e){
+    if(e.key==='ArrowLeft'||e.key==='a'){ keys.left=true; e.preventDefault(); }
+    if(e.key==='ArrowRight'||e.key==='d'){ keys.right=true; e.preventDefault(); }
+    if(e.key==='ArrowUp'||e.key===' '||e.key==='w'){ keys.jump=true; e.preventDefault(); }
+  }
+  function ku(e){
+    if(e.key==='ArrowLeft'||e.key==='a') keys.left=false;
+    if(e.key==='ArrowRight'||e.key==='d') keys.right=false;
+    if(e.key==='ArrowUp'||e.key===' '||e.key==='w') keys.jump=false;
+  }
+  scene.querySelectorAll('.sx-btn').forEach(b=>{
+    const k=b.getAttribute('data-k');
+    const dn=ev=>{ ev.preventDefault(); keys[k]=true; };
+    const up=ev=>{ ev.preventDefault(); keys[k]=false; };
+    b.addEventListener('pointerdown',dn);
+    b.addEventListener('pointerup',up);
+    b.addEventListener('pointerleave',up);
+    b.addEventListener('pointercancel',up);
+  });
+  sxKeys={kd,ku};
+  window.addEventListener('keydown',kd); window.addEventListener('keyup',ku);
+  // 手机竖屏提示横屏
+  if(window.innerHeight>window.innerWidth && matchMedia('(hover:none),(pointer:coarse)').matches){
+    const r=scene.querySelector('.sx-rotate'); if(r){ r.classList.add('show'); setTimeout(()=>r.classList.remove('show'),4500); }
+  }
+  sxGame=requestAnimationFrame(frame);
+}
+function sxStop(){
+  if(sxGame){ cancelAnimationFrame(sxGame); sxGame=null; }
+  if(sxKeys){ window.removeEventListener('keydown',sxKeys.kd); window.removeEventListener('keyup',sxKeys.ku); sxKeys=null; }
+}
 let currentRoomId=null;
 function enterLevel(id, taskId){
   closeRoom();
