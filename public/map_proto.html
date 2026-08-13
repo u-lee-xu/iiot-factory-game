@@ -423,6 +423,8 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .task-card .tc-title{flex:1;font-size:13px;color:#9aa3bd;line-height:1.3}
 .task-card .tc-xp{font-size:10px;color:#7c8ca6;background:#10172c;border:1px solid #223050;padding:2px 6px;border-radius:8px;flex:none}
 .task-card .tc-state{font-size:14px;flex:none;width:22px;text-align:center}
+.task-card{cursor:pointer}
+.task-card:hover{border-color:var(--rc);transform:translateX(2px)}
 .task-card.todo .tc-icon,.task-card.todo .tc-title{filter:grayscale(1);opacity:.55}
 .task-card.next{border-color:var(--amber);box-shadow:0 0 10px rgba(255,179,64,.28)}
 .task-card.next .tc-title{color:var(--amber);font-weight:bold}
@@ -801,7 +803,7 @@ function openRoom(id){
     const cls=done?'done':(next?'next':'todo');
     const state=done?'✓':(next?'▶':'·');
     const icon=TASK_ICON[t.type]||'📌';
-    return `<div class="task-card ${cls}"><span class="tc-icon">${icon}</span><span class="tc-title">${t.title||t.name||t.label||''}</span><span class="tc-xp">+${t.xp||0} XP</span><span class="tc-state">${state}</span></div>`;
+    return `<div class="task-card ${cls}" onclick="enterLevel('${lv.id}','${t.id}')"><span class="tc-icon">${icon}</span><span class="tc-title">${t.title||t.name||t.label||''}</span><span class="tc-xp">+${t.xp||0} XP</span><span class="tc-state">${state}</span></div>`;
   }).join('');
   const games=GAME_TAGS[lv.factoryArea]||[];
   const narr=(lv.narrative&&typeof lv.narrative==='object'&&lv.narrative.intro)?lv.narrative.intro:(typeof lv.narrative==='string'?lv.narrative:'');
@@ -816,7 +818,7 @@ function openRoom(id){
     <div class="room-progress"><div class="rp-bar"><div class="rp-fill" style="width:${prog.pct}%"></div></div><div class="rp-txt">已完成 ${prog.done}/${prog.total}（${prog.pct}%） · ⚡ ${earnedXP}/${totalXP} XP · 🏆 ${starStr(Math.max(st.self||0,st.teacher||0))}</div></div>
     <div class="room-narr"><div class="rt-who">👷 厂长</div>${narr||'加油，把这一层的任务打通！'}</div>
     <div class="room-tasks">
-      <div class="rt-sec">📋 任务清单（${prog.done}/${prog.total}）</div>
+      <div class="rt-sec">📋 任务清单（${prog.done}/${prog.total}）<em style="font-size:9px;color:#7c8ca6;font-style:normal">· 点击任务卡可直接进入</em></div>
       ${taskHTML}
       <div class="rt-sec">🎮 关联小游戏</div>
       <div class="games">${games.length?games.map(g=>`<span class="game-chip">${g}</span>`).join(''):'<span class="game-chip">-</span>'}</div>
