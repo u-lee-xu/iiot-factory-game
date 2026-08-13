@@ -646,6 +646,22 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 @keyframes trFill{0%{width:0%}60%{width:78%}100%{width:100%}}
 .tr-text{margin-top:12px;color:#9aa3bd;font-size:14px;letter-spacing:2px}
 .tr-text b{color:var(--amber)}
+/* ===== 手机横屏：房间面板左右分栏，场景完整显示 ===== */
+@media (orientation:landscape) and (max-width:960px) and (max-height:600px){
+  #room{padding:8px}
+  .room-panel{width:100%;max-height:calc(100vh - 16px);display:grid;
+    grid-template-columns:minmax(210px,38%) 1fr;grid-template-rows:auto auto auto 1fr auto;
+    overflow:hidden;border-radius:6px}
+  .room-head{grid-column:1;grid-row:1}
+  .room-progress{grid-column:1;grid-row:2;padding-top:10px}
+  .room-narr{grid-column:1;grid-row:3;margin:8px 10px 4px;overflow:auto}
+  .rs-foot{grid-column:1;grid-row:4;overflow:auto;margin:0 10px 6px}
+  .room-foot{grid-column:1;grid-row:5;padding:0 10px 10px}
+  .room-scene,.sx-scene{grid-column:2;grid-row:1/6;margin:10px 12px 10px 6px;
+    width:auto;align-self:center;justify-self:stretch}
+  .room-scene{height:340px}
+  .sx-scene{height:300px}
+}
 /* ===== 移动端 ===== */
 @media (max-width:700px){
   .brand{font-size:14px}
