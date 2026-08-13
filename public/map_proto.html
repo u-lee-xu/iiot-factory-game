@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>锐智工厂 · 厂区地图（原型）</title>
+<title>锐智工厂 · 厂区地图</title>
 <style>
 :root{
   --bg:#0b0e1a; --floor:#141a2e; --road:#1b2339; --roadline:#3a4568;
@@ -466,18 +466,18 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 <div id="loginBox">
   <div class="login-card">
     <h1>🏭 锐智工厂</h1>
-    <div class="sub">厂区地图 · 原型验证版</div>
+    <div class="sub">工业互联网实训 · 闯关平台</div>
     <div class="field"><label>姓名</label><input id="inpName" placeholder="学生姓名" maxlength="20"></div>
     <div class="field"><label>密码</label><input id="inpPw" type="password" placeholder="初始 123456" maxlength="30"></div>
     <button class="btn" onclick="doLogin()">进入工厂</button>
     <div class="err" id="err"></div>
-    <div class="hint">测试账号：张三 / 123456 · 独立原型页，不影响正式版</div>
+    <div class="hint">如无法登录，请联系老师添加账号</div>
   </div>
 </div>
 
 <div id="mapApp">
   <header>
-    <div class="brand">🏭 锐智工厂<small>FACTORY MAP · 厂区布局原型</small></div><button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
+    <div class="brand">🏭 锐智工厂<small>工业互联网实训 · 厂区地图</small></div><button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
     <div class="player">
       <span class="pill">👤 <b id="pName">-</b></span>
       <span class="pill">🏅 <b id="pRank">-</b></span>
@@ -537,7 +537,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       </div>
 
     </div>
-    <div class="foot">— 锐智工厂 · 工业互联网实训 · 厂区地图原型 —</div>
+    <div class="foot">— 锐智工厂 · 工业互联网实训 · 厂区地图 —</div>
   </div>
 </div>
 
@@ -803,7 +803,7 @@ function openPop(id){
     ${tasks.length?`<div class="stars-row">📋 任务：${tasks.join(' / ')}</div>`:''}
     ${games.length?`<div class="stars-row">🎮 关联小游戏：</div><div class="games">${games.map(g=>`<span class="game-chip">${g}</span>`).join('')}</div>`:''}
     <button class="pop-enter" style="--c:${color}" onclick="enterLevel('${lv.id}')">${locked?'🔒 未解锁':'🚪 进入 '+lv.areaName}</button>
-    <div class="pop-tip">原型版：正式版点击后将进入该幕任务</div>`;
+    <div class="pop-tip">点击后将进入该幕任务页面</div>`;
   $('popup').classList.add('show');
 }
 function facPop(kind){
