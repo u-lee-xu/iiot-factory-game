@@ -508,12 +508,26 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 /* 脚 */
 .rs-player .leg.l{left:4px;top:23px;width:6px;height:3px;background:#2a3852}
 .rs-player .leg.r{left:12px;top:23px;width:6px;height:3px;background:#22304a}
-/* 朝向控制：默认朝下(露双手)；朝上→手藏身后、无发旋；朝侧→只露右侧手 */
-.rs-player.dir-up .hand.l,.rs-player.dir-up .hand.r{display:none}
+/* ===== 朝向控制：不同方向身体姿态不同，转身感明显 ===== */
+/* 默认/朝下(dir-down)：看到后脑+垂手在身体两侧下方 */
+.rs-player .arm.l{left:-3px;top:13px;width:6px;height:9px}
+.rs-player .arm.r{right:-3px;top:13px;width:6px;height:9px}
+.rs-player .hand.l{left:-2px;top:21px}
+.rs-player .hand.r{right:-2px;top:21px}
+/* 朝上(dir-up)：手收到身体两侧上方(背手/插兜感)，身体块上缘变圆(朝前) */
+.rs-player.dir-up .arm.l{left:-3px;top:9px;width:6px;height:7px}
+.rs-player.dir-up .arm.r{right:-3px;top:9px;width:6px;height:7px}
+.rs-player.dir-up .hand.l{left:-2px;top:15px}
+.rs-player.dir-up .hand.r{right:-2px;top:15px}
+.rs-player.dir-up .body{top:13px;height:7px;border-radius:2px 2px 4px 4px}
 .rs-player.dir-up .hair::after{display:none}
-.rs-player.dir-side .hand.l{display:none}
-.rs-player.dir-side.flip .hand.l{display:block}
-.rs-player.dir-side.flip .hand.r{display:none}
+/* 朝侧(dir-side)：身体侧转，双手一前一后叠在身体中线(侧身感) */
+.rs-player.dir-side .arm.l{left:0;top:11px;width:6px;height:8px}
+.rs-player.dir-side .arm.r{right:0;top:14px;width:6px;height:8px}
+.rs-player.dir-side .hand.l{left:2px;top:18px;display:none}
+.rs-player.dir-side .hand.r{right:1px;top:21px}
+.rs-player.dir-side.flip .hand.l{display:block;left:1px;top:18px}
+.rs-player.dir-side.flip .hand.r{right:2px;top:21px;display:none}
 .rs-player.flip{transform:scaleX(-1)}
 .rs-player::after{content:"";position:absolute;left:1px;right:1px;top:26px;height:3px;background:rgba(0,0,0,.45);filter:blur(1px)}
 /* 任务/小游戏区（场景下方） */
@@ -1278,14 +1292,14 @@ function rsStart(){
   function setDir(dx, dy){
     // 俯视 4 方向：|dx|>=|dy| 朝侧(左右)，否则按 dy 分上下；flip 控制左右镜像
     if(Math.abs(dx)>=Math.abs(dy)){
-      player.classList.remove('dir-up','dir-down');
+      player.classList.remove('dir-up','dir-down','flip');
       player.classList.add('dir-side');
       player.classList.toggle('flip', dx<0);
     } else if(dy<0){
-      player.classList.remove('dir-side','dir-down');
+      player.classList.remove('dir-side','dir-up','dir-down','flip');
       player.classList.add('dir-up');
     } else {
-      player.classList.remove('dir-side','dir-up');
+      player.classList.remove('dir-side','dir-up','dir-down','flip');
       player.classList.add('dir-down');
     }
   }
