@@ -422,33 +422,47 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .rb-step.cur{color:var(--amber);border-color:var(--amber);font-weight:bold;animation:startPulse 1.8s ease-in-out infinite}
 .rb-step.done{color:var(--green);border-color:var(--green)}
 .rb-arrow{font-size:9px;color:#4a5570}
-/* ===== 2D 俯视房间（任务工位） ===== */
-.room-floor{background:
-  repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 2px, transparent 2px 6px),
-  repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 2px, transparent 2px 6px),
-  linear-gradient(180deg,#0d1126,#0a0e1c);
-  border:2px solid #2a3852;border-radius:6px;padding:12px;margin:0 18px 12px}
-.stage-zone{margin-bottom:14px}
-.stage-zone:last-child{margin-bottom:2px}
-.sz-label{font-size:11px;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:6px;letter-spacing:1px}
-.sz-label b{color:var(--amber)}
-.sz-count{font-size:10px;color:var(--green);background:#0a0e1c;border:1px solid #223050;padding:1px 7px;border-radius:8px}
-.sz-label::after{content:"";flex:1;height:1px;background:#223050}
-.station-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px}
-.station{position:relative;background:#0a0e1c;border:2px solid #223050;border-radius:3px;padding:8px 4px;text-align:center;cursor:pointer;transition:border-color .2s,transform .15s}
-.station:hover{border-color:var(--amber);transform:translateY(-2px)}
-.station .st-icon{font-size:22px;display:block;line-height:1}
-.station .st-name{font-size:9px;color:#9aa3bd;margin-top:4px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.station .st-num{position:absolute;top:2px;right:3px;font-size:8px;color:#7c8ca6}
-.station.done{border-color:var(--green);background:linear-gradient(180deg,rgba(0,230,118,.1),transparent)}
-.station.done .st-name{color:var(--green)}
-.station.done .st-state{position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--green);color:#04140b;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
-.station.next{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.5);animation:stNext 1.6s ease-in-out infinite}
-.station.next::before{content:"▶";position:absolute;top:-16px;left:50%;transform:translateX(-50%);color:var(--amber);font-size:12px;animation:stArrow 1.1s ease-in-out infinite;text-shadow:0 0 6px rgba(255,179,64,.7)}
-.station.next .st-icon{animation:stPulse 1.6s ease-in-out infinite}
-.station.next .st-name{color:var(--amber);font-weight:bold}
-.station.todo{opacity:.6}
-.station.todo:hover{opacity:1}
+/* ===== RPG 室内场景（俯视房间地图） ===== */
+.room-scene{position:relative;height:340px;margin:0 18px 12px;border-radius:6px;overflow:hidden;
+  border:8px solid #1c2440;box-shadow:inset 0 0 0 2px #0a0d18}
+/* 地板 */
+.rs-floor{position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,#151b33 0 22px,#131828 22px 44px),
+  repeating-linear-gradient(0deg,#141930 0 22px,#121627 22px 44px)}
+.rs-floor::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 100% at 50% 0%, rgba(255,179,64,.04), transparent 60%)}
+/* 门（顶部墙的开口） */
+.rs-door{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:52px;height:14px;background:#2a3852;border:2px solid #0a0d18;z-index:5}
+.rs-door::after{content:"🚪";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px}
+/* 楼层标牌 */
+.rs-label{position:absolute;top:10px;left:12px;font-size:11px;color:var(--amber);background:rgba(11,14,26,.8);border:1px solid var(--amber);padding:2px 9px;border-radius:8px;z-index:5;letter-spacing:1px}
+/* 中央控制台（装饰） */
+.rs-console{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);width:150px;height:52px;z-index:2;
+  background:linear-gradient(180deg,#1d2542,#121830);border:2px solid #0a0d18;box-shadow:inset 0 0 0 3px rgba(255,255,255,.04)}
+.rs-console::before{content:"🖥️";position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.85}
+.rs-console::after{content:"· 控制台 ·";position:absolute;left:34px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--dim);letter-spacing:1px}
+/* 任务设备（房间里的交互点） */
+.rs-task{position:absolute;width:56px;height:48px;z-index:4;background:#0a0e1c;border:2px solid #2a3852;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.rs-task:hover{border-color:var(--amber);transform:translateY(-2px)}
+.rs-task .rt-icon{font-size:20px;line-height:1}
+.rs-task .rt-name{font-size:8px;color:#9aa3bd;margin-top:3px;max-width:52px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-task.done{border-color:var(--green);background:linear-gradient(180deg,rgba(0,230,118,.12),transparent)}
+.rs-task.done .rt-name{color:var(--green)}
+.rs-task.done::after{content:"✓";position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--green);color:#04140b;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
+.rs-task.next{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6);animation:stNext 1.6s ease-in-out infinite}
+.rs-task.next::before{content:"▶";position:absolute;top:-15px;left:50%;transform:translateX(-50%);color:var(--amber);font-size:12px;animation:stArrow 1.1s ease-in-out infinite;text-shadow:0 0 6px rgba(255,179,64,.7)}
+.rs-task.next .rt-icon{animation:stPulse 1.6s ease-in-out infinite}
+.rs-task.next .rt-name{color:var(--amber);font-weight:bold}
+.rs-task.todo{opacity:.55}
+.rs-task.todo:hover{opacity:1}
+/* 楼梯（上楼） */
+.rs-stairs{position:absolute;right:14px;bottom:12px;width:38px;height:38px;z-index:5;display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:3px;cursor:pointer;background:#0a0e1c;border:2px solid #2a3852}
+.rs-stairs.locked{opacity:.4;cursor:not-allowed}
+.rs-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.55);animation:stNext 1.6s ease-in-out infinite}
+.rs-stairs.open::after{content:"↑ 上楼";position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);white-space:nowrap;text-shadow:0 0 5px rgba(255,179,64,.6)}
+/* 厂长 NPC */
+.rs-npc{position:absolute;left:16px;bottom:14px;font-size:26px;z-index:5;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
+/* 任务/小游戏区（场景下方） */
+.rs-foot{margin:0 18px 12px}
 @keyframes stNext{0%,100%{box-shadow:0 0 8px rgba(255,179,64,.35)}50%{box-shadow:0 0 20px rgba(255,179,64,.75)}}
 @keyframes stArrow{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
 @keyframes stPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
@@ -883,6 +897,7 @@ function facPop(kind){
 }
 const TASK_ICON={install_wizard:'🖥️',terminal:'⌨️',chain_quiz:'💬',quiz:'💬',fill_blank:'✍️',sort:'🔀',diagnosis_tree:'🩺',progress_bar:'📊',scenario_match:'🔗',code_review:'📝',ethics:'⚖️',drag_classify:'🗂️',boss_fight:'💥'};
 function openRoom(id){
+  if(currentRoomId!==id){ currentRoomId=id; try{ window._roomFlr=0; }catch(e){} }
   const lv=content.levels.find(l=>l.id==id); if(!lv) return;
   const color=AREA_COLOR[lv.factoryArea]||lv.color;
   const [r,g,b]=hex2rgb(color);
@@ -895,30 +910,44 @@ function openRoom(id){
   const totalXP=tasks.reduce((s,t)=>s+(t.xp||0),0);
   const earnedXP=tasks.filter(t=>isTaskDone(t.id)).reduce((s,t)=>s+(t.xp||0),0);
   let cur=null; tasks.forEach(t=>{ if(cur===null&&!isTaskDone(t.id)) cur=t; });
-  // 2D 俯视房间：任务=房间里的工位设备，当前任务发光引导
-  const stHTML=(t)=>{
-    const done=isTaskDone(t.id), next=(!done&&t===cur);
-    const cls=done?'done':(next?'next':'todo');
-    const icon=TASK_ICON[t.type]||'📌';
-    const nm=(t.title||t.name||t.label||'').slice(0,7);
-    return `<div class="station ${cls}" onclick="enterLevel('${lv.id}','${t.id}')" title="${(t.title||t.name||t.label||'')}">
-      <span class="st-icon">${icon}</span>
-      ${done?'<span class="st-state">✓</span>':'<span class="st-num">'+(t.xp||0)+'XP</span>'}
-      <span class="st-name">${nm}</span>
-    </div>`;
-  };
-  const szHTML=(title,secTasks)=>{
-    const d=secTasks.filter(t=>isTaskDone(t.id)).length;
-    return `<div class="stage-zone"><div class="sz-label"><b>${title}</b><span class="sz-count">${d}/${secTasks.length}</span></div>
-      <div class="station-grid">${secTasks.map(stHTML).join('')}</div></div>`;
-  };
-  const PHASE=['阶段一','阶段二','阶段三','阶段四','阶段五'];
+  // RPG 室内场景：任务=房间里的设备，按楼层摆放，楼梯上楼
+  // 楼层切分：普通任务分到各层，隐藏挑战放最后一层
   const regs=tasks.filter(t=>!String(t.id).includes('hidden'));
   const hiddens=tasks.filter(t=>String(t.id).includes('hidden'));
-  const size=Math.max(4,Math.ceil(regs.length/4));
-  let floorHTML='';
-  for(let i=0;i<regs.length;i+=size) floorHTML+=szHTML(PHASE[i/size]||('第'+(i/size+1)+'阶段'), regs.slice(i,i+size));
-  if(hiddens.length) floorHTML+=szHTML('🌶 隐藏挑战', hiddens);
+  const nFlr = Math.min(3, Math.max(2, Math.ceil(regs.length/7)));
+  const perFlr = Math.ceil(regs.length/nFlr);
+  const flrTasks=[];
+  for(let fi=0;fi<nFlr;fi++) flrTasks.push(regs.slice(fi*perFlr, (fi+1)*perFlr));
+  if(hiddens.length) flrTasks[flrTasks.length-1] = flrTasks[flrTasks.length-1].concat(hiddens);
+  window._roomFlr = Math.min(window._roomFlr||0, flrTasks.length-1);
+  const fi = window._roomFlr;
+  const ft = flrTasks[fi]||[];
+  const flrDone = ft.length>0 && ft.every(t=>isTaskDone(t.id));
+  const hasNext = fi < flrTasks.length-1;
+  // 设备摆放（每行最多5个）
+  const tpos=(i,n)=>{ const per=5, r=Math.floor(i/per), c=i%per; const rw=Math.floor(n/per)+1;
+    const top = 14 + r*(64/rw) + (rw>1?6:0); const left = 8 + c*18; return {top:top+'%', left:left+'%'}; };
+  const ftHTML = ft.map((t,i)=>{
+    const done=isTaskDone(t.id), next=(!done&&t===cur);
+    const cls=done?'done':(next?'next':'todo');
+    const pos=tpos(i,ft.length);
+    return `<div class="rs-task ${cls}" style="left:${pos.left};top:${pos.top}" onclick="enterLevel('${lv.id}','${t.id}')" title="${t.title||t.name||t.label||''}">
+      <span class="rt-icon">${TASK_ICON[t.type]||'📌'}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
+    </div>`;
+  }).join('');
+  const stairsCls = (flrDone&&hasNext)?'open':'locked';
+  const stairsHTML = hasNext ? `<div class="rs-stairs ${stairsCls}" ${flrDone&&hasNext?'onclick="nextRoomFloor()"':''}>🪜</div>` : '';
+  const doneCnt=ft.filter(t=>isTaskDone(t.id)).length;
+  const sceneHTML = `<div class="room-scene">
+    <div class="rs-floor"></div>
+    <div class="rs-door"></div>
+    <div class="rs-label">${fi+1}F · ${flrDone?'✅ 本层完成':doneCnt+'/'+ft.length}</div>
+    <div class="rs-console"></div>
+    ${ftHTML}
+    ${stairsHTML}
+    <div class="rs-npc">👷</div>
+  </div>`;
+  const rfHint = flrDone&&hasNext ? '本层任务完成，点击🪜楼梯上楼 →' : (cur?'点发光的设备开始任务':'本层已完成');
   const games=GAME_TAGS[lv.factoryArea]||[];
   const narr=(lv.narrative&&typeof lv.narrative==='object'&&lv.narrative.intro)?lv.narrative.intro:(typeof lv.narrative==='string'?lv.narrative:'');
   const room=$('room');
@@ -932,8 +961,8 @@ function openRoom(id){
     </div>
     <div class="room-progress"><div class="rp-bar"><div class="rp-fill" style="width:${prog.pct}%"></div></div><div class="rp-txt">已完成 ${prog.done}/${prog.total}（${prog.pct}%） · ⚡ ${earnedXP}/${totalXP} XP · 🏆 ${starStr(Math.max(st.self||0,st.teacher||0))}</div></div>
     <div class="room-narr"><div class="rt-who">👷 厂长</div>${narr||'加油，把这一层的任务打通！'}</div>
-    <div class="room-floor">
-      ${floorHTML}
+    ${sceneHTML}
+    <div class="rs-foot">
       <div class="rt-sec">🎮 关联小游戏</div>
       <div class="games">${games.length?games.map(g=>`<span class="game-chip">${g}</span>`).join(''):'<span class="game-chip">-</span>'}</div>
     </div>
@@ -945,6 +974,8 @@ function openRoom(id){
   room.classList.add('show');
 }
 function closeRoom(){ $('room').classList.remove('show'); if(musOn){ try{ musPlay('hub'); }catch(e){} } }
+function nextRoomFloor(){ if(typeof window._roomFlr==='number') window._roomFlr++; openRoom(currentRoomId); }
+let currentRoomId=null;
 function enterLevel(id, taskId){
   closeRoom();
   try{ if(id) sessionStorage.setItem('mapRoom', id); }catch(e){}
