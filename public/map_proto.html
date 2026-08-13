@@ -103,10 +103,12 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .parking::before{content:"";position:absolute;inset:8px 6px;background:repeating-linear-gradient(90deg,transparent 0 14px,#3a4568 14px 16px,transparent 16px 30px);opacity:.4}
 .parking .pk-pole{position:absolute;left:8px;top:8px;width:2px;height:12px;background:#3a4560;border:1px solid #04060c}
 .parking .pk-arm{position:absolute;left:10px;top:8px;width:14px;height:2px;background:#ff5252;transform-origin:left;animation:armUp 4s ease-in-out infinite}
-@keyframes armUp{0%,60%,100%{transform:rotate(0)}75%,95%{transform:rotate(60deg)}}
-.pk-car{position:absolute;bottom:4px;font-size:15px}
-.pk-car.c1{left:8px}
-.pk-car.c2{right:6px;font-size:13px}
+@keyframes armUp{0%,8%,30%,100%{transform:rotate(0)}12%,24%{transform:rotate(58deg)}}
+.pk-car{position:absolute;top:50%;transform:translateY(-50%);font-size:15px;opacity:0;will-change:left}
+.pk-car.cA{animation:carA 11s linear infinite}
+.pk-car.cB{animation:carB 13s linear infinite 2.5s;font-size:13px}
+@keyframes carA{0%{left:-26px;opacity:0}9%{opacity:1}24%{left:26px}30%{left:26px}52%{left:26px}74%{left:62px}92%{left:112px;opacity:1}100%{left:118px;opacity:0}}
+@keyframes carB{0%{left:112px;opacity:0}9%{opacity:1}24%{left:62px}52%{left:62px}74%{left:26px}92%{left:-22px;opacity:1}100%{left:-28px;opacity:0}}
 /* 像素树 */
 .p-tree{position:relative;display:inline-block;width:18px;height:22px}
 .p-tree .pt-trunk{position:absolute;left:7px;bottom:0;width:4px;height:8px;background:#6b4a2b;border:1px solid #04060c}
@@ -151,6 +153,27 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .lg-flask .lgf-neck{position:absolute;left:9px;top:0;width:3px;height:3px;border:1px solid var(--c);border-bottom:none}
 .lg-flask .lgf-body{position:absolute;left:6px;top:2px;width:10px;height:6px;border:1px solid var(--c);border-radius:0 0 5px 5px}
 .lg-flask .lgf-liquid{position:absolute;left:7px;bottom:1px;width:8px;height:3px;background:var(--c);box-shadow:0 0 4px var(--cg);border-radius:0 0 4px 4px}
+/* 伸缩门开关（有车进出） */
+.gate .bar{animation:gateSlide 9s ease-in-out infinite}
+@keyframes gateSlide{0%,55%,100%{transform:translateY(-50%) scaleX(1);opacity:.65}64%,88%{transform:translateY(-50%) scaleX(.25);opacity:1}}
+/* 水塔滴水 + 警示灯 */
+.water-tower .wt-drop{position:absolute;left:50%;top:30px;width:2px;height:3px;background:#7deaff;border-radius:50% 50% 2px 2px;opacity:0;animation:wtDrip 3s ease-in infinite}
+@keyframes wtDrip{0%{transform:translateY(0);opacity:0}12%{opacity:.85}100%{transform:translateY(16px);opacity:0}}
+.wt-tank::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:-4px;width:4px;height:4px;border-radius:50%;background:#ff6d00;box-shadow:0 0 6px #ff6d00;animation:blink 1.4s infinite}
+/* 储罐指示灯 */
+.tk::before{content:"";position:absolute;left:6px;top:-3px;width:3px;height:3px;border-radius:50%;background:#ff5252;animation:blink 2s infinite}
+/* 天空小鸟 */
+.sky-bird{position:absolute;color:#9aa3bd;font-size:10px;z-index:3;pointer-events:none;animation:fly 42s linear infinite}
+.sky-bird.b2{top:13%;animation-duration:55s;animation-delay:9s;font-size:8px}
+@keyframes fly{from{left:-24px}to{left:104%}}
+/* 无人机 */
+.drone{position:absolute;top:6%;left:110%;z-index:3;width:22px;height:10px;pointer-events:none;animation:droneX 34s linear infinite}
+@keyframes droneX{to{left:-14%}}
+.dr-body{position:absolute;left:6px;top:3px;width:10px;height:4px;background:#2a3852;border:1px solid #04060c;border-radius:2px}
+.dr-rotor{position:absolute;left:4px;top:0;width:6px;height:2px;background:#4a5570;border:1px solid #04060c;animation:spin .18s linear infinite}
+.dr-rotor.r2{left:13px}
+@keyframes spin{from{transform:scaleX(1)}50%{transform:scaleX(.3)}to{transform:scaleX(1)}}
+.dr-light{position:absolute;left:14px;top:1px;width:2px;height:2px;border-radius:50%;background:#ff5252;box-shadow:0 0 5px #ff5252;animation:blink .5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 /* ===== 新建筑（工业骨架+赛博皮肤）===== */
 .building{--c:#00bcd4;--cg:rgba(0,188,212,.5);--sh:74px;--bh:56px;
@@ -353,6 +376,8 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 
   <div id="map">
     <div class="compound">
+      <div class="sky-bird">〰</div><div class="sky-bird b2">〰</div>
+      <div class="drone"><i class="dr-rotor"></i><i class="dr-body"></i><i class="dr-rotor r2"></i><i class="dr-light"></i></div>
 
       <!-- 厂区入口 -->
       <div class="entrance">
@@ -399,7 +424,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       <!-- 动力站区 -->
       <div class="utility-zone">
         <span class="ut-label">动力站 · 储罐区</span>
-        <div class="water-tower"><i class="wt-legs"></i><i class="wt-tank"></i><i class="wt-roof"></i></div>
+        <div class="water-tower"><i class="wt-legs"></i><i class="wt-tank"></i><i class="wt-roof"></i><i class="wt-drop"></i></div>
         <div class="tanks"><i class="tk"></i><i class="tk tk2"></i></div>
       </div>
 
@@ -553,7 +578,7 @@ function facilityHTML(kind){
   const gameFac=[{x:16,y:11,w:20,h:16,t:'screen',l:'glow',a:'breath'},{x:11,y:32,w:5,h:5,t:'round',l:'glow',a:'flick'},{x:19,y:32,w:5,h:5,t:'round',l:'glow',a:'flick'},{x:27,y:32,w:5,h:5,t:'round',l:'glow',a:'flick'},{x:35,y:32,w:5,h:5,t:'round',l:'warm',a:'tw'},{x:43,y:32,w:5,h:5,t:'round',l:'warm',a:'tw'},{x:51,y:32,w:5,h:5,t:'round',l:'dark',a:''}];
   const resFac=[{x:16,y:12,w:16,h:10,t:'screen',l:'glow',a:'breath'},{x:9,y:29,w:11,h:8,t:'sq',l:'warm',a:'tw'},{x:22,y:29,w:11,h:8,t:'sq',l:'cy',a:'tw'},{x:35,y:29,w:11,h:8,t:'sq',l:'warm',a:'tw'},{x:48,y:29,w:11,h:8,t:'sq',l:'dark',a:''}];
   if(kind==='rest') return `<div class="fac-cell" onclick="facPop('rest')"><div class="pavilion"><i class="pv-roof"></i><i class="pv-post p1"></i><i class="pv-post p2"></i><i class="pv-bench"></i></div><div class="fac-sub">凉亭 · 长椅 · 树荫</div></div>`;
-  if(kind==='park') return `<div class="fac-cell" onclick="facPop('park')"><div class="parking"><i class="pk-pole"></i><i class="pk-arm"></i><span class="pk-car c1">🚙</span><span class="pk-car c2">🚗</span></div><div class="fac-sub">叉车 · 货车 · 班车</div></div>`;
+  if(kind==='park') return `<div class="fac-cell" onclick="facPop('park')"><div class="parking"><i class="pk-pole"></i><i class="pk-arm"></i><span class="pk-car cA">🚙</span><span class="pk-car cB">🚗</span></div><div class="fac-sub">叉车 · 货车 · 班车</div></div>`;
   const c= kind==='game' ? {name:'游戏房',color:'#ff8ac2',facade:gameFac,awn:true,sub:'<em>翻牌·快打·防御战·小蜜蜂</em>'}
     : {name:'研发中心',color:'#64b5f6',facade:resFac,awn:false,sub:'术语 · 图鉴 · 排行榜 · 成就'};
   const [r,g,b]=hex2rgb(c.color); const cg=`rgba(${r},${g},${b},.5)`;
