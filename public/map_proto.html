@@ -154,6 +154,20 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 /* 伸缩门开关（有车进出） */
 .gate .bar{animation:gateSlide 9s ease-in-out infinite}
 @keyframes gateSlide{0%,55%,100%{transform:translateY(-50%) scaleX(1);opacity:.65}64%,88%{transform:translateY(-50%) scaleX(.25);opacity:1}}
+/* 信号灯塔 */
+.signal-tower{position:absolute;left:-22px;bottom:-26px;width:18px;height:78px;pointer-events:none;z-index:3}
+.st-pole{position:absolute;left:7px;top:16px;bottom:2px;width:3px;background:repeating-linear-gradient(180deg,#3a4560 0 4px,#20283c 4px 6px);border:1px solid #04060c}
+.st-cross{position:absolute;left:5px;width:8px;height:2px;background:#3a4560;border:1px solid #04060c}
+.st-cross.c1{top:26px}
+.st-cross.c2{top:40px}
+.st-cross.c3{top:54px}
+.st-cabin{position:absolute;left:4px;top:6px;width:10px;height:12px;background:#1a2238;border:2px solid #04060c}
+.st-cabin::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:5px;height:5px;background:#ffd98a;box-shadow:0 0 8px #ffd98a;animation:blink 1.2s infinite}
+.st-beam{position:absolute;left:50%;top:12px;width:44px;height:54px;transform-origin:50% 0;
+  background:conic-gradient(from 90deg at 50% 0,transparent 12deg,rgba(255,230,120,.13) 42deg,transparent 72deg);
+  animation:stSweep 6s ease-in-out infinite}
+@keyframes stSweep{0%,100%{transform:rotate(-32deg);opacity:.7}50%{transform:rotate(32deg);opacity:1}}
+.st-beacon{position:absolute;left:50%;transform:translateX(-50%);top:-3px;width:4px;height:4px;border-radius:50%;background:#ff5252;box-shadow:0 0 9px #ff5252;animation:blink 1.1s infinite}
 /* 水塔滴水 + 警示灯 */
 .water-tower .wt-drop{position:absolute;left:50%;top:30px;width:2px;height:3px;background:#7deaff;border-radius:50% 50% 2px 2px;opacity:0;animation:wtDrip 3s ease-in infinite}
 @keyframes wtDrip{0%{transform:translateY(0);opacity:0}12%{opacity:.85}100%{transform:translateY(16px);opacity:0}}
@@ -499,7 +513,9 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
           <div class="boss-bubble" id="bossBubble">厂长：欢迎来到锐智工厂！</div>
         </div>
       </div>
-      <div class="gate"><div class="bar"></div><div class="guard"></div></div>
+      <div class="gate"><div class="bar"></div><div class="guard"></div>
+        <div class="signal-tower"><i class="st-pole"></i><i class="st-cross c1"></i><i class="st-cross c2"></i><i class="st-cross c3"></i><i class="st-cabin"></i><i class="st-beam"></i><i class="st-beacon"></i></div>
+      </div>
 
       <!-- 闯关路线条 -->
       <div class="route-bar" id="routeBar"></div>
