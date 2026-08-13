@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>像素画风参考 · 地图素材预览</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    background:#0e1420; color:#e8eef7; padding:28px 20px 60px;
+  }
+  .wrap { max-width:1100px; margin:0 auto; }
+  h1 { font-size:26px; margin-bottom:6px; }
+  .sub { color:#9fb0c8; font-size:14px; margin-bottom:26px; }
+  .hint {
+    background:#1a2334; border:1px solid #2c3a55; border-radius:10px;
+    padding:12px 16px; font-size:13px; color:#b7c6dd; margin-bottom:30px; line-height:1.7;
+  }
+  .group { margin-bottom:40px; }
+  .group h2 {
+    font-size:18px; margin-bottom:4px; display:flex; align-items:center; gap:8px;
+  }
+  .tag {
+    font-size:11px; padding:2px 8px; border-radius:20px; background:#243147; color:#a7d8ff;
+  }
+  .tag.free { background:#1e3a2b; color:#8be3a8; }
+  .group .desc { color:#9fb0c8; font-size:13px; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+  .card {
+    background:#151e2e; border:1px solid #2a3852; border-radius:12px; overflow:hidden;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.45); }
+  .card img { width:100%; display:block; aspect-ratio:3/2; object-fit:cover; background:#0a0f18; }
+  .card .name { padding:10px 14px; font-size:13px; color:#cdd8ea; }
+  .card .src { padding:0 14px 12px; font-size:11px; color:#7c8ca6; word-break:break-all; }
+  .foot { margin-top:40px; padding-top:16px; border-top:1px solid #243150; font-size:12px; color:#7c8ca6; line-height:1.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎨 地图画风参考预览</h1>
+  <div class="sub">从 CraftPix 免费素材里挑的 5 张预览图，先看看喜欢哪个方向（纯参考，确认后再决定用 CC0 素材 / CSS 手绘 / 生成）</div>
+
+  <div class="hint">
+    💡 <b>怎么看：</b>手机或电脑浏览器打开 <code>http://IP:3000/tileset_preview.html</code>，点开大图看细节。
+    每张都是 <b>1800×1200</b> 的预览图。这些是 CraftPix 免费素材（Freebies，可商用免版税），
+    不是最终素材，只是让你定 <b>风格方向</b>。
+  </div>
+
+  <div class="group">
+    <h2>🏭 工业区 Tileset <span class="tag free">免费 · 可商用</span></h2>
+    <div class="desc">经典像素工厂：厂房、仓库、烟囱、管道。整体偏 <b>暗色工业风</b>，最贴近"锐智工厂"的设定。</div>
+    <div class="grid">
+      <div class="card"><img src="tileset_preview_assets/industrial_1.jpg" alt="工业区 1"><div class="name">工业区 · 全貌（厂房 + 烟囱）</div><div class="src">craftpix.net/freebies/free-industrial-zone-tileset-pixel-art</div></div>
+      <div class="card"><img src="tileset_preview_assets/industrial_2.jpg" alt="工业区 2"><div class="name">工业区 · 建筑细节</div><div class="src">同上</div></div>
+      <div class="card"><img src="tileset_preview_assets/industrial_3.jpg" alt="工业区 3"><div class="name">工业区 · 环境件</div><div class="src">同上</div></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <h2>🤖 赛博工厂 Tileset <span class="tag free">免费 · 可商用</span></h2>
+    <div class="desc">32×32 像素，<b>未来工业科幻风</b>：锈蚀钢架、机械、管道、通风井、霓虹。适合把地图做得更"酷"、更游戏化。</div>
+    <div class="grid">
+      <div class="card"><img src="tileset_preview_assets/cyberpunk_factory.jpg" alt="赛博工厂"><div class="name">赛博工厂 · 全貌</div><div class="src">craftpix.net/freebies/free-factory-pixel-art-32x32-tileset-for-cyberpunk</div></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <h2>⚡ 电厂 Tileset <span class="tag free">免费 · 可商用</span></h2>
+    <div class="desc">SCI-FI 电厂：冷却塔、发电机组、控制面板、线缆、灯光，带<b>白天/夜晚双背景</b>。可做"电力/能源"相关场景。</div>
+    <div class="grid">
+      <div class="card"><img src="tileset_preview_assets/power_station.jpg" alt="电厂"><div class="name">电厂 · 全貌</div><div class="src">craftpix.net/freebies/power-station-free-tileset-pixel-art</div></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    备注：以上均为 CraftPix <b>Freebies 免费素材</b>（免版税，可商用，免费下载）。<br>
+    如果你想要其它风格（明快卡通 / 复古 8-bit / 暗黑废墟 / 手绘），我可以再去找 OpenGameArt、Kenney、itch.io 等站的 CC0 素材，或直接用 imagegen 生成原创像素素材。
+  </div>
+</div>
+</body>
+</html>
