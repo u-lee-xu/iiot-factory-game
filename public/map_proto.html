@@ -44,10 +44,8 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
     radial-gradient(120% 90% at 50% 0%, rgba(30,50,95,.18), transparent 60%),
     linear-gradient(180deg,#0d1226,#0a0e1c)}
 /* 厂区入口 */
-.entrance{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 14px 12px;background:linear-gradient(180deg,rgba(255,179,64,.06),transparent)}
-.gate-sign{text-align:center;flex:none;min-width:200px}
-.gate-sign .t{font-size:18px;letter-spacing:6px;color:var(--amber);text-shadow:0 0 12px rgba(255,179,64,.6)}
-.gate-sign .s{font-size:10px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.entrance{position:relative;display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 14px 12px;background:linear-gradient(180deg,rgba(255,179,64,.06),transparent)}
+
 .gate{position:relative;width:min(420px,80vw);height:26px;margin:6px auto 0;border-top:2px solid #3a4568;border-bottom:2px solid #3a4568;background:rgba(20,26,46,.6)}
 .gate::before{content:"";position:absolute;left:0;top:-4px;bottom:-4px;width:6px;background:linear-gradient(180deg,#56617e,#2a3040);border:2px solid #0a0d18}
 .gate::after{content:"";position:absolute;right:0;top:-4px;bottom:-4px;width:6px;background:linear-gradient(180deg,#56617e,#2a3040);border:2px solid #0a0d18}
@@ -499,10 +497,6 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
         <div class="boss" id="boss">
           <span class="boss-sprite">👷</span>
           <div class="boss-bubble" id="bossBubble">厂长：欢迎来到锐智工厂！</div>
-        </div>
-        <div class="gate-sign">
-          <div class="t">锐 智 工 厂</div>
-          <div class="s">· 工业互联网实训基地 ·</div>
         </div>
       </div>
       <div class="gate"><div class="bar"></div><div class="guard"></div></div>
