@@ -489,12 +489,11 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 /* 厂长 NPC（站在门口右侧） */
 .rs-npc{position:absolute;left:18px;top:16px;font-size:24px;z-index:6;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
 /* 俯视玩家小人（与横版同款像素小人） */
-.rs-player{position:absolute;z-index:9;width:18px;height:26px;left:48%;top:60%;pointer-events:none;transition:left .42s ease,top .42s ease}
+.rs-player{position:absolute;z-index:9;width:18px;height:26px;left:48%;top:58%;pointer-events:none;transition:left .42s ease,top .42s ease}
 .rs-player .pl{position:absolute;image-rendering:pixelated}
-.rs-player .h-rim{left:0;top:0;width:18px;height:5px;background:#ffb340;box-shadow:inset 0 -2px 0 #b8731f}
-.rs-player .h-top{left:4px;top:2px;width:10px;height:6px;background:#ffc966;box-shadow:inset 0 2px 0 #ffdfa0}
-.rs-player .face{left:4px;top:7px;width:10px;height:6px;background:#f0c89a}
-.rs-player .eye{left:6px;top:9px;width:2px;height:2px;background:#2a2130}
+.rs-player .hair{left:3px;top:0;width:12px;height:5px;background:#3a2a20;box-shadow:inset 0 -1px 0 #241a12}
+.rs-player .face{left:4px;top:5px;width:10px;height:8px;background:#f0c89a}
+.rs-player .eye{left:6px;top:7px;width:2px;height:2px;background:#2a2130}
 .rs-player .body{left:2px;top:13px;width:14px;height:8px;background:#3d6df2;box-shadow:inset 0 -2px 0 #2748b0}
 .rs-player .belt{left:2px;top:15px;width:14px;height:2px;background:#1d2f6e}
 .rs-player .leg.l{left:2px;top:21px;width:6px;height:5px;background:#2a3852}
@@ -583,22 +582,22 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .sx-task.near{border-color:var(--amber);transform:scale(1.1);z-index:8}
 .sx-task.near::before{content:"点击进入";position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:2px 7px;border-radius:8px;white-space:nowrap;z-index:9}
 /* 玩家：精细 8bit 像素小人（安全帽+工装+手臂，会走路） */
-.sx-player{position:absolute;z-index:9;width:26px;height:38px}
+.sx-player{position:absolute;z-index:9;width:26px;height:40px}
 .sx-player .pl{position:absolute;image-rendering:pixelated}
-.sx-player .h-rim{left:0;top:0;width:26px;height:8px;background:#ffb340;box-shadow:inset 0 -4px 0 #b8731f}
-.sx-player .h-top{left:6px;top:3px;width:14px;height:9px;background:#ffc966;box-shadow:inset 0 3px 0 #ffdfa0}
-.sx-player .face{left:6px;top:10px;width:14px;height:9px;background:#f0c89a}
-.sx-player .eye{left:9px;top:13px;width:3px;height:3px;background:#2a2130;box-shadow:5px 0 0 #2a2130}
-.sx-player .body{left:3px;top:19px;width:20px;height:12px;background:#3d6df2;box-shadow:inset 0 -4px 0 #2748b0}
-.sx-player .belt{left:3px;top:23px;width:20px;height:3px;background:#1d2f6e}
-.sx-player .arm.l{left:-2px;top:19px;width:6px;height:10px;background:#3d6df2;box-shadow:inset -2px 0 0 #2748b0}
-.sx-player .arm.r{right:-2px;top:19px;width:6px;height:10px;background:#2f57cf;box-shadow:inset 2px 0 0 #1d3a9a}
-.sx-player .hand.l{left:0;top:27px;width:3px;height:4px;background:#f0c89a}
-.sx-player .hand.r{right:0;top:27px;width:3px;height:4px;background:#f0c89a}
-.sx-player .leg.l{left:4px;top:31px;width:8px;height:7px;background:#2a3852}
-.sx-player .leg.r{left:14px;top:31px;width:8px;height:7px;background:#22304a}
-.sx-player .boot.l{left:3px;top:36px;width:9px;height:3px;background:#1d2440}
-.sx-player .boot.r{left:14px;top:36px;width:9px;height:3px;background:#1d2440}
+.sx-player .hair{left:4px;top:0;width:18px;height:8px;background:#3a2a20;box-shadow:inset 0 -2px 0 #241a12}
+.sx-player .hair::after{content:"";position:absolute;left:4px;top:6px;width:10px;height:4px;background:#3a2a20;border-radius:50% 50% 0 0}
+.sx-player .face{left:6px;top:7px;width:14px;height:12px;background:#f0c89a}
+.sx-player .eye{left:9px;top:11px;width:3px;height:3px;background:#2a2130;box-shadow:5px 0 0 #2a2130}
+.sx-player .body{left:3px;top:20px;width:20px;height:12px;background:#3d6df2;box-shadow:inset 0 -4px 0 #2748b0}
+.sx-player .belt{left:3px;top:24px;width:20px;height:3px;background:#1d2f6e}
+.sx-player .arm.l{left:-2px;top:20px;width:6px;height:10px;background:#3d6df2;box-shadow:inset -2px 0 0 #2748b0}
+.sx-player .arm.r{right:-2px;top:20px;width:6px;height:10px;background:#2f57cf;box-shadow:inset 2px 0 0 #1d3a9a}
+.sx-player .hand.l{left:0;top:28px;width:3px;height:4px;background:#f0c89a}
+.sx-player .hand.r{right:0;top:28px;width:3px;height:4px;background:#f0c89a}
+.sx-player .leg.l{left:4px;top:32px;width:8px;height:7px;background:#2a3852}
+.sx-player .leg.r{left:14px;top:32px;width:8px;height:7px;background:#22304a}
+.sx-player .boot.l{left:3px;top:37px;width:9px;height:3px;background:#1d2440}
+.sx-player .boot.r{left:14px;top:37px;width:9px;height:3px;background:#1d2440}
 .sx-player.flip{transform:scaleX(-1)}
 .sx-player::after{content:"";position:absolute;left:2px;right:2px;top:38px;height:3px;background:rgba(0,0,0,.45);filter:blur(1px)}
 /* 走路动画 */
@@ -1153,10 +1152,13 @@ function openRoom(id){
         <div class="sx-ground"></div>${propHTML}${platHTML}${taskElsHTML}
         <div class="sx-stairs" id="sxStairs">🪜</div>
         <div class="sx-player" id="sxPlayer">
-          <span class="pl h-rim"></span><span class="pl h-top"></span>
+          <span class="pl hair"></span>
           <span class="pl face"></span><span class="pl eye"></span>
           <span class="pl body"></span><span class="pl belt"></span>
-          <span class="pl leg l"></span><span class="pl leg r"></span>
+          <span class="pl arm l"></span><span class="pl hand l"></span>
+          <span class="pl arm r"></span><span class="pl hand r"></span>
+          <span class="pl leg l"></span><span class="pl boot l"></span>
+          <span class="pl leg r"></span><span class="pl boot r"></span>
         </div>
       </div>
       <div class="sx-hud"><div class="sx-hint">点击地面小人走过去 · <b>←→</b> 移动 · <b>↑</b> 跳跃</div><div class="sx-btns">
@@ -1178,7 +1180,7 @@ function openRoom(id){
       ${stairsHTML}
       <div class="rs-npc">👷</div>
       <div class="rs-player" id="rsPlayer">
-        <span class="pl h-rim"></span><span class="pl h-top"></span>
+        <span class="pl hair"></span>
         <span class="pl face"></span><span class="pl eye"></span>
         <span class="pl body"></span><span class="pl belt"></span>
         <span class="pl leg l"></span><span class="pl leg r"></span>
