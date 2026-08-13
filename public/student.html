@@ -1082,6 +1082,7 @@ body:has(.mm-overlay) { overflow: hidden; }
 </head>
 <body>
 <!-- Header -->
+<div id="mapCrumb" style="display:none;background:#0a0e1c;border-bottom:1px solid var(--border);color:var(--amber);font-size:12px;padding:5px 12px;letter-spacing:1px"></div>
 <div class="header">
   <div class="h-left">
     <span class="logo">⚙</span>
@@ -2301,7 +2302,7 @@ function renderMission() {
 // 自带讲解的类型（内部已调用generateTeach + addDirectorBox）
 var selfTeachTypes = ['terminal', 'quiz', 'chain_quiz', 'fill_blank', 'drag_classify', 'install_wizard', 'progress_bar'];
 
-function openTaskModal(lvId, taskId) {
+function openTaskModal(lvId, taskId, onOpen) {
   const lv = content.levels.find(l => l.id === lvId);
   if (!lv) return;
   const task = lv.tasks.find(t => t.id === taskId);
@@ -2331,6 +2332,7 @@ function openTaskModal(lvId, taskId) {
       const handler = getInteraction(task.type);
       if (!handler) {
         body.innerHTML = '<div style="text-align:center;padding:20px;color:var(--dim)">⚠️ 未知任务类型: ' + task.type + '</div>';
+        if (typeof onOpen === 'function') onOpen();
         return;
       }
       handler.render(body, task);
@@ -2338,6 +2340,7 @@ function openTaskModal(lvId, taskId) {
     // 任务道具（商城买的：提示卡 / 免错金牌）
     window.__passActive = false;
     addTaskItemBar(task);
+    if (typeof onOpen === 'function') onOpen();
   });
 }
 
@@ -10626,6 +10629,9 @@ function logout() {
 // 13. INIT
 // =========================================================================
 async function init() {
+  const _urlQ = new URLSearchParams(location.search);
+  const _fromMap = !!( _urlQ.get('task') || _urlQ.get('level') || _urlQ.get('open') );
+  if (_fromMap) { try { sessionStorage.setItem('mapFlow', '1'); } catch(e){} }
   await loadGameContent();
   if (!content) {
     document.getElementById('missionTitle').textContent = '无法加载游戏内容';
@@ -10683,11 +10689,27 @@ init().then(() => {
   const openFeat = p.get('open');
   const backBtn = document.getElementById('backMapBtn');
   if (backBtn && (taskId || levelId || openFeat)) backBtn.style.display = '';
+  const _crumbEl = document.getElementById('mapCrumb');
+  if (_crumbEl && (taskId || levelId || openFeat)) _crumbEl.style.display = '';
   if (taskId || levelId || openFeat) { try { sessionStorage.setItem('mapFlow', '1'); } catch(e){} }
   if (openFeat) {
     const featMap = { game: openGameZone, pedia: openPedia, leaderboard: openLeaderboard, achievements: openAchievements, wallet: openWallet };
     const fn = featMap[openFeat];
     if (fn) setTimeout(() => { try { fn(); } catch(e){} }, 600);
+  }
+  if (taskId || levelId || openFeat) {
+    // 顶部面包屑：明确是在厂区地图的任务流
+    let crumb = '';
+    if (taskId || levelId) {
+      const _lv = content.levels.find(l => (taskId ? (l.tasks || []).some(t => String(t.id) === taskId) : String(l.id) === levelId));
+      const _t = taskId ? (_lv && _lv.tasks.find(t => String(t.id) === taskId)) : null;
+      crumb = '🗺️ 厂区地图 › ' + (_lv ? _lv.areaName : '') + (_t ? ' · ' + _t.title : '');
+    } else {
+      const _names = { game: '游戏专区', pedia: '术语图鉴', leaderboard: '排行榜', achievements: '成就', wallet: '工资与商城' };
+      crumb = '🗺️ 厂区地图 › ' + (_names[openFeat] || '');
+    }
+    const _bc = document.getElementById('mapCrumb');
+    if (_bc) _bc.textContent = crumb;
   }
   if (taskId || levelId) {
     let lv = null;
@@ -10696,7 +10718,10 @@ init().then(() => {
     if (lv) {
       const realTask = taskId ? lv.tasks.find(t => String(t.id) === taskId) : null;
       selectLevel(lv.id);
-      if (realTask) setTimeout(() => openTaskModal(lv.id, realTask.id), 400);
+      if (realTask) {
+        // 排进登录弹窗队列之后打开：欢迎/改密逐个关完，再进任务前言，避免弹窗轰炸
+        enqueueLoginPopup(done => openTaskModal(lv.id, realTask.id, done));
+      }
     }
   }
 });
