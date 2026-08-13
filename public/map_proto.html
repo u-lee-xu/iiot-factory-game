@@ -506,84 +506,93 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 @keyframes stNext{0%,100%{box-shadow:0 0 8px rgba(255,179,64,.35)}50%{box-shadow:0 0 20px rgba(255,179,64,.75)}}
 @keyframes stArrow{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
 @keyframes stPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
-/* ===== 横版过关场景（side-scroll · 8bit 像素） ===== */
-.sx-scene{position:relative;height:300px;margin:0 18px 12px;border-radius:2px;overflow:hidden;
-  border:8px solid #2a3352;box-shadow:inset 0 0 0 2px #0a0d18,0 4px 0 rgba(0,0,0,.35);background:#0a0e22;touch-action:none}
+/* ===== 横版过关场景（side-scroll · 室内房间剖面 · 8bit） ===== */
+.sx-scene{position:relative;height:460px;margin:0 18px 12px;border-radius:2px;overflow:hidden;
+  border:10px solid #2c2a48;box-shadow:inset 0 0 0 2px #141222,0 4px 0 rgba(0,0,0,.4);background:#0a0e22;touch-action:none}
 .sx-stage{position:absolute;top:0;left:0;height:100%;will-change:transform}
-/* 背景：夜空 + 远处像素工厂天际线 + 扫描层 */
+/* 室内墙背景：亮暖灰，有墙裙与砖纹 */
 .sx-bg{position:absolute;inset:0;background:
-  linear-gradient(180deg,#0e1633 0%,#0b1029 42%,#090c20 100%)}
-.sx-bg::before{content:"";position:absolute;left:0;right:0;top:0;height:120px;background:
-  repeating-linear-gradient(90deg,
-    rgba(122,142,198,.16) 0 6px, transparent 6px 14px,
-    rgba(255,255,255,.03) 14px 20px, transparent 20px 30px,
-    rgba(82,108,178,.10) 30px 36px, transparent 36px 44px)}
-.sx-bg::after{content:"";position:absolute;left:0;right:0;top:60px;height:64px;background:
-  linear-gradient(180deg,transparent 0 70%,rgba(255,179,64,.05) 70% 100%)}
-/* 像素星星 */
-.sx-star{position:absolute;width:3px;height:3px;background:#9fb0d8;opacity:.5;box-shadow:0 0 4px rgba(159,176,216,.6)}
-/* 远处工厂剪影（像素建筑+烟囱） */
-.sx-skyline{position:absolute;left:0;right:0;bottom:26px;height:44px;opacity:.5;
-  background:linear-gradient(180deg,rgba(60,78,120,.5),rgba(30,42,74,.6))}
-.sx-skyline::before{content:"";position:absolute;left:0;right:0;bottom:0;height:100%;background:
-  repeating-linear-gradient(90deg,#1a2340 0 18px,transparent 18px 20px,#18203a 20px 34px,transparent 34px 36px)}
-/* 发光窗 */
-.sx-window{position:absolute;bottom:44px;width:8px;height:10px;background:rgba(255,179,64,.75);
-  box-shadow:0 0 8px rgba(255,179,64,.5);animation:blink 3.2s ease-in-out infinite}
-/* 地面：像素砖 + 高光 */
-.sx-ground{position:absolute;left:0;right:0;bottom:0;height:26px;background:
-  repeating-linear-gradient(90deg,#2a3352 0 16px,#232b49 16px 32px);border-top:3px solid #4a5a86;box-shadow:0 -2px 0 rgba(255,255,255,.04)}
-.sx-ground::before{content:"";position:absolute;left:0;right:0;top:3px;height:5px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 8px,transparent 8px 16px)}
-/* 平台：像素金属板 + 支撑 */
-.sx-platform{position:absolute;height:12px;background:
-  repeating-linear-gradient(90deg,#46568a 0 8px,#3a4a78 8px 16px);border:2px solid #0a0d18;border-bottom:none;border-radius:1px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
-.sx-platform::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.12)}
-/* 任务设备：像素机柜/终端 */
-.sx-task{position:absolute;width:54px;height:46px;z-index:5;background:#0a0e1c;border:2px solid #4a5a86;border-radius:1px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:4px 4px 0 rgba(0,0,0,.4),inset 0 0 0 2px rgba(255,255,255,.03);transition:transform .15s,border-color .2s}
-.sx-task::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:5px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 6px,#0a0e1c 6px 12px);opacity:.8}
-.sx-task .rt-icon{font-size:20px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.6))}
-.sx-task .rt-name{font-size:8px;color:#c3cbe0;margin-top:3px;max-width:50px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
-.sx-task.done{border-color:var(--green);background:rgba(0,230,118,.12)}
-.sx-task.done::before{background:repeating-linear-gradient(90deg,var(--green) 0 6px,#0a0e1c 6px 12px)}
+  linear-gradient(180deg,#3d4a72 0%,#38446a 58%,#333f63 100%)}
+.sx-bg::before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:
+  repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 22px,transparent 22px 44px),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 22px,transparent 22px 44px)}
+/* 墙裙（下部墙饰） */
+.sx-bg::after{content:"";position:absolute;left:0;right:0;height:110px;bottom:46px;
+  background:linear-gradient(180deg,#2c3558 0%,#262e4e 100%);
+  border-top:3px solid #4a5a86;border-bottom:3px solid #1d2440}
+/* 天花板：像素横梁 + 一排灯 */
+.sx-ceil{position:absolute;left:0;right:0;top:0;height:30px;z-index:2;
+  background:linear-gradient(180deg,#2c2a48,#211f3a);border-bottom:3px solid #141222;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.06)}
+.sx-ceil::after{content:"";position:absolute;left:0;right:0;top:12px;height:4px;
+  background:repeating-linear-gradient(90deg,#ffd9a0 0 26px,#ffb340 26px 28px,#ffd9a0 28px 54px);
+  opacity:.9;filter:drop-shadow(0 0 4px rgba(255,179,64,.6))}
+/* 房间挂画/仪表盘（墙上装饰） */
+.sx-deco{position:absolute;border:3px solid #141222;box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.sx-deco.pic{width:34px;height:26px;background:repeating-linear-gradient(135deg,#4a7fb0 0 8px,#3a6a9a 8px 16px)}
+.sx-deco.gauge{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 50% 45%,#7fd0ff 0 26%,#2a3a60 30% 60%,#1a2440 62%);box-shadow:0 0 8px rgba(127,208,255,.4)}
+.sx-deco.pipe{height:8px;background:linear-gradient(180deg,#5a6a9a,#3a4a78);border-left:none;border-right:none}
+/* 地板：厚实木地板 + 高光 */
+.sx-ground{position:absolute;left:0;right:0;bottom:0;height:46px;background:
+  repeating-linear-gradient(90deg,#6a5a3a 0 26px,#5a4c30 26px 52px);
+  border-top:4px solid #8a7a52;box-shadow:0 -2px 0 rgba(255,255,255,.12),inset 0 6px 0 rgba(255,255,255,.07)}
+.sx-ground::before{content:"";position:absolute;left:0;right:0;top:6px;height:3px;
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 13px,transparent 13px 26px)}
+/* 平台：像素金属平台（带支撑腿） */
+.sx-platform{position:absolute;height:14px;background:
+  repeating-linear-gradient(90deg,#6a7aae 0 10px,#5a6a9a 10px 20px);border:2px solid #141222;border-radius:1px;box-shadow:3px 3px 0 rgba(0,0,0,.4)}
+.sx-platform::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,.22)}
+.sx-platform::after{content:"";position:absolute;left:12px;top:14px;width:4px;height:60px;background:#2a2f4e;box-shadow:40px 0 0 #2a2f4e,80px 0 0 #2a2f4e}
+/* 任务设备：像素机柜/终端（放大） */
+.sx-task{position:absolute;width:66px;height:56px;z-index:6;background:#141a30;border:2px solid #5a6a9a;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.04);transition:transform .15s,border-color .2s}
+.sx-task::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:6px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 8px,#141a30 8px 16px);opacity:.9}
+.sx-task .rt-icon{font-size:26px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
+.sx-task .rt-name{font-size:10px;color:#dce4f5;margin-top:4px;max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000;letter-spacing:.5px}
+.sx-task.done{border-color:var(--green);background:rgba(0,230,118,.14)}
+.sx-task.done::before{background:repeating-linear-gradient(90deg,var(--green) 0 8px,#141a30 8px 16px)}
 .sx-task.done .rt-name{color:var(--green)}
-.sx-task.done::after{content:"✓";position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--green);color:#04140b;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
-.sx-task.next{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.7),4px 4px 0 rgba(0,0,0,.4);animation:stNext 1.6s ease-in-out infinite}
-.sx-task.next::before{background:repeating-linear-gradient(90deg,var(--amber) 0 6px,#0a0e1c 6px 12px)}
+.sx-task.done::after{content:"✓";position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--green);color:#04140b;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
+.sx-task.next{border-color:var(--amber);box-shadow:0 0 16px rgba(255,179,64,.75),5px 5px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
+.sx-task.next::before{background:repeating-linear-gradient(90deg,var(--amber) 0 8px,#141a30 8px 16px)}
 .sx-task.next .rt-name{color:var(--amber);font-weight:bold}
-.sx-task.todo{opacity:.7}
+.sx-task.todo{opacity:.82}
 .sx-task.todo:hover{opacity:1}
-.sx-task.near{border-color:var(--amber);transform:scale(1.12);z-index:7}
-.sx-task.near::before{content:"点击进入";position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);background:rgba(11,14,26,.92);border:1px solid var(--amber);padding:1px 6px;border-radius:8px;white-space:nowrap;z-index:8}
-/* 玩家：8bit 像素小人（安全帽+工装） */
-.sx-player{position:absolute;z-index:8;width:18px;height:26px}
+.sx-task.near{border-color:var(--amber);transform:scale(1.1);z-index:8}
+.sx-task.near::before{content:"点击进入";position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);background:rgba(11,14,26,.94);border:1px solid var(--amber);padding:2px 7px;border-radius:8px;white-space:nowrap;z-index:9}
+/* 玩家：8bit 像素小人（放大） */
+.sx-player{position:absolute;z-index:9;width:24px;height:34px}
 .sx-player .pl{position:absolute;image-rendering:pixelated}
-.sx-player .h-rim{left:0;top:0;width:18px;height:5px;background:#ffb340;box-shadow:inset 0 -2px 0 #b8731f}
-.sx-player .h-top{left:4px;top:2px;width:10px;height:6px;background:#ffc966;box-shadow:inset 0 2px 0 #ffdfa0}
-.sx-player .face{left:4px;top:7px;width:10px;height:6px;background:#f0c89a}
-.sx-player .eye{left:6px;top:9px;width:2px;height:2px;background:#2a2130}
-.sx-player .body{left:2px;top:13px;width:14px;height:8px;background:#3d6df2;box-shadow:inset 0 -2px 0 #2748b0}
-.sx-player .belt{left:2px;top:15px;width:14px;height:2px;background:#1d2f6e}
-.sx-player .leg.l{left:2px;top:21px;width:6px;height:5px;background:#2a3852}
-.sx-player .leg.r{left:10px;top:21px;width:6px;height:5px;background:#2a3852}
+.sx-player .h-rim{left:0;top:0;width:24px;height:7px;background:#ffb340;box-shadow:inset 0 -3px 0 #b8731f}
+.sx-player .h-top{left:5px;top:3px;width:14px;height:8px;background:#ffc966;box-shadow:inset 0 3px 0 #ffdfa0}
+.sx-player .face{left:5px;top:9px;width:14px;height:8px;background:#f0c89a}
+.sx-player .eye{left:8px;top:12px;width:3px;height:3px;background:#2a2130}
+.sx-player .body{left:3px;top:17px;width:18px;height:10px;background:#3d6df2;box-shadow:inset 0 -3px 0 #2748b0}
+.sx-player .belt{left:3px;top:20px;width:18px;height:3px;background:#1d2f6e}
+.sx-player .leg.l{left:3px;top:27px;width:8px;height:7px;background:#2a3852}
+.sx-player .leg.r{left:13px;top:27px;width:8px;height:7px;background:#2a3852}
 .sx-player.flip{transform:scaleX(-1)}
-.sx-player::after{content:"";position:absolute;left:1px;right:1px;top:24px;height:2px;background:rgba(0,0,0,.4);filter:blur(1px)}
+.sx-player::after{content:"";position:absolute;left:2px;right:2px;top:32px;height:3px;background:rgba(0,0,0,.45);filter:blur(1px)}
 /* 楼梯 */
-.sx-stairs{position:absolute;z-index:6;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;background:#10162a;border:2px solid #4a5a86;border-radius:2px;box-shadow:4px 4px 0 rgba(0,0,0,.4)}
+.sx-stairs{position:absolute;z-index:7;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;background:#1a2140;border:2px solid #5a6a9a;border-radius:2px;box-shadow:5px 5px 0 rgba(0,0,0,.45)}
 .sx-stairs.locked{opacity:.4;cursor:not-allowed}
-.sx-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.6),4px 4px 0 rgba(0,0,0,.4);animation:stNext 1.6s ease-in-out infinite}
-.sx-stairs.open::after{content:"上楼";position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);white-space:nowrap}
+.sx-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.6),5px 5px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
+.sx-stairs.open::after{content:"上楼";position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);white-space:nowrap}
 /* HUD */
-.sx-hud{position:absolute;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:space-between;align-items:flex-end;padding:0 6px 6px;pointer-events:none}
-.sx-hint{font-size:10px;color:#c3cbe0;background:rgba(11,14,26,.88);border:1px solid #3a4a78;padding:4px 9px;border-radius:2px;text-shadow:0 1px 0 #000}
+.sx-hud{position:absolute;left:0;right:0;bottom:0;z-index:11;display:flex;justify-content:space-between;align-items:flex-end;padding:0 8px 8px;pointer-events:none}
+.sx-hint{font-size:11px;color:#e2e9fb;background:rgba(13,16,34,.9);border:1px solid #4a5a86;padding:5px 10px;border-radius:3px;text-shadow:0 1px 0 #000}
 .sx-hint b{color:var(--amber)}
-.sx-btns{display:none;gap:9px;pointer-events:auto}
-.sx-btn{width:58px;height:58px;font-size:22px;border-radius:2px;background:rgba(10,14,28,.9);border:2px solid #4a5a86;color:var(--amber);cursor:pointer;user-select:none;touch-action:none;font-family:inherit;-webkit-tap-highlight-color:transparent;box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.sx-btns{display:none;gap:10px;pointer-events:auto}
+.sx-btn{width:62px;height:62px;font-size:24px;border-radius:3px;background:rgba(13,16,34,.92);border:2px solid #5a6a9a;color:var(--amber);cursor:pointer;user-select:none;touch-action:none;font-family:inherit;-webkit-tap-highlight-color:transparent;box-shadow:0 3px 0 rgba(0,0,0,.45)}
 .sx-btn:active{background:#2a3852;transform:translateY(2px);box-shadow:none}
 @media (hover:none),(pointer:coarse){
   .sx-btns{display:flex}
 }
-.sx-rotate{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:12;font-size:11px;color:var(--amber);background:rgba(11,14,26,.92);border:1px solid var(--amber);padding:4px 12px;border-radius:2px;display:none;white-space:nowrap;pointer-events:none}
+.sx-rotate{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:13;font-size:11px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:4px 12px;border-radius:3px;display:none;white-space:nowrap;pointer-events:none}
 .sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
+/* 竖屏/窄屏：场景保持较高 */
+@media (max-width:700px){
+  .sx-scene{height:430px}
+}
 /* ===== 房间界面 ===== */
 #room{position:fixed;inset:0;background:rgba(4,6,12,.84);display:none;align-items:center;justify-content:center;z-index:70;padding:14px}
 #room.show{display:flex}
@@ -657,10 +666,10 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
   .room-narr{grid-column:1;grid-row:3;margin:8px 10px 4px;overflow:auto}
   .rs-foot{grid-column:1;grid-row:4;overflow:auto;margin:0 10px 6px}
   .room-foot{grid-column:1;grid-row:5;padding:0 10px 10px}
-  .room-scene,.sx-scene{grid-column:2;grid-row:1/6;margin:10px 12px 10px 6px;
+  .room-scene,.sx-scene{grid-column:2;grid-row:1/6;margin:8px 10px 8px 6px;
     width:auto;align-self:center;justify-self:stretch}
   .room-scene{height:340px}
-  .sx-scene{height:300px}
+  .sx-scene{height:calc(100vh - 40px);max-height:420px}
 }
 /* ===== 移动端 ===== */
 @media (max-width:700px){
@@ -1077,41 +1086,35 @@ function openRoom(id){
   const viewType = ROOM_VIEW[lv.factoryArea]||'top';
   let sceneHTML;
   if(viewType==='side'){
-    // 横版过关：横向长廊，任务设备分散在长廊各处，小人左右移动
-    const groundTop=274, gap=240, baseX=120;
-    const stageW=Math.max(760, ft.length*gap+240);
+    // 横版过关：室内房间剖面，任务设备分散在长廊各处，小人左右移动
+    // 坐标在 sxStart 里根据场景实际高度动态计算（groundTop/平台/设备）
+    const gap=250, baseX=140;
+    const stageW=Math.max(900, ft.length*gap+260);
     let platHTML='', taskElsHTML='';
     ft.forEach((t,i)=>{
       const done=isTaskDone(t.id), next=(!done&&t===cur);
       const cls=done?'done':(next?'next':'todo');
-      const x=baseX+i*gap, onPlat=(i%2===1);
-      const tTop=onPlat?106:(groundTop-44);
-      taskElsHTML+=`<div class="sx-task ${cls}" data-plat="${onPlat?1:0}" style="left:${x}px;top:${tTop}px" onclick="sxGoTask('${lv.id}','${t.id}',this)" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}">
+      const onPlat=(i%2===1);
+      taskElsHTML+=`<div class="sx-task ${cls}" data-plat="${onPlat?1:0}" data-idx="${i}" onclick="sxGoTask('${lv.id}','${t.id}',this)" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}">
         <span class="rt-icon">${TASK_ICON[t.type]||'📌'}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
       </div>`;
-      if(onPlat) platHTML+=`<div class="sx-platform" style="left:${x-14}px;top:150px;width:84px"></div>`;
+      if(onPlat) platHTML+=`<div class="sx-platform" data-idx="${i}"></div>`;
     });
-    const stairsX=baseX+ft.length*gap+70;
-    const stairsCls2=(flrDone&&hasNext)?'open':'locked';
-    const stairsHTML2=hasNext?`<div class="sx-stairs ${stairsCls2}" style="left:${stairsX}px;top:${groundTop-44}px" ${flrDone&&hasNext?'onclick="nextRoomFloor()"':''}>🪜</div>`:'';
-    // 像素背景装饰：星星 + 远处工厂剪影 + 发光窗
-    let starsHTML='';
-    for(let k=0;k<9;k++){
-      const sx=Math.round(20+Math.random()*stageW*0.6), sy=Math.round(8+Math.random()*42);
-      starsHTML+=`<span class="sx-star" style="left:${sx}px;top:${sy}px"></span>`;
-    }
-    let winHTML='';
+    // 室内墙面装饰：挂画 + 仪表盘 + 横管（挂在墙裙上方）
+    let decoHTML='';
     for(let k=0;k<6;k++){
-      const wx=Math.round(60+k*260), wy=52+(k%3)*16;
-      winHTML+=`<span class="sx-window" style="left:${wx}px;top:${wy}px;animation-delay:${(k*0.7).toFixed(1)}s"></span>`;
+      const dx=Math.round(90+k*260);
+      const kind=k%3===0?'pic':(k%3===1?'gauge':'pipe');
+      decoHTML+=`<div class="sx-deco ${kind}" style="left:${dx}px;top:${52+(k%3)*26}px"></div>`;
     }
+    window._sxRoom={flrDone:flrDone, hasNext:hasNext};
     sceneHTML=`<div class="sx-scene" id="sxScene">
       <div class="sx-bg"></div>
-      ${starsHTML}
-      <div class="sx-skyline"></div>
-      ${winHTML}
+      <div class="sx-ceil"></div>
+      ${decoHTML}
       <div class="sx-stage" id="sxStage" style="width:${stageW}px">
-        <div class="sx-ground"></div>${platHTML}${taskElsHTML}${stairsHTML2}
+        <div class="sx-ground"></div>${platHTML}${taskElsHTML}
+        <div class="sx-stairs" id="sxStairs">🪜</div>
         <div class="sx-player" id="sxPlayer">
           <span class="pl h-rim"></span><span class="pl h-top"></span>
           <span class="pl face"></span><span class="pl eye"></span>
@@ -1178,8 +1181,8 @@ function nextRoomFloor(){ if(typeof window._roomFlr==='number') window._roomFlr+
 let sxGame=null, sxKeys=null, sxGo=null;
 /* 横版：点击任务设备 → 小人自动走过去，到跟前进入任务 */
 function sxGoTask(lvId, taskId, el){
-  const tx=parseFloat(el.style.left)+27, ty=parseFloat(el.style.top)+23;
-  const platY = (el.getAttribute('data-plat')==='1') ? 150 : 0;
+  const tx=parseFloat(el.style.left)+33, ty=parseFloat(el.style.top)+28;
+  const platY = el.getAttribute('data-plat')==='1' ? (parseFloat(el.dataset.platY)||0) : 0;
   sxGo={lvId, taskId, x:tx, y:ty, platY};
 }
 /* 俯视：小人走到设备跟前 → 进入任务 */
@@ -1214,13 +1217,39 @@ function sxStart(){
   const scene=document.getElementById('sxScene'); if(!scene) return;
   const stage=document.getElementById('sxStage'); if(!stage) return;
   const player=document.getElementById('sxPlayer'); if(!player) return;
-  const groundTop=274, g=0.42, jumpV=-11.5, speed=4.6, ph=26;
+  // 动态坐标：按场景实际高度计算（室内房间剖面）
+  const H=scene.clientHeight;
+  const groundH=46, groundTop=H-groundH;
+  const platTop=Math.max(120, H-200);
+  const g=0.42, jumpV=-12.5, speed=4.6, ph=34;
+  const gap=250, baseX=140;
   let x=40, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
   const keys={left:false,right:false,jump:false};
-  const plats=[]; scene.querySelectorAll('.sx-platform').forEach(el=>{
-    plats.push({x:parseFloat(el.style.left)||0, y:parseFloat(el.style.top)||150, w:parseFloat(el.style.width)||84});
-  });
+  // 摆放任务设备 + 平台 + 楼梯
+  const plats=[];
   const taskEls=[].slice.call(scene.querySelectorAll('.sx-task'));
+  taskEls.forEach((el,i)=>{
+    const onPlat=el.getAttribute('data-plat')==='1';
+    const tx=baseX+i*gap;
+    const tTop=onPlat?(platTop-56):(groundTop-56);
+    el.style.left=tx+'px'; el.style.top=tTop+'px';
+    el.dataset.platY=onPlat?platTop:0;
+    if(onPlat){
+      const pe=scene.querySelector('.sx-platform[data-idx="'+i+'"]');
+      if(pe){ pe.style.left=(tx-16)+'px'; pe.style.top=platTop+'px'; pe.style.width='100px';
+        plats.push({x:tx-16, y:platTop, w:100}); }
+    }
+  });
+  // 楼梯：放长廊末端
+  const stairsEl=document.getElementById('sxStairs');
+  if(stairsEl){
+    const sx=window._sxRoom||{};
+    const sCls=sx.flrDone&&sx.hasNext?'open':'locked';
+    stairsEl.className='sx-stairs '+sCls;
+    stairsEl.style.left=(baseX+taskEls.length*gap+70)+'px';
+    stairsEl.style.top=(groundTop-48)+'px';
+    if(sx.flrDone&&sx.hasNext) stairsEl.onclick=function(){ nextRoomFloor(); };
+  }
   const rw=scene.clientWidth, stageW=stage.clientWidth;
   // 点哪儿走哪儿：点击场景（非设备/楼梯/按钮）→ 小人走到该水平位置
   scene.addEventListener('pointerdown', function(e){
@@ -1234,12 +1263,12 @@ function sxStart(){
     // 点击任务设备：自动走过去，到跟前进入任务
     if(sxGo){
       moveTarget=sxGo.x;
-      const dx=Math.abs((x+9)-sxGo.x);
-      if(dx<12){
+      const dx=Math.abs((x+12)-sxGo.x);
+      if(dx<14){
         // 设备在平台上且玩家还在下面 → 自动跳上去
-        if(sxGo.platY && onGround && y > sxGo.platY-42){ vy=jumpV; onGround=false; }
-        const dy=Math.abs((y+13)-sxGo.y);
-        if(dy<30){ enterLevel(sxGo.lvId,sxGo.taskId); sxGo=null; moveTarget=null; return; }
+        if(sxGo.platY && onGround && y > sxGo.platY-46){ vy=jumpV; onGround=false; }
+        const dy=Math.abs((y+17)-sxGo.y);
+        if(dy<34){ enterLevel(sxGo.lvId,sxGo.taskId); sxGo=null; moveTarget=null; return; }
       }
     }
     // 键盘方向优先，按方向键清除点击目标
@@ -1258,7 +1287,7 @@ function sxStart(){
     if(y+ph>=groundTop){ y=groundTop-ph; vy=0; onGround=true; }
     // 平台：宽松落点（玩家身体中段接触即可站上）
     for(const p of plats){
-      if(vy>=0 && x+5<p.x+p.w && x+13>p.x && y+ph>=p.y-8 && y+ph<=p.y+18){ y=p.y-ph; vy=0; onGround=true; }
+      if(vy>=0 && x+5<p.x+p.w && x+19>p.x && y+ph>=p.y-8 && y+ph<=p.y+20){ y=p.y-ph; vy=0; onGround=true; }
     }
     if(x<4) x=4; if(x>stageW-30) x=stageW-30;
     player.style.left=x+'px'; player.style.top=y+'px';
@@ -1266,9 +1295,9 @@ function sxStart(){
     let cam=x-rw/2+13; cam=Math.max(0,Math.min(cam,stageW-rw));
     stage.style.transform='translateX('+(-cam)+'px)';
     taskEls.forEach(el=>{
-      const tx=parseFloat(el.style.left)+27, ty=parseFloat(el.style.top)+23;
-      const dx=Math.abs(tx-(x+9)), dy=Math.abs(ty-(y+13));
-      const near=dx<60&&dy<70;
+      const tx=parseFloat(el.style.left)+33, ty=parseFloat(el.style.top)+28;
+      const dx=Math.abs(tx-(x+12)), dy=Math.abs(ty-(y+17));
+      const near=dx<64&&dy<74;
       el.classList.toggle('near',near);
     });
     sxGame=requestAnimationFrame(frame);
