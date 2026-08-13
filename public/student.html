@@ -1122,6 +1122,19 @@ body:has(.mm-overlay) { overflow: hidden; }
 /* 分数徽章：方块感 */
 .mm-stats b, .gz-meta b { color: var(--amber); }
 
+/* ===== 过场动画页 ===== */
+.transit{position:fixed;inset:0;z-index:60;background:
+  repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 2px, transparent 2px 4px), #06080f;
+  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.transit.show{opacity:1;pointer-events:auto}
+.tr-inner{text-align:center;font-family:"Courier New",ui-monospace,monospace}
+.tr-icon{font-size:52px;filter:drop-shadow(0 0 14px rgba(0,188,212,.6));animation:trSpin 1.2s linear infinite}
+@keyframes trSpin{to{transform:rotate(360deg)}}
+.tr-bar{width:220px;height:12px;background:#0a0e1c;border:1px solid #2a3852;margin:18px auto 0;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.tr-fill{height:100%;width:0%;background:linear-gradient(90deg,#00bcd4,#e040fb,#ffb340);background-size:200% 100%;animation:trFill 1.3s ease forwards}
+@keyframes trFill{0%{width:0%}60%{width:78%}100%{width:100%}}
+.tr-text{margin-top:12px;color:#9aa3bd;font-size:14px;letter-spacing:2px}
+.tr-text b{color:#ffb340}
 /* 地图流程(?task/?level/?open)：隐藏旧版关卡页+旧头部，只显示功能浮层+返回厂区+面包屑 */
 body.map-flow .factory-wrap, body.map-flow .mission-wrap { display: none !important; }
 body.map-flow .header .xp-wrap,
@@ -1132,7 +1145,22 @@ body.map-flow .header .director-avatar { display: none !important; }
 </style>
 </head>
 <body>
-<script>try{if(/[?&](task|level|open)=/.test(location.search))document.body.classList.add("map-flow");}catch(e){}</script>
+<div id="transit" class="transit"><div class="tr-inner">
+  <div class="tr-icon">⚙️</div><div class="tr-bar"><div class="tr-fill"></div></div>
+  <div class="tr-text" id="trText">正在进入…</div>
+</div></div>
+<script>try{
+  var _u=location.search;
+  if(/[?&](task|level|open)=/.test(_u)){
+    document.body.classList.add("map-flow");
+    var _f=(_u.match(/[?&]open=([^&]+)/)||[])[1];
+    var _t=_f==='game'?'游戏专区':_f==='pedia'?'术语图鉴':_f==='leaderboard'?'排行榜':_f==='achievements'?'成就':_f==='wallet'?'工资与商城':(/[?&]task=/.test(_u)?'任务':(/[?&]level=/.test(_u)?'关卡':''));
+    var _tr=document.getElementById('trText');
+    if(_tr&&_t)_tr.innerHTML='正在进入 <b>'+_t+'</b>…';
+    var _tv=document.getElementById('transit');
+    if(_tv)_tv.classList.add('show');
+  }
+}catch(e){}</script>
 <!-- Header -->
 <div id="mapCrumb" style="display:none;background:#0a0e1c;border-bottom:1px solid var(--border);color:var(--amber);font-size:12px;padding:5px 12px;letter-spacing:1px"></div>
 <div class="header">
@@ -1154,7 +1182,7 @@ body.map-flow .header .director-avatar { display: none !important; }
     <button class="btn-icon" id="musicToggle" onclick="toggleMusic()" title="背景音乐开关">🎵</button>
     <button class="btn-icon" onclick="nextMusic()" title="切换背景曲">⏭</button>
     <span class="director-avatar" id="directorAvatar" style="font-size:20px;margin-left:8px;cursor:default;transition:transform .2s">👨‍💼</span>
-    <button class="btn-icon" id="backMapBtn" onclick="location.href='map_proto.html'" title="返回厂区地图" style="display:none;color:var(--amber);border-color:var(--amber);font-size:13px;padding:3px 9px">🗺️ 返回厂区</button>
+    <button class="btn-icon" id="backMapBtn" onclick="goMap()" title="返回厂区地图" style="display:none;color:var(--amber);border-color:var(--amber);font-size:13px;padding:3px 9px">🗺️ 返回厂区</button>
     <button class="btn-logout" onclick="logout()">退出</button>
   </div>
 </div>
@@ -4295,7 +4323,7 @@ function buildWallet() {
   document.body.appendChild(ov);
 }
 function openWallet(){ buildWallet(); renderWallet(); document.getElementById('walletOverlay').classList.add('show'); }
-function closeWallet(){ if (_mapFlowFeature) { location.href='map_proto.html'; return; } var o=document.getElementById('walletOverlay'); if(o) o.classList.remove('show'); }
+function closeWallet(){ if (_mapFlowFeature) { goMap(); return; } var o=document.getElementById('walletOverlay'); if(o) o.classList.remove('show'); }
 function renderWallet() {
   var body=document.getElementById('walletBody'); if(!body) return;
   var si=gameState.salaryInfo||{}, inv=gameState.inventory||{}, coins=gameState.coins||0;
@@ -5184,7 +5212,7 @@ function openAchievements() {
 }
 
 function closeLb() {
-  if (_mapFlowFeature) { location.href = 'map_proto.html'; return; }
+  if (_mapFlowFeature) { goMap(); return; }
   document.getElementById('lbOverlay').classList.remove('show');
 }
 
@@ -5511,7 +5539,7 @@ function openGameZone() {
 }
 function closeGameZone() {
   // 地图流程：关闭=回厂区地图，避免露出旧版页面
-  if (_mapFlowFeature) { location.href = 'map_proto.html'; return; }
+  if (_mapFlowFeature) { goMap(); return; }
   const ov = document.getElementById('gzOverlay');
   if (ov) ov.classList.remove('show');
 }
@@ -10368,7 +10396,7 @@ function openPedia() {
   renderPedia();
 }
 function closePedia() {
-  if (_mapFlowFeature) { location.href = 'map_proto.html'; return; }
+  if (_mapFlowFeature) { goMap(); return; }
   document.getElementById('pdOverlay').classList.remove('show');
 }
 function renderPedia() {
@@ -10577,7 +10605,7 @@ function showLevelComplete(lv, done) {
   
   if (sessionStorage.getItem('mapFlow') === '1') {
     btn.textContent = '🗺️ 回厂区继续';
-    btn.onclick = () => { playSound('click'); location.href = 'map_proto.html'; };
+    btn.onclick = () => { playSound('click'); goMap(); };
   } else {
     btn.onclick = () => {
       overlay.style.opacity = '0';
@@ -10680,6 +10708,12 @@ async function submitBugReport(){
 // =========================================================================
 // 12. LOGOUT
 // =========================================================================
+function hideTransit(){ var t=document.getElementById('transit'); if(t){ setTimeout(function(){ t.classList.remove('show'); }, 150); } }
+function goMap(){
+  var t=document.getElementById('transit');
+  if(t){ var e=document.getElementById('trText'); if(e) e.innerHTML='正在返回 <b>厂区地图</b>…'; t.classList.add('show'); }
+  setTimeout(function(){ location.href='map_proto.html'; }, 500);
+}
 function logout() {
   sessionStorage.clear();
   location.href = 'index.html';
@@ -10759,6 +10793,7 @@ init().then(() => {
     const fn = featMap[openFeat];
     if (openFeat) _mapFlowFeature = openFeat;
     if (fn) setTimeout(() => { try { fn(); } catch(e){} }, 600);
+    setTimeout(() => hideTransit(), 1500);   // 功能浮层打开后淡出过场
   }
   if (taskId || levelId || openFeat) {
     // 顶部面包屑：明确是在厂区地图的任务流
@@ -10783,7 +10818,7 @@ init().then(() => {
       selectLevel(lv.id);
       if (realTask) {
         // 排进登录弹窗队列之后打开：欢迎/改密逐个关完，再进任务前言，避免弹窗轰炸
-        enqueueLoginPopup(done => openTaskModal(lv.id, realTask.id, done));
+        enqueueLoginPopup(done => openTaskModal(lv.id, realTask.id, function(){ hideTransit(); done(); }));
       }
     }
   }
