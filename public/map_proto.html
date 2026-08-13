@@ -45,7 +45,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
     linear-gradient(180deg,#0d1226,#0a0e1c)}
 /* 厂区入口 */
 .entrance{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 14px 12px;background:linear-gradient(180deg,rgba(255,179,64,.06),transparent)}
-.gate-sign{text-align:center}
+.gate-sign{text-align:center;flex:none;min-width:200px}
 .gate-sign .t{font-size:18px;letter-spacing:6px;color:var(--amber);text-shadow:0 0 12px rgba(255,179,64,.6)}
 .gate-sign .s{font-size:10px;color:var(--dim);letter-spacing:3px;margin-top:2px}
 .gate{position:relative;width:min(420px,80vw);height:26px;margin:6px auto 0;border-top:2px solid #3a4568;border-bottom:2px solid #3a4568;background:rgba(20,26,46,.6)}
@@ -422,7 +422,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 /* 走动厂长 */
 .boss{display:flex;align-items:center;gap:8px;pointer-events:none;flex:none;min-width:0}
 .boss-sprite{font-size:26px;filter:drop-shadow(0 0 6px rgba(255,179,64,.5));animation:npcBob 2.2s ease-in-out infinite}
-.boss-bubble{font-size:11px;color:var(--amber);background:rgba(11,14,26,.94);border:1px solid var(--amber);padding:4px 10px;border-radius:8px;max-width:210px;line-height:1.5;box-shadow:0 0 10px rgba(255,179,64,.3)}
+.boss-bubble{font-size:11px;color:var(--amber);background:rgba(11,14,26,.94);border:1px solid var(--amber);padding:5px 10px;border-radius:8px;max-width:150px;line-height:1.5;box-shadow:0 0 10px rgba(255,179,64,.3)}
 .task-card{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:6px 0;border-radius:8px;border:1px solid #223050;background:#0a0e1c;transition:border-color .2s}
 .task-card .tc-icon{font-size:16px;width:24px;text-align:center;flex:none}
 .task-card .tc-title{flex:1;font-size:13px;color:#9aa3bd;line-height:1.3}
