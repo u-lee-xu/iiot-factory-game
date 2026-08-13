@@ -344,7 +344,7 @@ async function loginStudent() {
     sessionStorage.setItem('token', data.token);
     sessionStorage.setItem('role', 'student');
     sessionStorage.setItem('name', name);
-    window.location.href = 'student.html';
+    window.location.href = 'map_proto.html';
   } catch (e) {
     showError('网络错误，请检查服务是否启动');
     setLoading(false);

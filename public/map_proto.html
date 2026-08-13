@@ -914,6 +914,28 @@ const GAME_TAGS={
 };
 $('inpName').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 $('inpPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ===== 自动登录（从 index.html 登录后带 token 进入）=====
+async function autoLogin(){
+  const t=sessionStorage.getItem('token');
+  if(!t) return false;
+  try{
+    const mr=await fetch(API+'/api/student/me',{headers:{Authorization:'Bearer '+t}});
+    if(mr.status===401){ try{ sessionStorage.removeItem('token'); }catch(e){} return false; }
+    const j=await mr.json();
+    if(!j.ok) return false;
+    token=t; me=j.data;
+    const cr=await fetch(API+'/api/game/content').then(r=>r.json());
+    content=cr.data||cr;
+    if(!content||!content.levels) return false;
+    render();
+    $('loginBox').classList.add('hide');
+    $('mapApp').classList.add('show');
+    try{ musStart(); }catch(e){}
+    return true;
+  }catch(e){ return false; }
+}
+autoLogin();
 </script>
 <script src="/data/music.js"></script>
 <script>
