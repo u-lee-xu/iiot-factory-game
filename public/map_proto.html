@@ -350,6 +350,41 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .pop-enter:hover{filter:brightness(1.12)}
 .pop-tip{font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
 .foot{text-align:center;font-size:11px;color:var(--dim);padding:14px 0 20px;letter-spacing:1px}
+/* ===== ISA-95 数据流转层次 ===== */
+.isa-layer{position:relative;background:rgba(10,14,28,.45);border:1px solid #223050;border-radius:8px;padding:18px 10px 12px;margin:0 0 4px}
+.isa-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:7px;background:#0b0e1a;border:1px solid var(--border);padding:2px 12px;border-radius:12px;white-space:nowrap;z-index:2}
+.isa-tag .ilv{font-size:11px;font-weight:bold;color:#1a1206;background:var(--amber);padding:1px 7px;border-radius:8px}
+.isa-tag b{font-size:12px;color:var(--text)}
+.isa-tag em{font-size:9px;color:var(--dim);font-style:normal;letter-spacing:1px}
+.isa-layer .row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 8px}
+/* 层间数据流（自下而上） */
+.dataflow{display:flex;align-items:center;justify-content:center;gap:6px;height:20px;margin:2px 0;position:relative}
+.dataflow .df-label{font-size:9px;color:#4fd6ff;letter-spacing:2px;opacity:.75}
+.df-pack{width:5px;height:5px;border-radius:50%;background:#4fd6ff;box-shadow:0 0 6px #4fd6ff;opacity:0;animation:dfUp 2.6s ease-in infinite}
+.df-pack.p2{animation-delay:.9s}
+.df-pack.p3{animation-delay:1.8s}
+@keyframes dfUp{0%{transform:translateY(7px);opacity:0}25%{opacity:1}100%{transform:translateY(-11px);opacity:0}}
+/* 音乐喷泉 */
+.fountain.musical .f-jet{position:absolute;left:50%;bottom:10px;width:3px;border-radius:2px;background:linear-gradient(180deg,#7deaff,#4fd6ff);opacity:.85}
+.fountain.musical .f-jet.j1{transform:translateX(-12px);animation:jetA 1.1s ease-in-out infinite}
+.fountain.musical .f-jet.j2{height:14px;animation:jetB 1.1s ease-in-out infinite .18s}
+.fountain.musical .f-jet.j3{transform:translateX(12px);animation:jetC 1.1s ease-in-out infinite .36s}
+@keyframes jetA{0%,100%{height:6px;opacity:.6}50%{height:14px;opacity:1}}
+@keyframes jetB{0%,100%{height:14px;opacity:1}50%{height:5px;opacity:.5}}
+@keyframes jetC{0%,100%{height:9px;opacity:.8}50%{height:16px;opacity:1}}
+.fountain.musical .f-note{position:absolute;left:50%;transform:translateX(-50%);color:#ffd400;font-size:8px;bottom:20px;opacity:0;animation:noteUp 2.8s ease-in infinite}
+@keyframes noteUp{0%{transform:translate(-10px,0);opacity:0}25%{opacity:1}100%{transform:translate(9px,-20px);opacity:0}}
+.fountain.musical .f-basin::after{animation:hueCycle 6s linear infinite}
+@keyframes hueCycle{0%,100%{background:#4fd6ff}25%{background:#e040fb}50%{background:#ffd400}75%{background:#00e676}}
+/* 蒸汽 */
+.steam{position:relative;width:20px;height:18px;display:inline-block;opacity:.85}
+.steam i{position:absolute;bottom:0;width:6px;height:6px;border-radius:50%;background:rgba(225,235,245,.55);filter:blur(1px);animation:stRise 3s ease-out infinite}
+.steam .s2{left:7px;animation-delay:1s}
+.steam .s3{left:13px;animation-delay:2s}
+@keyframes stRise{0%{transform:translateY(0) scale(.6);opacity:.6}100%{transform:translateY(-24px) scale(1.7);opacity:0}}
+/* 警报灯（边缘柜） */
+.b-alarm{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--sh) - var(--bh) - 36px);width:5px;height:5px;border-radius:50%;background:#ff1744;box-shadow:0 0 9px #ff1744;z-index:2;animation:alarmFlash 3.6s steps(2,end) infinite}
+@keyframes alarmFlash{0%,72%,100%{opacity:1}80%{opacity:.15}}
 /* ===== 移动端 ===== */
 @media (max-width:700px){
   .brand{font-size:14px}
@@ -414,24 +449,15 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       <!-- 主干道 A -->
       <div class="road road-a"><div class="road-h"></div><i class="p-lamp lamp-l"></i><i class="p-lamp lamp-r"></i><div class="walker">🛵</div><div class="walker w2">👷</div><div class="walker w3">🧑‍🏭</div></div>
 
-      <!-- 生产一区 -->
-      <div class="zone">
-        <div class="zone-tag"><b>生产一区</b> · 设备联网</div>
-        <div class="row" id="grid1"></div>
-      </div>
+      <!-- ISA-95 数据流转层次（云 → 现场，数据自下而上） -->
+      <div id="isaArea"></div>
 
-      <!-- 中心广场 -->
+      <!-- 中心广场（音乐喷泉） -->
       <div class="plaza">
         <div class="p-tree"></div><div class="flowerbed"></div>
-        <div class="fountain"><i class="f-basin"></i><i class="f-spout"></i><i class="f-water"></i></div>
+        <div class="fountain musical"><i class="f-basin"></i><i class="f-jet j1"></i><i class="f-jet j2"></i><i class="f-jet j3"></i><i class="f-note">♪</i></div>
         <div class="flag">🚩</div>
         <div class="flowerbed"></div><div class="p-tree"></div>
-      </div>
-
-      <!-- 生产二区 -->
-      <div class="zone">
-        <div class="zone-tag" style="left:auto;right:14px"><b>生产二区</b> · 数据上云</div>
-        <div class="row" id="grid2"></div>
       </div>
 
       <!-- 主干道 B -->
@@ -445,6 +471,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
         <span class="ut-label">动力站 · 储罐区</span>
         <div class="windmill"><i class="wm-pole"></i><div class="wm-rotor"><i class="wm-blade b1"></i><i class="wm-blade b2"></i><i class="wm-blade b3"></i><i class="wm-hub"></i></div></div>
         <div class="water-tower"><i class="wt-legs"></i><i class="wt-tank"></i><i class="wt-roof"></i><i class="wt-drop"></i></div>
+        <div class="steam"><i></i><i class="s2"></i><i class="s3"></i></div>
         <div class="tanks"><i class="tk"></i><i class="tk tk2"></i></div>
       </div>
 
@@ -485,6 +512,12 @@ const FACADES={
   ai_lab:[
     {x:10,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},{x:30,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},{x:50,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},{x:10,y:33,w:14,h:8,t:'sq',l:'glow',a:'flick'},{x:44,y:33,w:14,h:8,t:'sq',l:'glow',a:'flick'}]
 };
+const ISA_LAYERS=[
+  {level:'L4',name:'云与智能层',sub:'☁️云平台 · 🤖AI分析 · 业务决策',areas:['cloud_platform','ai_lab'],flow:'数据上云 · 智能分析'},
+  {level:'L3',name:'数据贯通层',sub:'📊监控大屏 · 🔗数据管道 · 实时流',areas:['big_screen','data_pipe'],flow:'监控上送 · 实时流转'},
+  {level:'L2',name:'控制操作层',sub:'🖥️中控室 · 🎛️操作台 · SCADA/HMI',areas:['control_room','console'],flow:'状态采集 · 控制指令'},
+  {level:'L1',name:'现场接入层',sub:'⚙️车间设备 · 📦边缘网关 · 数据源头',areas:['workshop','edge_cabinet'],flow:'物理过程 · 数据源头'}
+];
 const LOGOS={
   control_room:'<span class="b-logo lg-term"><i class="lt-screen"></i><i class="lt-line l1"></i><i class="lt-line l2"></i><i class="lt-line l3"></i></span>',
   console:'<span class="b-logo lg-console"><i class="lc-body"></i><i class="lc-btn b1"></i><i class="lc-btn b2"></i><i class="lc-knob"></i></span>',
@@ -550,7 +583,8 @@ function logoHTML(area,color){
   return `<span style="--c:${color};--cg:rgba(${r},${g},${b},.5);display:inline-block">${LOGOS[area]||''}</span>`;
 }
 
-function buildingHTML(lv, idx){
+function buildingHTML(lv){
+  const idx=content.levels.indexOf(lv);
   const prog=levelProgress(lv);
   const acc=accessOf(lv,idx);
   const state= prog.completed?'completed':(acc==='open'?'current':'locked');
@@ -568,12 +602,13 @@ function buildingHTML(lv, idx){
     : '<div class="b-roof roof-flat"></div>';
   const chimney = area==='workshop' ? '<div class="b-chimney"><i class="b-smoke"></i><i class="b-smoke s2"></i><i class="b-smoke s3"></i></div>' : '';
   const ant = (area==='control_room'||area==='big_screen') ? '<div class="b-ant"><i class="b-beacon"></i></div>' : '';
+  const alarm = area==='edge_cabinet' ? '<div class="b-alarm"></div>' : '';
   const logo = logoHTML(area,color);
   const totalStar = Math.max(st.self||0, st.teacher||0);
   return `<div class="building ${state}" style="--c:${color};--cg:${cg};--bh:${bh}" onclick="openPop('${lv.id}')">
     <div class="b-sprite">
       <div class="b-shadow"></div>
-      ${ant}${chimney}${roof}
+      ${ant}${chimney}${alarm}${roof}
       <div class="b-sign">${logo}</div>
       <div class="b-side"></div><div class="b-body"><div class="b-wall"></div><div class="b-ribs"></div>${wins}<div class="b-base"></div><div class="b-door"></div></div>
       <div class="b-pipe"></div>
@@ -628,10 +663,11 @@ function render(){
   $('pXp').textContent=xp;
   $('pCoins').textContent=me.coins||0;
 
-  const rows=content.factory.rows;
-  const g1=rows[0]?rows[0].areas:[], g2=rows[1]?rows[1].areas:[];
-  $('grid1').innerHTML=g1.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx):''; }).join('');
-  $('grid2').innerHTML=g2.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx+4):''; }).join('');
+  $('isaArea').innerHTML = ISA_LAYERS.map((L,i)=>{
+    const body=L.areas.map(a=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv):''; }).join('');
+    const flow=i<ISA_LAYERS.length-1 ? `<div class="dataflow"><span class="df-label">↑ ${L.flow}</span><i class="df-pack p1"></i><i class="df-pack p2"></i><i class="df-pack p3"></i></div>` : '';
+    return `<div class="isa-layer"><div class="isa-tag"><span class="ilv">${L.level}</span><b>${L.name}</b><em>${L.sub}</em></div><div class="row">${body}</div></div>${flow}`;
+  }).join('');
   $('facRow').innerHTML=facilityHTML('game')+facilityHTML('research')+facilityHTML('rest')+facilityHTML('park');
 
   const doneCount=content.levels.filter(l=>levelProgress(l).completed).length;
