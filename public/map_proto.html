@@ -698,12 +698,12 @@ function facilityHTML(kind){
   const resFac=[{x:16,y:12,w:16,h:10,t:'screen',l:'glow',a:'breath'},{x:9,y:29,w:11,h:8,t:'sq',l:'warm',a:'tw'},{x:22,y:29,w:11,h:8,t:'sq',l:'cy',a:'tw'},{x:35,y:29,w:11,h:8,t:'sq',l:'warm',a:'tw'},{x:48,y:29,w:11,h:8,t:'sq',l:'dark',a:''}];
   if(kind==='rest') return `<div class="fac-cell" onclick="facPop('rest')"><div class="pavilion"><i class="pv-roof"></i><i class="pv-post p1"></i><i class="pv-post p2"></i><i class="pv-bench"></i></div><div class="fac-sub">凉亭 · 长椅 · 树荫</div></div>`;
   if(kind==='park') return `<div class="fac-cell" onclick="facPop('park')"><div class="parking"><i class="pk-pole"></i><i class="pk-arm"></i><span class="pk-car cA">🚙</span><span class="pk-car cB">🚗</span></div><div class="fac-sub">叉车 · 货车 · 班车</div></div>`;
-  const c= kind==='game' ? {name:'游戏房',color:'#ff8ac2',facade:gameFac,awn:true,sub:'<em>翻牌·快打·防御战·小蜜蜂</em>'}
-    : {name:'研发中心',color:'#64b5f6',facade:resFac,awn:false,sub:'术语 · 图鉴 · 排行榜 · 成就'};
+  const c= kind==='game' ? {name:'游戏房',color:'#ff8ac2',facade:gameFac,awn:true,sub:'<em>翻牌·快打·防御战·小蜜蜂</em>',go:"student.html?open=game"}
+    : {name:'研发中心',color:'#64b5f6',facade:resFac,awn:false,sub:'术语 · 图鉴 · 排行榜 · 成就',go:"student.html?open=pedia"};
   const [r,g,b]=hex2rgb(c.color); const cg=`rgba(${r},${g},${b},.5)`;
   const wins=c.facade.map(winHTML).join('');
   const roof= kind==='research' ? '<div class="b-roof roof-dome"></div>' : '<div class="b-roof roof-flat"></div>';
-  return `<div class="fac-cell" onclick="facPop('${kind}')">
+  return `<div class="fac-cell" onclick="location.href='${c.go}'">
     <div class="building" style="--c:${c.color};--cg:${cg};--bh:56px">
       <div class="b-sprite">
         <div class="b-shadow"></div>${roof}

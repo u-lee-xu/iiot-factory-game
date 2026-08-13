@@ -10674,9 +10674,15 @@ init().then(() => {
   const p = new URLSearchParams(location.search);
   const taskId = p.get('task');
   const levelId = p.get('level');
+  const openFeat = p.get('open');
   const backBtn = document.getElementById('backMapBtn');
-  if (backBtn && (taskId || levelId)) backBtn.style.display = '';
-  if (taskId || levelId) { try { sessionStorage.setItem('mapFlow', '1'); } catch(e){} }
+  if (backBtn && (taskId || levelId || openFeat)) backBtn.style.display = '';
+  if (taskId || levelId || openFeat) { try { sessionStorage.setItem('mapFlow', '1'); } catch(e){} }
+  if (openFeat) {
+    const featMap = { game: openGameZone, pedia: openPedia, leaderboard: openLeaderboard, achievements: openAchievements, wallet: openWallet };
+    const fn = featMap[openFeat];
+    if (fn) setTimeout(() => { try { fn(); } catch(e){} }, 600);
+  }
   if (taskId || levelId) {
     let lv = null;
     if (taskId) lv = content.levels.find(l => (l.tasks || []).some(t => String(t.id) === taskId));
