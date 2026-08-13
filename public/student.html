@@ -1101,6 +1101,7 @@ body:has(.mm-overlay) { overflow: hidden; }
     <button class="btn-icon" id="musicToggle" onclick="toggleMusic()" title="背景音乐开关">🎵</button>
     <button class="btn-icon" onclick="nextMusic()" title="切换背景曲">⏭</button>
     <span class="director-avatar" id="directorAvatar" style="font-size:20px;margin-left:8px;cursor:default;transition:transform .2s">👨‍💼</span>
+    <button class="btn-icon" id="backMapBtn" onclick="location.href='map_proto.html'" title="返回厂区地图" style="display:none">🗺️</button>
     <button class="btn-logout" onclick="logout()">退出</button>
   </div>
 </div>
@@ -10658,7 +10659,24 @@ async function init() {
   }
 }
 
-init();
+init().then(() => {
+  // —— 从厂区地图跳转：?task=1-0 或 ?level=1 自动定位 ——
+  const p = new URLSearchParams(location.search);
+  const taskId = p.get('task');
+  const levelId = p.get('level');
+  const backBtn = document.getElementById('backMapBtn');
+  if (backBtn && (taskId || levelId)) backBtn.style.display = '';
+  if (taskId || levelId) {
+    let lv = null;
+    if (taskId) lv = content.levels.find(l => (l.tasks || []).some(t => String(t.id) === taskId));
+    if (!lv && levelId) lv = content.levels.find(l => String(l.id) === levelId);
+    if (lv) {
+      const realTask = taskId ? lv.tasks.find(t => String(t.id) === taskId) : null;
+      selectLevel(lv.id);
+      if (realTask) setTimeout(() => openTaskModal(lv.id, realTask.id), 400);
+    }
+  }
+});
 </script>
 </body>
 </html>

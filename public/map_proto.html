@@ -595,6 +595,7 @@ async function doLogin(){
     const j=await r.json();
     if(!j.ok) throw new Error(j.error||'登录失败');
     token=j.token;
+    try{ sessionStorage.setItem('token',token); sessionStorage.setItem('role','student'); sessionStorage.setItem('name',name); }catch(e){}
     await loadAll();
     $('loginBox').classList.add('hide');
     $('mapApp').classList.add('show');
@@ -818,13 +819,20 @@ function openRoom(id){
     </div>
     <div class="room-foot">
       <button class="room-back" onclick="closeRoom()">← 返回厂区</button>
-      <button class="room-go ${locked?'locked':''}" onclick="enterLevel('${lv.id}')">${locked?'🔒 未解锁':(cur?'▶ 进入「'+cur.title+'」':'✅ 已通关')}</button>
+      <button class="room-go ${locked?'locked':''}" onclick="enterLevel('${lv.id}','${cur?cur.id:''}')">${locked?'🔒 未解锁':(cur?'▶ 进入「'+cur.title+'」':'✅ 已通关')}</button>
     </div>
   </div>`;
   room.classList.add('show');
 }
 function closeRoom(){ $('room').classList.remove('show'); }
-function enterLevel(id){ closeRoom(); showToast('🚪 原型版：点击进入 L'+id+' 关卡（正式版将跳转任务）'); }
+function enterLevel(id, taskId){
+  closeRoom();
+  const q=new URLSearchParams();
+  if(taskId) q.set('task', taskId);
+  else if(id) q.set('level', id);
+  const qs=q.toString()?'?'+q.toString():'';
+  location.href='student.html'+qs;
+}
 function closePop(){ $('popup').classList.remove('show'); }
 function showToast(msg){
   const t=document.createElement('div');
