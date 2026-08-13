@@ -656,7 +656,17 @@ function buildingHTML(lv){
   const cg=`rgba(${r},${g},${b},.5)`;
   const shape={control_room:'flat',console:'peak',workshop:'flat',edge_cabinet:'flat',cloud_platform:'flat',big_screen:'flat',data_pipe:'pipe',ai_lab:'dome'}[area]||'flat';
   const bh={control_room:'62px',console:'56px',workshop:'56px',edge_cabinet:'56px',cloud_platform:'62px',big_screen:'62px',data_pipe:'56px',ai_lab:'56px'}[area]||'56px';
-  const wins=(FACADES[area]||[]).map(winHTML).join('');
+  // 窗户随任务进度点亮：未做=暗，进行中=幕色微光，全通关=暖光闪烁
+  const winDefs=(FACADES[area]||[]);
+  const darks=winDefs.map((f,i)=>f.l==='dark'?i:-1).filter(i=>i>=0);
+  const litN=Math.round(darks.length*(prog.pct/100));
+  const wins=winDefs.map((f,i)=>{
+    if(f.l==='dark'&&darks.indexOf(i)<litN){
+      const lit=prog.completed?{l:'warm',a:'tw'}:{l:'glow',a:'flick'};
+      return winHTML(Object.assign({},f,lit),i);
+    }
+    return winHTML(f,i);
+  }).join('');
   const roof = shape==='peak' ? '<div class="b-roof roof-peak"></div>'
     : shape==='dome' ? '<div class="b-roof roof-dome"></div>'
     : shape==='pipe' ? '<div class="b-roof roof-pipe"></div>'
@@ -743,6 +753,11 @@ function render(){
     return `<span class="rb-step ${done?'done':''} ${cur?'cur':''}">${nums[i]}${lv.areaName}</span>`+(i<7?'<span class="rb-arrow">→</span>':'');
   }).join('');
 
+  // 返回庆祝：刚从任务页回来且刚完成一个任务
+  try{
+    const lc=JSON.parse(sessionStorage.getItem('lastCompleted')||'null');
+    if(lc&&lc.title){ setTimeout(()=>showToast('✅ 已完成「'+lc.title+'」'+(lc.xp?'  +'+lc.xp+'XP':''), lc.color), 700); sessionStorage.removeItem('lastCompleted'); }
+  }catch(e){}
   const doneCount=content.levels.filter(l=>levelProgress(l).completed).length;
   if(doneCount===0) $('npcBubble').textContent='厂长：沿 ①→⑧ 数字顺序闯关！从①中控室开始，一层层打通。';
   else if(doneCount<8) $('npcBubble').textContent=`厂长：干得不错！已完成 ${doneCount}/8 幕，继续推进！`;

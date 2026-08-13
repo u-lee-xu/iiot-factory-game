@@ -2443,6 +2443,12 @@ function completeTask(taskId, xp) {
     saveState();
     evaluateAchievements(true);
     refreshLeaderboard().then(() => evaluateAchievements(true));
+    // 记录最近完成的任务（回厂区地图弹庆祝 toast）
+    try {
+      const _lv = content.levels.find(l => l.tasks.some(t => t.id === taskId));
+      const _t = _lv && _lv.tasks.find(t => t.id === taskId);
+      sessionStorage.setItem('lastCompleted', JSON.stringify({ title: (_t&&_t.title)||'', xp }));
+    } catch(e){}
     // 地图流程：本层全部打完 → 立刻弹通关庆祝 + 回厂区
     if (sessionStorage.getItem('mapFlow') === '1') {
       const lv = content.levels.find(l => l.tasks.some(t => t.id === taskId));
