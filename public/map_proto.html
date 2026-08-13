@@ -483,6 +483,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       <span class="pill">🏅 <b id="pRank">-</b></span>
       <span class="pill">XP <b id="pXp">0</b></span>
       <span class="pill">💰 <b id="pCoins">0</b></span>
+      <button class="back" onclick="doLogout()" title="退出登录">🚪 退出</button>
       <a class="back" href="student.html" target="_blank">旧版 →</a>
     </div>
   </header>
@@ -885,6 +886,15 @@ function enterLevel(id, taskId){
   location.href='student.html'+qs;
 }
 function closePop(){ $('popup').classList.remove('show'); }
+function doLogout(){
+  try{ sessionStorage.removeItem('token'); sessionStorage.removeItem('role'); sessionStorage.removeItem('name');
+    sessionStorage.removeItem('mapFlow'); sessionStorage.removeItem('lastCompleted'); }catch(e){}
+  token=''; content=null; me=null;
+  try{ if(musOn&&musSrc){ musSrc.stop(); musSrc=null; } }catch(e){}
+  $('loginBox').classList.remove('hide');
+  $('mapApp').classList.remove('show');
+  $('inpName').value=''; $('inpPw').value='';
+}
 function showToast(msg){
   const t=document.createElement('div');
   t.textContent=msg;
