@@ -14,3 +14,6 @@ Thumbs.db
 
 # 本地测试产物
 /tmp/
+
+# 数据库备份（含敏感数据）
+data/game.db.bak*

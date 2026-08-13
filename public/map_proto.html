@@ -124,10 +124,89 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
   .npc .bubble{font-size:11px;max-width:150px}
   #map{max-width:100%}
 }
+
+/* ===== 氛围背景 ===== */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg-sky{position:absolute;inset:0;background:linear-gradient(180deg,#04060f 0%,#070c1f 38%,#0e1730 65%,#1a2340 100%)}
+.bg-stars{position:absolute;inset:0;background-image:
+  radial-gradient(1px 1px at 12% 18%,#fff,transparent),
+  radial-gradient(1px 1px at 28% 8%,#fff,transparent),
+  radial-gradient(1px 1px at 42% 22%,#ffd,transparent),
+  radial-gradient(1px 1px at 55% 12%,#fff,transparent),
+  radial-gradient(1.5px 1.5px at 67% 25%,#cfe,transparent),
+  radial-gradient(1px 1px at 78% 9%,#fff,transparent),
+  radial-gradient(1px 1px at 88% 20%,#ffe,transparent),
+  radial-gradient(1px 1px at 8% 32%,#fff,transparent),
+  radial-gradient(1px 1px at 93% 30%,#fff,transparent),
+  radial-gradient(1px 1px at 35% 30%,#fff,transparent);
+  animation:starTw 4s ease-in-out infinite}
+@keyframes starTw{0%,100%{opacity:.6}50%{opacity:1}}
+.bg-moon{position:absolute;top:8%;right:12%;width:44px;height:44px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff,#d9d2a8 55%,#b8b18a);box-shadow:0 0 40px 12px rgba(255,240,180,.18)}
+.bg-skyline{position:absolute;left:0;right:0;bottom:26%;height:130px;opacity:.5;
+  background-image:
+    linear-gradient(#0b1226,#0b1226),
+    linear-gradient(#0a1020,#0a1020);
+  background-repeat:no-repeat;background-size:90px 70px,140px 100px;
+  background-position:6% 100%,22% 100%;
+  filter:blur(.3px)}
+.bg-skyline::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34px;opacity:.35;
+  background:repeating-linear-gradient(90deg,transparent 0 22px,#0d1526 22px 26px)}
+.bg-clouds{position:absolute;background:rgba(30,45,80,.28);border-radius:40px;filter:blur(2px)}
+.bg-clouds.c1{width:220px;height:26px;top:16%;left:-240px;animation:drift 60s linear infinite}
+.bg-clouds.c2{width:150px;height:20px;top:27%;left:-170px;animation:drift 80s linear infinite 12s;opacity:.7}
+.bg-clouds::before,.bg-clouds::after{content:"";position:absolute;border-radius:50%;background:inherit}
+.bg-clouds::before{width:70px;height:50px;top:-26px;left:24px}
+.bg-clouds::after{width:50px;height:40px;top:-18px;left:90px}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 400px))}}
+.bg-fog{position:absolute;left:0;right:0;bottom:0;height:130px;
+  background:linear-gradient(180deg,transparent,rgba(10,16,34,.55) 60%,rgba(10,16,34,.9));
+  animation:fogBob 7s ease-in-out infinite}
+@keyframes fogBob{0%,100%{opacity:.75;transform:translateY(0)}50%{opacity:.95;transform:translateY(-6px)}}
+/* 地图在背景之上 */
+#mapApp{position:relative;z-index:1}
+/* 道路流动数据 */
+.road-h::before{background:repeating-linear-gradient(90deg,rgba(255,179,64,.85) 0 10px,transparent 10px 22px);
+  animation:flow 1.1s linear infinite}
+.road-h::after{content:"";position:absolute;top:50%;left:0;right:0;height:3px;transform:translateY(-50%);
+  background:repeating-linear-gradient(90deg,rgba(100,200,255,.9) 0 6px,transparent 6px 18px);
+  animation:flow 0.9s linear infinite reverse;opacity:.55}
+@keyframes flow{to{background-position:22px 0}}
+/* 烟囱冒烟 */
+.chimney{overflow:visible}
+.smoke{position:absolute;top:-12px;left:-3px;width:10px;height:10px;border-radius:50%;
+  background:rgba(200,200,200,.5);opacity:0;animation:smoke 3s ease-out infinite}
+.smoke.s2{left:5px;animation-delay:1.2s}
+.smoke.s3{left:1px;animation-delay:2.1s}
+@keyframes smoke{0%{transform:translateY(0) scale(.5);opacity:.55}100%{transform:translateY(-34px) scale(1.8);opacity:0}}
+/* 探照灯 */
+.light{position:absolute;top:-30px;left:50%;transform-origin:50% 100%;width:26px;height:60px;
+  background:conic-gradient(from 90deg at 50% 100%,transparent 30deg,rgba(255,230,120,.14) 55deg,transparent 80deg);
+  animation:sweep 7s ease-in-out infinite;pointer-events:none}
+@keyframes sweep{0%,100%{transform:translateX(-50%) rotate(-24deg);opacity:.7}50%{transform:translateX(-50%) rotate(24deg);opacity:1}}
+/* 窗户闪烁 */
+.b-win.on{animation:winTwinkle 3.4s ease-in-out infinite}
+.b-win.on:nth-child(3n){animation-delay:.6s}
+.b-win.on:nth-child(2n){animation-delay:1.3s}
+.b-win.on:nth-child(5n){animation-delay:2s}
+@keyframes winTwinkle{0%,100%{background:#ffe9a8}35%{background:#fff7d6}70%{background:#ffe9a8}}
+/* 路上走动的小工人 */
+.walker{position:absolute;top:50%;z-index:5;font-size:15px;transform:translateY(-50%);animation:walkX 14s linear infinite}
+@keyframes walkX{0%{left:2%;transform:translateY(-50%) scaleX(1)}48%{left:96%;transform:translateY(-50%) scaleX(1)}
+  50%{left:96%;transform:translateY(-50%) scaleX(-1)}98%{left:2%;transform:translateY(-50%) scaleX(-1)}
+  100%{left:2%;transform:translateY(-50%) scaleX(1)}}
+/* 探照灯只有大屏才放, 避免太挤 */
+@media (max-width:700px){.bg-skyline{display:none}.bg-moon{width:28px;height:28px}}
 </style>
 </head>
 <body>
 
+<div class="bg">
+  <div class="bg-sky"></div><div class="bg-stars"></div><div class="bg-moon"></div>
+  <div class="bg-skyline"></div>
+  <div class="bg-clouds c1"></div><div class="bg-clouds c2"></div>
+  <div class="bg-fog"></div>
+</div>
 <div id="loginBox">
   <div class="login-card">
     <h1>🏭 锐智工厂</h1>
@@ -142,7 +221,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 
 <div id="mapApp">
   <header>
-    <div class="brand">🏭 锐智工厂<small>PIXEL MAP · 原型</small></div>
+    <div class="brand">🏭 锐智工厂<small>PIXEL MAP · 原型</small></div><button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
     <div class="player">
       <span class="pill">👤 <b id="pName">-</b></span>
       <span class="pill">🏅 <b id="pRank">-</b></span>
@@ -160,9 +239,9 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       </div>
       <div class="fac" id="researchSlot"></div>
     </div>
-    <div class="roads" id="roadTop"></div>
+    <div class="roads done" id="roadTop"><div class="road-h"></div><div class="walker">🛵</div></div>
     <div class="main-grid" id="grid"></div>
-    <div class="roads" id="roadMid"></div>
+    <div class="roads done" id="roadMid"><div class="road-h"></div><div class="walker">👷</div></div>
     <div class="main-grid" id="grid2"></div>
     <div class="foot">— 锐智工厂 · 工业互联网实训 · 像素地图原型 —</div>
   </div>
@@ -190,6 +269,7 @@ async function doLogin(){
     await loadAll();
     $('loginBox').classList.add('hide');
     $('mapApp').classList.add('show');
+    try{ musStart(); }catch(e){}
   }catch(e){ $('err').textContent=e.message; }
 }
 
@@ -246,8 +326,8 @@ function buildingHTML(lv, idx){
     : shape.roof==='dome' ? '<div class="dome"></div>'
     : shape.roof==='roof-peak' ? '<div class="roof-peak"></div>'
     : '<div class="roof-flat"></div>';
-  const extra = shape.chimney?'<div class="chimney"></div>':'';
-  const ant = shape.antenna?'<div class="antenna"></div>':'';
+  const extra = shape.chimney?'<div class="chimney"><div class="smoke"></div><div class="smoke s2"></div><div class="smoke s3"></div></div>':'';
+  const ant = shape.antenna?'<div class="antenna"></div><div class="light"></div>':'';
   const totalStar = Math.max(st.self||0, st.teacher||0);
   return `<div class="building ${state}" style="--c:${lv.color}" onclick="openPop('${lv.id}')">
     <div class="b-sprite">${ant}${extra}${roof}<div class="b-body"><div class="b-windows">${wins}</div><div class="b-door"></div></div></div>
@@ -373,6 +453,37 @@ const GAME_TAGS={
 
 $('inpName').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 $('inpPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+<script src="/data/music.js"></script>
+<script>
+// ===== 8-bit 背景音乐 =====
+zzfxV=.3; zzfxR=44100;
+zzfxG=(q=1,k=.05,c=220,e=0,t=0,u=.1,r=0,F=1,v=0,z=0,w=0,A=0,l=0,B=0,x=0,G=0,d=0,y=1,m=0,C=0)=>{let b=2*Math.PI,H=v*=500*b/zzfxR**2,I=(0<x?1:-1)*b/4,D=c*=(1+2*k*Math.random()-k)*b/zzfxR,Z=[],g=0,E=0,a=0,n=1,J=0,K=0,f=0,p,h;e=99+zzfxR*e;m*=zzfxR;t*=zzfxR;u*=zzfxR;d*=zzfxR;z*=500*b/zzfxR**3;x*=b/zzfxR;w*=b/zzfxR;A*=zzfxR;l=zzfxR*l|0;for(h=e+m+t+u+d|0;a<h;Z[a++]=f)++K%(100*G|0)||(f=r?1<r?2<r?3<r?Math.sin((g%b)**3):Math.max(Math.min(Math.tan(g),1),-1):1-(2*g/b%2+2)%2:1-4*Math.abs(Math.round(g/b)-g/b):Math.sin(g),f=(l?1-C+C*Math.sin(2*Math.PI*a/l):1)*(0<f?1:-1)*Math.abs(f)**F*q*zzfxV*(a<e?a/e:a<e+m?1-(a-e)/m*(1-y):a<e+m+t?y:a<h-d?(h-a-d)/u*y:0),f=d?f/2+(d>a?0:(a<h-d?1:(h-a)/d)*Z[a-d|0]/2):f),p=(c+=v+=z)*Math.sin(E*x-I),g+=p-p*B*(1-1E9*(Math.sin(a)+1)%2),E+=p-p*B*(1-1E9*(Math.sin(a)**2+1)%2),n&&++n>A&&(c+=w,D+=w,n=0),!l||++J%l||(c=D,v=H,n=n||1);return Z}
+zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q=0,s=1,v={},w=zzfxR/e*60>>2;for(;s;k++)R=[s=a=d=m=0],t.map((e,d)=>{for(x=f[e][k]||[0,0,0],s|=!!f[e][k],G=m+(f[e][0].length-2-!a)*w,p=d==t.length-1,o=2,r=m;o<x.length+p;a=++o){for(g=x[o],u=o==x.length+p-1&&p||c!=(x[0]||0)|g|0,z=0;z<w&&a;z++>w-99&&u?i+=(i<1)/99:0)h=(1-i)*R[M++]/2||0,b[r]=(b[r]||0)-h*q+h,j[r]=(j[r++]||0)+h*q+h;g&&(i=g%1,q=x[1]||0,(g|=0)&&(R=v[[c=x[M=0]||0,g]]=v[[c,g]]||(l=[...n[c]],l[2]*=2**((g-12)/12),g>0?zzfxG(...l):[])))}m=G});return[b,j]}
+const MUSIC_KEYS=['hub','control_room','console','workshop','edge_cabinet','cloud_platform','big_screen','data_pipe','ai_lab','tetris','mario','dkc','kirby','pokemon'];
+let musCtx=null,musSrc=null,musGain=null,musOn=true,musIdx=0;
+function musAudio(){ if(!musCtx){musCtx=new(window.AudioContext||window.webkitAudioContext)();} if(musCtx.state==='suspended')musCtx.resume(); return musCtx; }
+function musPlay(k){
+  if(!window.MUSIC_SONGS||!window.MUSIC_SONGS[k])return;
+  try{
+    const c=musAudio();
+    if(musSrc){try{musSrc.stop();}catch(e){} musSrc=null;}
+    const data=zzfxM.apply(null,window.MUSIC_SONGS[k]);
+    const buf=c.createBuffer(data.length,data[0].length,zzfxR);
+    for(let i=0;i<data.length;i++)buf.getChannelData(i).set(data[i]);
+    if(!musGain){musGain=c.createGain();musGain.gain.value=.5;musGain.connect(c.destination);}
+    const src=c.createBufferSource();src.buffer=buf;src.loop=true;src.connect(musGain);src.start();musSrc=src;
+  }catch(e){}
+}
+function musNext(){ musIdx=(musIdx+1)%MUSIC_KEYS.length; musPlay(MUSIC_KEYS[musIdx]); }
+function musToggle(){
+  musOn=!musOn;
+  const btn=document.getElementById('musicBtn');
+  if(musOn){ musPlay(MUSIC_KEYS[musIdx]); btn.textContent='♫ 开'; }
+  else { if(musSrc){try{musSrc.stop();}catch(e){}} musSrc=null; btn.textContent='♪ 关'; }
+}
+function musStart(){ if(musOn){ try{musAudio(); musPlay(MUSIC_KEYS[musIdx]);}catch(e){} } }
+document.getElementById('musicBtn').addEventListener('click',musToggle);
 </script>
 </body>
 </html>
