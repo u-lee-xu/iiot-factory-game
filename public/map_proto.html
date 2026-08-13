@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>锐智工厂 · 像素地图（原型）</title>
+<title>锐智工厂 · 厂区地图（原型）</title>
 <style>
 :root{
-  --bg:#0b0e1a; --floor:#141a2e; --road:#232c47; --roadline:#3a4568;
+  --bg:#0b0e1a; --floor:#141a2e; --road:#1b2339; --roadline:#3a4568;
   --text:#e8eaf0; --dim:#9aa3bd; --amber:#ffb340; --green:#00e676; --red:#ff5252;
   --border:#2c3552;
 }
@@ -37,59 +37,203 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .pill b{color:var(--amber)}
 .back{font-size:12px;color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:5px 9px;border-radius:3px}
 .back:hover{color:var(--amber);border-color:var(--amber)}
-/* ===== 地图 ===== */
-#map{max-width:980px;margin:0 auto;padding:14px 10px 30px}
-/* 顶部设施 */
-.top-fac{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}
-.fac{flex:1;min-width:0}
-.npc{flex:0 0 auto;text-align:center;padding-top:6px}
-.npc .npc-sprite{font-size:34px;filter:drop-shadow(0 0 8px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
-.npc .bubble{position:relative;background:#121830;border:2px solid var(--border);border-radius:4px;padding:7px 10px;font-size:12px;color:var(--amber);max-width:190px;margin-top:6px;line-height:1.5}
-.npc .bubble::before{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);border:7px solid transparent;border-bottom:7px solid var(--border)}
-@keyframes npcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-/* 建筑通用 */
-.building{--c:#00bcd4;text-align:center;cursor:pointer;position:relative;user-select:none;-webkit-tap-highlight-color:transparent}
-.building .b-sprite{position:relative;width:84px;height:74px;margin:0 auto;image-rendering:pixelated}
-/* 楼体 */
-.b-body{position:absolute;left:8px;right:8px;bottom:0;height:44px;background:linear-gradient(180deg,var(--c),#0000 0%),#151b2e;border:2px solid #0a0d18;box-shadow:inset 0 0 0 2px rgba(255,255,255,.06)}
-.b-windows{position:absolute;top:6px;left:7px;right:7px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.b-win{height:8px;background:#0c101e;border:1px solid #0a0d18}
-.b-win.on{background:#ffe9a8;box-shadow:0 0 6px rgba(255,233,168,.7)}
-.b-door{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:16px;height:12px;background:#0a0d18;border:2px solid var(--c)}
-/* 屋顶类型 */
-.roof-flat{position:absolute;top:-8px;left:12px;right:12px;height:8px;background:var(--c);border:2px solid #0a0d18}
-.roof-tri{position:absolute;top:-14px;left:4px;right:4px;height:14px;background:var(--c);clip-path:polygon(50% 0,100% 100%,0 100%);border:2px solid #0a0d18;border-bottom:none}
-.roof-peak{position:absolute;top:-22px;left:16px;right:16px;height:20px;background:var(--c);clip-path:polygon(50% 0,100% 100%,0 100%);border:2px solid #0a0d18}
-.chimney{position:absolute;top:-26px;left:22px;width:12px;height:18px;background:var(--c);border:2px solid #0a0d18}
-.chimney::after{content:"";position:absolute;top:-9px;left:-2px;width:12px;height:9px;background:rgba(200,200,200,.4);border:1px solid #0a0d18}
-.dome{position:absolute;top:-16px;left:8px;right:8px;height:16px;background:var(--c);border-radius:50% 50% 0 0;border:2px solid #0a0d18}
-.antenna{position:absolute;top:-26px;left:50%;transform:translateX(-50%);width:3px;height:22px;background:var(--c);border:1px solid #0a0d18}
-.antenna::after{content:"";position:absolute;top:-5px;left:-3px;width:7px;height:5px;background:var(--red);border:1px solid #0a0d18;animation:blink 1.1s infinite}
+/* ===== 厂区 ===== */
+#map{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding:14px 12px 36px}
+.compound{position:relative;border:2px solid #223050;border-radius:10px;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(30,50,95,.18), transparent 60%),
+    linear-gradient(180deg,#0d1226,#0a0e1c)}
+/* 厂区入口 */
+.entrance{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;padding:16px 14px 12px;flex-wrap:wrap;background:linear-gradient(180deg,rgba(255,179,64,.06),transparent)}
+.gate-sign{text-align:center}
+.gate-sign .t{font-size:18px;letter-spacing:6px;color:var(--amber);text-shadow:0 0 12px rgba(255,179,64,.6)}
+.gate-sign .s{font-size:10px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+.gate{position:relative;width:min(420px,80vw);height:26px;margin:6px auto 0;border-top:2px solid #3a4568;border-bottom:2px solid #3a4568;background:rgba(20,26,46,.6)}
+.gate::before{content:"";position:absolute;left:0;top:-4px;bottom:-4px;width:6px;background:linear-gradient(180deg,#56617e,#2a3040);border:2px solid #0a0d18}
+.gate::after{content:"";position:absolute;right:0;top:-4px;bottom:-4px;width:6px;background:linear-gradient(180deg,#56617e,#2a3040);border:2px solid #0a0d18}
+.gate .bar{position:absolute;left:8px;right:8px;top:50%;transform:translateY(-50%);height:6px;
+  background:repeating-linear-gradient(90deg,#3a4568 0 8px,transparent 8px 12px);border:1px solid #0a0d18;opacity:.7}
+.guard{position:absolute;right:8px;bottom:-18px;width:34px;height:22px;background:#151b2e;border:2px solid #0a0d18;box-shadow:0 0 8px rgba(255,179,64,.25)}
+.guard::before{content:"🚦";position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:10px;animation:blink 1.2s infinite}
+.npc{display:flex;align-items:center;gap:10px;background:#121830;border:2px solid var(--border);border-radius:8px;padding:8px 12px;box-shadow:0 0 16px rgba(255,179,64,.18)}
+.npc .npc-sprite{font-size:30px;filter:drop-shadow(0 0 8px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
+.npc .bubble{font-size:12px;color:var(--amber);max-width:230px;line-height:1.5}
+@keyframes npcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+/* 主干道 */
+.road{position:relative;margin:10px 0;height:30px}
+.road-h{position:absolute;top:50%;left:0;right:0;height:16px;background:var(--road);border-top:2px solid var(--roadline);border-bottom:2px solid var(--roadline);transform:translateY(-50%)}
+.road-h::before{content:"";position:absolute;top:50%;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,rgba(255,179,64,.8) 0 12px,transparent 12px 24px);transform:translateY(-50%);animation:flow 1.1s linear infinite}
+.road-h::after{content:"";position:absolute;top:50%;left:0;right:0;height:3px;transform:translateY(-50%);background:repeating-linear-gradient(90deg,rgba(100,200,255,.7) 0 6px,transparent 6px 18px);animation:flow .9s linear infinite reverse;opacity:.4}
+@keyframes flow{to{background-position:24px 0}}
+.walker{position:absolute;top:50%;z-index:5;font-size:16px;transform:translateY(-50%);animation:walkX 16s linear infinite}
+.walker.w2{animation-duration:20s;animation-delay:3s;font-size:14px}
+@keyframes walkX{0%{left:2%;transform:translateY(-50%) scaleX(1)}48%{left:96%;transform:translateY(-50%) scaleX(1)}50%{left:96%;transform:translateY(-50%) scaleX(-1)}98%{left:2%;transform:translateY(-50%) scaleX(-1)}100%{left:2%;transform:translateY(-50%) scaleX(1)}}
+.forklift{position:absolute;top:50%;z-index:5;font-size:18px;transform:translateY(-50%);animation:forkX 34s linear infinite}
+@keyframes forkX{0%{left:-4%;transform:translateY(-50%) scaleX(1)}45%{left:96%;transform:translateY(-50%) scaleX(1)}50%{left:96%;transform:translateY(-50%) scaleX(-1)}95%{left:-4%;transform:translateY(-50%) scaleX(-1)}100%{left:-4%;transform:translateY(-50%) scaleX(1)}}
+/* 生产区 */
+.zone{position:relative;background:rgba(10,14,28,.42);border:1px solid #223050;border-radius:8px;padding:14px 10px 10px;margin:0 0 8px}
+.zone-tag{position:absolute;top:-9px;left:14px;font-size:10px;color:var(--dim);background:#0b0e1a;border:1px solid var(--border);padding:2px 10px;border-radius:10px;letter-spacing:2px}
+.zone-tag b{color:var(--amber)}
+.row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 8px}
+/* 中心广场 */
+.plaza{display:flex;align-items:center;justify-content:center;gap:26px;margin:4px 0 8px;padding:6px 0;background:linear-gradient(180deg,transparent,rgba(0,229,118,.04),transparent);border-radius:8px}
+.fountain{font-size:30px;animation:npcBob 3s ease-in-out infinite}
+.ptree{font-size:22px}
+.flag{font-size:22px;animation:flagWave 2.4s ease-in-out infinite}
+@keyframes flagWave{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+/* 配套设施 */
+.facilities{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.fac-card{background:rgba(10,14,28,.5);border:1px solid #223050;border-radius:8px;padding:8px;text-align:center;cursor:pointer}
+.fac-card:hover{border-color:var(--amber)}
+.fac-card .fc-icon{font-size:24px;margin-bottom:4px}
+.fac-card .fc-name{font-size:13px;color:var(--text)}
+.fac-card .fc-sub{font-size:10px;color:var(--dim);margin-top:2px;line-height:1.4}
+.fac-card .fc-sub em{color:var(--green);font-style:normal}
+/* 绿化/装饰 */
+.decor{position:absolute;pointer-events:none;z-index:3}
+.d-tree{position:absolute;font-size:18px;filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}
+.d-lamp{position:absolute;font-size:14px;animation:blink 2.4s infinite}
+.d-lamp::after{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:6px;height:3px;background:#ffe9a8;border-radius:50%;box-shadow:0 0 6px #ffe9a8}
+.utility{display:flex;align-items:center;gap:16px;margin:8px 0;padding:8px 14px;background:rgba(10,14,28,.35);border:1px dashed #2a3852;border-radius:8px}
+.utility .tank,.utility .water{font-size:20px}
+.utility .ut-label{font-size:10px;color:var(--dim);letter-spacing:2px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.pipe{position:absolute;top:-18px;left:8px;right:8px;height:18px;background:var(--c);border:2px solid #0a0d18}
-.pipe::after{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:rgba(255,255,255,.25);border-bottom:1px solid #0a0d18}
+/* ===== 新建筑（工业骨架+赛博皮肤）===== */
+.building{--c:#00bcd4;--cg:rgba(0,188,212,.5);--sh:74px;--bh:56px;
+  text-align:center;cursor:pointer;position:relative;user-select:none;-webkit-tap-highlight-color:transparent}
+.building .b-sprite{position:relative;width:84px;height:var(--sh);margin:0 auto;image-rendering:pixelated}
+.b-shadow{position:absolute;bottom:-6px;left:6px;right:6px;height:8px;background:rgba(0,0,0,.5);border-radius:50%;filter:blur(1px);pointer-events:none}
+.b-body{position:absolute;left:6px;right:6px;bottom:0;height:var(--bh);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.5), transparent 15%, transparent 85%, rgba(0,0,0,.5)),
+    repeating-linear-gradient(180deg, rgba(255,255,255,.045) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg,#242d4d 0%,#161c34 60%,#0b1020 100%);
+  box-shadow:inset 0 0 0 2px #04060c, inset 0 0 0 1px rgba(255,255,255,.07), inset 0 -4px 0 rgba(0,0,0,.35), 0 0 12px var(--cg)}
+.b-wall{position:absolute;inset:0}
+.b-wall::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0 2px, transparent 2px 9px);opacity:.45}
+.b-ribs{position:absolute;inset:0;background:repeating-linear-gradient(90deg, transparent 0 15px, rgba(0,0,0,.4) 15px 17px)}
+.b-base{position:absolute;left:0;right:0;bottom:0;height:calc(var(--bh) - 46px);background:repeating-linear-gradient(90deg, rgba(0,0,0,.35) 0 10px, transparent 10px 12px),linear-gradient(180deg,#12182e,#0a0e1c);border-top:2px solid #04060c}
+.b-side{position:absolute;right:-4px;top:2px;bottom:2px;width:4px;background:linear-gradient(180deg,#1c2440,#0a0e1c);border:1px solid #04060c;z-index:1}
+.b-pipe{position:absolute;left:1px;top:calc(var(--sh) - var(--bh) - 8px);bottom:0;width:6px;z-index:2;background:repeating-linear-gradient(180deg,#4a5570 0 5px,#222a40 5px 7px);border:1px solid #04060c}
+.b-pipe::before{content:"";position:absolute;left:-2px;top:10px;width:9px;height:3px;background:#3a4560;border:1px solid #04060c}
+.b-pipe::after{content:"";position:absolute;left:-2px;top:26px;width:9px;height:3px;background:#3a4560;border:1px solid #04060c}
+.b-win{position:absolute;background:#0a0e1c;border:1px solid #04060c}
+.b-win.sq{border-radius:1px}
+.b-win.round{border-radius:50%}
+.b-win.strip{border-radius:1px}
+.b-win.slit{border-radius:1px}
+.b-win.grill{border-radius:1px;background:repeating-linear-gradient(90deg,#0a0e1c 0 4px,#1c2440 4px 6px)}
+.b-win.screen{border-radius:2px;border:2px solid #04060c}
+.b-win.dark{background:#0a0e1c}
+.b-win.warm{background:#ffd98a;box-shadow:0 0 5px rgba(255,217,138,.9)}
+.b-win.cy{background:#c9f2ff;box-shadow:0 0 6px var(--cg)}
+.b-win.red{background:#ff7a7a;box-shadow:0 0 6px rgba(255,80,80,.95)}
+.b-win.glow{background:var(--c);box-shadow:0 0 8px var(--cg)}
+.b-win.tw{animation:winTw 3.2s ease-in-out infinite}
+.b-win.flick{animation:flick .55s steps(2,end) infinite}
+.b-win.breath{animation:breath 2.6s ease-in-out infinite}
+@keyframes winTw{0%,100%{filter:brightness(1)}45%{filter:brightness(.55)}60%{filter:brightness(1.2)}}
+@keyframes flick{0%,100%{opacity:1}50%{opacity:.12}}
+@keyframes breath{0%,100%{opacity:1}50%{opacity:.4}}
+.b-door{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:14px;height:9px;z-index:2;background:#04060c;border:1px solid var(--c);box-shadow:0 0 6px var(--cg)}
+.b-roof{position:absolute;left:3px;right:3px;background:linear-gradient(180deg,#2b3454,#181e36);border:2px solid #04060c}
+.b-roof::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:var(--c);box-shadow:0 0 8px var(--cg);animation:neonPulse 2.6s ease-in-out infinite}
+.roof-flat{top:calc(var(--sh) - var(--bh) - 8px);height:8px}
+.roof-peak{top:calc(var(--sh) - var(--bh) - 20px);height:20px;clip-path:polygon(50% 0,100% 100%,0 100%);border-bottom:none}
+.roof-dome{top:calc(var(--sh) - var(--bh) - 16px);height:16px;border-radius:50% 50% 0 0}
+.roof-pipe{top:calc(var(--sh) - var(--bh) - 16px);height:16px}
+@keyframes neonPulse{0%,100%{opacity:1}50%{opacity:.55}}
+.b-sign{position:absolute;top:calc(var(--sh) - var(--bh) + 1px);left:50%;transform:translateX(-50%);width:24px;height:8px;background:rgba(4,6,12,.9);border:1px solid var(--c);border-radius:1px;box-shadow:0 0 9px var(--cg), inset 0 0 3px var(--cg);display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1;animation:neonPulse 2.2s ease-in-out infinite;z-index:3}
+.b-chimney{position:absolute;left:16px;top:calc(var(--sh) - var(--bh) - 24px);width:13px;height:16px;background:repeating-linear-gradient(180deg,#3a4560 0 4px,#1c2438 4px 6px);border:2px solid #04060c}
+.b-chimney::before{content:"";position:absolute;top:-3px;left:-2px;width:13px;height:3px;background:var(--c);box-shadow:0 0 6px var(--cg)}
+.b-chimney::after{content:"";position:absolute;bottom:3px;left:-2px;width:13px;height:3px;background:rgba(255,255,255,.13)}
+.b-chimney{overflow:visible}
+.b-smoke{position:absolute;top:-12px;left:-3px;width:9px;height:9px;border-radius:50%;background:rgba(190,200,215,.5);opacity:0;animation:smoke 3s ease-out infinite}
+.b-smoke.s2{left:4px;animation-delay:1.2s}
+.b-smoke.s3{left:0;animation-delay:2.1s}
+@keyframes smoke{0%{transform:translateY(0) scale(.5);opacity:.55}100%{transform:translateY(-34px) scale(1.8);opacity:0}}
+.b-ant{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--sh) - var(--bh) - 32px);width:3px;height:26px;background:linear-gradient(180deg,#4a5570,#1c2438);border:1px solid #04060c}
+.b-beacon{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--cg);animation:blink 1.1s infinite}
+.b-scan{position:absolute;left:4px;right:4px;top:-74px;height:16px;pointer-events:none;background:linear-gradient(180deg, transparent, rgba(255,255,255,.06) 45%, transparent);animation:scanSweep 6s linear infinite;opacity:0}
+@keyframes scanSweep{0%{transform:translateY(0);opacity:0}6%{opacity:1}55%{opacity:1}72%{opacity:0}100%{transform:translateY(156px);opacity:0}}
+.b-baseglow{position:absolute;left:2px;right:2px;bottom:-4px;height:9px;pointer-events:none;background:radial-gradient(ellipse at center, var(--cg) 0%, transparent 70%);animation:neonPulse 3s ease-in-out infinite}
+.b-label{margin-top:6px;font-size:12px;color:var(--text);line-height:1.2}
+.b-label .icon{display:block;font-size:14px;margin-bottom:1px}
+.b-stars{font-size:10px;color:var(--dim);margin-top:2px}
 /* 状态 */
-.building.locked .b-sprite{filter:grayscale(1) brightness(.55)}
-.building.locked .b-label{opacity:.55}
-.building.locked::after{content:"🔒";position:absolute;top:-2px;right:calc(50% - 52px);font-size:16px;z-index:3;filter:none}
-.building.current .b-sprite{animation:glow 1.6s ease-in-out infinite}
+.building.locked .b-sprite{filter:grayscale(1) brightness(.5)}
+.building.locked .b-label{opacity:.6}
+.building.locked::after{content:"🔒";position:absolute;top:-2px;right:calc(50% - 50px);font-size:14px;z-index:6;filter:none}
 .building.current .b-label{color:var(--amber);font-weight:bold}
+.building.current .b-sprite{animation:glow 1.8s ease-in-out infinite}
 @keyframes glow{0%,100%{filter:drop-shadow(0 0 3px var(--c))}50%{filter:drop-shadow(0 0 12px var(--c))}}
 .building.completed .b-label{color:var(--green)}
-.building.completed::after{content:"✓";position:absolute;top:-4px;right:calc(50% - 50px);color:var(--green);font-size:15px;font-weight:bold;z-index:3}
+.building.completed::after{content:"✓";position:absolute;top:-4px;right:calc(50% - 48px);color:var(--green);font-size:14px;font-weight:bold;z-index:6}
 .building:hover .b-sprite{transform:translateY(-3px)}
 .building:active .b-sprite{transform:translateY(0)}
-/* 标签 */
-.b-label{margin-top:6px;font-size:13px;line-height:1.2;color:var(--text)}
-.b-label .icon{display:block;font-size:15px;margin-bottom:1px}
-.b-stars{font-size:11px;color:var(--dim);margin-top:2px}
-/* 道路 */
-.roads{position:relative;margin:6px 0;height:26px}
-.road-h{position:absolute;top:50%;left:0;right:0;height:14px;background:var(--road);border-top:2px solid var(--roadline);border-bottom:2px solid var(--roadline);transform:translateY(-50%)}
-.road-h::before{content:"";position:absolute;top:50%;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,var(--amber) 0 12px,transparent 12px 24px);transform:translateY(-50%);opacity:.5}
-.roads.done .road-h::before{opacity:1}
-/* 主干网格 */
-.main-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 8px}
+/* ===== 8 栋楼专属像素 Logo ===== */
+.b-logo{position:relative;width:20px;height:8px;display:inline-block;vertical-align:middle;flex:none}
+.lg-term .lt-screen{position:absolute;left:1px;top:0;width:18px;height:8px;background:#04060c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg);border-radius:1px}
+.lg-term .lt-line{position:absolute;left:3px;height:1px;background:var(--c);box-shadow:0 0 3px var(--cg)}
+.lg-term .lt-line.l1{top:2px;width:12px}
+.lg-term .lt-line.l2{top:4px;width:7px}
+.lg-term .lt-line.l3{top:6px;width:10px}
+.lg-console .lc-body{position:absolute;left:2px;top:1px;width:16px;height:6px;background:#0a0e1c;border:1px solid var(--c);border-radius:1px;box-shadow:0 0 5px var(--cg)}
+.lg-console .lc-btn{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--c);box-shadow:0 0 4px var(--cg)}
+.lg-console .lc-btn.b1{left:4px;top:3px}
+.lg-console .lc-btn.b2{left:8px;top:3px}
+.lg-console .lc-knob{position:absolute;left:13px;top:2px;width:2px;height:4px;background:var(--c);box-shadow:0 0 3px var(--cg)}
+.lg-gear .lg-hub{position:absolute;left:7px;top:1px;width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-gear .lg-tooth{position:absolute;background:var(--c);box-shadow:0 0 3px var(--cg)}
+.lg-gear .lg-tooth.t1{left:9px;top:0;width:2px;height:3px}
+.lg-gear .lg-tooth.t2{left:9px;bottom:0;width:2px;height:3px}
+.lg-gear .lg-tooth.t3{left:5px;top:3px;width:3px;height:2px}
+.lg-gear .lg-tooth.t4{right:5px;top:3px;width:3px;height:2px}
+.lg-cabinet .lcab-body{position:absolute;left:2px;top:0;width:12px;height:8px;background:#0a0e1c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-cabinet .lcab-led{position:absolute;left:6px;top:1px;width:3px;height:2px;background:var(--c);box-shadow:0 0 4px var(--cg);animation:flick .6s steps(2,end) infinite}
+.lg-cabinet .lcab-vents{position:absolute;left:4px;bottom:1px;width:8px;height:1px;background:repeating-linear-gradient(90deg,var(--c) 0 1px,transparent 1px 2px);opacity:.8}
+.lg-cloud .lcl-b{position:absolute;background:var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-cloud .lcl-b.b1{left:2px;top:4px;width:6px;height:3px;border-radius:2px}
+.lg-cloud .lcl-b.b2{left:6px;top:2px;width:6px;height:5px;border-radius:3px 3px 0 0}
+.lg-cloud .lcl-b.b3{left:11px;top:4px;width:6px;height:3px;border-radius:2px}
+.lg-cloud .lcl-drop{position:absolute;left:17px;top:1px;width:2px;height:2px;background:#fff;opacity:.85;animation:drop 1.6s ease-in infinite}
+@keyframes drop{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(4px);opacity:.3}}
+.lg-chart .lch-body{position:absolute;left:1px;top:0;width:18px;height:8px;background:#04060c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-chart .lch-bar{position:absolute;bottom:1px;width:3px;background:var(--c);box-shadow:0 0 4px var(--cg);animation:breath 2.4s ease-in-out infinite}
+.lg-chart .lch-bar.b1{left:3px;height:3px}
+.lg-chart .lch-bar.b2{left:9px;height:5px}
+.lg-chart .lch-bar.b3{left:15px;height:7px}
+.b-pipe-logo{position:relative;width:20px;height:8px;display:inline-block;vertical-align:middle;flex:none}
+.b-pipe-logo .pl-pipe{position:absolute;left:1px;right:1px;top:50%;transform:translateY(-50%);height:4px;background:linear-gradient(180deg,#465170,#262e44);border:1px solid #04060c;border-radius:1px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09), 0 0 6px var(--cg)}
+.b-pipe-logo .pl-pipe::before,.b-pipe-logo .pl-pipe::after{content:"";position:absolute;top:-2px;bottom:-2px;width:3px;background:linear-gradient(180deg,#56617e,#30384e);border:1px solid #04060c}
+.b-pipe-logo .pl-pipe::before{left:-3px}
+.b-pipe-logo .pl-pipe::after{right:-3px}
+.b-pipe-logo .pl-dot{position:absolute;top:50%;width:3px;height:3px;border-radius:50%;background:var(--c);box-shadow:0 0 5px var(--cg);transform:translateY(-50%);animation:plFlow 1.5s linear infinite;opacity:0}
+.b-pipe-logo .pl-dot.d2{animation-delay:.5s}
+.b-pipe-logo .pl-dot.d3{animation-delay:1s}
+@keyframes plFlow{0%{left:2px;opacity:0}12%{opacity:1}85%{opacity:1}100%{left:15px;opacity:0}}
+.lg-chip .lchp-body{position:absolute;left:5px;top:1px;width:10px;height:8px;background:#0a0e1c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-chip .lchp-core{position:absolute;left:8px;top:3px;width:4px;height:4px;background:var(--c);box-shadow:0 0 6px var(--cg);animation:breath 2s ease-in-out infinite}
+.lg-chip .lchp-pin{position:absolute;background:var(--c);width:2px;height:2px}
+.lg-chip .lchp-pin.p1{left:6px;top:-1px}
+.lg-chip .lchp-pin.p2{left:12px;top:-1px}
+.lg-chip .lchp-pin.p3{left:6px;bottom:-1px}
+.lg-chip .lchp-pin.p4{left:12px;bottom:-1px}
+/* ===== 氛围背景 ===== */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg-sky{position:absolute;inset:0;background:linear-gradient(180deg,#04060f 0%,#070c1f 38%,#0e1730 65%,#1a2340 100%)}
+.bg-stars{position:absolute;inset:0;background-image:
+  radial-gradient(1px 1px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 28% 8%,#fff,transparent),radial-gradient(1px 1px at 42% 22%,#ffd,transparent),radial-gradient(1px 1px at 55% 12%,#fff,transparent),radial-gradient(1.5px 1.5px at 67% 25%,#cfe,transparent),radial-gradient(1px 1px at 78% 9%,#fff,transparent),radial-gradient(1px 1px at 88% 20%,#ffe,transparent),radial-gradient(1px 1px at 8% 32%,#fff,transparent),radial-gradient(1px 1px at 93% 30%,#fff,transparent),radial-gradient(1px 1px at 35% 30%,#fff,transparent);
+  animation:starTw 4s ease-in-out infinite}
+@keyframes starTw{0%,100%{opacity:.6}50%{opacity:1}}
+.bg-moon{position:absolute;top:8%;right:12%;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#d9d2a8 55%,#b8b18a);box-shadow:0 0 40px 12px rgba(255,240,180,.18)}
+.bg-clouds{position:absolute;background:rgba(30,45,80,.28);border-radius:40px;filter:blur(2px)}
+.bg-clouds.c1{width:220px;height:26px;top:16%;left:-240px;animation:drift 60s linear infinite}
+.bg-clouds.c2{width:150px;height:20px;top:27%;left:-170px;animation:drift 80s linear infinite 12s;opacity:.7}
+.bg-clouds::before,.bg-clouds::after{content:"";position:absolute;border-radius:50%;background:inherit}
+.bg-clouds::before{width:70px;height:50px;top:-26px;left:24px}
+.bg-clouds::after{width:50px;height:40px;top:-18px;left:90px}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 400px))}}
 /* ===== 信息弹窗 ===== */
 #popup{position:fixed;inset:0;background:rgba(4,6,12,.7);display:none;align-items:center;justify-content:center;z-index:60;padding:16px}
 #popup.show{display:flex}
@@ -111,117 +255,39 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .pop-enter{width:100%;padding:12px;font-size:15px;font-family:inherit;background:var(--c,var(--amber));color:#111;border:none;cursor:pointer;font-weight:bold;letter-spacing:2px;margin-top:6px}
 .pop-enter:hover{filter:brightness(1.12)}
 .pop-tip{font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
-/* ===== 底部提示 ===== */
 .foot{text-align:center;font-size:11px;color:var(--dim);padding:14px 0 20px;letter-spacing:1px}
-/* 移动端 */
+/* ===== 移动端 ===== */
 @media (max-width:700px){
   .brand{font-size:14px}
   .player{font-size:11px}
-  .building .b-sprite{width:66px;height:60px}
-  .b-body{height:38px}
-  .b-windows .b-win{height:7px}
-  .npc .npc-sprite{font-size:26px}
-  .npc .bubble{font-size:11px;max-width:150px}
-  #map{max-width:100%}
+  .building .b-sprite{zoom:.8}
+  .row{gap:4px}
+  .b-label{font-size:11px}
+  .facilities{grid-template-columns:repeat(2,1fr)}
+  .npc .bubble{max-width:160px}
 }
-
-/* ===== 氛围背景 ===== */
-.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.bg-sky{position:absolute;inset:0;background:linear-gradient(180deg,#04060f 0%,#070c1f 38%,#0e1730 65%,#1a2340 100%)}
-.bg-stars{position:absolute;inset:0;background-image:
-  radial-gradient(1px 1px at 12% 18%,#fff,transparent),
-  radial-gradient(1px 1px at 28% 8%,#fff,transparent),
-  radial-gradient(1px 1px at 42% 22%,#ffd,transparent),
-  radial-gradient(1px 1px at 55% 12%,#fff,transparent),
-  radial-gradient(1.5px 1.5px at 67% 25%,#cfe,transparent),
-  radial-gradient(1px 1px at 78% 9%,#fff,transparent),
-  radial-gradient(1px 1px at 88% 20%,#ffe,transparent),
-  radial-gradient(1px 1px at 8% 32%,#fff,transparent),
-  radial-gradient(1px 1px at 93% 30%,#fff,transparent),
-  radial-gradient(1px 1px at 35% 30%,#fff,transparent);
-  animation:starTw 4s ease-in-out infinite}
-@keyframes starTw{0%,100%{opacity:.6}50%{opacity:1}}
-.bg-moon{position:absolute;top:8%;right:12%;width:44px;height:44px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#fff,#d9d2a8 55%,#b8b18a);box-shadow:0 0 40px 12px rgba(255,240,180,.18)}
-.bg-skyline{position:absolute;left:0;right:0;bottom:26%;height:130px;opacity:.5;
-  background-image:
-    linear-gradient(#0b1226,#0b1226),
-    linear-gradient(#0a1020,#0a1020);
-  background-repeat:no-repeat;background-size:90px 70px,140px 100px;
-  background-position:6% 100%,22% 100%;
-  filter:blur(.3px)}
-.bg-skyline::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34px;opacity:.35;
-  background:repeating-linear-gradient(90deg,transparent 0 22px,#0d1526 22px 26px)}
-.bg-clouds{position:absolute;background:rgba(30,45,80,.28);border-radius:40px;filter:blur(2px)}
-.bg-clouds.c1{width:220px;height:26px;top:16%;left:-240px;animation:drift 60s linear infinite}
-.bg-clouds.c2{width:150px;height:20px;top:27%;left:-170px;animation:drift 80s linear infinite 12s;opacity:.7}
-.bg-clouds::before,.bg-clouds::after{content:"";position:absolute;border-radius:50%;background:inherit}
-.bg-clouds::before{width:70px;height:50px;top:-26px;left:24px}
-.bg-clouds::after{width:50px;height:40px;top:-18px;left:90px}
-@keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 400px))}}
-.bg-fog{position:absolute;left:0;right:0;bottom:0;height:130px;
-  background:linear-gradient(180deg,transparent,rgba(10,16,34,.55) 60%,rgba(10,16,34,.9));
-  animation:fogBob 7s ease-in-out infinite}
-@keyframes fogBob{0%,100%{opacity:.75;transform:translateY(0)}50%{opacity:.95;transform:translateY(-6px)}}
-/* 地图在背景之上 */
-#mapApp{position:relative;z-index:1}
-/* 道路流动数据 */
-.road-h::before{background:repeating-linear-gradient(90deg,rgba(255,179,64,.85) 0 10px,transparent 10px 22px);
-  animation:flow 1.1s linear infinite}
-.road-h::after{content:"";position:absolute;top:50%;left:0;right:0;height:3px;transform:translateY(-50%);
-  background:repeating-linear-gradient(90deg,rgba(100,200,255,.9) 0 6px,transparent 6px 18px);
-  animation:flow 0.9s linear infinite reverse;opacity:.55}
-@keyframes flow{to{background-position:22px 0}}
-/* 烟囱冒烟 */
-.chimney{overflow:visible}
-.smoke{position:absolute;top:-12px;left:-3px;width:10px;height:10px;border-radius:50%;
-  background:rgba(200,200,200,.5);opacity:0;animation:smoke 3s ease-out infinite}
-.smoke.s2{left:5px;animation-delay:1.2s}
-.smoke.s3{left:1px;animation-delay:2.1s}
-@keyframes smoke{0%{transform:translateY(0) scale(.5);opacity:.55}100%{transform:translateY(-34px) scale(1.8);opacity:0}}
-/* 探照灯 */
-.light{position:absolute;top:-30px;left:50%;transform-origin:50% 100%;width:26px;height:60px;
-  background:conic-gradient(from 90deg at 50% 100%,transparent 30deg,rgba(255,230,120,.14) 55deg,transparent 80deg);
-  animation:sweep 7s ease-in-out infinite;pointer-events:none}
-@keyframes sweep{0%,100%{transform:translateX(-50%) rotate(-24deg);opacity:.7}50%{transform:translateX(-50%) rotate(24deg);opacity:1}}
-/* 窗户闪烁 */
-.b-win.on{animation:winTwinkle 3.4s ease-in-out infinite}
-.b-win.on:nth-child(3n){animation-delay:.6s}
-.b-win.on:nth-child(2n){animation-delay:1.3s}
-.b-win.on:nth-child(5n){animation-delay:2s}
-@keyframes winTwinkle{0%,100%{background:#ffe9a8}35%{background:#fff7d6}70%{background:#ffe9a8}}
-/* 路上走动的小工人 */
-.walker{position:absolute;top:50%;z-index:5;font-size:15px;transform:translateY(-50%);animation:walkX 14s linear infinite}
-@keyframes walkX{0%{left:2%;transform:translateY(-50%) scaleX(1)}48%{left:96%;transform:translateY(-50%) scaleX(1)}
-  50%{left:96%;transform:translateY(-50%) scaleX(-1)}98%{left:2%;transform:translateY(-50%) scaleX(-1)}
-  100%{left:2%;transform:translateY(-50%) scaleX(1)}}
-/* 探照灯只有大屏才放, 避免太挤 */
-@media (max-width:700px){.bg-skyline{display:none}.bg-moon{width:28px;height:28px}}
 </style>
 </head>
 <body>
 
-<div class="bg">
-  <div class="bg-sky"></div><div class="bg-stars"></div><div class="bg-moon"></div>
-  <div class="bg-skyline"></div>
-  <div class="bg-clouds c1"></div><div class="bg-clouds c2"></div>
-  <div class="bg-fog"></div>
-</div>
+<div class="bg"><div class="bg-sky"></div><div class="bg-stars"></div><div class="bg-moon"></div>
+  <div class="bg-clouds c1"></div><div class="bg-clouds c2"></div></div>
+
 <div id="loginBox">
   <div class="login-card">
     <h1>🏭 锐智工厂</h1>
-    <div class="sub">像素地图 · 原型验证版</div>
+    <div class="sub">厂区地图 · 原型验证版</div>
     <div class="field"><label>姓名</label><input id="inpName" placeholder="学生姓名" maxlength="20"></div>
     <div class="field"><label>密码</label><input id="inpPw" type="password" placeholder="初始 123456" maxlength="30"></div>
     <button class="btn" onclick="doLogin()">进入工厂</button>
     <div class="err" id="err"></div>
-    <div class="hint">测试账号：张三 / 123456 · 这是独立原型页，不影响正式版</div>
+    <div class="hint">测试账号：张三 / 123456 · 独立原型页，不影响正式版</div>
   </div>
 </div>
 
 <div id="mapApp">
   <header>
-    <div class="brand">🏭 锐智工厂<small>PIXEL MAP · 原型</small></div><button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
+    <div class="brand">🏭 锐智工厂<small>FACTORY MAP · 厂区布局原型</small></div><button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
     <div class="player">
       <span class="pill">👤 <b id="pName">-</b></span>
       <span class="pill">🏅 <b id="pRank">-</b></span>
@@ -230,32 +296,102 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
       <a class="back" href="student.html" target="_blank">旧版 →</a>
     </div>
   </header>
+
   <div id="map">
-    <div class="top-fac">
-      <div class="fac" id="gameRoomSlot"></div>
-      <div class="npc">
-        <div class="npc-sprite">👷</div>
-        <div class="bubble" id="npcBubble">厂长：挑一栋楼开工吧！</div>
+    <div class="compound">
+
+      <!-- 厂区入口 -->
+      <div class="entrance">
+        <div class="gate-sign">
+          <div class="t">锐 智 工 厂</div>
+          <div class="s">· 工业互联网实训基地 ·</div>
+        </div>
+        <div class="npc">
+          <div class="npc-sprite">👷</div>
+          <div class="bubble" id="npcBubble">厂长：欢迎！先到门岗登记，然后挑一栋楼开工吧！</div>
+        </div>
       </div>
-      <div class="fac" id="researchSlot"></div>
+      <div class="gate"><div class="bar"></div><div class="guard"></div></div>
+
+      <!-- 主干道 A -->
+      <div class="road road-a"><div class="road-h"></div><div class="walker">🛵</div><div class="walker w2">👷</div></div>
+
+      <!-- 生产一区 -->
+      <div class="zone">
+        <div class="zone-tag"><b>生产一区</b> · 设备联网</div>
+        <div class="row" id="grid1"></div>
+      </div>
+
+      <!-- 中心广场 -->
+      <div class="plaza">
+        <div class="ptree">🌳</div><div class="fountain">⛲</div><div class="flag">🚩</div><div class="fountain" style="font-size:20px">🌱</div><div class="ptree">🌳</div>
+      </div>
+
+      <!-- 生产二区 -->
+      <div class="zone">
+        <div class="zone-tag" style="left:auto;right:14px"><b>生产二区</b> · 数据上云</div>
+        <div class="row" id="grid2"></div>
+      </div>
+
+      <!-- 主干道 B -->
+      <div class="road road-b"><div class="road-h"></div><div class="forklift">🏗️</div></div>
+
+      <!-- 配套设施 -->
+      <div class="facilities" id="facRow"></div>
+
+      <!-- 辅助设施 -->
+      <div class="utility">
+        <span class="tank">🛢️</span><span class="water">🏭</span><span class="ut-label">储罐区 · 冷却水塔 · 动力站</span><span class="water" style="margin-left:auto">🔦</span>
+      </div>
+
     </div>
-    <div class="roads done" id="roadTop"><div class="road-h"></div><div class="walker">🛵</div></div>
-    <div class="main-grid" id="grid"></div>
-    <div class="roads done" id="roadMid"><div class="road-h"></div><div class="walker">👷</div></div>
-    <div class="main-grid" id="grid2"></div>
-    <div class="foot">— 锐智工厂 · 工业互联网实训 · 像素地图原型 —</div>
+    <div class="foot">— 锐智工厂 · 工业互联网实训 · 厂区地图原型 —</div>
   </div>
 </div>
 
-<div id="popup" onclick="if(event.target===this)closePop()">
-  <div class="pop-card" id="popCard"></div>
-</div>
+<div id="popup" onclick="if(event.target===this)closePop()"><div class="pop-card" id="popCard"></div></div>
 
 <script>
 const API = location.origin;
 const RANKS=[{min:0,t:'实习生',e:'🔰'},{min:1000,t:'学徒',e:'🔧'},{min:2500,t:'技工',e:'⚙️'},{min:4500,t:'工程师',e:'🛠️'},{min:7000,t:'专家',e:'🏆'}];
 let content=null, me=null, token='';
 const $=id=>document.getElementById(id);
+
+// 厂区幕色（样张定稿，暂不走 game-content 的旧色）
+const AREA_COLOR={control_room:'#00bcd4',console:'#ffd400',workshop:'#00e676',edge_cabinet:'#ff5252',
+  cloud_platform:'#1565c0',big_screen:'#e040fb',data_pipe:'#ff6d00',ai_lab:'#9c27b0'};
+const FACADES={
+  control_room:[
+    {x:22,y:12,w:24,h:13,t:'screen',l:'glow',a:'breath'},{x:9,y:15,w:11,h:11,t:'round',l:'glow',a:'tw'},{x:48,y:15,w:11,h:11,t:'round',l:'glow',a:'tw'},
+    {x:9,y:31,w:14,h:8,t:'sq',l:'glow',a:'flick'},{x:24,y:31,w:14,h:8,t:'sq',l:'warm',a:'tw'},{x:40,y:31,w:14,h:8,t:'sq',l:'dark',a:''},{x:55,y:31,w:13,h:8,t:'sq',l:'dark',a:''}],
+  console:[
+    {x:8,y:14,w:24,h:6,t:'strip',l:'glow',a:'tw'},{x:36,y:14,w:24,h:6,t:'strip',l:'glow',a:'tw'},{x:8,y:24,w:24,h:6,t:'strip',l:'warm',a:'tw'},{x:36,y:24,w:24,h:6,t:'strip',l:'warm',a:'tw'},{x:8,y:34,w:24,h:6,t:'strip',l:'dark',a:''},{x:36,y:34,w:24,h:6,t:'strip',l:'dark',a:''}],
+  workshop:[
+    {x:8,y:13,w:13,h:8,t:'sq',l:'glow',a:'tw'},{x:23,y:13,w:13,h:8,t:'sq',l:'warm',a:'tw'},{x:38,y:13,w:13,h:8,t:'sq',l:'dark',a:''},{x:53,y:13,w:13,h:8,t:'sq',l:'glow',a:'tw'},
+    {x:8,y:24,w:13,h:8,t:'sq',l:'glow',a:'tw'},{x:23,y:24,w:13,h:8,t:'sq',l:'glow',a:'tw'},{x:38,y:24,w:13,h:8,t:'sq',l:'warm',a:'tw'},{x:53,y:24,w:13,h:8,t:'sq',l:'glow',a:'flick'},
+    {x:8,y:35,w:13,h:8,t:'sq',l:'dark',a:''},{x:23,y:35,w:13,h:8,t:'sq',l:'dark',a:''},{x:38,y:35,w:13,h:8,t:'sq',l:'dark',a:''},{x:53,y:35,w:13,h:8,t:'sq',l:'dark',a:''}],
+  edge_cabinet:[
+    {x:10,y:13,w:11,h:11,t:'round',l:'red',a:'tw'},{x:28,y:13,w:11,h:11,t:'round',l:'glow',a:'tw'},{x:46,y:13,w:11,h:11,t:'round',l:'glow',a:'tw'},{x:10,y:30,w:47,h:8,t:'grill',l:'',a:''}],
+  cloud_platform:[
+    {x:12,y:12,w:6,h:20,t:'slit',l:'glow',a:'breath'},{x:26,y:12,w:6,h:20,t:'slit',l:'glow',a:'breath'},{x:40,y:12,w:6,h:20,t:'slit',l:'warm',a:'tw'},{x:54,y:12,w:6,h:20,t:'slit',l:'glow',a:'breath'}],
+  big_screen:[
+    {x:12,y:12,w:44,h:20,t:'screen',l:'glow',a:'breath'},{x:12,y:36,w:14,h:5,t:'sq',l:'warm',a:'tw'},{x:30,y:36,w:14,h:5,t:'sq',l:'dark',a:''},{x:48,y:36,w:14,h:5,t:'sq',l:'warm',a:'tw'}],
+  data_pipe:[
+    {x:8,y:14,w:12,h:12,t:'round',l:'glow',a:'tw'},{x:24,y:14,w:12,h:12,t:'round',l:'warm',a:'tw'},{x:40,y:14,w:12,h:12,t:'round',l:'glow',a:'tw'},{x:56,y:14,w:12,h:12,t:'round',l:'warm',a:'tw'},{x:24,y:31,w:20,h:10,t:'screen',l:'glow',a:'flick'}],
+  ai_lab:[
+    {x:10,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},{x:30,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},{x:50,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},{x:10,y:33,w:14,h:8,t:'sq',l:'glow',a:'flick'},{x:44,y:33,w:14,h:8,t:'sq',l:'glow',a:'flick'}]
+};
+const LOGOS={
+  control_room:'<span class="b-logo lg-term"><i class="lt-screen"></i><i class="lt-line l1"></i><i class="lt-line l2"></i><i class="lt-line l3"></i></span>',
+  console:'<span class="b-logo lg-console"><i class="lc-body"></i><i class="lc-btn b1"></i><i class="lc-btn b2"></i><i class="lc-knob"></i></span>',
+  workshop:'<span class="b-logo lg-gear"><i class="lg-hub"></i><i class="lg-tooth t1"></i><i class="lg-tooth t2"></i><i class="lg-tooth t3"></i><i class="lg-tooth t4"></i></span>',
+  edge_cabinet:'<span class="b-logo lg-cabinet"><i class="lcab-body"></i><i class="lcab-led"></i><i class="lcab-vents"></i></span>',
+  cloud_platform:'<span class="b-logo lg-cloud"><i class="lcl-b b1"></i><i class="lcl-b b2"></i><i class="lcl-b b3"></i><i class="lcl-drop"></i></span>',
+  big_screen:'<span class="b-logo lg-chart"><i class="lch-body"></i><i class="lch-bar b1"></i><i class="lch-bar b2"></i><i class="lch-bar b3"></i></span>',
+  data_pipe:'<span class="b-logo b-pipe-logo"><i class="pl-pipe"></i><i class="pl-dot"></i><i class="pl-dot d2"></i><i class="pl-dot d3"></i></span>',
+  ai_lab:'<span class="b-logo lg-chip"><i class="lchp-body"></i><i class="lchp-core"></i><i class="lchp-pin p1"></i><i class="lchp-pin p2"></i><i class="lchp-pin p3"></i><i class="lchp-pin p4"></i></span>'
+};
+function hex2rgb(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
 
 async function doLogin(){
   const name=$('inpName').value.trim(), pw=$('inpPw').value;
@@ -300,80 +436,72 @@ function areaStars(lv){
 }
 function starStr(v){ let s=''; for(let i=0;i<5;i++) s+= i<v?'★':'☆'; return s; }
 
-// ===== 建筑造型 =====
-const SHAPES={
-  control_room:{roof:'roof-flat',h:'tall'},
-  console:{roof:'roof-peak',h:'mid'},
-  workshop:{roof:'roof-flat',h:'wide',chimney:true},
-  edge_cabinet:{roof:'roof-flat',h:'short'},
-  cloud_platform:{roof:'roof-flat',h:'tall'},
-  big_screen:{roof:'roof-flat',h:'tall',antenna:true},
-  data_pipe:{roof:'pipe',h:'mid'},
-  ai_lab:{roof:'dome',h:'mid'}
-};
+function winHTML(f,i){
+  const anim=f.a?` b-win ${f.a}`:'';
+  const delay=f.a==='tw'?` style="animation-delay:${(i%5)*0.4}s"`:'';
+  return `<div class="b-win ${f.t} ${f.l}${anim}" style="left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px${delay}"></div>`;
+}
+function logoHTML(area,color){
+  const [r,g,b]=hex2rgb(color);
+  return `<span style="--c:${color};--cg:rgba(${r},${g},${b},.5);display:inline-block">${LOGOS[area]||''}</span>`;
+}
 
 function buildingHTML(lv, idx){
   const prog=levelProgress(lv);
   const acc=accessOf(lv,idx);
   const state= prog.completed?'completed':(acc==='open'?'current':'locked');
   const st=areaStars(lv);
-  const shape=SHAPES[lv.factoryArea]||{roof:'roof-flat',h:'mid'};
-  const winCount=9;
-  const lit=Math.round(winCount*(prog.completed?1:(prog.pct/100)));
-  let wins='';
-  for(let i=0;i<winCount;i++) wins+=`<div class="b-win ${i<lit?'on':''}"></div>`;
-  const roof = shape.roof==='pipe' ? '<div class="pipe"></div>'
-    : shape.roof==='dome' ? '<div class="dome"></div>'
-    : shape.roof==='roof-peak' ? '<div class="roof-peak"></div>'
-    : '<div class="roof-flat"></div>';
-  const extra = shape.chimney?'<div class="chimney"><div class="smoke"></div><div class="smoke s2"></div><div class="smoke s3"></div></div>':'';
-  const ant = shape.antenna?'<div class="antenna"></div><div class="light"></div>':'';
+  const color=AREA_COLOR[lv.factoryArea]||lv.color;
+  const area=lv.factoryArea;
+  const [r,g,b]=hex2rgb(color);
+  const cg=`rgba(${r},${g},${b},.5)`;
+  const shape={control_room:'flat',console:'peak',workshop:'flat',edge_cabinet:'flat',cloud_platform:'flat',big_screen:'flat',data_pipe:'pipe',ai_lab:'dome'}[area]||'flat';
+  const bh={control_room:'62px',console:'56px',workshop:'56px',edge_cabinet:'56px',cloud_platform:'62px',big_screen:'62px',data_pipe:'56px',ai_lab:'56px'}[area]||'56px';
+  const wins=(FACADES[area]||[]).map(winHTML).join('');
+  const roof = shape==='peak' ? '<div class="b-roof roof-peak"></div>'
+    : shape==='dome' ? '<div class="b-roof roof-dome"></div>'
+    : shape==='pipe' ? '<div class="b-roof roof-pipe"></div>'
+    : '<div class="b-roof roof-flat"></div>';
+  const chimney = area==='workshop' ? '<div class="b-chimney"><i class="b-smoke"></i><i class="b-smoke s2"></i><i class="b-smoke s3"></i></div>' : '';
+  const ant = (area==='control_room'||area==='big_screen') ? '<div class="b-ant"><i class="b-beacon"></i></div>' : '';
+  const logo = logoHTML(area,color);
   const totalStar = Math.max(st.self||0, st.teacher||0);
-  return `<div class="building ${state}" style="--c:${lv.color}" onclick="openPop('${lv.id}')">
-    <div class="b-sprite">${ant}${extra}${roof}<div class="b-body"><div class="b-windows">${wins}</div><div class="b-door"></div></div></div>
-    <div class="b-label"><span class="icon">${lv.areaIcon}</span>${lv.areaName}</div>
+  return `<div class="building ${state}" style="--c:${color};--cg:${cg};--bh:${bh}" onclick="openPop('${lv.id}')">
+    <div class="b-sprite">
+      <div class="b-shadow"></div>
+      ${ant}${chimney}${roof}
+      <div class="b-sign">${logo}</div>
+      <div class="b-side"></div><div class="b-body"><div class="b-wall"></div><div class="b-ribs"></div>${wins}<div class="b-base"></div><div class="b-door"></div></div>
+      <div class="b-pipe"></div>
+      <div class="b-scan"></div>
+      <div class="b-baseglow"></div>
+    </div>
+    <div class="b-label"><span class="icon">${logo}</span>${lv.areaName}</div>
     <div class="b-stars">${starStr(totalStar)}</div>
   </div>`;
 }
 
-function facilityHTML(kind){
-  if(kind==='game'){
-    return `<div class="building current" style="--c:#ff8ac2" onclick="facPop('game')">
-      <div class="b-sprite"><div class="roof-flat"></div><div class="b-body"><div class="b-windows">
-        ${'<div class="b-win on"></div>'.repeat(9)}</div><div class="b-door"></div></div></div>
-      <div class="b-label"><span class="icon">🕹️</span>游戏房</div><div class="b-stars">已解锁的小游戏</div>
-    </div>`;
-  }
-  return `<div class="building current" style="--c:#64b5f6" onclick="facPop('research')">
-    <div class="b-sprite"><div class="roof-flat"></div><div class="b-body"><div class="b-windows">
-      ${'<div class="b-win on"></div>'.repeat(9)}</div><div class="b-door"></div></div></div>
-    <div class="b-label"><span class="icon">📖</span>研发中心</div><div class="b-stars">术语 · 图鉴 · 排行榜</div>
-  </div>`;
+function facilityCard(kind){
+  if(kind==='game') return `<div class="fac-card" onclick="facPop('game')"><div class="fc-icon">🕹️</div><div class="fc-name">游戏房</div><div class="fc-sub">已解锁小游戏<br><em>翻牌·快打·防御战·小蜜蜂</em></div></div>`;
+  if(kind==='research') return `<div class="fac-card" onclick="facPop('research')"><div class="fc-icon">📖</div><div class="fc-name">研发中心</div><div class="fc-sub">术语·图鉴·排行榜·成就</div></div>`;
+  return `<div class="fac-card" onclick="facPop('rest')"><div class="fc-icon">🌳</div><div class="fc-name">休息区</div><div class="fc-sub">长椅·树荫<br>放松一下再战</div></div>`;
 }
 
 function render(){
-  const player=me.name;
   const xp=me.salaryInfo?me.salaryInfo.xp:0;
   let rank=RANKS[0];
   for(const r of RANKS) if(xp>=r.min) rank=r;
-  $('pName').textContent=player;
+  $('pName').textContent=me.name;
   $('pRank').textContent=rank.e+' '+rank.t;
   $('pXp').textContent=xp;
   $('pCoins').textContent=me.coins||0;
 
-  // 建筑
   const rows=content.factory.rows;
   const g1=rows[0]?rows[0].areas:[], g2=rows[1]?rows[1].areas:[];
-  const b1=g1.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx):''; }).join('');
-  const b2=g2.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx+4):''; }).join('');
-  $('grid').innerHTML=b1;
-  $('grid2').innerHTML=b2;
+  $('grid1').innerHTML=g1.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx):''; }).join('');
+  $('grid2').innerHTML=g2.map((a,idx)=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv,idx+4):''; }).join('');
+  $('facRow').innerHTML=facilityCard('game')+facilityCard('research')+facilityCard('rest')+`<div class="fac-card" onclick="facPop('park')"><div class="fc-icon">🅿️</div><div class="fc-name">停车场</div><div class="fc-sub">叉车·货车·班车</div></div>`;
 
-  // 设施
-  $('gameRoomSlot').innerHTML=facilityHTML('game');
-  $('researchSlot').innerHTML=facilityHTML('research');
-
-  // 厂长台词: 根据进度
   const doneCount=content.levels.filter(l=>levelProgress(l).completed).length;
   if(doneCount===0) $('npcBubble').textContent='厂长：小伙子/姑娘，从①中控室开始你的第一间工位吧！';
   else if(doneCount<8) $('npcBubble').textContent=`厂长：干得不错！已完成 ${doneCount}/8 幕，继续推进！`;
@@ -387,50 +515,36 @@ function openPop(id){
   const prog=levelProgress(lv); const st=areaStars(lv);
   const acc=content.levels.indexOf(lv);
   const locked=acc>0&&!levelProgress(content.levels[acc-1]).completed;
-  // 该幕的任务主题(取任务名)
+  const color=AREA_COLOR[lv.factoryArea]||lv.color;
   const tasks=(lv.tasks||[]).filter(t=>!t.auto).map(t=>t.title||t.name||t.label).filter(Boolean).slice(0,5);
   const games=GAME_TAGS[lv.factoryArea]||[];
-  const narr = (lv.narrative && typeof lv.narrative==='object' && lv.narrative.intro)
-    ? lv.narrative.intro
-    : (typeof lv.narrative==='string' ? lv.narrative : '');
-  const card=`
-    <div class="pop-head">
-      <span class="big">${lv.areaIcon}</span>
+  const narr=(lv.narrative&&typeof lv.narrative==='object'&&lv.narrative.intro)?lv.narrative.intro:(typeof lv.narrative==='string'?lv.narrative:'');
+  $('popCard').innerHTML=`
+    <div class="pop-head"><span class="big">${logoHTML(lv.factoryArea,color)}</span>
       <div class="t"><h2>${lv.areaName}</h2><div class="lvl">${lv.name}</div></div>
-      <button class="pop-close" onclick="closePop()">✕</button>
-    </div>
+      <button class="pop-close" onclick="closePop()">✕</button></div>
     <div class="pop-narr">${narr}</div>
-    <div class="prog">任务进度 ${prog.done}/${prog.total}（${prog.pct}%）
-      <div class="prog-bar"><div class="prog-fill" style="width:${prog.pct}%;--c:${lv.color}"></div></div>
-    </div>
+    <div class="prog">任务进度 ${prog.done}/${prog.total}（${prog.pct}%）<div class="prog-bar"><div class="prog-fill" style="width:${prog.pct}%;--c:${color}"></div></div></div>
     <div class="stars-row">🏆 星级：自己 <b>${starStr(st.self)}</b> · 老师 <b>${starStr(st.teacher)}</b></div>
     ${tasks.length?`<div class="stars-row">📋 任务：${tasks.join(' / ')}</div>`:''}
     ${games.length?`<div class="stars-row">🎮 关联小游戏：</div><div class="games">${games.map(g=>`<span class="game-chip">${g}</span>`).join('')}</div>`:''}
-    <button class="pop-enter" style="--c:${lv.color}" onclick="enterLevel('${lv.id}')">${locked?'🔒 未解锁':'🚪 进入 '+lv.areaName}</button>
+    <button class="pop-enter" style="--c:${color}" onclick="enterLevel('${lv.id}')">${locked?'🔒 未解锁':'🚪 进入 '+lv.areaName}</button>
     <div class="pop-tip">原型版：正式版点击后将进入该幕任务</div>`;
-  $('popCard').innerHTML=card;
   $('popup').classList.add('show');
 }
 function facPop(kind){
-  const info = kind==='game'
-    ? {icon:'🕹️',name:'游戏房',desc:'集中放置已解锁的小游戏：翻牌、快打、防御战、小蜜蜂、贪吃蛇…'}
-    : {icon:'📖',name:'研发中心',desc:'术语卡、图鉴、排行榜、成就都在这里查看'};
-  $('popCard').innerHTML=`
-    <div class="pop-head"><span class="big">${info.icon}</span>
-      <div class="t"><h2>${info.name}</h2><div class="lvl">地图设施</div></div>
-      <button class="pop-close" onclick="closePop()">✕</button></div>
-    <div class="pop-narr">${info.desc}</div>
-    <button class="pop-enter" onclick="closePop()">好的，了解</button>
+  const map={game:{icon:'🕹️',name:'游戏房',desc:'集中放置已解锁的小游戏：翻牌、快打、防御战、小蜜蜂、贪吃蛇…'},
+    research:{icon:'📖',name:'研发中心',desc:'术语卡、图鉴、排行榜、成就都在这里查看'},
+    rest:{icon:'🌳',name:'休息区',desc:'长椅、树荫、喷泉。劳逸结合，休息好了答题更快！'},
+    park:{icon:'🅿️',name:'停车场',desc:'厂里的叉车、货车、班车都停这儿。'}};
+  const info=map[kind]||{icon:'🏭',name:'厂区',desc:''};
+  $('popCard').innerHTML=`<div class="pop-head"><span class="big">${info.icon}</span><div class="t"><h2>${info.name}</h2><div class="lvl">厂区设施</div></div><button class="pop-close" onclick="closePop()">✕</button></div>
+    <div class="pop-narr">${info.desc}</div><button class="pop-enter" onclick="closePop()">好的，了解</button>
     <div class="pop-tip">正式版：游戏房聚合所有小游戏入口，研发中心聚合术语/图鉴/排行榜</div>`;
   $('popup').classList.add('show');
 }
-function enterLevel(id){
-  closePop();
-  showToast('🚪 原型版：点击进入 L'+id+' 关卡（正式版将跳转任务）');
-}
+function enterLevel(id){ closePop(); showToast('🚪 原型版：点击进入 L'+id+' 关卡（正式版将跳转任务）'); }
 function closePop(){ $('popup').classList.remove('show'); }
-
-// ===== 轻提示 =====
 function showToast(msg){
   const t=document.createElement('div');
   t.textContent=msg;
@@ -438,8 +552,6 @@ function showToast(msg){
   document.body.appendChild(t);
   setTimeout(()=>t.remove(),2000);
 }
-
-// 关卡→小游戏映射(原型展示用, 大致对应)
 const GAME_TAGS={
   control_room:['翻牌·看清你的网卡','2048·数据融合','术语防御战'],
   console:['快打·指令','连连看','黑客终端'],
@@ -450,13 +562,11 @@ const GAME_TAGS={
   data_pipe:['快打·管道','激光反射','管道工'],
   ai_lab:['快打·AI','数据蜂群']
 };
-
 $('inpName').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 $('inpPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 </script>
 <script src="/data/music.js"></script>
 <script>
-// ===== 8-bit 背景音乐 =====
 zzfxV=.3; zzfxR=44100;
 zzfxG=(q=1,k=.05,c=220,e=0,t=0,u=.1,r=0,F=1,v=0,z=0,w=0,A=0,l=0,B=0,x=0,G=0,d=0,y=1,m=0,C=0)=>{let b=2*Math.PI,H=v*=500*b/zzfxR**2,I=(0<x?1:-1)*b/4,D=c*=(1+2*k*Math.random()-k)*b/zzfxR,Z=[],g=0,E=0,a=0,n=1,J=0,K=0,f=0,p,h;e=99+zzfxR*e;m*=zzfxR;t*=zzfxR;u*=zzfxR;d*=zzfxR;z*=500*b/zzfxR**3;x*=b/zzfxR;w*=b/zzfxR;A*=zzfxR;l=zzfxR*l|0;for(h=e+m+t+u+d|0;a<h;Z[a++]=f)++K%(100*G|0)||(f=r?1<r?2<r?3<r?Math.sin((g%b)**3):Math.max(Math.min(Math.tan(g),1),-1):1-(2*g/b%2+2)%2:1-4*Math.abs(Math.round(g/b)-g/b):Math.sin(g),f=(l?1-C+C*Math.sin(2*Math.PI*a/l):1)*(0<f?1:-1)*Math.abs(f)**F*q*zzfxV*(a<e?a/e:a<e+m?1-(a-e)/m*(1-y):a<e+m+t?y:a<h-d?(h-a-d)/u*y:0),f=d?f/2+(d>a?0:(a<h-d?1:(h-a)/d)*Z[a-d|0]/2):f),p=(c+=v+=z)*Math.sin(E*x-I),g+=p-p*B*(1-1E9*(Math.sin(a)+1)%2),E+=p-p*B*(1-1E9*(Math.sin(a)**2+1)%2),n&&++n>A&&(c+=w,D+=w,n=0),!l||++J%l||(c=D,v=H,n=n||1);return Z}
 zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q=0,s=1,v={},w=zzfxR/e*60>>2;for(;s;k++)R=[s=a=d=m=0],t.map((e,d)=>{for(x=f[e][k]||[0,0,0],s|=!!f[e][k],G=m+(f[e][0].length-2-!a)*w,p=d==t.length-1,o=2,r=m;o<x.length+p;a=++o){for(g=x[o],u=o==x.length+p-1&&p||c!=(x[0]||0)|g|0,z=0;z<w&&a;z++>w-99&&u?i+=(i<1)/99:0)h=(1-i)*R[M++]/2||0,b[r]=(b[r]||0)-h*q+h,j[r]=(j[r++]||0)+h*q+h;g&&(i=g%1,q=x[1]||0,(g|=0)&&(R=v[[c=x[M=0]||0,g]]=v[[c,g]]||(l=[...n[c]],l[2]*=2**((g-12)/12),g>0?zzfxG(...l):[])))}m=G});return[b,j]}

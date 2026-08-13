@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>建筑风格样张 · 工业骨架 + 赛博皮肤</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b0e1a;color:#e8eaf0;font-family:"Courier New",ui-monospace,Menlo,Consolas,monospace;padding:30px 18px 70px}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font-size:24px;color:#ffb340;letter-spacing:1px}
+.sub{font-size:13px;color:#9aa3bd;margin:6px 0 26px}
+section{margin-bottom:44px}
+section h2{font-size:16px;color:#e8eaf0;margin-bottom:14px;border-left:3px solid #ffb340;padding-left:10px}
+
+/* ===== 主样张舞台 ===== */
+.stage{background:linear-gradient(180deg,#0a0e1c,#10172c);border:2px solid #2c3552;border-radius:8px;
+  padding:46px 20px 30px;text-align:center;position:relative;overflow:hidden;min-height:330px}
+.stage::before{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;
+  background:repeating-linear-gradient(90deg,rgba(255,179,64,.05) 0 40px,transparent 40px 80px)}
+.hero-slot{display:inline-block;transform:scale(2.3);transform-origin:center;margin:46px 0 6px}
+.hero-note{font-size:12px;color:#7c8ca6;margin-top:34px}
+.legend{margin:24px auto 0;max-width:520px;text-align:left;font-size:13px;color:#cdd8ea;line-height:2.1}
+.legend li{list-style:none;padding-left:26px;position:relative}
+.legend li::before{position:absolute;left:0;color:#ffb340}
+.legend .ind::before{content:"🧱"}
+.legend .cyb::before{content:"💡"}
+.legend .fix::before{content:"✅"}
+
+/* ===== Logo 图鉴舞台 ===== */
+.logo-stage{background:linear-gradient(180deg,#0d1120,#141a2e);border:2px solid #2c3552;border-radius:8px;padding:26px 20px 30px}
+.logo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.logo-item{background:#0e1324;border:1px solid #243150;border-radius:8px;padding:16px 8px 12px;text-align:center}
+.logo-item .zoom{display:inline-block;transform:scale(4);transform-origin:center;margin:26px 0 30px;filter:drop-shadow(0 0 6px rgba(0,0,0,.6))}
+.logo-item .nm{font-size:13px;color:#e8eaf0}
+.logo-item .ic{font-size:11px;color:#7c8ca6;margin-top:4px}
+.logo-item .real{display:inline-block;margin-top:10px;background:rgba(0,0,0,.3);padding:5px 10px;border-radius:3px}
+.logo-note{font-size:12px;color:#7c8ca6;text-align:center;margin-top:22px}
+
+/* ===== 配色/移动端行 ===== */
+.row-title{font-size:12px;color:#9aa3bd;margin:20px 0 12px}
+.color-row{display:flex;flex-wrap:wrap;gap:22px;justify-content:center;align-items:flex-start}
+.color-row.mobile .building{zoom:.78}
+.mobile-note{font-size:11px;color:#7c8ca6;text-align:center;margin-top:8px}
+
+/* ===== 新风格建筑 ===== */
+.building{--c:#00bcd4;--cg:rgba(0,188,212,.5);--sh:74px;--bh:56px;
+  text-align:center;position:relative;user-select:none;cursor:pointer}
+.building .b-sprite{position:relative;width:84px;height:var(--sh);margin:0 auto;image-rendering:pixelated}
+.b-shadow{position:absolute;bottom:-6px;left:6px;right:6px;height:8px;background:rgba(0,0,0,.45);border-radius:50%;filter:blur(1px);pointer-events:none}
+.b-body{position:absolute;left:6px;right:6px;bottom:0;height:var(--bh);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.5), transparent 15%, transparent 85%, rgba(0,0,0,.5)),
+    repeating-linear-gradient(180deg, rgba(255,255,255,.045) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg,#242d4d 0%,#161c34 60%,#0b1020 100%);
+  box-shadow:inset 0 0 0 2px #04060c, inset 0 0 0 1px rgba(255,255,255,.07), inset 0 -4px 0 rgba(0,0,0,.35), 0 0 12px var(--cg)}
+.b-wall{position:absolute;inset:0}
+.b-wall::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0 2px, transparent 2px 9px);opacity:.45}
+.b-ribs{position:absolute;inset:0;background:repeating-linear-gradient(90deg, transparent 0 15px, rgba(0,0,0,.4) 15px 17px)}
+.b-base{position:absolute;left:0;right:0;bottom:0;height:calc(var(--bh) - 46px);
+  background:repeating-linear-gradient(90deg, rgba(0,0,0,.35) 0 10px, transparent 10px 12px),
+    linear-gradient(180deg,#12182e,#0a0e1c);
+  border-top:2px solid #04060c}
+.b-pipe{position:absolute;left:1px;top:calc(var(--sh) - var(--bh) - 8px);bottom:0;width:6px;z-index:2;
+  background:repeating-linear-gradient(180deg,#4a5570 0 5px,#222a40 5px 7px);
+  border:1px solid #04060c}
+.b-pipe::before{content:"";position:absolute;left:-2px;top:10px;width:9px;height:3px;background:#3a4560;border:1px solid #04060c}
+.b-pipe::after{content:"";position:absolute;left:-2px;top:26px;width:9px;height:3px;background:#3a4560;border:1px solid #04060c}
+/* 窗户：每栋楼专属窗面 */
+.b-win{position:absolute;background:#0a0e1c;border:1px solid #04060c}
+.b-win.sq{border-radius:1px}
+.b-win.round{border-radius:50%}
+.b-win.strip{border-radius:1px}
+.b-win.slit{border-radius:1px}
+.b-win.grill{border-radius:1px;background:repeating-linear-gradient(90deg,#0a0e1c 0 4px,#1c2440 4px 6px)}
+.b-win.screen{border-radius:2px;border:2px solid #04060c}
+.b-win.dark{background:#0a0e1c}
+.b-win.warm{background:#ffd98a;box-shadow:0 0 5px rgba(255,217,138,.9)}
+.b-win.cy{background:#c9f2ff;box-shadow:0 0 6px var(--cg)}
+.b-win.red{background:#ff7a7a;box-shadow:0 0 6px rgba(255,80,80,.95)}
+.b-win.glow{background:var(--c);box-shadow:0 0 8px var(--cg)}
+.b-win.tw{animation:winTw 3.2s ease-in-out infinite}
+.b-win.flick{animation:flick .55s steps(2,end) infinite}
+.b-win.breath{animation:breath 2.6s ease-in-out infinite}
+@keyframes winTw{0%,100%{filter:brightness(1)}45%{filter:brightness(.55)}60%{filter:brightness(1.2)}}
+@keyframes flick{0%,100%{opacity:1}50%{opacity:.12}}
+@keyframes breath{0%,100%{opacity:1}50%{opacity:.4}}
+.b-door{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:14px;height:9px;z-index:2;
+  background:#04060c;border:1px solid var(--c);box-shadow:0 0 6px var(--cg)}
+.b-roof{position:absolute;left:3px;right:3px;background:linear-gradient(180deg,#2b3454,#181e36);border:2px solid #04060c}
+.b-roof::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:var(--c);
+  box-shadow:0 0 8px var(--cg);animation:neonPulse 2.6s ease-in-out infinite}
+.roof-flat{top:calc(var(--sh) - var(--bh) - 8px);height:8px}
+.roof-peak{top:calc(var(--sh) - var(--bh) - 20px);height:20px;clip-path:polygon(50% 0,100% 100%,0 100%);border-bottom:none}
+.roof-dome{top:calc(var(--sh) - var(--bh) - 16px);height:16px;border-radius:50% 50% 0 0}
+.roof-pipe{top:calc(var(--sh) - var(--bh) - 16px);height:16px}
+@keyframes neonPulse{0%,100%{opacity:1}50%{opacity:.55}}
+.b-sign{position:absolute;top:calc(var(--sh) - var(--bh) + 1px);left:50%;transform:translateX(-50%);
+  width:24px;height:8px;background:rgba(4,6,12,.9);border:1px solid var(--c);border-radius:1px;
+  box-shadow:0 0 9px var(--cg), inset 0 0 3px var(--cg);
+  display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1;
+  animation:neonPulse 2.2s ease-in-out infinite;z-index:3}
+.b-chimney{position:absolute;left:16px;top:calc(var(--sh) - var(--bh) - 24px);width:13px;height:16px;
+  background:repeating-linear-gradient(180deg,#3a4560 0 4px,#1c2438 4px 6px);border:2px solid #04060c}
+.b-chimney::before{content:"";position:absolute;top:-3px;left:-2px;width:13px;height:3px;background:var(--c);box-shadow:0 0 6px var(--cg)}
+.b-chimney::after{content:"";position:absolute;bottom:3px;left:-2px;width:13px;height:3px;background:rgba(255,255,255,.13)}
+.b-chimney{overflow:visible}
+.b-smoke{position:absolute;top:-12px;left:-3px;width:9px;height:9px;border-radius:50%;background:rgba(190,200,215,.5);opacity:0;animation:smoke 3s ease-out infinite}
+.b-smoke.s2{left:4px;animation-delay:1.2s}
+.b-smoke.s3{left:0;animation-delay:2.1s}
+@keyframes smoke{0%{transform:translateY(0) scale(.5);opacity:.55}100%{transform:translateY(-34px) scale(1.8);opacity:0}}
+.b-ant{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--sh) - var(--bh) - 32px);width:3px;height:26px;
+  background:linear-gradient(180deg,#4a5570,#1c2438);border:1px solid #04060c}
+.b-beacon{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;
+  background:var(--c);box-shadow:0 0 8px var(--cg);animation:blink 1.1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.b-scan{position:absolute;left:4px;right:4px;top:-74px;height:16px;pointer-events:none;
+  background:linear-gradient(180deg, transparent, rgba(255,255,255,.06) 45%, transparent);
+  animation:scanSweep 6s linear infinite;opacity:0}
+@keyframes scanSweep{0%{transform:translateY(0);opacity:0}6%{opacity:1}55%{opacity:1}72%{opacity:0}100%{transform:translateY(156px);opacity:0}}
+.b-baseglow{position:absolute;left:2px;right:2px;bottom:-4px;height:9px;pointer-events:none;
+  background:radial-gradient(ellipse at center, var(--cg) 0%, transparent 70%);animation:neonPulse 3s ease-in-out infinite}
+.b-label{margin-top:8px;font-size:13px;color:#e8eaf0;line-height:1.2}
+.b-label .icon{display:block;font-size:16px;margin-bottom:1px}
+.b-stars{font-size:11px;color:#9aa3bd;margin-top:2px}
+
+/* ===== 8 栋楼专属像素 Logo（自绘，无 emoji）===== */
+.b-logo{position:relative;width:20px;height:8px;display:inline-block;vertical-align:middle;flex:none}
+/* 中控室 · 终端屏 */
+.lg-term .lt-screen{position:absolute;left:1px;top:0;width:18px;height:8px;background:#04060c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg);border-radius:1px}
+.lg-term .lt-line{position:absolute;left:3px;height:1px;background:var(--c);box-shadow:0 0 3px var(--cg)}
+.lg-term .lt-line.l1{top:2px;width:12px}
+.lg-term .lt-line.l2{top:4px;width:7px}
+.lg-term .lt-line.l3{top:6px;width:10px}
+/* 操作台 · 控制面板 */
+.lg-console .lc-body{position:absolute;left:2px;top:1px;width:16px;height:6px;background:#0a0e1c;border:1px solid var(--c);border-radius:1px;box-shadow:0 0 5px var(--cg)}
+.lg-console .lc-btn{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--c);box-shadow:0 0 4px var(--cg)}
+.lg-console .lc-btn.b1{left:4px;top:3px}
+.lg-console .lc-btn.b2{left:8px;top:3px}
+.lg-console .lc-knob{position:absolute;left:13px;top:2px;width:2px;height:4px;background:var(--c);box-shadow:0 0 3px var(--cg)}
+/* 车间 · 齿轮 */
+.lg-gear .lg-hub{position:absolute;left:7px;top:1px;width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-gear .lg-tooth{position:absolute;background:var(--c);box-shadow:0 0 3px var(--cg)}
+.lg-gear .lg-tooth.t1{left:9px;top:0;width:2px;height:3px}
+.lg-gear .lg-tooth.t2{left:9px;bottom:0;width:2px;height:3px}
+.lg-gear .lg-tooth.t3{left:5px;top:3px;width:3px;height:2px}
+.lg-gear .lg-tooth.t4{right:5px;top:3px;width:3px;height:2px}
+/* 边缘柜 · 机柜 */
+.lg-cabinet .lcab-body{position:absolute;left:2px;top:0;width:12px;height:8px;background:#0a0e1c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-cabinet .lcab-led{position:absolute;left:6px;top:1px;width:3px;height:2px;background:var(--c);box-shadow:0 0 4px var(--cg);animation:flick .6s steps(2,end) infinite}
+.lg-cabinet .lcab-vents{position:absolute;left:4px;bottom:1px;width:8px;height:1px;background:repeating-linear-gradient(90deg,var(--c) 0 1px,transparent 1px 2px);opacity:.8}
+/* 云平台 · 数据云 */
+.lg-cloud .lcl-b{position:absolute;background:var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-cloud .lcl-b.b1{left:2px;top:4px;width:6px;height:3px;border-radius:2px}
+.lg-cloud .lcl-b.b2{left:6px;top:2px;width:6px;height:5px;border-radius:3px 3px 0 0}
+.lg-cloud .lcl-b.b3{left:11px;top:4px;width:6px;height:3px;border-radius:2px}
+.lg-cloud .lcl-drop{position:absolute;left:17px;top:1px;width:2px;height:2px;background:#fff;opacity:.85;animation:drop 1.6s ease-in infinite}
+@keyframes drop{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(4px);opacity:.3}}
+/* 监控大屏 · 数据图表 */
+.lg-chart .lch-body{position:absolute;left:1px;top:0;width:18px;height:8px;background:#04060c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-chart .lch-bar{position:absolute;bottom:1px;width:3px;background:var(--c);box-shadow:0 0 4px var(--cg);animation:breath 2.4s ease-in-out infinite}
+.lg-chart .lch-bar.b1{left:3px;height:3px}
+.lg-chart .lch-bar.b2{left:9px;height:5px}
+.lg-chart .lch-bar.b3{left:15px;height:7px}
+/* 数据管道 · 管道 + 流动数据点 */
+.b-pipe-logo{position:relative;width:20px;height:8px;display:inline-block;vertical-align:middle;flex:none}
+.b-pipe-logo .pl-pipe{position:absolute;left:1px;right:1px;top:50%;transform:translateY(-50%);height:4px;
+  background:linear-gradient(180deg,#465170,#262e44);border:1px solid #04060c;border-radius:1px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09), 0 0 6px var(--cg)}
+.b-pipe-logo .pl-pipe::before,.b-pipe-logo .pl-pipe::after{content:"";position:absolute;top:-2px;bottom:-2px;width:3px;
+  background:linear-gradient(180deg,#56617e,#30384e);border:1px solid #04060c}
+.b-pipe-logo .pl-pipe::before{left:-3px}
+.b-pipe-logo .pl-pipe::after{right:-3px}
+.b-pipe-logo .pl-dot{position:absolute;top:50%;width:3px;height:3px;border-radius:50%;background:var(--c);
+  box-shadow:0 0 5px var(--cg);transform:translateY(-50%);animation:plFlow 1.5s linear infinite;opacity:0}
+.b-pipe-logo .pl-dot.d2{animation-delay:.5s}
+.b-pipe-logo .pl-dot.d3{animation-delay:1s}
+@keyframes plFlow{0%{left:2px;opacity:0}12%{opacity:1}85%{opacity:1}100%{left:15px;opacity:0}}
+/* AI实验室 · 芯片 */
+.lg-chip .lchp-body{position:absolute;left:5px;top:1px;width:10px;height:8px;background:#0a0e1c;border:1px solid var(--c);box-shadow:0 0 5px var(--cg)}
+.lg-chip .lchp-core{position:absolute;left:8px;top:3px;width:4px;height:4px;background:var(--c);box-shadow:0 0 6px var(--cg);animation:breath 2s ease-in-out infinite}
+.lg-chip .lchp-pin{position:absolute;background:var(--c);width:2px;height:2px}
+.lg-chip .lchp-pin.p1{left:6px;top:-1px}
+.lg-chip .lchp-pin.p2{left:12px;top:-1px}
+.lg-chip .lchp-pin.p3{left:6px;bottom:-1px}
+.lg-chip .lchp-pin.p4{left:12px;bottom:-1px}
+
+@media (max-width:640px){ .hero-slot{transform:scale(1.9)} .logo-grid{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏗️ 建筑风格样张</h1>
+  <div class="sub">工业骨架 + 赛博皮肤 + 8 栋楼专属自绘像素 Logo（零图片）</div>
+
+  <section>
+    <h2>样张楼 · 中控室（2.3 倍放大预览）</h2>
+    <div class="stage">
+      <div class="hero-slot" id="hero"></div>
+      <div class="hero-note">↑ 实际地图尺寸约 84×74px，这里是放大预览</div>
+      <ul class="legend">
+        <li class="fix">零重叠 + 每栋楼窗面/Logo 独一无二</li>
+        <li class="ind">工业骨架 —— 金属墙板 + 铆钉面板、外露管道、烟囱 + 冒烟、厂房屋顶、地基条</li>
+        <li class="cyb">赛博皮肤 —— 幕色霓虹描边 + 光晕、霓虹招牌（放专属 Logo）、天线信标、扫描线、基座光晕</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>8 栋楼专属 Logo 图鉴</h2>
+    <div class="logo-stage">
+      <div class="logo-grid" id="logoGrid"></div>
+      <div class="logo-note">每个 Logo 4 倍放大 + 正常大小（霓虹招牌里用的就是它）；全部自绘 CSS 像素，不用 emoji</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>各幕配色预览（地图实际尺寸）</h2>
+    <div class="row-title">桌面端 84px：</div>
+    <div class="color-row" id="colorRow"></div>
+    <div class="mobile-note" style="margin-top:26px">—— 移动端 66px（zoom .78）——</div>
+    <div class="color-row mobile" id="mobileRow"></div>
+  </section>
+</div>
+
+<script>
+const ACTS=[
+  {id:'control_room', name:'中控室',  color:'#00bcd4', roof:'flat', ant:true,  bh:'62px'},
+  {id:'console',      name:'操作台',  color:'#ffd400', roof:'peak',           bh:'56px'},
+  {id:'workshop',     name:'车间',    color:'#00e676', roof:'flat', chimney:true, bh:'56px'},
+  {id:'edge_cabinet', name:'边缘柜',  color:'#ff5555', roof:'flat',           bh:'56px'},
+  {id:'cloud_platform',name:'云平台', color:'#1565c0', roof:'flat',           bh:'62px'},
+  {id:'big_screen',   name:'监控大屏',color:'#e040fb', roof:'flat', ant:true,  bh:'62px'},
+  {id:'data_pipe',    name:'数据管道',color:'#ff6d00', roof:'pipe',           bh:'56px'},
+  {id:'ai_lab',       name:'AI实验室',color:'#9c27b0', roof:'dome',           bh:'56px'}
+];
+const FACADES={
+  control_room:[
+    {x:22,y:12,w:24,h:13,t:'screen',l:'glow',a:'breath'},
+    {x:9,y:15,w:11,h:11,t:'round',l:'glow',a:'tw'},
+    {x:48,y:15,w:11,h:11,t:'round',l:'glow',a:'tw'},
+    {x:9,y:31,w:14,h:8,t:'sq',l:'glow',a:'flick'},
+    {x:24,y:31,w:14,h:8,t:'sq',l:'warm',a:'tw'},
+    {x:40,y:31,w:14,h:8,t:'sq',l:'dark',a:''},
+    {x:55,y:31,w:13,h:8,t:'sq',l:'dark',a:''}
+  ],
+  console:[
+    {x:8,y:14,w:24,h:6,t:'strip',l:'glow',a:'tw'},
+    {x:36,y:14,w:24,h:6,t:'strip',l:'glow',a:'tw'},
+    {x:8,y:24,w:24,h:6,t:'strip',l:'warm',a:'tw'},
+    {x:36,y:24,w:24,h:6,t:'strip',l:'warm',a:'tw'},
+    {x:8,y:34,w:24,h:6,t:'strip',l:'dark',a:''},
+    {x:36,y:34,w:24,h:6,t:'strip',l:'dark',a:''}
+  ],
+  workshop:[
+    {x:8,y:13,w:13,h:8,t:'sq',l:'glow',a:'tw'},{x:23,y:13,w:13,h:8,t:'sq',l:'warm',a:'tw'},{x:38,y:13,w:13,h:8,t:'sq',l:'dark',a:''},{x:53,y:13,w:13,h:8,t:'sq',l:'glow',a:'tw'},
+    {x:8,y:24,w:13,h:8,t:'sq',l:'glow',a:'tw'},{x:23,y:24,w:13,h:8,t:'sq',l:'glow',a:'tw'},{x:38,y:24,w:13,h:8,t:'sq',l:'warm',a:'tw'},{x:53,y:24,w:13,h:8,t:'sq',l:'glow',a:'flick'},
+    {x:8,y:35,w:13,h:8,t:'sq',l:'dark',a:''},{x:23,y:35,w:13,h:8,t:'sq',l:'dark',a:''},{x:38,y:35,w:13,h:8,t:'sq',l:'dark',a:''},{x:53,y:35,w:13,h:8,t:'sq',l:'dark',a:''}
+  ],
+  edge_cabinet:[
+    {x:10,y:13,w:11,h:11,t:'round',l:'red',a:'tw'},
+    {x:28,y:13,w:11,h:11,t:'round',l:'glow',a:'tw'},
+    {x:46,y:13,w:11,h:11,t:'round',l:'glow',a:'tw'},
+    {x:10,y:30,w:47,h:8,t:'grill',l:'',a:''}
+  ],
+  cloud_platform:[
+    {x:12,y:12,w:6,h:20,t:'slit',l:'glow',a:'breath'},
+    {x:26,y:12,w:6,h:20,t:'slit',l:'glow',a:'breath'},
+    {x:40,y:12,w:6,h:20,t:'slit',l:'warm',a:'tw'},
+    {x:54,y:12,w:6,h:20,t:'slit',l:'glow',a:'breath'}
+  ],
+  big_screen:[
+    {x:12,y:12,w:44,h:20,t:'screen',l:'glow',a:'breath'},
+    {x:12,y:36,w:14,h:5,t:'sq',l:'warm',a:'tw'},
+    {x:30,y:36,w:14,h:5,t:'sq',l:'dark',a:''},
+    {x:48,y:36,w:14,h:5,t:'sq',l:'warm',a:'tw'}
+  ],
+  data_pipe:[
+    {x:8,y:14,w:12,h:12,t:'round',l:'glow',a:'tw'},
+    {x:24,y:14,w:12,h:12,t:'round',l:'warm',a:'tw'},
+    {x:40,y:14,w:12,h:12,t:'round',l:'glow',a:'tw'},
+    {x:56,y:14,w:12,h:12,t:'round',l:'warm',a:'tw'},
+    {x:24,y:31,w:20,h:10,t:'screen',l:'glow',a:'flick'}
+  ],
+  ai_lab:[
+    {x:10,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},
+    {x:30,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},
+    {x:50,y:13,w:14,h:14,t:'round',l:'glow',a:'breath'},
+    {x:10,y:33,w:14,h:8,t:'sq',l:'glow',a:'flick'},
+    {x:44,y:33,w:14,h:8,t:'sq',l:'glow',a:'flick'}
+  ]
+};
+function hex2rgb(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+
+// ===== 8 个自绘 Logo 的 HTML（data_pipe 用管道 logo）=====
+const LOGOS={
+  control_room:'<span class="b-logo lg-term"><i class="lt-screen"></i><i class="lt-line l1"></i><i class="lt-line l2"></i><i class="lt-line l3"></i></span>',
+  console:'<span class="b-logo lg-console"><i class="lc-body"></i><i class="lc-btn b1"></i><i class="lc-btn b2"></i><i class="lc-knob"></i></span>',
+  workshop:'<span class="b-logo lg-gear"><i class="lg-hub"></i><i class="lg-tooth t1"></i><i class="lg-tooth t2"></i><i class="lg-tooth t3"></i><i class="lg-tooth t4"></i></span>',
+  edge_cabinet:'<span class="b-logo lg-cabinet"><i class="lcab-body"></i><i class="lcab-led"></i><i class="lcab-vents"></i></span>',
+  cloud_platform:'<span class="b-logo lg-cloud"><i class="lcl-b b1"></i><i class="lcl-b b2"></i><i class="lcl-b b3"></i><i class="lcl-drop"></i></span>',
+  big_screen:'<span class="b-logo lg-chart"><i class="lch-body"></i><i class="lch-bar b1"></i><i class="lch-bar b2"></i><i class="lch-bar b3"></i></span>',
+  data_pipe:'<span class="b-logo b-pipe-logo"><i class="pl-pipe"></i><i class="pl-dot"></i><i class="pl-dot d2"></i><i class="pl-dot d3"></i></span>',
+  ai_lab:'<span class="b-logo lg-chip"><i class="lchp-body"></i><i class="lchp-core"></i><i class="lchp-pin p1"></i><i class="lchp-pin p2"></i><i class="lchp-pin p3"></i><i class="lchp-pin p4"></i></span>'
+};
+function logoHTML(a){
+  const [r,g,b]=hex2rgb(a.color);
+  return `<span style="--c:${a.color};--cg:rgba(${r},${g},${b},.5);display:inline-block">${LOGOS[a.id]}</span>`;
+}
+
+function winHTML(f,i){
+  const anim = f.a ? ` b-win ${f.a}` : '';
+  const delay = f.a==='tw' ? ` style="animation-delay:${(i%5)*0.4}s"` : '';
+  return `<div class="b-win ${f.t} ${f.l}${anim}" style="left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px${delay}"></div>`;
+}
+
+function newBuilding(a){
+  const [r,g,b]=hex2rgb(a.color);
+  const cg=`rgba(${r},${g},${b},.5)`;
+  const wins=(FACADES[a.id]||[]).map(winHTML).join('');
+  const roof = a.roof==='peak' ? '<div class="b-roof roof-peak"></div>'
+    : a.roof==='dome' ? '<div class="b-roof roof-dome"></div>'
+    : a.roof==='pipe' ? '<div class="b-roof roof-pipe"></div>'
+    : '<div class="b-roof roof-flat"></div>';
+  const chimney = a.chimney ? '<div class="b-chimney"><i class="b-smoke"></i><i class="b-smoke s2"></i><i class="b-smoke s3"></i></div>' : '';
+  const ant = a.ant ? '<div class="b-ant"><i class="b-beacon"></i></div>' : '';
+  const logo = logoHTML(a);
+  const sign = `<div class="b-sign">${logo}</div>`;
+  const labelIcon = `<span class="icon"><span style="display:inline-block;transform:scale(1.15)">${logo}</span></span>`;
+  return `<div class="building" style="--c:${a.color};--cg:${cg};--bh:${a.bh}">
+    <div class="b-sprite">
+      <div class="b-shadow"></div>
+      ${ant}${chimney}${roof}
+      ${sign}
+      <div class="b-body">
+        <div class="b-wall"></div><div class="b-ribs"></div>
+        ${wins}
+        <div class="b-base"></div>
+        <div class="b-door"></div>
+      </div>
+      <div class="b-pipe"></div>
+      <div class="b-scan"></div>
+      <div class="b-baseglow"></div>
+    </div>
+    <div class="b-label">${labelIcon}${a.name}</div>
+    <div class="b-stars">★★★☆☆</div>
+  </div>`;
+}
+
+// Logo 图鉴
+document.getElementById('logoGrid').innerHTML = ACTS.map(a=>`
+  <div class="logo-item">
+    <div class="zoom">${logoHTML(a)}</div>
+    <div class="nm">${a.name}</div>
+    <div class="ic">${a.roof}${a.ant?' +天线':''}${a.chimney?' +烟囱':''}</div>
+    <div class="real">${logoHTML(a)}</div>
+  </div>`).join('');
+
+document.getElementById('hero').innerHTML = newBuilding(ACTS[0]);
+document.getElementById('colorRow').innerHTML = ACTS.map(a=>newBuilding(a)).join('');
+document.getElementById('mobileRow').innerHTML = ACTS.map(a=>newBuilding(a)).join('');
+</script>
+</body>
+</html>
