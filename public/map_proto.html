@@ -422,6 +422,36 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .rb-step.cur{color:var(--amber);border-color:var(--amber);font-weight:bold;animation:startPulse 1.8s ease-in-out infinite}
 .rb-step.done{color:var(--green);border-color:var(--green)}
 .rb-arrow{font-size:9px;color:#4a5570}
+/* ===== 2D 俯视房间（任务工位） ===== */
+.room-floor{background:
+  repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 2px, transparent 2px 6px),
+  repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 2px, transparent 2px 6px),
+  linear-gradient(180deg,#0d1126,#0a0e1c);
+  border:2px solid #2a3852;border-radius:6px;padding:12px;margin:0 18px 12px}
+.stage-zone{margin-bottom:14px}
+.stage-zone:last-child{margin-bottom:2px}
+.sz-label{font-size:11px;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:6px;letter-spacing:1px}
+.sz-label b{color:var(--amber)}
+.sz-count{font-size:10px;color:var(--green);background:#0a0e1c;border:1px solid #223050;padding:1px 7px;border-radius:8px}
+.sz-label::after{content:"";flex:1;height:1px;background:#223050}
+.station-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px}
+.station{position:relative;background:#0a0e1c;border:2px solid #223050;border-radius:3px;padding:8px 4px;text-align:center;cursor:pointer;transition:border-color .2s,transform .15s}
+.station:hover{border-color:var(--amber);transform:translateY(-2px)}
+.station .st-icon{font-size:22px;display:block;line-height:1}
+.station .st-name{font-size:9px;color:#9aa3bd;margin-top:4px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.station .st-num{position:absolute;top:2px;right:3px;font-size:8px;color:#7c8ca6}
+.station.done{border-color:var(--green);background:linear-gradient(180deg,rgba(0,230,118,.1),transparent)}
+.station.done .st-name{color:var(--green)}
+.station.done .st-state{position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--green);color:#04140b;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
+.station.next{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.5);animation:stNext 1.6s ease-in-out infinite}
+.station.next::before{content:"▶";position:absolute;top:-16px;left:50%;transform:translateX(-50%);color:var(--amber);font-size:12px;animation:stArrow 1.1s ease-in-out infinite;text-shadow:0 0 6px rgba(255,179,64,.7)}
+.station.next .st-icon{animation:stPulse 1.6s ease-in-out infinite}
+.station.next .st-name{color:var(--amber);font-weight:bold}
+.station.todo{opacity:.6}
+.station.todo:hover{opacity:1}
+@keyframes stNext{0%,100%{box-shadow:0 0 8px rgba(255,179,64,.35)}50%{box-shadow:0 0 20px rgba(255,179,64,.75)}}
+@keyframes stArrow{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+@keyframes stPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
 /* ===== 房间界面 ===== */
 #room{position:fixed;inset:0;background:rgba(4,6,12,.84);display:none;align-items:center;justify-content:center;z-index:70;padding:14px}
 #room.show{display:flex}
@@ -865,24 +895,30 @@ function openRoom(id){
   const totalXP=tasks.reduce((s,t)=>s+(t.xp||0),0);
   const earnedXP=tasks.filter(t=>isTaskDone(t.id)).reduce((s,t)=>s+(t.xp||0),0);
   let cur=null; tasks.forEach(t=>{ if(cur===null&&!isTaskDone(t.id)) cur=t; });
-  const cardHTML=(t)=>{
+  // 2D 俯视房间：任务=房间里的工位设备，当前任务发光引导
+  const stHTML=(t)=>{
     const done=isTaskDone(t.id), next=(!done&&t===cur);
     const cls=done?'done':(next?'next':'todo');
-    const state=done?'✓':(next?'▶':'·');
     const icon=TASK_ICON[t.type]||'📌';
-    return `<div class="task-card ${cls}" onclick="enterLevel('${lv.id}','${t.id}')"><span class="tc-icon">${icon}</span><span class="tc-title">${t.title||t.name||t.label||''}</span><span class="tc-xp">+${t.xp||0} XP</span><span class="tc-state">${state}</span></div>`;
+    const nm=(t.title||t.name||t.label||'').slice(0,7);
+    return `<div class="station ${cls}" onclick="enterLevel('${lv.id}','${t.id}')" title="${(t.title||t.name||t.label||'')}">
+      <span class="st-icon">${icon}</span>
+      ${done?'<span class="st-state">✓</span>':'<span class="st-num">'+(t.xp||0)+'XP</span>'}
+      <span class="st-name">${nm}</span>
+    </div>`;
   };
-  const secHTML=(title,secTasks)=>{
+  const szHTML=(title,secTasks)=>{
     const d=secTasks.filter(t=>isTaskDone(t.id)).length;
-    return `<div class="rt-sec">${title}<span class="sec-count">${d}/${secTasks.length}</span></div>`+secTasks.map(cardHTML).join('');
+    return `<div class="stage-zone"><div class="sz-label"><b>${title}</b><span class="sz-count">${d}/${secTasks.length}</span></div>
+      <div class="station-grid">${secTasks.map(stHTML).join('')}</div></div>`;
   };
   const PHASE=['阶段一','阶段二','阶段三','阶段四','阶段五'];
   const regs=tasks.filter(t=>!String(t.id).includes('hidden'));
   const hiddens=tasks.filter(t=>String(t.id).includes('hidden'));
   const size=Math.max(4,Math.ceil(regs.length/4));
-  let taskHTML='';
-  for(let i=0;i<regs.length;i+=size) taskHTML+=secHTML(PHASE[i/size]||('第'+(i/size+1)+'阶段'), regs.slice(i,i+size));
-  if(hiddens.length) taskHTML+=secHTML('🌶 隐藏挑战', hiddens);
+  let floorHTML='';
+  for(let i=0;i<regs.length;i+=size) floorHTML+=szHTML(PHASE[i/size]||('第'+(i/size+1)+'阶段'), regs.slice(i,i+size));
+  if(hiddens.length) floorHTML+=szHTML('🌶 隐藏挑战', hiddens);
   const games=GAME_TAGS[lv.factoryArea]||[];
   const narr=(lv.narrative&&typeof lv.narrative==='object'&&lv.narrative.intro)?lv.narrative.intro:(typeof lv.narrative==='string'?lv.narrative:'');
   const room=$('room');
@@ -896,9 +932,8 @@ function openRoom(id){
     </div>
     <div class="room-progress"><div class="rp-bar"><div class="rp-fill" style="width:${prog.pct}%"></div></div><div class="rp-txt">已完成 ${prog.done}/${prog.total}（${prog.pct}%） · ⚡ ${earnedXP}/${totalXP} XP · 🏆 ${starStr(Math.max(st.self||0,st.teacher||0))}</div></div>
     <div class="room-narr"><div class="rt-who">👷 厂长</div>${narr||'加油，把这一层的任务打通！'}</div>
-    <div class="room-tasks">
-      <div class="rt-sec">📋 任务清单（${prog.done}/${prog.total}）<em style="font-size:9px;color:#7c8ca6;font-style:normal">· 点击任务卡可直接进入</em></div>
-      ${taskHTML}
+    <div class="room-floor">
+      ${floorHTML}
       <div class="rt-sec">🎮 关联小游戏</div>
       <div class="games">${games.length?games.map(g=>`<span class="game-chip">${g}</span>`).join(''):'<span class="game-chip">-</span>'}</div>
     </div>
@@ -912,6 +947,7 @@ function openRoom(id){
 function closeRoom(){ $('room').classList.remove('show'); if(musOn){ try{ musPlay('hub'); }catch(e){} } }
 function enterLevel(id, taskId){
   closeRoom();
+  try{ if(id) sessionStorage.setItem('mapRoom', id); }catch(e){}
   const q=new URLSearchParams();
   if(taskId) q.set('task', taskId);
   else if(id) q.set('level', id);
@@ -974,6 +1010,11 @@ async function autoLogin(){
     render();
     $('mapApp').classList.add('show');
     try{ musStart(); }catch(e){}
+    // 从任务叉掉/完成跳回：自动重新打开对应房间（房间=该幕任务清单）
+    try{
+      const mr=sessionStorage.getItem('mapRoom');
+      if(mr){ sessionStorage.removeItem('mapRoom'); const lv=content.levels.find(l=>String(l.id)===String(mr)); if(lv) setTimeout(()=>openRoom(lv.id), 450); }
+    }catch(e){}
     return true;
   }catch(e){ $('loginBox').classList.remove('hide'); return false; }
 }
