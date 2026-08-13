@@ -918,21 +918,22 @@ $('inpPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 async function autoLogin(){
   const t=sessionStorage.getItem('token');
   if(!t) return false;
+  // 有 token：立刻隐藏登录框，避免从任务/游戏专区跳回时闪一下登录页
+  $('loginBox').classList.add('hide');
   try{
     const mr=await fetch(API+'/api/student/me',{headers:{Authorization:'Bearer '+t}});
-    if(mr.status===401){ try{ sessionStorage.removeItem('token'); }catch(e){} return false; }
+    if(mr.status===401){ try{ sessionStorage.removeItem('token'); }catch(e){} $('loginBox').classList.remove('hide'); return false; }
     const j=await mr.json();
-    if(!j.ok) return false;
+    if(!j.ok){ $('loginBox').classList.remove('hide'); return false; }
     token=t; me=j.data;
     const cr=await fetch(API+'/api/game/content').then(r=>r.json());
     content=cr.data||cr;
-    if(!content||!content.levels) return false;
+    if(!content||!content.levels){ $('loginBox').classList.remove('hide'); return false; }
     render();
-    $('loginBox').classList.add('hide');
     $('mapApp').classList.add('show');
     try{ musStart(); }catch(e){}
     return true;
-  }catch(e){ return false; }
+  }catch(e){ $('loginBox').classList.remove('hide'); return false; }
 }
 autoLogin();
 </script>
