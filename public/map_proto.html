@@ -44,7 +44,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
     radial-gradient(120% 90% at 50% 0%, rgba(30,50,95,.18), transparent 60%),
     linear-gradient(180deg,#0d1226,#0a0e1c)}
 /* 厂区入口 */
-.entrance{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;padding:16px 14px 12px;flex-wrap:wrap;background:linear-gradient(180deg,rgba(255,179,64,.06),transparent)}
+.entrance{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 14px 12px;background:linear-gradient(180deg,rgba(255,179,64,.06),transparent)}
 .gate-sign{text-align:center}
 .gate-sign .t{font-size:18px;letter-spacing:6px;color:var(--amber);text-shadow:0 0 12px rgba(255,179,64,.6)}
 .gate-sign .s{font-size:10px;color:var(--dim);letter-spacing:3px;margin-top:2px}
@@ -420,8 +420,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .rt-sec::after{content:"";flex:1;height:1px;background:#223050}
 .rt-sec .sec-count{font-size:10px;color:var(--green);background:#0a0e1c;border:1px solid #223050;padding:1px 7px;border-radius:8px;margin-left:auto;flex:none}
 /* 走动厂长 */
-.boss{position:absolute;left:30px;top:24px;z-index:9;display:flex;align-items:center;gap:8px;transition:left .9s cubic-bezier(.45,.05,.35,1),top .9s cubic-bezier(.45,.05,.35,1);pointer-events:none}
-@media (max-width:700px){ .boss{top:70px} }
+.boss{display:flex;align-items:center;gap:8px;pointer-events:none;flex:none;min-width:0}
 .boss-sprite{font-size:26px;filter:drop-shadow(0 0 6px rgba(255,179,64,.5));animation:npcBob 2.2s ease-in-out infinite}
 .boss-bubble{font-size:11px;color:var(--amber);background:rgba(11,14,26,.94);border:1px solid var(--amber);padding:4px 10px;border-radius:8px;max-width:210px;line-height:1.5;box-shadow:0 0 10px rgba(255,179,64,.3)}
 .task-card{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:6px 0;border-radius:8px;border:1px solid #223050;background:#0a0e1c;transition:border-color .2s}
@@ -497,13 +496,16 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 
       <!-- 厂区入口 -->
       <div class="entrance">
+        <div class="boss" id="boss">
+          <span class="boss-sprite">👷</span>
+          <div class="boss-bubble" id="bossBubble">厂长：欢迎来到锐智工厂！</div>
+        </div>
         <div class="gate-sign">
           <div class="t">锐 智 工 厂</div>
           <div class="s">· 工业互联网实训基地 ·</div>
         </div>
       </div>
       <div class="gate"><div class="bar"></div><div class="guard"></div></div>
-      <div class="boss" id="boss"><span class="boss-sprite">👷</span><div class="boss-bubble" id="bossBubble">厂长：欢迎来到锐智工厂！</div></div>
 
       <!-- 闯关路线条 -->
       <div class="route-bar" id="routeBar"></div>
@@ -623,22 +625,10 @@ async function loadAll(){
 
 function isTaskDone(tid){ return !!(me.check && me.check[''+tid]); }
 function placeBoss(){
-  const compound=$('map').querySelector('.compound'); const boss=$('boss'); if(!compound||!boss) return;
-  const cr=compound.getBoundingClientRect();
   let curLv=null;
   for(let i=0;i<content.levels.length;i++){ if(!levelProgress(content.levels[i]).completed){ curLv=content.levels[i]; break; } }
-  if(curLv){
-    const bEl=compound.querySelector('.building[data-lv="'+curLv.id+'"]');
-    if(bEl){
-      const br=bEl.getBoundingClientRect();
-      const x=br.left-cr.left+br.width/2-55, y=br.bottom-cr.top+6;
-      boss.style.left=Math.max(4,x)+'px'; boss.style.top=Math.max(4,y)+'px';
-      $('bossBubble').textContent='厂长：去 '+curLv.areaName+'！任务在等你，我陪你。';
-      return;
-    }
-  }
-  boss.style.left='30px'; boss.style.top=(window.innerWidth<=700?'70px':'24px');
-  $('bossBubble').textContent='厂长：全厂通关，你就是数字化大师！🎉';
+  if(curLv){ $('bossBubble').textContent='厂长：去 '+curLv.areaName+'！任务在等你。'; }
+  else { $('bossBubble').textContent='厂长：全厂通关，你就是数字化大师！🎉'; }
 }
 function levelProgress(lv){
   let done=0,total=0;
