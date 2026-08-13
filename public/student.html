@@ -1078,6 +1078,50 @@ body:has(.mm-overlay) { overflow: hidden; }
   .lb-box { max-height: 90vh; }
 }
 
+
+/* ===== 小游戏像素风主题（8-bit，与厂区地图统一） ===== */
+/* 容器：直角 + 双层像素边框 + 霓虹描边 + 扫描线 */
+.mm-box, .gz-box {
+  border-radius: 0 !important;
+  font-family: "Courier New", ui-monospace, Menlo, Consolas, monospace;
+  border: 2px solid #04060c !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.05),
+    0 0 0 3px #1a2238,
+    0 0 0 5px var(--cyan),
+    0 0 28px rgba(0,188,212,.28);
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px),
+    #12121a;
+}
+/* CRT 扫描线背景（非常淡，不影响阅读） */
+.mm-overlay, .gz-overlay {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 2px, transparent 2px 4px),
+    rgba(0,0,0,.8);
+}
+/* 8-bit 按钮：直角 + 硬偏移阴影 */
+.mm-btn {
+  border-radius: 0 !important;
+  box-shadow: 3px 3px 0 rgba(4,6,12,.9);
+}
+.mm-btn:active { box-shadow: 1px 1px 0 rgba(4,6,12,.9); transform: translate(2px,2px); }
+/* 标题：像素字重 + 硬阴影 */
+.mm-title, .gz-section { letter-spacing: 1px; text-shadow: 2px 2px 0 rgba(4,6,12,.8); }
+/* 翻牌卡片：直角 + 像素格纹背面 */
+.mm-face { border-radius: 2px !important; }
+.mm-back {
+  background:
+    repeating-conic-gradient(#1a1a26 0% 25%, #262640 0% 50%) 0 0 / 10px 10px !important;
+  border: 1px solid var(--cyan);
+  color: var(--amber);
+  text-shadow: 1px 1px 0 #04060c;
+}
+/* 游戏专区行：直角 + 像素 */
+.gz-row { border-radius: 0 !important; }
+/* 分数徽章：方块感 */
+.mm-stats b, .gz-meta b { color: var(--amber); }
+
 </style>
 </head>
 <body>
