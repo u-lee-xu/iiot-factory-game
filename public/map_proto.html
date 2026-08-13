@@ -1269,6 +1269,7 @@ function sxGoTask(lvId, taskId, el){
 }
 /* ===== 俯视：延伸房间 + 小人走动 + 摄像机跟随 ===== */
 let rsLoop=null, rsGo=null, rsStageEl=null, rsSceneEl=null;
+let rsCamX=0, rsCamY=0;
 function rsStart(){
   const scene=document.getElementById('rsScene'); if(!scene) return;
   const stage=document.getElementById('rsStage'); if(!stage) return;
@@ -1279,14 +1280,16 @@ function rsStart(){
   const rt=window._rtRoom||{};
   // 小人初始位置：门口（房间左下角）
   let px=60, py=stageH-120, tx=null, ty=null, speed=2.6;
+  rsCamX=0; rsCamY=0;
   player.style.left=px+'px'; player.style.top=py+'px';
   // 点哪走哪：点击场景（非设备/楼梯/家具）→ 小人走到点击位置
+  // 注意：stage 有 transform 平移，getBoundingClientRect 是可视位置；内容坐标 = 可视坐标 + 摄像机偏移
   scene.addEventListener('pointerdown', function(e){
     const t=e.target;
     if(t.closest&&(t.closest('.rs-task')||t.closest('.rs-stairs')||t.closest('.rs-furn')||t.closest('.rs-door')||t.closest('.rs-npc')||t.closest('.rs-label'))) return;
-    const rect=stage.getBoundingClientRect();
-    tx=Math.max(6, Math.min(e.clientX-rect.left, stageW-40));
-    ty=Math.max(6, Math.min(e.clientY-rect.top, stageH-30));
+    const rect=scene.getBoundingClientRect();
+    tx=Math.max(6, Math.min((e.clientX-rect.left)+rsCamX, stageW-40));
+    ty=Math.max(6, Math.min((e.clientY-rect.top)+rsCamY, stageH-30));
     rsGo=null;
   }, true);
   function setDir(dx, dy){
@@ -1321,9 +1324,9 @@ function rsStart(){
     player.classList.toggle('walk', moving);
     player.style.left=px+'px'; player.style.top=py+'px';
     // 摄像机跟随：stage 平移使小人居中（x/y 双向）
-    let camX=px-rw/2+12; camX=Math.max(0, Math.min(camX, stageW-rw));
-    let camY=py-rh/2+12; camY=Math.max(0, Math.min(camY, stageH-rh));
-    stage.style.transform='translate('+(-camX)+'px,'+(-camY)+'px)';
+    rsCamX=px-rw/2+12; rsCamX=Math.max(0, Math.min(rsCamX, stageW-rw));
+    rsCamY=py-rh/2+12; rsCamY=Math.max(0, Math.min(rsCamY, stageH-rh));
+    stage.style.transform='translate('+(-rsCamX)+'px,'+(-rsCamY)+'px)';
     rsLoop=requestAnimationFrame(frame);
   }
   rsLoop=requestAnimationFrame(frame);
@@ -1343,12 +1346,12 @@ function roomGoTask(lvId, taskId, el){
 }
 /* 俯视：点家具 → 小人走过去并提示 */
 function roomGoPoint(ev){
-  const sc=document.getElementById('rsStage'); if(!sc) return;
+  const sc=document.getElementById('rsScene'); if(!sc) return;
   const sr=sc.getBoundingClientRect();
   const f=ev.target.closest&&ev.target.closest('[data-name]');
   const name=f?f.getAttribute('data-name'):'';
-  tx=Math.max(6, Math.min(ev.clientX-sr.left, (window._rtRoom&&window._rtRoom.stageW||600)-40));
-  ty=Math.max(6, Math.min(ev.clientY-sr.top, (window._rtRoom&&window._rtRoom.stageH||420)-30));
+  tx=Math.max(6, Math.min((ev.clientX-sr.left)+rsCamX, (window._rtRoom&&window._rtRoom.stageW||600)-40));
+  ty=Math.max(6, Math.min((ev.clientY-sr.top)+rsCamY, (window._rtRoom&&window._rtRoom.stageH||420)-30));
   if(rsGo) rsGo=null;
   if(name&&typeof showToast==='function') setTimeout(()=>showToast('走近'+name), 600);
 }
