@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "python3 tests/smoke_all.py",
+    "test:mobile": "python3 tests/mobile_check.py"
   },
   "dependencies": {
     "express": "^4.21.0",
