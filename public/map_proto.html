@@ -714,6 +714,10 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
   <div class="bg-clouds c1"></div><div class="bg-clouds c2"></div></div>
 
 <div id="loginBox">
+  <script>
+  // 立即隐藏登录框：有 token（从房间/实验室/任务返回）就不等异步校验，避免闪现登录页
+  try{ if(sessionStorage.getItem('token')) document.getElementById('loginBox').classList.add('hide'); }catch(e){}
+  </script>
   <div class="login-card">
     <h1>🏭 锐智工厂</h1>
     <div class="sub">工业互联网实训 · 闯关平台</div>
