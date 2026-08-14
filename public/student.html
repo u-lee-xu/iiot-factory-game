@@ -2178,18 +2178,17 @@ function renderFactory() {
 // =========================================================================
 // 7. RENDER: MISSION PANEL
 // =========================================================================
-function selectLevel(lvId) {
+function selectLevel(lvId, skipIntro) {
   const lv = content.levels.find(l => l.id === lvId);
   if (!lv) return;
   currentLevelId = lvId;
   setArea(lvId); playAreaMusic();
-  
-  // Show level intro dialogue first
-  showLevelIntro(lv, () => {
-    renderFactory();
-    renderMission();
-    renderHeader();
-  });
+  const renderAll = () => { renderFactory(); renderMission(); renderHeader(); };
+  // 直接从厂区地图进入某个任务时跳过“幕intro”（任务前言会单独讲解），
+  // 避免与蓝色任务前言两个弹窗叠加；进入关卡本身仍保留幕intro
+  if (skipIntro) { renderAll(); return; }
+  // 幕intro 也排进登录弹窗队列，保证全局一次只弹一个（不与成就/欢迎/前言叠加）
+  enqueueLoginPopup(done => showLevelIntro(lv, () => { renderAll(); done(); }));
 }
 
 function renderMission() {
@@ -5095,10 +5094,14 @@ function enqueueAchievementsJob(){
   });
 }
 
+let achDraining = false;
 function drainAchQueue(onAllDone) {
+  // 串行：同一时刻只弹一个成就，防止多处 evaluateAchievements 并发 drain 造成成就叠弹
+  if (achDraining) return;
   if (achQueue.length === 0) { if (onAllDone) onAllDone(); return; }
+  achDraining = true;
   const a = achQueue.shift();
-  showAchievementUnlock(a, () => setTimeout(() => drainAchQueue(onAllDone), 300), a.__source);
+  showAchievementUnlock(a, () => { achDraining = false; setTimeout(() => drainAchQueue(onAllDone), 300); }, a.__source);
 }
 
 // —— 已看过的成就快照（登录后识别“老师新发/系统新发”的成就）——
@@ -10815,7 +10818,7 @@ init().then(() => {
     if (!lv && levelId) lv = content.levels.find(l => String(l.id) === levelId);
     if (lv) {
       const realTask = taskId ? lv.tasks.find(t => String(t.id) === taskId) : null;
-      selectLevel(lv.id);
+      selectLevel(lv.id, !!realTask);
       if (realTask) {
         // 排进登录弹窗队列之后打开：欢迎/改密逐个关完，再进任务前言，避免弹窗轰炸
         enqueueLoginPopup(done => openTaskModal(lv.id, realTask.id, function(){ hideTransit(); done(); }));
