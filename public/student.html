@@ -6608,7 +6608,8 @@ function openSnake(cfg, onComplete) {
     const X_MIN=2, X_MAX=COLS-3, Y_MIN=1, Y_MAX=ROWS-2;
     let x,y,tries=0;
     do { x=X_MIN+Math.floor(Math.random()*(X_MAX-X_MIN+1)); y=Y_MIN+Math.floor(Math.random()*(Y_MAX-Y_MIN+1)); tries++; }
-    while((isOnSnake(x,y) || foods.some(f=>f.x===x&&f.y===y)) && tries<60);
+    // 避开蛇身、已有食物、以及与已有食物文字重叠（x/y 至少隔 2 格，文字在上方不打架）
+    while((isOnSnake(x,y) || foods.some(f=>f.x===x&&f.y===y) || foods.some(f=>Math.abs(f.x-x)<2&&Math.abs(f.y-y)<2)) && tries<90);
     // 场上不要出现两个一样的词/解释，避免配对歧义
     const busy = {}; foods.forEach(f=>{ busy[f.label]=true; });
     if(kind==='term'){
@@ -6616,15 +6617,34 @@ function openSnake(cfg, onComplete) {
       const t = pool.length ? pool[Math.floor(Math.random()*pool.length)] : terms[Math.floor(Math.random()*terms.length)];
       foods.push({x,y,kind:'term',label:t});
     } else {
-      const pool = hints.filter(h=>!busy[h]);
-      const h = pool.length ? pool[Math.floor(Math.random()*pool.length)] : hints[Math.floor(Math.random()*hints.length)];
+      // 优先放"场上已有术语对应的解释"，保证蓝黄能配对
+      const fieldTerm = foods.find(f=>f.kind==='term');
+      let h = null;
+      if(fieldTerm && !busy[hintOf[fieldTerm.label]]) h = hintOf[fieldTerm.label];
+      if(!h){
+        // 否则从场上所有术语的解释里选一个还没在场的
+        const fieldHints = foods.filter(f=>f.kind==='term').map(f=>hintOf[f.label]).filter(hh=>!busy[hh]);
+        if(fieldHints.length) h = fieldHints[Math.floor(Math.random()*fieldHints.length)];
+      }
+      if(!h){ const pool = hints.filter(hh=>!busy[hh]); h = pool.length ? pool[Math.floor(Math.random()*pool.length)] : hints[Math.floor(Math.random()*hints.length)]; }
       foods.push({x,y,kind:'hint',label:h});
     }
   }
   function ensureFoods(){
     if(!foods.some(f=>f.kind==='term')) spawnFood('term');
     if(!foods.some(f=>f.kind==='hint')) spawnFood('hint');
-    while(foods.length<5) spawnFood(Math.random()<0.5?'term':'hint');
+    // 若玩家正带着词，确保场上出现它对应的解释（能完成配对）
+    if(currentTerm && !foods.some(f=>f.kind==='hint' && f.label===hintOf[currentTerm])){
+      const busy={}; foods.forEach(f=>{busy[f.label]=true;});
+      if(!busy[hintOf[currentTerm]]) spawnFood('hint');
+    }
+    while(foods.length<5){
+      // 补位时也优先凑可配对的一对（蓝+对应黄）
+      const ft=foods.find(f=>f.kind==='term');
+      const hasMatch = ft && foods.some(f=>f.kind==='hint'&&f.label===hintOf[ft.label]);
+      if(ft && !hasMatch) spawnFood('hint');
+      else spawnFood(Math.random()<0.5?'term':'hint');
+    }
   }
   function addParticles(x,y,c){ for(let i=0;i<14;i++)particles.push({x:x*cell+cell/2,y:y*cell+cell/2,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220,t:0,color:c}); }
   // 飘字：注意参数是 txt，对象里写 txt:txt（旧版误写 txt:t → 吃食物即 ReferenceError 死机）
@@ -6702,13 +6722,13 @@ function openSnake(cfg, onComplete) {
     if(!ate) snake.pop();
     // 补充食物
     spawnTimer-=dt; if(spawnTimer<=0){ ensureFoods(); spawnTimer=0.6; }
-    if(cfg._endless && paired>0 && paired%10===0) speed = 2.6 + paired*0.3;   // 无限战略快
+    if(cfg._endless && paired>0 && paired%10===0) speed = 1.9 + paired*0.2;   // 无限战略快
   }
   function update(dt){
     if(ended || quizLock) return;
     if(invuln>0) invuln-=dt;
     if(!(nextDir.x===-dir.x && nextDir.y===-dir.y)) dir=nextDir;
-    speed = 2.6 + paired*0.15; timer += dt; const stepT=1/speed;
+    speed = 1.9 + paired*0.1; timer += dt; const stepT=1/speed;
     if(timer<stepT) return; timer-=stepT;
     step();
   }
@@ -6743,35 +6763,65 @@ function openSnake(cfg, onComplete) {
       ctx.strokeText(f.label, fx, fy-20);
       ctx.fillStyle='#fff'; ctx.fillText(f.label, fx, fy-20);
     });
-    // 蛇身：圆角 + 渐变（从尾到头的亮度提升），蛇头带眼睛和方向高光
+    // 蛇身：卡通圆润——身体用带内高光的圆角胶囊，尾部渐细，蛇头大圆+大眼睛+腮红+小舌头
     const segN=snake.length;
-    snake.forEach(function(s,i){
-      const isHead = i===0;
-      const t = isHead?1:(0.35+0.6*(1-i/segN));
-      const x0=s.x*cell+2, y0=s.y*cell+2, sz=cell-4, rr=Math.min(6,sz/2.5);
-      if(isHead && currentTerm){ ctx.shadowColor='#4dd0e1'; ctx.shadowBlur=14; }
-      ctx.fillStyle = isHead ? (currentTerm?'#00e5ff':'#7cff5a') : ('rgba(0,200,83,'+t.toFixed(2)+')');
-      ctx.beginPath();
-      ctx.moveTo(x0+rr,y0); ctx.arcTo(x0+sz,y0,x0+sz,y0+sz,rr); ctx.arcTo(x0+sz,y0+sz,x0,y0+sz,rr);
-      ctx.arcTo(x0,y0+sz,x0,y0,rr); ctx.arcTo(x0,y0,x0+sz,y0,rr); ctx.closePath(); ctx.fill();
-      // 蛇身鳞片高光（小斜线）
-      if(!isHead && i%2===1){ ctx.fillStyle='rgba(255,255,255,.10)'; ctx.beginPath(); ctx.arc(s.x*cell+cell*0.62,s.y*cell+cell*0.38,3,0,Math.PI*2); ctx.fill(); }
+    // 身体关节：为让身体连贯，取每段中心画圆角胶囊
+    const drawSeg = function(s,i){
+      const isHead = (i===0);
+      const cx=s.x*cell+cell/2, cy=s.y*cell+cell/2;
+      const tailT = Math.max(0.35, 1 - i/segN);           // 尾部略小
+      const r = isHead ? cell*0.5 : cell*0.38*tailT;
+      // 前一节（用于连接圆角）
+      const prev = snake[i+1];
+      const bodyColor = isHead ? (currentTerm?'#00e5ff':'#8cff5e') : 'rgba(0,205,102,'+(0.4+0.6*tailT).toFixed(2)+')';
+      ctx.fillStyle = bodyColor;
+      if(isHead && currentTerm){ ctx.shadowColor='#4dd0e1'; ctx.shadowBlur=16; }
+      if(prev){
+        // 在两节之间画一个胶囊（连接相邻节，使身体连续）
+        const pcx=prev.x*cell+cell/2, pcy=prev.y*cell+cell/2;
+        const ang=Math.atan2(cy-pcy, cx-pcx);
+        const len=Math.hypot(cx-pcx, cy-pcy);
+        const rr=r*0.8;
+        ctx.beginPath();
+        ctx.moveTo(cx+Math.cos(ang+Math.PI/2)*rr, cy+Math.sin(ang+Math.PI/2)*rr);
+        ctx.lineTo(pcx+Math.cos(ang+Math.PI/2)*rr, pcy+Math.sin(ang+Math.PI/2)*rr);
+        ctx.lineTo(pcx+Math.cos(ang-Math.PI/2)*rr, pcy+Math.sin(ang-Math.PI/2)*rr);
+        ctx.lineTo(cx+Math.cos(ang-Math.PI/2)*rr, cy+Math.sin(ang-Math.PI/2)*rr);
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+      // 内高光（顶部小圆）卡通质感
+      ctx.fillStyle='rgba(255,255,255,.28)';
+      ctx.beginPath(); ctx.arc(cx-r*0.28, cy-r*0.32, r*0.32, 0, Math.PI*2); ctx.fill();
       if(isHead){
         ctx.shadowBlur=0;
-        // 眼睛（按方向）
         const ex = dir.x, ey = dir.y;
-        const eyeOff = cell*0.24, eyeR = 2.6;
-        const cxm = ex===0 ? (ey<0?-1:1) : 0, cym = ey===0 ? (ex<0?-1:1) : 0;
-        // 主眼（朝向）
-        const px1=s.x*cell+cell/2+ex*eyeOff, py1=s.y*cell+cell/2+ey*eyeOff;
-        ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px1+ex*3,py1+ey*3,eyeR+0.6,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle='#0b1520'; ctx.beginPath(); ctx.arc(px1+ex*4.4,py1+ey*4.4,eyeR,0,Math.PI*2); ctx.fill();
-        // 侧眼（垂直向时）
-        if(ex===0){ const ox=cell*0.5-4.5; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s.x*cell+ox,py1,eyeR,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#0b1520'; ctx.beginPath(); ctx.arc(s.x*cell+ox+ey*1.4,py1+ey*3,eyeR*0.85,0,Math.PI*2); ctx.fill(); }
-        if(ey===0){ const oy=cell*0.5-4.5; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px1,s.y*cell+oy,eyeR,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#0b1520'; ctx.beginPath(); ctx.arc(px1+ex*3,s.y*cell+oy+ex*1.4,eyeR*0.85,0,Math.PI*2); ctx.fill(); }
+        const eo = cell*0.30, er = 4.2;
+        // 大眼睛（两个，朝方向偏移）
+        [[-0.5,0.6],[0.5,0.6]].forEach(function(off){
+          const exx = ex*eo + off[0]*cell*0.26;
+          const eyy = ey*eo + off[1]*cell*0.26;
+          const eX=cx+exx, eY=cy+eyy;
+          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(eX,eY,er,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#123'; ctx.beginPath(); ctx.arc(eX+ex*1.2,eY+ey*1.2,er*0.62,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(eX+ex*2.2-eY*0+ex*0.4,eY+ey*2.2-2,1.4,0,Math.PI*2); ctx.fill();
+        });
+        // 腮红
+        ctx.fillStyle='rgba(255,120,120,.4)';
+        ctx.beginPath(); ctx.arc(cx - cell*0.42, cy+cell*0.34, 3.4, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + cell*0.42, cy+cell*0.34, 3.4, 0, Math.PI*2); ctx.fill();
+        // 小舌头（朝方向）
+        ctx.strokeStyle='#ff5a5a'; ctx.lineWidth=2; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(cx+ex*cell*0.42, cy+ey*cell*0.42);
+        ctx.lineTo(cx+ex*cell*0.62, cy+ey*cell*0.62); ctx.stroke();
+        // 头顶呆毛
+        ctx.strokeStyle='rgba(140,255,94,.9)'; ctx.lineWidth=2.4; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(cx - cell*0.15, cy - cell*0.5);
+        ctx.quadraticCurveTo(cx - cell*0.28, cy - cell*0.72, cx - cell*0.05, cy - cell*0.6); ctx.stroke();
       }
       ctx.shadowBlur=0;
-    });
+    };
+    for(let i=0;i<segN;i++){ const s=snake[i]; drawSeg(s,i); }
     // 粒子
     particles.forEach(function(p){ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
     ctx.globalAlpha=1; particles=particles.filter(function(p){return p.t<0.5;});
