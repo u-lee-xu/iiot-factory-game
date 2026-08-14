@@ -102,11 +102,17 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-bg::before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:
   repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 22px,transparent 22px 44px),
   repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 22px,transparent 22px 44px)}
-.sx-bg::after{content:"";position:absolute;left:0;right:0;height:96px;bottom:56px;
+.sx-bg::after{content:"";position:absolute;left:0;right:0;height:96px;bottom:118px;
   background:linear-gradient(180deg,#2c3558 0%,#262e4e 100%);
   border-top:3px solid #4a5a86;border-bottom:3px solid #1d2440}
-/* 天花板：横梁 + 灯带 */
-.sx-ceil{position:absolute;left:0;right:0;top:0;height:30px;z-index:2;
+/* 顶部留白/天空带：让房间墙不再顶到画面上沿（压缩房间比例） */
+.sx-sky{position:absolute;left:0;right:0;top:0;height:40px;z-index:2;
+  background:linear-gradient(180deg,#0a0e22 0%,#0d132c 55%,#121830 100%);
+  border-bottom:3px solid #1d2440}
+.sx-sky::before{content:"";position:absolute;left:14px;right:14px;top:8px;height:2px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 22px,transparent 22px 44px)}
+/* 天花板：横梁 + 灯带（置于天空带下方） */
+.sx-ceil{position:absolute;left:0;right:0;top:40px;height:26px;z-index:3;
   background:linear-gradient(180deg,#2c2a48,#211f3a);border-bottom:3px solid #141222;
   box-shadow:inset 0 3px 0 rgba(255,255,255,.06)}
 .sx-ceil::after{content:"";position:absolute;left:0;right:0;top:12px;height:4px;
@@ -135,7 +141,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
   .sx-btns{display:flex}
 }
 /* 地板：厚实木地板（在 HUD 条上方） */
-.sx-ground{position:absolute;left:0;right:0;bottom:52px;height:46px;background:
+.sx-ground{position:absolute;left:0;right:0;bottom:52px;height:64px;background:
   repeating-linear-gradient(90deg,#6a5a3a 0 26px,#5a4c30 26px 52px);
   border-top:4px solid #8a7a52;box-shadow:0 -2px 0 rgba(255,255,255,.12),inset 0 6px 0 rgba(255,255,255,.07)}
 .sx-ground::before{content:"";position:absolute;left:0;right:0;top:6px;height:3px;
@@ -214,7 +220,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
 /* 竖屏/窄屏：场景保持较高 */
 @media (max-width:700px){
-  .sx-scene{height:min(380px,52vh);min-height:300px}
+  .sx-scene{height:min(380px,56vh);min-height:300px}
   .room-narr{max-height:64px;overflow:auto}
 }
 /* ===== 房间界面 ===== */
@@ -293,7 +299,11 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
   .room-scene,.sx-scene{grid-column:2;grid-row:1/6;margin:8px 10px 8px 6px;
     width:auto;align-self:center;justify-self:stretch}
   .room-scene{height:340px}
-  .sx-scene{height:calc(100vh - 40px);height:calc(100dvh - 16px);max-height:440px;min-height:260px}
+  /* 场景高度压缩到视口内(居中留边)，避免底部被浏览器栏/方向键遮挡 */
+  .sx-scene{height:min(78dvh, 380px);max-height:380px;min-height:250px}
+  /* 左侧成长发言气泡：加高+字号，至少 2 行可读 */
+  .room-narr{min-height:74px;font-size:15px;line-height:1.65;padding:12px 14px}
+  .room-narr .rt-who{font-size:12px;margin-bottom:5px}
 }
 /* ===== room.html 页面级 ===== */
 body{min-height:100vh;overflow-x:hidden}
@@ -524,7 +534,7 @@ function sxStart(){
   const player=document.getElementById('sxPlayer'); if(!player) return;
   // 动态坐标：HUD 52px + 地面 46px，跑动区居中
   const H=scene.clientHeight;
-  const groundH=46, groundTop=H-52-groundH;
+  const groundH=64, groundTop=H-52-groundH;
   const platTop=Math.max(110, groundTop-150);
   const g=0.42, jumpV=-12.5, speed=4.6, ph=38;
   const gap=250, baseX=140;
@@ -753,7 +763,7 @@ function renderRoom(id){
     for(let k=0;k<decoKinds.length;k++){
       const dx=Math.round(70+k*250);
       const kind=decoKinds[k];
-      const dy = kind==='pipe' ? 150 : (46+((k*37)%90));
+      const dy = kind==='pipe' ? 186 : (82+((k*37)%80));
       decoHTML+=`<div class="sx-deco ${kind}" style="left:${dx}px;top:${dy}px"></div>`;
     }
     // 地面静态道具：木箱/木桶（放在设备之间的空隙，与设备错开）
@@ -766,6 +776,7 @@ function renderRoom(id){
     window._sxRoom={flrDone:flrDone, hasNext:hasNext};
     sceneHTML=`<div class="sx-scene" id="sxScene">
       <div class="sx-bg"></div>
+      <div class="sx-sky"></div>
       <div class="sx-ceil"></div>
       ${decoHTML}
       <div class="sx-stage" id="sxStage" style="width:${stageW}px">
