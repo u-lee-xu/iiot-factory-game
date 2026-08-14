@@ -547,8 +547,13 @@ function sxStart(){
   if(!H || H<180){ setTimeout(()=>{ try{ sxStop(); sxStart(); }catch(e){} }, 120); return; }
   const groundH=58, groundTop=H-52-groundH;
   const platTop=Math.max(112, groundTop-100);
-  const g=0.46, jumpV=-11.5, speed=4.6, ph=38;
+  const g=0.46, speed=4.6, ph=38;
   const gap=250, baseX=140;
+  // 动态跳跃：最大跳跃高度 = min(上平台所需高度的2.2倍, 地面到场景顶可用高度的78%)
+  // 保证跳最高时人物不超出场景顶部被裁切，同时足够跳上高处横杠
+  const needJump = Math.max(30, groundTop - platTop);
+  const maxJump = Math.min(needJump * 2.2, Math.max(50, (groundTop - ph) * 0.78));
+  const jumpV = -Math.sqrt(2 * g * maxJump);
   let x=72, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
   const keys={left:false,right:false,jump:false};
   // 摆放任务设备 + 平台 + 楼梯
