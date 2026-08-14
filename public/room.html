@@ -102,7 +102,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-bg::before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:
   repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 22px,transparent 22px 44px),
   repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 22px,transparent 22px 44px)}
-.sx-bg::after{content:"";position:absolute;left:0;right:0;height:96px;bottom:118px;
+.sx-bg::after{content:"";position:absolute;left:0;right:0;height:96px;bottom:112px;
   background:linear-gradient(180deg,#2c3558 0%,#262e4e 100%);
   border-top:3px solid #4a5a86;border-bottom:3px solid #1d2440}
 /* 顶部留白/天空带：让房间墙不再顶到画面上沿（压缩房间比例） */
@@ -141,7 +141,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
   .sx-btns{display:flex}
 }
 /* 地板：厚实木地板（在 HUD 条上方） */
-.sx-ground{position:absolute;left:0;right:0;bottom:52px;height:64px;background:
+.sx-ground{position:absolute;left:0;right:0;bottom:52px;height:58px;background:
   repeating-linear-gradient(90deg,#6a5a3a 0 26px,#5a4c30 26px 52px);
   border-top:4px solid #8a7a52;box-shadow:0 -2px 0 rgba(255,255,255,.12),inset 0 6px 0 rgba(255,255,255,.07)}
 .sx-ground::before{content:"";position:absolute;left:0;right:0;top:6px;height:3px;
@@ -158,13 +158,20 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-platform::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,.22)}
 .sx-platform::after{content:"";position:absolute;left:12px;top:14px;width:4px;height:50px;background:#2a2f4e;box-shadow:40px 0 0 #2a2f4e,80px 0 0 #2a2f4e}
 /* 任务设备：像素机柜/终端（放大） */
-.sx-task,.sx-door-exit{position:absolute;width:66px;height:56px;z-index:6;background:#141a30;border:2px solid #5a6a9a;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.04);transition:transform .15s,border-color .2s}
+.sx-task,.sx-door-exit{position:absolute;width:50px;height:42px;z-index:6;background:#141a30;border:2px solid #5a6a9a;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.04);transition:transform .15s,border-color .2s}
 .sx-task::before,.sx-door-exit::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:6px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 8px,#141a30 8px 16px);opacity:.9}
-.sx-task .rt-icon,.sx-door-exit .rt-icon{font-size:26px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
-.sx-task .rt-name,.sx-door-exit .rt-name{font-size:10px;color:#dce4f5;margin-top:4px;max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000;letter-spacing:.5px}
+.sx-task .rt-icon,.sx-door-exit .rt-icon{font-size:19px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
+/* 任务名：藏在设备上方，小人走近才浮现（不占设备内部空间） */
+.sx-task .rt-name,.sx-door-exit .rt-name{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  font-size:11px;color:var(--amber);background:rgba(13,16,34,.96);border:1px solid var(--amber);padding:2px 9px;border-radius:8px;
+  white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;letter-spacing:.5px;
+  opacity:0;pointer-events:none;transition:opacity .15s;z-index:12;text-shadow:none}
+.sx-task.near .rt-name{opacity:1}
+.sx-door-exit .rt-name{opacity:1}
+
 .sx-task.done{border-color:var(--green);background:rgba(0,230,118,.14)}
 .sx-task.done::before{background:repeating-linear-gradient(90deg,var(--green) 0 8px,#141a30 8px 16px)}
-.sx-task.done .rt-name{color:var(--green)}
+.sx-task.done .rt-name{color:var(--green);border-color:var(--green);opacity:1}
 .sx-task.done::after{content:"✓";position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--green);color:#04140b;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
 .sx-task.next{border-color:var(--amber);box-shadow:0 0 16px rgba(255,179,64,.75),5px 5px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
 .sx-task.next::before{background:repeating-linear-gradient(90deg,var(--amber) 0 8px,#141a30 8px 16px)}
@@ -172,7 +179,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-task.todo{opacity:.82}
 .sx-task.todo:hover{opacity:1}
 .sx-task.near{border-color:var(--amber);transform:scale(1.1);z-index:8}
-.sx-task.near::before{content:"点击进入";position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:2px 7px;border-radius:8px;white-space:nowrap;z-index:9}
+/* 走近提示已由 rt-name tooltip 承担 */
 /* 玩家：精细 8bit 像素小人（安全帽+工装+手臂，会走路） */
 .sx-player{position:absolute;z-index:9;width:26px;height:40px}
 .sx-player .pl{position:absolute;image-rendering:pixelated}
@@ -300,7 +307,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
     width:auto;align-self:center;justify-self:stretch}
   .room-scene{height:340px}
   /* 场景高度压缩到视口内(居中留边)，避免底部被浏览器栏/方向键遮挡 */
-  .sx-scene{height:min(78dvh, 380px);max-height:380px;min-height:250px}
+  .sx-scene{height:min(72dvh, 340px);max-height:340px;min-height:250px}
   /* 左侧成长发言气泡：加高+字号，至少 2 行可读 */
   .room-narr{min-height:74px;font-size:15px;line-height:1.65;padding:12px 14px}
   .room-narr .rt-who{font-size:12px;margin-bottom:5px}
@@ -443,7 +450,7 @@ function rsSetDir(dx,dy){
 }
 
 function sxGoTask(lvId, taskId, el){
-  const tx=parseFloat(el.style.left)+33, ty=parseFloat(el.style.top)+28;
+  const tx=parseFloat(el.style.left)+25, ty=parseFloat(el.style.top)+21;
   const platY = el.getAttribute('data-plat')==='1' ? (parseFloat(el.dataset.platY)||0) : 0;
   sxGo={lvId, taskId, x:tx, y:ty, platY};
 }
@@ -534,11 +541,11 @@ function sxStart(){
   const player=document.getElementById('sxPlayer'); if(!player) return;
   // 动态坐标：HUD 52px + 地面 46px，跑动区居中
   const H=scene.clientHeight;
-  const groundH=64, groundTop=H-52-groundH;
-  const platTop=Math.max(110, groundTop-150);
-  const g=0.42, jumpV=-12.5, speed=4.6, ph=38;
+  const groundH=58, groundTop=H-52-groundH;
+  const platTop=Math.max(115, groundTop-140);
+  const g=0.46, jumpV=-10.5, speed=4.6, ph=38;
   const gap=250, baseX=140;
-  let x=40, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
+  let x=72, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
   const keys={left:false,right:false,jump:false};
   // 摆放任务设备 + 平台 + 楼梯
   const plats=[];
@@ -546,7 +553,7 @@ function sxStart(){
   taskEls.forEach((el,i)=>{
     const onPlat=el.getAttribute('data-plat')==='1';
     const tx=baseX+i*gap;
-    const tTop=onPlat?(platTop-56):(groundTop-56);
+    const tTop=onPlat?(platTop-42):(groundTop-42);
     el.style.left=tx+'px'; el.style.top=tTop+'px';
     el.dataset.platY=onPlat?platTop:0;
     if(onPlat){
@@ -559,7 +566,7 @@ function sxStart(){
     for(let pi=0;pi<props.length;pi++){
       const px=Math.round(60+pi*130+40);
       props[pi].style.left=px+'px';
-      props[pi].style.top=(groundTop-26)+'px';
+      props[pi].style.top=(groundTop-24)+'px';
     }
   });
   // 楼梯：放长廊末端
@@ -569,7 +576,7 @@ function sxStart(){
     const sCls=sx.flrDone&&sx.hasNext?'open':'locked';
     stairsEl.className='sx-stairs '+sCls;
     stairsEl.style.left=(baseX+taskEls.length*gap+70)+'px';
-    stairsEl.style.top=(groundTop-64)+'px';
+    stairsEl.style.top=(groundTop-48)+'px';
     if(sx.flrDone&&sx.hasNext){
       stairsEl.onclick=function(){ nextRoomFloor(); };
       const tip=document.createElement('div'); tip.className='sx-door-tip'; tip.textContent='出门 · 下一层';
@@ -578,7 +585,7 @@ function sxStart(){
   }
   // 出厂区门：场景左端（小人出生点旁），点击返回厂区
   const doorEl=document.getElementById('sxDoorExit');
-  if(doorEl){ doorEl.style.left='8px'; doorEl.style.top=(groundTop-64)+'px'; }
+  if(doorEl){ doorEl.style.left='4px'; doorEl.style.top=(groundTop-48)+'px'; }
   const rw=scene.clientWidth, stageW=stage.clientWidth;
   // 点哪儿走哪儿：点击场景（非设备/楼梯/按钮）→ 小人走到该水平位置
   scene.addEventListener('pointerdown', function(e){
@@ -627,7 +634,7 @@ function sxStart(){
     let cam=x-rw/2+13; cam=Math.max(0,Math.min(cam,stageW-rw));
     stage.style.transform='translateX('+(-cam)+'px)';
     taskEls.forEach(el=>{
-      const tx=parseFloat(el.style.left)+33, ty=parseFloat(el.style.top)+28;
+      const tx=parseFloat(el.style.left)+25, ty=parseFloat(el.style.top)+21;
       const dx=Math.abs(tx-(x+12)), dy=Math.abs(ty-(y+17));
       const near=dx<64&&dy<74;
       el.classList.toggle('near',near);
