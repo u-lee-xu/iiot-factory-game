@@ -11,7 +11,7 @@
   --border:#2c3552;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospace,Menlo,Consolas,monospace;min-height:100vh;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospace,Menlo,Consolas,monospace;min-height:100dvh;min-height:100vh;overflow-x:hidden}
 /* ===== RPG 室内场景（俯视工坊风 · 8bit · 延伸房间+摄像机跟随） ===== */
 /* 可视窗（固定大小），内部 rs-stage 横向延伸，画面随人物移动 */
 .room-scene{position:relative;height:400px;margin:0 18px 12px;border-radius:2px;overflow:hidden;
@@ -229,13 +229,13 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
 /* 竖屏/窄屏：场景保持较高 */
 @media (max-width:700px){
-  .sx-scene{height:min(380px,56vh);min-height:300px}
+  .sx-scene{height:min(380px,56dvh);min-height:300px}
   .room-narr{max-height:64px;overflow:auto}
 }
 /* ===== 房间界面 ===== */
-#room{position:fixed;inset:0;background:rgba(4,6,12,.84);display:none;align-items:center;justify-content:center;z-index:70;padding:14px}
+#room{position:fixed;left:0;right:0;top:0;bottom:0;width:100%;height:100dvh;height:100vh;background:rgba(4,6,12,.84);display:none;align-items:center;justify-content:center;z-index:70;padding:14px}
 #room.show{display:flex}
-.room-panel{width:min(600px,96vw);max-height:92vh;overflow:auto;background:#10162a;border:2px solid var(--border);border-radius:10px;box-shadow:0 0 40px rgba(0,0,0,.6)}
+.room-panel{width:min(600px,96vw);max-height:92dvh;max-height:92vh;overflow:auto;background:#10162a;border:2px solid var(--border);border-radius:10px;box-shadow:0 0 40px rgba(0,0,0,.6)}
 .room-head{display:flex;align-items:center;gap:12px;padding:16px 18px 12px;border-bottom:1px solid #223050;position:sticky;top:0;background:#10162a;z-index:2}
 .room-logo{width:46px;height:46px;background:#0a0e1c;border:1px solid var(--rc);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px var(--rcg);flex:none}
 .room-logo .b-logo{transform:scale(2.1)}
@@ -315,7 +315,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
   .room-narr .rt-who{font-size:12px;margin-bottom:5px}
 }
 /* ===== room.html 页面级 ===== */
-body{min-height:100vh;overflow-x:hidden}
+body{min-height:100dvh;min-height:100vh;overflow-x:hidden}
 .room-mus{position:fixed;right:12px;top:12px;z-index:80;background:#10162a;border:1px solid var(--border);color:var(--text);
   font-family:inherit;font-size:15px;padding:6px 10px;border-radius:4px;cursor:pointer;opacity:.85}
 .room-mus:hover{opacity:1;border-color:var(--amber)}
@@ -541,8 +541,10 @@ function sxStart(){
   const scene=document.getElementById('sxScene'); if(!scene) return;
   const stage=document.getElementById('sxStage'); if(!stage) return;
   const player=document.getElementById('sxPlayer'); if(!player) return;
-  // 动态坐标：HUD 52px + 地面 46px，跑动区居中
-  const H=scene.clientHeight;
+  // 动态坐标：HUD 52px + 地面 58px，跑动区居中
+  // 地址栏占位/未布局完成时 clientHeight 可能为 0 → 延迟到有真实高度再定位
+  let H=scene.clientHeight;
+  if(!H || H<180){ setTimeout(()=>{ try{ sxStop(); sxStart(); }catch(e){} }, 120); return; }
   const groundH=58, groundTop=H-52-groundH;
   const platTop=Math.max(112, groundTop-100);
   const g=0.46, jumpV=-11.5, speed=4.6, ph=38;
@@ -669,6 +671,21 @@ function sxStart(){
     const r=scene.querySelector('.sx-rotate'); if(r){ r.classList.add('show'); setTimeout(()=>r.classList.remove('show'),4500); }
   }
   sxGame=requestAnimationFrame(frame);
+
+  // 地址栏占位变化（横屏旋转/浏览器地址栏出现收起）→ 重排场景坐标，避免人物被挤出可视区
+  if(!window.__sxReflowBound){
+    window.__sxReflowBound=true;
+    let t=null;
+    const reflow=()=>{
+      if(t) clearTimeout(t);
+      t=setTimeout(()=>{
+        try{ if(document.getElementById('sxScene')){ renderRoom(currentRoomId); } }catch(e){}
+      },160);
+    };
+    window.addEventListener('resize', reflow);
+    window.addEventListener('orientationchange', reflow);
+    if(window.visualViewport) window.visualViewport.addEventListener('resize', reflow);
+  }
 }
 
 function sxStop(){
