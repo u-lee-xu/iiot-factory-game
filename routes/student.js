@@ -36,6 +36,13 @@ function levelCompleted(check, level) {
   return total > 0 && done >= total;
 }
 
+router.post('/notify-login-ach', requireAuth, (req, res) => {
+  const { ids } = req.body || {};
+  const list = Array.isArray(ids) ? ids.map(String).filter(id => id.indexOf('login_') === 0) : [];
+  if (list.length) db.markLoginAchNotified(req.session.name, list);
+  res.json({ ok: true });
+});
+
 router.get('/me', requireAuth, (req, res) => {
   if (req.session.role !== 'student') {
     return res.status(403).json({ ok: false, error: '仅学生可访问' });
@@ -73,8 +80,10 @@ router.get('/me', requireAuth, (req, res) => {
   // 客户端以 seen 快照挡重复；张三这种历史授予的不会返回，避免每次进入都弹。
   const todayStr = db.localDateString();
   const achAll = JSON.parse(student.achievements || '{}');
+  let notifiedLogin = {};
+  try { notifiedLogin = JSON.parse(student.login_ach_notified || '{}'); } catch(e){}
   Object.keys(achAll).forEach(id => {
-    if (id.indexOf('login_') === 0 && achAll[id] && String(achAll[id]).slice(0, 10) === todayStr) newlyAwardedLogin.push(id);
+    if (id.indexOf('login_') === 0 && achAll[id] && String(achAll[id]).slice(0, 10) === todayStr && !notifiedLogin[id]) newlyAwardedLogin.push(id);
   });
   // 钱包信息
   const contentRes2 = getContent();

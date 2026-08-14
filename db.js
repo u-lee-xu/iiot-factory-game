@@ -103,6 +103,7 @@ async function init() {
   if (!hasCol('inventory')) db.exec("ALTER TABLE students ADD COLUMN inventory TEXT DEFAULT '{}'");
   if (!hasCol('last_salary_date')) db.exec("ALTER TABLE students ADD COLUMN last_salary_date TEXT");
   if (!hasCol('month_salary_total')) db.exec("ALTER TABLE students ADD COLUMN month_salary_total INTEGER DEFAULT 0");
+  if (!hasCol('login_ach_notified')) db.exec("ALTER TABLE students ADD COLUMN login_ach_notified TEXT DEFAULT '{}'");
 
   save();
 }
@@ -303,6 +304,17 @@ function awardAchievements(name, ids) {
   }
   return { awarded, exists };
 }
+function markLoginAchNotified(name, ids) {
+  const student = findStudent(name);
+  if (!student) return null;
+  let n = {};
+  try { n = JSON.parse(student.login_ach_notified || '{}'); } catch(e){}
+  (ids || []).forEach(id => { if (id.indexOf('login_') === 0) n[id] = 1; });
+  exec('UPDATE students SET login_ach_notified = ? WHERE name = ?', [JSON.stringify(n), name]);
+  save();
+  return n;
+}
+
 
 // 教师手动发放成就：同时记入 achievements（展示已解锁）与 teacher_awards（来源标记，供学生端动画）
 function awardTeacherAchievements(name, ids) {
@@ -368,7 +380,7 @@ module.exports = {
   updateStudentData, updateStudentStars, updateStudentMeta, updateStudentPassword, resetStudent,
   getTeacherPassword, createSession, validateSession, cleanupExpiredSessions,
   DEFAULT_PASSWORD, isDefaultPassword, hashPassword, verifyPassword, isHashed,
-  recordLogin, incrementLoginCount, awardAchievements, awardTeacherAchievements,
+  recordLogin, incrementLoginCount, awardAchievements, awardTeacherAchievements, markLoginAchNotified,
   addBugReport, listBugReports, deleteBugReport,
   // 工资 & 商城
   localDateString, salaryRate, calcStudentXP, getWallet, claimSalary, addInventory, consumeInventory, setCoins
