@@ -6702,13 +6702,13 @@ function openSnake(cfg, onComplete) {
     if(!ate) snake.pop();
     // 补充食物
     spawnTimer-=dt; if(spawnTimer<=0){ ensureFoods(); spawnTimer=0.6; }
-    if(cfg._endless && paired>0 && paired%10===0) speed = 4 + paired*0.4;   // 无限战更快
+    if(cfg._endless && paired>0 && paired%10===0) speed = 2.6 + paired*0.3;   // 无限战略快
   }
   function update(dt){
     if(ended || quizLock) return;
     if(invuln>0) invuln-=dt;
     if(!(nextDir.x===-dir.x && nextDir.y===-dir.y)) dir=nextDir;
-    speed = 4 + paired*0.3; timer += dt; const stepT=1/speed;
+    speed = 2.6 + paired*0.15; timer += dt; const stepT=1/speed;
     if(timer<stepT) return; timer-=stepT;
     step();
   }
@@ -6716,28 +6716,60 @@ function openSnake(cfg, onComplete) {
   // ================= 渲染 =================
   function draw(){
     ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle='rgba(0,188,212,.07)'; ctx.lineWidth=1;
+    ctx.strokeStyle='rgba(0,188,212,.06)'; ctx.lineWidth=1;
     for(let x=0;x<=W;x+=cell){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<=H;y+=cell){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    // 底部网格微光
+    ctx.fillStyle='rgba(0,188,212,.03)'; ctx.fillRect(0,0,W,H);
     // 食物：蓝=术语 / 黄=解释，圆点 + 上方完整文字（深色描边便于阅读）
     foods.forEach(function(f){
       const fx=f.x*cell+cell/2, fy=f.y*cell+cell/2;
       const isTerm = f.kind==='term';
+      const pulse = 1 + 0.12*Math.sin(performance.now()/260 + f.x*1.7 + f.y*2.3);
+      const rad = 12*pulse;
+      // 外发光环
+      ctx.fillStyle = isTerm ? 'rgba(33,150,243,.22)' : 'rgba(255,179,0,.22)';
+      ctx.beginPath(); ctx.arc(fx,fy,rad+7,0,Math.PI*2); ctx.fill();
+      // 主体
       ctx.fillStyle = isTerm ? '#2196f3' : '#ffb300';
-      ctx.shadowColor = isTerm ? '#2196f3' : '#ffb300'; ctx.shadowBlur=10;
-      ctx.beginPath(); ctx.arc(fx,fy,13,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+      ctx.shadowColor = isTerm ? '#2196f3' : '#ffb300'; ctx.shadowBlur=12;
+      ctx.beginPath(); ctx.arc(fx,fy,rad,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+      // 高光
+      ctx.fillStyle='rgba(255,255,255,.55)';
+      ctx.beginPath(); ctx.arc(fx-rad*0.3,fy-rad*0.35,rad*0.28,0,Math.PI*2); ctx.fill();
       ctx.font='bold '+Math.round(F_FOOD/sf)+'px sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-      ctx.lineWidth=4; ctx.strokeStyle='rgba(0,0,0,.85)';
-      ctx.strokeText(f.label, fx, fy-18);
-      ctx.fillStyle='#fff'; ctx.fillText(f.label, fx, fy-18);
+      ctx.lineWidth=4; ctx.strokeStyle='rgba(0,0,0,.88)';
+      ctx.strokeText(f.label, fx, fy-20);
+      ctx.fillStyle='#fff'; ctx.fillText(f.label, fx, fy-20);
     });
-    // 蛇（带词时蛇头发蓝光）
+    // 蛇身：圆角 + 渐变（从尾到头的亮度提升），蛇头带眼睛和方向高光
+    const segN=snake.length;
     snake.forEach(function(s,i){
       const isHead = i===0;
-      ctx.fillStyle = isHead ? (currentTerm ? '#4dd0e1' : '#b2ff59') : 'rgba(0,200,83,'+(0.4+0.6*(1-i/snake.length))+')';
-      if(isHead && currentTerm){ ctx.shadowColor='#4dd0e1'; ctx.shadowBlur=12; }
-      ctx.fillRect(s.x*cell+1, s.y*cell+1, cell-2, cell-2);
+      const t = isHead?1:(0.35+0.6*(1-i/segN));
+      const x0=s.x*cell+2, y0=s.y*cell+2, sz=cell-4, rr=Math.min(6,sz/2.5);
+      if(isHead && currentTerm){ ctx.shadowColor='#4dd0e1'; ctx.shadowBlur=14; }
+      ctx.fillStyle = isHead ? (currentTerm?'#00e5ff':'#7cff5a') : ('rgba(0,200,83,'+t.toFixed(2)+')');
+      ctx.beginPath();
+      ctx.moveTo(x0+rr,y0); ctx.arcTo(x0+sz,y0,x0+sz,y0+sz,rr); ctx.arcTo(x0+sz,y0+sz,x0,y0+sz,rr);
+      ctx.arcTo(x0,y0+sz,x0,y0,rr); ctx.arcTo(x0,y0,x0+sz,y0,rr); ctx.closePath(); ctx.fill();
+      // 蛇身鳞片高光（小斜线）
+      if(!isHead && i%2===1){ ctx.fillStyle='rgba(255,255,255,.10)'; ctx.beginPath(); ctx.arc(s.x*cell+cell*0.62,s.y*cell+cell*0.38,3,0,Math.PI*2); ctx.fill(); }
+      if(isHead){
+        ctx.shadowBlur=0;
+        // 眼睛（按方向）
+        const ex = dir.x, ey = dir.y;
+        const eyeOff = cell*0.24, eyeR = 2.6;
+        const cxm = ex===0 ? (ey<0?-1:1) : 0, cym = ey===0 ? (ex<0?-1:1) : 0;
+        // 主眼（朝向）
+        const px1=s.x*cell+cell/2+ex*eyeOff, py1=s.y*cell+cell/2+ey*eyeOff;
+        ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px1+ex*3,py1+ey*3,eyeR+0.6,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#0b1520'; ctx.beginPath(); ctx.arc(px1+ex*4.4,py1+ey*4.4,eyeR,0,Math.PI*2); ctx.fill();
+        // 侧眼（垂直向时）
+        if(ex===0){ const ox=cell*0.5-4.5; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s.x*cell+ox,py1,eyeR,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#0b1520'; ctx.beginPath(); ctx.arc(s.x*cell+ox+ey*1.4,py1+ey*3,eyeR*0.85,0,Math.PI*2); ctx.fill(); }
+        if(ey===0){ const oy=cell*0.5-4.5; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px1,s.y*cell+oy,eyeR,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#0b1520'; ctx.beginPath(); ctx.arc(px1+ex*3,s.y*cell+oy+ex*1.4,eyeR*0.85,0,Math.PI*2); ctx.fill(); }
+      }
       ctx.shadowBlur=0;
     });
     // 粒子
