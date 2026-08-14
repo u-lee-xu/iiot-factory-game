@@ -6949,10 +6949,10 @@ function openFlappy(cfg, onComplete) {
   const questions=(cfg.questions||[{q:'SSH 登录命令是？',opts:['ssh user@ip','apt install','nslookup'],ans:0}]).map(function(q){return {q:String(q.q||''),opts:(q.opts||[]).map(String),ans:Number(q.ans)||0};});
   const W=840,H=560;
   const laneYs=[H*0.25, H*0.5, H*0.75];
-  const gapHalf=50;
+  const gapHalf=58;
   let lives=3, score=0, ended=false;
   let py=H/2, vy=0, rot=0;
-  let pipes=[], timer=0, speed=150;
+  let pipes=[], timer=0, speed=130;
   let particles=[];
   const overlay=document.createElement('div');
   overlay.className='mm-overlay';
@@ -6979,7 +6979,7 @@ function openFlappy(cfg, onComplete) {
   }
   function update(dt){
     if(ended)return;
-    speed = 150 + score*3; speedEl.textContent=Math.round(speed);
+    speed = 130 + score*2.5; speedEl.textContent=Math.round(speed);
     vy += 380*dt; py += vy*dt; rot = Math.max(-0.5, Math.min(1, vy/600));
     timer -= dt;
     if(timer<=0){ spawnPipe(); timer = Math.max(1.2, 1.7 - score*0.02); }
