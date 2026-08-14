@@ -1142,6 +1142,24 @@ body.map-flow .header .rank-badge,
 body.map-flow .header .btn-icon:not(#backMapBtn),
 body.map-flow .header .btn-logout,
 body.map-flow .header .director-avatar { display: none !important; }
+
+/* ===== 任务答题页面化：从房间/地图进入任务时，任务作为全屏"任务页"呈现，不再露 map-flow 空壳(用户名+返回厂区) ===== */
+body.map-flow .modal-overlay {
+  background: linear-gradient(180deg, #070a15 0%, #0b1020 55%, #0e1528 100%);
+  padding: 0;
+}
+body.map-flow .modal-box {
+  width: 100%; max-width: 100%; max-height: 100vh; height: 100vh;
+  border: none; border-radius: 0; background: transparent;
+}
+body.map-flow .modal-head {
+  padding: 12px 22px; border-bottom: 1px solid var(--border);
+  background: rgba(8,11,20,.92); flex: none;
+}
+body.map-flow .modal-head h3 { font-size: 17px; letter-spacing: 1px; }
+body.map-flow .modal-close { font-size: 21px; }
+body.map-flow .modal-body { padding: 18px 24px; }
+body.map-flow .modal-foot { padding: 12px 24px; }
 </style>
 </head>
 <body>
