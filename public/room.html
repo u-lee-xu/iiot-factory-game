@@ -5,13 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>锐智工厂 · 车间</title>
 <style>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>锐智工厂 · 厂区地图</title>
-<style>
 :root{
   --bg:#0b0e1a; --floor:#141a2e; --road:#1b2339; --roadline:#3a4568;
   --text:#e8eaf0; --dim:#9aa3bd; --amber:#ffb340; --green:#00e676; --red:#ff5252;
@@ -65,11 +58,11 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .rs-crate::after{content:"🪵";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;opacity:.9}
 @keyframes furnFire{0%,100%{filter:drop-shadow(0 0 3px rgba(255,150,60,.8));transform:translateX(-50%) scale(1)}50%{filter:drop-shadow(0 0 10px rgba(255,180,80,1));transform:translateX(-50%) scale(1.15)}}
 /* 任务设备（房间里的交互点，沿长廊分散） */
-.rs-task{position:absolute;width:58px;height:50px;z-index:4;background:#0c1122;border:2px solid #4a5a86;border-radius:1px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:4px 4px 0 rgba(0,0,0,.4),inset 0 0 0 2px rgba(255,255,255,.03)}
-.rs-task::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:5px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 6px,#0c1122 6px 12px);opacity:.85}
+.rs-task,.rs-exit{position:absolute;width:58px;height:50px;z-index:4;background:#0c1122;border:2px solid #4a5a86;border-radius:1px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:4px 4px 0 rgba(0,0,0,.4),inset 0 0 0 2px rgba(255,255,255,.03)}
+.rs-task::before,.rs-exit::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:5px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 6px,#0c1122 6px 12px);opacity:.85}
 .rs-task:hover{border-color:var(--amber);transform:translateY(-2px)}
-.rs-task .rt-icon{font-size:20px;line-height:1}
-.rs-task .rt-name{font-size:8px;color:#c3cbe0;margin-top:3px;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
+.rs-task .rt-icon,.rs-exit .rt-icon{font-size:20px;line-height:1}
+.rs-task .rt-name,.rs-exit .rt-name{font-size:8px;color:#c3cbe0;margin-top:3px;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
 .rs-task.done{border-color:var(--green);background:linear-gradient(180deg,rgba(0,230,118,.12),transparent)}
 .rs-task.done .rt-name{color:var(--green)}
 .rs-task.done::after{content:"✓";position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--green);color:#04140b;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
@@ -85,11 +78,9 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .rs-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.6),4px 4px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
 .rs-stairs.open::after{content:"上楼";position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);white-space:nowrap}
 /* 厂长 NPC（站在门口） */
-/* 出厂区出口（俯视房间左下角，点击返回厂区） */
-.rs-exit{position:absolute;left:40px;bottom:26px;width:80px;height:54px;z-index:8;background:linear-gradient(180deg,#2e5266,#25414f);border:2px solid #5a7a8a;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;box-shadow:4px 4px 0 rgba(0,0,0,.45);transition:border-color .2s, box-shadow .2s}
-.rs-exit .ie{font-size:22px;line-height:1}
-.rs-exit .il{font-size:11px;color:#cfe0ff;letter-spacing:1px;text-shadow:0 1px 0 #000}
-.rs-exit:hover{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6),4px 4px 0 rgba(0,0,0,.45)}
+/* 出厂区出口（俯视左下角，样式同任务设备 rs-task，点击返回厂区） */
+.rs-exit{left:40px;bottom:26px;z-index:8}
+.rs-exit:hover{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6),4px 4px 0 rgba(0,0,0,.45);transform:translateY(-2px)}
 .rs-npc{position:absolute;left:120px;top:34px;font-size:24px;z-index:6;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
 /* 俯视玩家小人：从头顶往下看——只看到 头顶头发/肩部/两侧手臂/脚，没有脸和眼睛 */
 /* 4 方向：dir-down(朝下·默认露双手) / dir-up(朝上·手藏身后) / dir-side(朝侧·露一侧手,左右用flip镜像) */
@@ -161,10 +152,10 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-platform::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,.22)}
 .sx-platform::after{content:"";position:absolute;left:12px;top:14px;width:4px;height:50px;background:#2a2f4e;box-shadow:40px 0 0 #2a2f4e,80px 0 0 #2a2f4e}
 /* 任务设备：像素机柜/终端（放大） */
-.sx-task{position:absolute;width:66px;height:56px;z-index:6;background:#141a30;border:2px solid #5a6a9a;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.04);transition:transform .15s,border-color .2s}
-.sx-task::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:6px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 8px,#141a30 8px 16px);opacity:.9}
-.sx-task .rt-icon{font-size:26px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
-.sx-task .rt-name{font-size:10px;color:#dce4f5;margin-top:4px;max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000;letter-spacing:.5px}
+.sx-task,.sx-door-exit{position:absolute;width:66px;height:56px;z-index:6;background:#141a30;border:2px solid #5a6a9a;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.04);transition:transform .15s,border-color .2s}
+.sx-task::before,.sx-door-exit::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:6px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 8px,#141a30 8px 16px);opacity:.9}
+.sx-task .rt-icon,.sx-door-exit .rt-icon{font-size:26px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
+.sx-task .rt-name,.sx-door-exit .rt-name{font-size:10px;color:#dce4f5;margin-top:4px;max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000;letter-spacing:.5px}
 .sx-task.done{border-color:var(--green);background:rgba(0,230,118,.14)}
 .sx-task.done::before{background:repeating-linear-gradient(90deg,var(--green) 0 8px,#141a30 8px 16px)}
 .sx-task.done .rt-name{color:var(--green)}
@@ -216,10 +207,9 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 
 .sx-door-tip{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);white-space:nowrap;text-shadow:0 1px 0 #000}
 /* 出厂区门（横版场景左端） */
-.sx-door-exit{position:absolute;z-index:20;width:46px;height:64px;cursor:pointer;background:#3a5a6a;border:4px solid #2a3a44;border-radius:2px;box-shadow:4px 4px 0 rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;transition:border-color .2s, box-shadow .2s}
-.sx-door-exit::after{content:"🚪";font-size:20px;filter:drop-shadow(0 0 2px rgba(0,0,0,.6))}
-.sx-door-exit::before{content:"出厂区";position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);white-space:nowrap;text-shadow:0 1px 0 #000}
-.sx-door-exit:hover{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6),4px 4px 0 rgba(0,0,0,.45)}
+/* 出厂区出口（横版左端，样式同任务设备 sx-task，点击返回厂区） */
+.sx-door-exit{z-index:20}
+.sx-door-exit:hover{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6),5px 5px 0 rgba(0,0,0,.45);transform:translateY(-2px)}
 .sx-rotate{position:absolute;top:36px;left:50%;transform:translateX(-50%);z-index:13;font-size:11px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:4px 12px;border-radius:3px;display:none;white-space:nowrap;pointer-events:none}
 .sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
 /* 竖屏/窄屏：场景保持较高 */
@@ -780,7 +770,7 @@ function renderRoom(id){
       <div class="sx-stage" id="sxStage" style="width:${stageW}px">
         <div class="sx-ground"></div>${propHTML}${platHTML}${taskElsHTML}
         <div class="sx-stairs" id="sxStairs"></div>
-        <div class="sx-door-exit" id="sxDoorExit" onclick="goBack()" title="出厂区"></div>
+        <div class="sx-door-exit" id="sxDoorExit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="rt-name">出厂区</span></div>
         <div class="sx-player" id="sxPlayer">
           <span class="pl hair"></span>
           <span class="pl face"></span><span class="pl eye"></span>
@@ -810,7 +800,7 @@ function renderRoom(id){
         ${ftHTML}
         ${stairsHTML}
         <div class="rs-npc">👷</div>
-        <div class="rs-exit" onclick="goBack()" title="出厂区"><span class="ie">🚪</span><span class="il">出厂区</span></div>
+        <div class="rs-exit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="rt-name">出厂区</span></div>
                 <div class="rs-player" id="rsPlayer"><canvas width="20" height="20"></canvas></div>
       </div>
     </div>`;
