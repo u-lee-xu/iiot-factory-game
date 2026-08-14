@@ -1417,7 +1417,7 @@ const RANKS = [
 ];
 
 let content = null;       // game content from API
-let gameState = { check: {}, stars: {}, achievements: {}, teacherAwards: {}, hasPassword: false };
+let gameState = { check: {}, stars: {}, achievements: {}, teacherAwards: {}, hasPassword: false, newlyAwardedLogin: [] };
 // 交互统计变量（部分交互复用同一组计数，需全局兜底，避免 ReferenceError）
 let errors = 0;
 let streak = 0;
@@ -2055,6 +2055,7 @@ async function loadState() {
     gameState.stars = res.data.stars || {};
     gameState.achievements = res.data.achievements || {};
     gameState.teacherAwards = res.data.teacherAwards || {};
+    gameState.newlyAwardedLogin = res.data.newlyAwardedLogin || [];
     gameState.hasPassword = !!res.data.hasPassword;
     gameState.coins = res.data.coins || 0;
     gameState.inventory = res.data.inventory || {};
@@ -5140,8 +5141,9 @@ function detectNewServerAchievements(){
   const fresh = [];
   // 教师手动发放的成就（teacherAwards）
   Object.keys(gameState.teacherAwards || {}).forEach(id => { if (!seen[id]) fresh.push({ id, source: 'teacher' }); });
-  // 系统自动发放的登录签到成就（login_*）
-  Object.keys(gameState.achievements || {}).forEach(id => { if (id.indexOf('login_') === 0 && !seen[id]) fresh.push({ id, source: 'auto' }); });
+  // 系统自动发放的登录签到成就（login_*）：只提示“服务端当天新授予”的，
+  // 不再遍历所有历史 login 成就——避免 seen 快照丢失(换设备/清缓存)后每次进入都重复弹窗
+  (gameState.newlyAwardedLogin || []).forEach(id => { if (!seen[id]) fresh.push({ id, source: 'auto' }); });
   // 快照：所有成就（含教师发放）
   const snap = Object.assign({}, gameState.achievements || {}, gameState.teacherAwards || {});
   setSeenAch(snap);

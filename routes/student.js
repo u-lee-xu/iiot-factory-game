@@ -46,6 +46,7 @@ router.get('/me', requireAuth, (req, res) => {
   }
   // 登录签到（系统自动发放）：初次登录 / 连续登录成就
   let salaryJustClaimed = false;
+  let newlyAwardedLogin = [];   // 本次真正新授予的登录成就（仅本次首次登录授予，客户端据此提示一次）
   const login = db.recordLogin(req.session.name);
   if (login && !login.alreadyToday) {
     const toAward = [];
@@ -55,7 +56,9 @@ router.get('/me', requireAuth, (req, res) => {
     if (st >= 7) toAward.push('login_7');
     if (st >= 14) toAward.push('login_14');
     if (st >= 30) toAward.push('login_30');
-    if (toAward.length) db.awardAchievements(req.session.name, toAward);
+    if (toAward.length) {
+      db.awardAchievements(req.session.name, toAward);
+    }
     // 上班打卡：新的一天登录自动领当日工资
     const cr = getContent();
     if (cr.ok && cr.data) {
@@ -65,6 +68,14 @@ router.get('/me', requireAuth, (req, res) => {
     }
     student = db.findStudent(req.session.name);
   }
+  // 登录签到成就提示：返回"当天新授予"的 login_*（客户端据此提示一次）。
+  // 用 achievements 里各 login 成就的授予日期判断——同一天首次 /me 授予后，后续 /me 也会返回，
+  // 客户端以 seen 快照挡重复；张三这种历史授予的不会返回，避免每次进入都弹。
+  const todayStr = db.localDateString();
+  const achAll = JSON.parse(student.achievements || '{}');
+  Object.keys(achAll).forEach(id => {
+    if (id.indexOf('login_') === 0 && achAll[id] && String(achAll[id]).slice(0, 10) === todayStr) newlyAwardedLogin.push(id);
+  });
   // 钱包信息
   const contentRes2 = getContent();
   const xp = (contentRes2.ok && contentRes2.data) ? db.calcStudentXP(student, contentRes2.data) : 0;
@@ -80,6 +91,7 @@ router.get('/me', requireAuth, (req, res) => {
       teacherAwards: JSON.parse(student.teacher_awards || '{}'),
       levelFinishTimes: JSON.parse(student.level_finish_times || '{}'),
       hasPassword: !db.isDefaultPassword(student.password),
+      newlyAwardedLogin: newlyAwardedLogin,
       loginCount: student.login_count || 0,
       loginStreak: student.login_streak || 0,
       coins: wallet.coins,
