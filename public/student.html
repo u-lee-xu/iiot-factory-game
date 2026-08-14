@@ -929,6 +929,23 @@ body:has(.mm-overlay) { overflow: hidden; }
 .mm-stack-level.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; z-index: 2; }
 .mm-stack-level.leaving { opacity: 0; transform: translateY(26px) scale(.9); pointer-events: none; z-index: 1; }
 .mm-stack-grid { display: grid; gap: 10px; }
+/* 翻牌配对特效：彩屑粒子 / 连击环 / 连击飘字 */
+.mm-burst{position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:30;
+/* 连连看消除特效：连线 + 加分飘字 */
+.ll-line{position:absolute;height:3px;background:linear-gradient(90deg,#00e676,#ffd700);border-radius:2px;
+  transform-origin:left center;pointer-events:none;z-index:25;box-shadow:0 0 10px rgba(255,215,0,.7);animation:llLine .45s ease-out forwards}
+@keyframes llLine{0%{opacity:1;transform-origin:left center;transform:rotate(var(--rot)) scaleX(.2)}100%{opacity:0;transform-origin:left center;transform:rotate(var(--rot)) scaleX(1)}}
+.ll-float{position:absolute;transform:translateX(-50%);color:#ffd700;font-weight:bold;font-size:18px;pointer-events:none;z-index:30;
+  text-shadow:0 0 8px rgba(255,215,0,.8),0 1px 3px #000;animation:mmFloat .75s ease-out forwards}
+
+  animation:mmBurst .55s ease-out forwards}
+@keyframes mmBurst{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--mx)),calc(-50% + var(--my))) scale(.4);opacity:0}}
+.mm-combo-ring{position:absolute;width:52px;height:52px;border-radius:50%;border:3px solid #ffd700;pointer-events:none;z-index:30;
+  animation:mmRing .55s ease-out forwards}
+@keyframes mmRing{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.8);opacity:0}}
+.mm-combo-float{position:absolute;transform:translateX(-50%);color:#ffd700;font-weight:bold;font-size:16px;pointer-events:none;z-index:30;
+  text-shadow:0 0 8px rgba(255,215,0,.7),0 1px 3px #000;animation:mmFloat .8s ease-out forwards}
+@keyframes mmFloat{0%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,-46px);opacity:0}}
 .mm-result { text-align: center; padding: 26px 10px 10px; }
 .mm-result .big { font-size: 52px; }
 .mm-result .xp { font-size: 26px; color: var(--green); font-weight: bold; margin: 10px 0 4px; }
@@ -7973,6 +7990,38 @@ function openLianLian(cfg, onComplete) {
         cleared++; doneEl.textContent = cleared;
         score += 50 + Math.max(0, timeLeft) ;
         scoreEl.textContent = score;
+        // —— 消除特效：连线闪光 + 粒子 + 加分飘字 ——
+        try {
+          const gb = gridEl.getBoundingClientRect();
+          const t1 = gridEl.children[(sel.r-1)*cols+(sel.c-1)], t2 = gridEl.children[(r-1)*cols+(c-1)];
+          const b1 = t1.getBoundingClientRect(), b2 = t2.getBoundingClientRect();
+          const x1 = b1.left+b1.width/2-gb.left, y1 = b1.top+b1.height/2-gb.top;
+          const x2 = b2.left+b2.width/2-gb.left, y2 = b2.top+b2.height/2-gb.top;
+          // 连线
+          const line = document.createElement('div');
+          line.className = 'll-line';
+          const lx=(x1+x2)/2, ly=(y1+y2)/2, len=Math.hypot(x2-x1,y2-y1), ang=Math.atan2(y2-y1,x2-x1);
+          line.style.cssText = 'left:'+lx+'px;top:'+ly+'px;width:'+len+'px;transform:rotate('+ang+'rad)';
+          gridEl.appendChild(line);
+          setTimeout(()=>{ try{line.remove();}catch(e){} }, 500);
+          // 粒子（两端各 8 个）
+          [[x1,y1],[x2,y2]].forEach(function(pt){
+            for(let k=0;k<8;k++){
+              const p2=document.createElement('span');
+              p2.className='mm-burst';
+              p2.style.cssText='left:'+pt[0]+'px;top:'+pt[1]+'px;--mx:'+((Math.random()*100-50))+'px;--my:'+((Math.random()*-90-10))+'px;background:'+['#00e676','#ffd700','#7ee8fa','#b388ff'][k%4];
+              gridEl.appendChild(p2);
+              setTimeout(()=>{ try{p2.remove();}catch(e){} }, 550);
+            }
+          });
+          // 加分飘字
+          const fl=document.createElement('div');
+          fl.className='ll-float';
+          fl.textContent = '+'+(50 + Math.max(0, timeLeft));
+          fl.style.cssText='left:'+((x1+x2)/2)+'px;top:'+((y1+y2)/2-20)+'px';
+          gridEl.appendChild(fl);
+          setTimeout(()=>{ try{fl.remove();}catch(e){} }, 800);
+        } catch(e){}
         cells[sel.r][sel.c] = null; cells[r][c] = null;
         sel = null; playSound('success');
         render();
@@ -9656,6 +9705,36 @@ function openMemoryMatch(cfg, onComplete) {
           bestStreak = Math.max(bestStreak, streak);
           if (comboEl) comboEl.textContent = streak >= 2 ? 'x' + streak : '';
           bumpGameStats({ mmStreak: bestStreak, mmMatched: (getGameStats().mmMatched || 0) + 1 });
+          // —— 配对连击特效：彩屑粒子 + 连击环 + 飘字 ——
+          try {
+            const box = grid.getBoundingClientRect();
+            const ax = a.getBoundingClientRect(), bx = b.getBoundingClientRect();
+            const cx = (ax.left+ax.right+bx.left+bx.right)/4 - box.left;
+            const cy = (ax.top+ax.bottom+bx.top+bx.bottom)/4 - box.top;
+            // 彩屑粒子
+            for (let k=0;k<14;k++){
+              const p2=document.createElement('span');
+              p2.className='mm-burst';
+              const colors=['#00e676','#ffd700','#7ee8fa','#ff5252','#b388ff'];
+              p2.style.cssText='left:'+(cx)+'px;top:'+(cy)+'px;--mx:'+((Math.random()*120-60))+'px;--my:'+((Math.random()*-100-20))+'px;background:'+colors[k%colors.length];
+              grid.appendChild(p2);
+              setTimeout(()=>{ try{p2.remove();}catch(e){} }, 600);
+            }
+            // 连击环（≥2 连）
+            if (streak >= 2){
+              const ring=document.createElement('div');
+              ring.className='mm-combo-ring';
+              ring.style.cssText='left:'+(cx-26)+'px;top:'+(cy-26)+'px';
+              grid.appendChild(ring);
+              setTimeout(()=>{ try{ring.remove();}catch(e){} }, 600);
+              const fl=document.createElement('div');
+              fl.className='mm-combo-float';
+              fl.textContent = '🔥 连击 x'+streak+' +'+Math.min(10,5+streak*2)+'';
+              fl.style.cssText='left:'+(cx)+'px;top:'+(cy-46)+'px';
+              grid.appendChild(fl);
+              setTimeout(()=>{ try{fl.remove();}catch(e){} }, 900);
+            }
+          } catch(e){}
           flipped = [];
           lock = false;
           if (da.event) applyEvent(da.event);
