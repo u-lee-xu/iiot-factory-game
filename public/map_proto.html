@@ -1063,18 +1063,19 @@ function facPop(kind){
     <div class="pop-tip">正式版：游戏房聚合所有小游戏入口，研发中心聚合术语/图鉴/排行榜</div>`;
   $('popup').classList.add('show');
 }
-const RS_SPRITES={"S": ["....................", ".......HHHHHH.......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHhHHhHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "......HHHHHHHH......", ".....bbbbbbbbbb.....", "....BBBBBBBBBBBB....", "....BBBBBBBBBBBB....", "...K..BBBBBBBB..K...", "...K..BBBBBBBB..K...", "...K...BBBBBB...K...", ".....LL......LL.....", ".....LL......LL.....", "....XX.......XX.....", "...................."], "E": ["....................", "....................", "....................", ".............KKK....", "...HHHHH...BB.......", "..HHHHHHH.bBB...LLX.", "..HHHHHHHHbBBBB.LLX.", ".HHHHHHHHHbBBBBB....", ".HHHhHHHHHbBBBBB....", ".HHHHHHHHHbBBBBB....", ".HHHHHHHHHbBBBBB....", ".HHHhHHHHHbBBBBB....", ".HHHHHHHHHbBBBBB....", "..HHHHHHHHbBBBB.LL..", "..HHHHHHH.bBB...LLX.", "...HHHHH...BB.....X.", ".............KKK....", "....................", "....................", "...................."], "N": ["....................", ".....XX.......XX....", ".....LL......LL.....", ".....LL......LL.....", "...K...BBBBBB...K...", "...K..BBBBBBBB..K...", "...K..BBBBBBBB..K...", "....BBBBBBBBBBBB....", "....BBBBBBBBBBBB....", ".....bbbbbbbbbb.....", "......HHHHHHHH......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHhHHhHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", ".......HHHHHH.......", "...................."], "W": ["....................", "....................", "....................", "....KKK.............", ".X.....BB...HHHHH...", ".XLL...BBb.HHHHHHH..", "..LL.BBBBbHHHHHHHH..", "....BBBBBbHHHHHHHHH.", "....BBBBBbHHHHHhHHH.", "....BBBBBbHHHHHHHHH.", "....BBBBBbHHHHHHHHH.", "....BBBBBbHHHHHhHHH.", "....BBBBBbHHHHHHHHH.", ".XLL.BBBBbHHHHHHHH..", ".XLL...BBb.HHHHHHH..", ".......BB...HHHHH...", "....KKK.............", "....................", "....................", "...................."], "SE": ["....................", "..........HHH.......", ".........HHHHHH.....", "........HHHHHHHH....", ".......HHHHHHHHHH...", ".......HHHHHHHHHHH..", "......b.HHHHHHHHHH..", "....BBbbHHHHHHHHHHH.", "..K.BBBbbHHHHHHHHHH.", ".K...BBBbbHHHHHHHHH.", "....BBBBBbbHHHHHHH..", ".LL.BBBBBBbbHHHHH...", "XLL.BBBBBBBbb.HH....", ".....BBBBBBBbb......", "......BBBBBBB.......", ".......BBB.BB.......", "....................", ".......LL..K........", "......XLL.K.........", ".......X............"], "SW": ["....................", ".......HHH..........", ".....HHHHHH.........", "....HHHHHHHH........", "...HHHHHHHHHH.......", "..HHHHHHHHHHH.......", "..HHHHHHHHHH.b......", ".HHHHHHHHHHHbbBB....", ".HHHHHHHHHHbbBBB.K..", ".HHHHHHHHHbbBBB...K.", "..HHHHHHHbbBBBBB....", "...HHHHHbbBBBBBB.LL.", "....HH.bbBBBBBBB.LLX", "......bbBBBBBBB...X.", ".......BBBBBBB......", ".......BB.BBB.......", "....................", "........K..LL.......", ".........K.LL.......", "............X......."], "NE": [".......X............", ".......LL.K.........", ".......LL..K........", "....................", ".......BBB.BB.......", "......BBBBBBB.......", ".X...BBBBBBBb.......", "XLL.BBBBBBBbH.HH....", ".LL.BBBBBBbHHHHHH...", "....BBBBBbHHHHHHHH..", ".K...BBBbHHHHHHHHHH.", "..K.BBBbHHHHHHHHHHH.", "....BBbHHHHHHHHHHHH.", "........HHHHHHHHHH..", ".......HHHHHHHHHHH..", ".......HHHHHHHHHH...", "........HHHHHHHH....", ".........HHHHHH.....", "..........HHH.......", "...................."], "NW": ["............X.......", ".........K.LLX......", "........K..LL.......", "....................", ".......BB.BBB.......", ".......BBBBBBB......", ".......bBBBBBBB.....", "....HH.HbBBBBBBB.LLX", "...HHHHHHbBBBBBB.LL.", "..HHHHHHHHbBBBBB....", ".HHHHHHHHHHbBBB...K.", ".HHHHHHHHHHHbBBB.K..", ".HHHHHHHHHHHHbBB....", "..HHHHHHHHHH........", "..HHHHHHHHHHH.......", "...HHHHHHHHHH.......", "....HHHHHHHH........", ".....HHHHHH.........", ".......HHH..........", "...................."]};;
+const RS_SPRITES={"S_0": ["....................", ".......HHHHHH.......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHhHHhHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "......HHHHHHHH......", ".....bbbbbbbbbb.....", "....BBBBBBBBBBBB....", "...K..BBBBBBBB..K...", "...K..BBBBBBBB..K...", "....................", "....................", "....................", "....................", "....................", "...................."], "S_1": ["....................", ".......HHHHHH.......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHhHHhHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "......HHHHHHHH......", ".....bbbbbbbbbb.....", "..K..BBBBBBBBBB..K..", "..K..BBBBBBBBBB..K..", ".....BBBBBBBBBB.....", "....................", "....................", "....................", "....................", "....................", "...................."], "N_0": ["....................", "....HHhHHHHhHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "......HHHHHHHH......", ".....bbbbbbbbbb.....", "....BBBBBBBBBBBB....", "...K..BBBBBBBB..K...", "...K..BBBBBBBB..K...", "....................", "....................", "....................", "....................", "....................", "...................."], "N_1": ["....................", "....HHhHHHHhHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "......HHHHHHHH......", ".....bbbbbbbbbb.....", "..K..BBBBBBBBBB..K..", "..K..BBBBBBBBBB..K..", ".....BBBBBBBBBB.....", "....................", "....................", "....................", "....................", "....................", "...................."]}
 /* 俯视小人：纯俯视 8 方向整体旋转 sprite（canvas 渲染） */
-const RS_COLORS={'H':'#4a3524','h':'#2a1d12','B':'#4a76f5','K':'#e8c090','L':'#3a2a55','X':'#14141f'};
-let rsDir='S';
-function rsDraw(dir){
+const RS_COLORS={'H':'#4a3524','h':'#2a1d12','B':'#4a76f5','b':'#2c4fae','K':'#e8c090','L':'#3a2a55','X':'#14141f'};
+let rsDir='S', rsFrame=0;
+function rsDraw(dir, frame){
   const p=document.getElementById('rsPlayer');
   if(!p) return;
   let cv=p.querySelector('canvas');
   if(!cv){ cv=document.createElement('canvas'); cv.width=20; cv.height=20; p.appendChild(cv); }
   const ctx=cv.getContext('2d');
   ctx.clearRect(0,0,20,20);
-  const rows=RS_SPRITES[dir]||RS_SPRITES.S;
+  const key=dir+'_'+(frame||0);
+  const rows=RS_SPRITES[key]||RS_SPRITES[dir+'_0']||RS_SPRITES.S_0;
   for(let y=0;y<20;y++){
     const row=rows[y];
     for(let x=0;x<20;x++){
@@ -1084,19 +1085,12 @@ function rsDraw(dir){
   }
 }
 function rsSetDir(dx,dy){
-  // 8 方向：按角度分桶
+  // 只做上下两个方向：dy 决定朝上(N)/朝下(S)，左右保持当前朝向
   if(dx===0&&dy===0) return;
-  const ang=Math.atan2(dy,dx)*180/Math.PI; // -180..180, 东0 南90 西±180 北-90
-  // 映射: 东0 东南45 南90 西南135 西180/-180 西北-135 北-90 东北-45
-  const keys=['E','SE','S','SW','W','NW','N','NE'];
-  let idx=Math.round((ang+180)/45)%8; // 0=E ... 但 atan2 东0度=> (0+180)/45=4 => W! 需修正
-  // 标准: atan2(dy,dx): 东=0 南=90 西=180 北=-90
-  // 分桶 22.5 间隔: 
-  const a=((ang%360)+360)%360; // 0..360, 东0 南90 西180 北270
-  const sectors=['E','SE','S','SW','W','NW','N','NE'];
-  idx=Math.round(a/45)%8;
-  rsDir=sectors[idx];
-  rsDraw(rsDir);
+  if(Math.abs(dy)>=Math.abs(dx)){
+    rsDir = dy<0 ? 'N' : 'S';
+  }
+  rsDraw(rsDir, rsFrame);
 }
 const ROOM_VIEW={workshop:'top',edge_cabinet:'top',control_room:'top',console:'top',
   data_pipe:'side',big_screen:'side',cloud_platform:'top',ai_lab:'top'};
@@ -1273,7 +1267,7 @@ function rsStart(){
   // 小人初始位置：门口（房间左下角）
   let px=60, py=stageH-120, tx=null, ty=null, speed=2.6;
   rsCamX=0; rsCamY=0;
-  rsDraw('S');
+  rsDraw('S',0);
   player.style.left=px+'px'; player.style.top=py+'px';
   // 点哪走哪：点击场景（非设备/楼梯/家具）→ 小人走到点击位置
   // 注意：stage 有 transform 平移，getBoundingClientRect 是可视位置；内容坐标 = 可视坐标 + 摄像机偏移
@@ -1305,6 +1299,8 @@ function rsStart(){
     }
     if(moving) setDir(ldx, ldy);
     player.classList.toggle('walk', moving);
+    // 走路时手前后摆动（两帧交替）
+    if(moving){ rsFrame=(rsFrame+1)%2; rsDraw(rsDir, rsFrame); }
     player.style.left=px+'px'; player.style.top=py+'px';
     // 摄像机跟随：stage 平移使小人居中（x/y 双向）
     rsCamX=px-rw/2+12; rsCamX=Math.max(0, Math.min(rsCamX, stageW-rw));
