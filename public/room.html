@@ -158,8 +158,10 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-platform::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,.22)}
 .sx-platform::after{content:"";position:absolute;left:12px;top:14px;width:4px;height:50px;background:#2a2f4e;box-shadow:40px 0 0 #2a2f4e,80px 0 0 #2a2f4e}
 /* 任务设备：像素机柜/终端（放大） */
-.sx-task,.sx-door-exit{position:absolute;width:50px;height:42px;z-index:6;background:#141a30;border:2px solid #5a6a9a;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.04);transition:transform .15s,border-color .2s}
-.sx-task::before,.sx-door-exit::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:6px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 8px,#141a30 8px 16px);opacity:.9}
+/* 任务设备：去外框，图标悬浮（无方框/边框/阴影），用光晕区分状态 */
+.sx-task,.sx-door-exit{position:absolute;width:46px;height:40px;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
+  filter:drop-shadow(0 0 6px rgba(0,188,212,.45));transition:transform .15s;background:none;border:none}
+.sx-task::before,.sx-door-exit::before{content:none}
 .sx-task .rt-icon,.sx-door-exit .rt-icon{font-size:19px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
 /* 任务名：藏在设备上方，小人走近才浮现（不占设备内部空间） */
 .sx-task .rt-name,.sx-door-exit .rt-name{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
@@ -169,16 +171,16 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 .sx-task.near .rt-name{opacity:1}
 .sx-door-exit .rt-name{opacity:1}
 
-.sx-task.done{border-color:var(--green);background:rgba(0,230,118,.14)}
-.sx-task.done::before{background:repeating-linear-gradient(90deg,var(--green) 0 8px,#141a30 8px 16px)}
+.sx-task.done{filter:drop-shadow(0 0 8px rgba(0,230,118,.7))}
+.sx-task.done::before{content:none}
 .sx-task.done .rt-name{color:var(--green);border-color:var(--green);opacity:1}
 .sx-task.done::after{content:"✓";position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--green);color:#04140b;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
-.sx-task.next{border-color:var(--amber);box-shadow:0 0 16px rgba(255,179,64,.75),5px 5px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
-.sx-task.next::before{background:repeating-linear-gradient(90deg,var(--amber) 0 8px,#141a30 8px 16px)}
+.sx-task.next{animation:stNext 1.6s ease-in-out infinite}
+.sx-task.next::before{content:none}
 .sx-task.next .rt-name{color:var(--amber);font-weight:bold}
 .sx-task.todo{opacity:.82}
 .sx-task.todo:hover{opacity:1}
-.sx-task.near{border-color:var(--amber);transform:scale(1.1);z-index:8}
+.sx-task.near{transform:scale(1.12);z-index:8;filter:drop-shadow(0 0 12px rgba(255,179,64,.9))}
 /* 走近提示已由 rt-name tooltip 承担 */
 /* 玩家：精细 8bit 像素小人（安全帽+工装+手臂，会走路） */
 .sx-player{position:absolute;z-index:9;width:26px;height:40px}
@@ -222,7 +224,7 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 /* 出厂区门（横版场景左端） */
 /* 出厂区出口（横版左端，样式同任务设备 sx-task，点击返回厂区） */
 .sx-door-exit{z-index:20}
-.sx-door-exit:hover{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6),5px 5px 0 rgba(0,0,0,.45);transform:translateY(-2px)}
+.sx-door-exit:hover{transform:translateY(-2px);filter:drop-shadow(0 0 12px rgba(255,179,64,.9))}
 .sx-rotate{position:absolute;top:36px;left:50%;transform:translateX(-50%);z-index:13;font-size:11px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:4px 12px;border-radius:3px;display:none;white-space:nowrap;pointer-events:none}
 .sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
 /* 竖屏/窄屏：场景保持较高 */
@@ -542,8 +544,8 @@ function sxStart(){
   // 动态坐标：HUD 52px + 地面 46px，跑动区居中
   const H=scene.clientHeight;
   const groundH=58, groundTop=H-52-groundH;
-  const platTop=Math.max(115, groundTop-140);
-  const g=0.46, jumpV=-10.5, speed=4.6, ph=38;
+  const platTop=Math.max(112, groundTop-100);
+  const g=0.46, jumpV=-11.5, speed=4.6, ph=38;
   const gap=250, baseX=140;
   let x=72, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
   const keys={left:false,right:false,jump:false};
