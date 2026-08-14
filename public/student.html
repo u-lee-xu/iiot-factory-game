@@ -10718,9 +10718,12 @@ async function submitBugReport(){
 // =========================================================================
 function hideTransit(){ var t=document.getElementById('transit'); if(t){ setTimeout(function(){ t.classList.remove('show'); }, 150); } }
 function goMap(){
+  // 从房间进入的任务：返回时直接回房间 room.html?room=xx；否则回厂区地图
+  var target='map_proto.html';
+  try{ var mr=sessionStorage.getItem('mapRoom'); if(mr) target='room.html?room='+mr; }catch(e){}
   var t=document.getElementById('transit');
-  if(t){ var e=document.getElementById('trText'); if(e) e.innerHTML='正在返回 <b>厂区地图</b>…'; t.classList.add('show'); }
-  setTimeout(function(){ location.href='map_proto.html'; }, 500);
+  if(t){ var e=document.getElementById('trText'); if(e) e.innerHTML='正在返回 <b>厂区</b>…'; t.classList.add('show'); }
+  setTimeout(function(){ location.href=target; }, 500);
 }
 function logout() {
   sessionStorage.clear();

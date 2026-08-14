@@ -1096,6 +1096,10 @@ const ROOM_VIEW={workshop:'top',edge_cabinet:'top',control_room:'top',console:'t
   data_pipe:'side',big_screen:'side',cloud_platform:'top',ai_lab:'top'};
 const TASK_ICON={install_wizard:'🖥️',terminal:'⌨️',chain_quiz:'💬',quiz:'💬',fill_blank:'✍️',sort:'🔀',diagnosis_tree:'🩺',progress_bar:'📊',scenario_match:'🔗',code_review:'📝',ethics:'⚖️',drag_classify:'🗂️',boss_fight:'💥'};
 function openRoom(id){
+  // 房间已拆分为独立页面 room.html：地图点建筑 → 带过场进入房间
+  const lv2=content&&content.levels&&content.levels.find(l=>l.id==id);
+  goPage('room.html?room='+id, (lv2&&lv2.areaName)||'车间');
+  return;
   if(currentRoomId!==id){ currentRoomId=id; try{ window._roomFlr=0; }catch(e){} }
   const lv=content.levels.find(l=>l.id==id); if(!lv) return;
   const color=AREA_COLOR[lv.factoryArea]||lv.color;
@@ -1470,15 +1474,9 @@ function sxStop(){
 }
 let currentRoomId=null;
 function enterLevel(id, taskId){
-  closeRoom();
-  try{ if(id) sessionStorage.setItem('mapRoom', id); }catch(e){}
-  const q=new URLSearchParams();
-  if(taskId) q.set('task', taskId);
-  else if(id) q.set('level', id);
-  const qs=q.toString()?'?'+q.toString():'';
-  let title='关卡';
-  if(id){ const lv=content&&content.levels&&content.levels.find(l=>l.id==id); if(lv) title=lv.areaName; }
-  goPage('student.html'+qs, title);
+  // 地图页入口：进房间（房间已拆为独立页面 room.html）
+  const lv=content&&content.levels&&content.levels.find(l=>l.id==id);
+  goPage('room.html?room='+id, (lv&&lv.areaName)||'车间');
 }
 function closePop(){ $('popup').classList.remove('show'); }
 function goPage(url, title){

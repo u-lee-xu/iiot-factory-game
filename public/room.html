@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>锐智工厂 · 车间</title>
+<style>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>锐智工厂 · 厂区地图</title>
+<style>
+:root{
+  --bg:#0b0e1a; --floor:#141a2e; --road:#1b2339; --roadline:#3a4568;
+  --text:#e8eaf0; --dim:#9aa3bd; --amber:#ffb340; --green:#00e676; --red:#ff5252;
+  --border:#2c3552;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospace,Menlo,Consolas,monospace;min-height:100vh;overflow-x:hidden}
+/* ===== RPG 室内场景（俯视工坊风 · 8bit · 延伸房间+摄像机跟随） ===== */
+/* 可视窗（固定大小），内部 rs-stage 横向延伸，画面随人物移动 */
+.room-scene{position:relative;height:400px;margin:0 18px 12px;border-radius:2px;overflow:hidden;
+  border:10px solid #2a3352;box-shadow:inset 0 0 0 2px #0a0d18, 0 4px 0 rgba(0,0,0,.35);background:#141a30}
+/* 横屏：俯视场景高度撑满右栏 */
+@media (orientation:landscape) and (max-width:960px) and (max-height:600px){
+  .room-scene{height:calc(100vh - 40px);max-height:420px}
+}
+.rs-stage{position:absolute;top:0;left:0;height:100%;will-change:transform}
+/* 地板：8bit 木板像素格（铺满整条延伸房间） */
+.rs-floor{position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,#1c2340 0 16px,#19203a 16px 32px),
+  repeating-linear-gradient(0deg,#1b223d 0 16px,#182039 16px 32px)}
+.rs-floor::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(120% 90% at 50% 0%, rgba(255,179,64,.05), transparent 55%)}
+/* 上下像素砖墙（沿整条房间延伸） */
+.rs-wall{position:absolute;background:
+  repeating-linear-gradient(90deg,#3a4568 0 12px,#313c5c 12px 24px);z-index:3}
+.rs-wall.t{top:0;left:0;right:0;height:12px}
+.rs-wall.b{bottom:0;left:0;right:0;height:12px;background:
+  repeating-linear-gradient(90deg,#313c5c 0 12px,#3a4568 12px 24px)}
+/* 门（顶部墙开口，房间入口） */
+.rs-door{position:absolute;top:-2px;left:40px;width:56px;height:16px;background:#2a3852;border:2px solid #0a0d18;z-index:6}
+.rs-door::after{content:"🚪";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px}
+/* 楼层标牌 */
+.rs-label{position:absolute;top:16px;left:8px;font-size:11px;color:var(--amber);background:rgba(11,14,26,.85);border:1px solid var(--amber);padding:2px 9px;border-radius:2px;z-index:8;letter-spacing:1px}
+/* 工坊家具（装饰，沿房间散布，不可交互但点一下小人走过去） */
+.rs-furn{position:absolute;z-index:2;background:#151b33;border:2px solid #0a0d18;box-shadow:3px 3px 0 rgba(0,0,0,.35);cursor:pointer}
+.rs-furn:hover{border-color:var(--amber);transform:translateY(-1px)}
+.rs-furn:hover::after{filter:brightness(1.2)}
+.rs-furnace{left:22px;bottom:52px;width:64px;height:56px;border-radius:2px;background:linear-gradient(180deg,#2a1a14,#1a100c);box-shadow:3px 3px 0 rgba(0,0,0,.4),0 0 18px rgba(255,110,30,.35)}
+.rs-furnace::before{content:"🔥";position:absolute;left:50%;top:8px;transform:translateX(-50%);font-size:20px;animation:furnFire 1.4s ease-in-out infinite}
+.rs-furnace::after{content:"熔炉";position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:9px;color:#e8b88a;letter-spacing:2px}
+.rs-bench{left:160px;bottom:52px;width:150px;height:44px;border-radius:2px;background:
+  repeating-linear-gradient(90deg,#3a2f1e 0 10px,#33291a 10px 20px);box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.rs-bench::before{content:"🛠️🔧";position:absolute;left:50%;top:5px;transform:translateX(-50%);font-size:15px;letter-spacing:6px}
+.rs-bench::after{content:"工作台";position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:9px;color:#cbb98a;letter-spacing:3px}
+.rs-shelf{left:330px;bottom:52px;width:54px;height:62px;border-radius:2px;background:linear-gradient(180deg,#241c14,#1a140e)}
+.rs-shelf::before{content:"📦";position:absolute;left:50%;top:8px;transform:translateX(-50%);font-size:16px}
+.rs-shelf::after{content:"货架";position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:9px;color:#cbb98a;letter-spacing:2px}
+.rs-crate{width:26px;height:24px;border-radius:2px;background:#3a2f1e}
+.rs-crate.c1{left:110px;bottom:52px}
+.rs-crate.c2{left:280px;bottom:52px}
+.rs-crate::after{content:"🪵";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;opacity:.9}
+@keyframes furnFire{0%,100%{filter:drop-shadow(0 0 3px rgba(255,150,60,.8));transform:translateX(-50%) scale(1)}50%{filter:drop-shadow(0 0 10px rgba(255,180,80,1));transform:translateX(-50%) scale(1.15)}}
+/* 任务设备（房间里的交互点，沿长廊分散） */
+.rs-task{position:absolute;width:58px;height:50px;z-index:4;background:#0c1122;border:2px solid #4a5a86;border-radius:1px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,transform .15s;box-shadow:4px 4px 0 rgba(0,0,0,.4),inset 0 0 0 2px rgba(255,255,255,.03)}
+.rs-task::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:5px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 6px,#0c1122 6px 12px);opacity:.85}
+.rs-task:hover{border-color:var(--amber);transform:translateY(-2px)}
+.rs-task .rt-icon{font-size:20px;line-height:1}
+.rs-task .rt-name{font-size:8px;color:#c3cbe0;margin-top:3px;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
+.rs-task.done{border-color:var(--green);background:linear-gradient(180deg,rgba(0,230,118,.12),transparent)}
+.rs-task.done .rt-name{color:var(--green)}
+.rs-task.done::after{content:"✓";position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--green);color:#04140b;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
+.rs-task.next{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.6);animation:stNext 1.6s ease-in-out infinite}
+.rs-task.next::before{content:"▶";position:absolute;top:-15px;left:50%;transform:translateX(-50%);color:var(--amber);font-size:12px;animation:stArrow 1.1s ease-in-out infinite;text-shadow:0 0 6px rgba(255,179,64,.7)}
+.rs-task.next .rt-icon{animation:stPulse 1.6s ease-in-out infinite}
+.rs-task.next .rt-name{color:var(--amber);font-weight:bold}
+.rs-task.todo{opacity:.55}
+.rs-task.todo:hover{opacity:1}
+/* 出口楼梯（房间末端） */
+.rs-stairs{position:absolute;width:44px;height:44px;z-index:5;display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:2px;cursor:pointer;background:#1a2140;border:2px solid #5a6a9a;box-shadow:4px 4px 0 rgba(0,0,0,.45)}
+.rs-stairs.locked{opacity:.4;cursor:not-allowed}
+.rs-stairs.open{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,64,.6),4px 4px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
+.rs-stairs.open::after{content:"上楼";position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--amber);white-space:nowrap}
+/* 厂长 NPC（站在门口） */
+.rs-npc{position:absolute;left:120px;top:34px;font-size:24px;z-index:6;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
+/* 俯视玩家小人：从头顶往下看——只看到 头顶头发/肩部/两侧手臂/脚，没有脸和眼睛 */
+/* 4 方向：dir-down(朝下·默认露双手) / dir-up(朝上·手藏身后) / dir-side(朝侧·露一侧手,左右用flip镜像) */
+.rs-player{position:absolute;z-index:9;width:34px;height:34px;pointer-events:none;margin-left:-7px;margin-top:-7px}
+.rs-player canvas{display:block;width:34px;height:34px;image-rendering:pixelated}
+/* 任务/小游戏区（场景下方） */
+.rs-foot{margin:0 18px 12px}
+@keyframes stNext{0%,100%{box-shadow:0 0 8px rgba(255,179,64,.35)}50%{box-shadow:0 0 20px rgba(255,179,64,.75)}}
+@keyframes stArrow{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+@keyframes stPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+/* ===== 横版过关场景（side-scroll · 室内房间剖面 · 8bit） ===== */
+/* 三层结构：天花板 / 跑动区 / 地面 / 底部操作区(HUD) —— 跑动区始终在画面中间 */
+.sx-scene{position:relative;height:520px;margin:0 18px 12px;border-radius:2px;overflow:hidden;
+  border:10px solid #2c2a48;box-shadow:inset 0 0 0 2px #141222,0 4px 0 rgba(0,0,0,.4);background:#0a0e22;touch-action:none}
+.sx-stage{position:absolute;top:0;left:0;height:100%;will-change:transform}
+/* 室内墙背景：亮暖灰 + 砖纹 + 墙裙 */
+.sx-bg{position:absolute;inset:0;background:
+  linear-gradient(180deg,#3d4a72 0%,#38446a 55%,#333f63 100%)}
+.sx-bg::before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:
+  repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 22px,transparent 22px 44px),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 22px,transparent 22px 44px)}
+.sx-bg::after{content:"";position:absolute;left:0;right:0;height:96px;bottom:56px;
+  background:linear-gradient(180deg,#2c3558 0%,#262e4e 100%);
+  border-top:3px solid #4a5a86;border-bottom:3px solid #1d2440}
+/* 天花板：横梁 + 灯带 */
+.sx-ceil{position:absolute;left:0;right:0;top:0;height:30px;z-index:2;
+  background:linear-gradient(180deg,#2c2a48,#211f3a);border-bottom:3px solid #141222;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.06)}
+.sx-ceil::after{content:"";position:absolute;left:0;right:0;top:12px;height:4px;
+  background:repeating-linear-gradient(90deg,#ffd9a0 0 26px,#ffb340 26px 28px,#ffd9a0 28px 54px);
+  opacity:.9;filter:drop-shadow(0 0 4px rgba(255,179,64,.6))}
+/* 墙上装饰：挂画/仪表盘/窗户/时钟/横管 */
+.sx-deco{position:absolute;border:3px solid #141222;box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.sx-deco.pic{width:34px;height:26px;background:repeating-linear-gradient(135deg,#4a7fb0 0 8px,#3a6a9a 8px 16px)}
+.sx-deco.gauge{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 50% 45%,#7fd0ff 0 26%,#2a3a60 30% 60%,#1a2440 62%);box-shadow:0 0 8px rgba(127,208,255,.4)}
+.sx-deco.win{width:36px;height:32px;background:linear-gradient(180deg,#7fd0ff,#4a9ad0);border-width:4px;border-color:#4a5a86;box-shadow:inset 0 0 0 2px #141222,0 0 10px rgba(127,208,255,.35)}
+.sx-deco.win::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:#2c3558}
+.sx-deco.win::after{content:"";position:absolute;top:50%;left:0;right:0;height:2px;background:#2c3558}
+.sx-deco.clock{width:24px;height:24px;border-radius:50%;background:#e8e2d0;border:3px solid #141222}
+.sx-deco.clock::after{content:"";position:absolute;left:50%;top:6px;width:2px;height:7px;background:#333;transform-origin:bottom;transform:rotate(-35deg)}
+.sx-deco.pipe{height:8px;background:linear-gradient(180deg,#5a6a9a,#3a4a78);border-left:none;border-right:none}
+/* 地面下方：底部操作区（HUD 条），深色不透明，不挡跑动区 */
+.sx-hud{position:absolute;left:0;right:0;bottom:0;height:52px;z-index:11;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 10px;
+  background:linear-gradient(180deg,#1a2140,#10162a);border-top:3px solid #4a5a86;box-shadow:0 -3px 0 rgba(0,0,0,.35)}
+.sx-hint{font-size:11px;color:#e2e9fb;line-height:1.4;text-shadow:0 1px 0 #000;max-width:56%}
+.sx-hint b{color:var(--amber)}
+.sx-btns{display:none;gap:8px;flex:none}
+.sx-btn{width:50px;height:46px;font-size:20px;border-radius:3px;background:rgba(13,16,34,.95);border:2px solid #5a6a9a;color:var(--amber);cursor:pointer;user-select:none;touch-action:none;font-family:inherit;-webkit-tap-highlight-color:transparent;box-shadow:0 3px 0 rgba(0,0,0,.5)}
+.sx-btn:active{background:#2a3852;transform:translateY(2px);box-shadow:none}
+@media (hover:none),(pointer:coarse){
+  .sx-btns{display:flex}
+}
+/* 地板：厚实木地板（在 HUD 条上方） */
+.sx-ground{position:absolute;left:0;right:0;bottom:52px;height:46px;background:
+  repeating-linear-gradient(90deg,#6a5a3a 0 26px,#5a4c30 26px 52px);
+  border-top:4px solid #8a7a52;box-shadow:0 -2px 0 rgba(255,255,255,.12),inset 0 6px 0 rgba(255,255,255,.07)}
+.sx-ground::before{content:"";position:absolute;left:0;right:0;top:6px;height:3px;
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 13px,transparent 13px 26px)}
+/* 地面静态装饰：木箱/木桶（放在设备间隙，不与设备重叠） */
+.sx-prop{position:absolute;z-index:4}
+.sx-prop.crate{width:28px;height:22px;background:#6a5a3a;border:2px solid #141222;box-shadow:2px 2px 0 rgba(0,0,0,.4)}
+.sx-prop.crate::after{content:"";position:absolute;inset:0;border:1px solid rgba(0,0,0,.4);border-top:none;border-left:none}
+.sx-prop.barrel{width:20px;height:24px;border-radius:3px;background:linear-gradient(180deg,#5a4c30,#4a3e28);border:2px solid #141222;box-shadow:2px 2px 0 rgba(0,0,0,.4)}
+.sx-prop.barrel::before{content:"";position:absolute;left:3px;right:3px;top:6px;height:2px;background:rgba(0,0,0,.4)}
+/* 平台：像素金属平台（带支撑腿） */
+.sx-platform{position:absolute;height:14px;background:
+  repeating-linear-gradient(90deg,#6a7aae 0 10px,#5a6a9a 10px 20px);border:2px solid #141222;border-radius:1px;box-shadow:3px 3px 0 rgba(0,0,0,.4);z-index:5}
+.sx-platform::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,.22)}
+.sx-platform::after{content:"";position:absolute;left:12px;top:14px;width:4px;height:50px;background:#2a2f4e;box-shadow:40px 0 0 #2a2f4e,80px 0 0 #2a2f4e}
+/* 任务设备：像素机柜/终端（放大） */
+.sx-task{position:absolute;width:66px;height:56px;z-index:6;background:#141a30;border:2px solid #5a6a9a;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:5px 5px 0 rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.04);transition:transform .15s,border-color .2s}
+.sx-task::before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:6px;background:repeating-linear-gradient(90deg,var(--rc,#00bcd4) 0 8px,#141a30 8px 16px);opacity:.9}
+.sx-task .rt-icon{font-size:26px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
+.sx-task .rt-name{font-size:10px;color:#dce4f5;margin-top:4px;max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000;letter-spacing:.5px}
+.sx-task.done{border-color:var(--green);background:rgba(0,230,118,.14)}
+.sx-task.done::before{background:repeating-linear-gradient(90deg,var(--green) 0 8px,#141a30 8px 16px)}
+.sx-task.done .rt-name{color:var(--green)}
+.sx-task.done::after{content:"✓";position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--green);color:#04140b;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(0,230,118,.5)}
+.sx-task.next{border-color:var(--amber);box-shadow:0 0 16px rgba(255,179,64,.75),5px 5px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
+.sx-task.next::before{background:repeating-linear-gradient(90deg,var(--amber) 0 8px,#141a30 8px 16px)}
+.sx-task.next .rt-name{color:var(--amber);font-weight:bold}
+.sx-task.todo{opacity:.82}
+.sx-task.todo:hover{opacity:1}
+.sx-task.near{border-color:var(--amber);transform:scale(1.1);z-index:8}
+.sx-task.near::before{content:"点击进入";position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:2px 7px;border-radius:8px;white-space:nowrap;z-index:9}
+/* 玩家：精细 8bit 像素小人（安全帽+工装+手臂，会走路） */
+.sx-player{position:absolute;z-index:9;width:26px;height:40px}
+.sx-player .pl{position:absolute;image-rendering:pixelated}
+.sx-player .hair{left:4px;top:0;width:18px;height:8px;background:#3a2a20;box-shadow:inset 0 -2px 0 #241a12}
+.sx-player .hair::after{content:"";position:absolute;left:4px;top:6px;width:10px;height:4px;background:#3a2a20;border-radius:50% 50% 0 0}
+.sx-player .face{left:6px;top:7px;width:14px;height:12px;background:#f0c89a}
+.sx-player .eye{left:9px;top:11px;width:3px;height:3px;background:#2a2130;box-shadow:5px 0 0 #2a2130}
+.sx-player .body{left:3px;top:20px;width:20px;height:12px;background:#3d6df2;box-shadow:inset 0 -4px 0 #2748b0}
+.sx-player .belt{left:3px;top:24px;width:20px;height:3px;background:#1d2f6e}
+.sx-player .arm.l{left:-2px;top:20px;width:6px;height:10px;background:#3d6df2;box-shadow:inset -2px 0 0 #2748b0}
+.sx-player .arm.r{right:-2px;top:20px;width:6px;height:10px;background:#2f57cf;box-shadow:inset 2px 0 0 #1d3a9a}
+.sx-player .hand.l{left:0;top:28px;width:3px;height:4px;background:#f0c89a}
+.sx-player .hand.r{right:0;top:28px;width:3px;height:4px;background:#f0c89a}
+.sx-player .leg.l{left:4px;top:32px;width:8px;height:7px;background:#2a3852}
+.sx-player .leg.r{left:14px;top:32px;width:8px;height:7px;background:#22304a}
+.sx-player .boot.l{left:3px;top:37px;width:9px;height:3px;background:#1d2440}
+.sx-player .boot.r{left:14px;top:37px;width:9px;height:3px;background:#1d2440}
+.sx-player.flip{transform:scaleX(-1)}
+.sx-player::after{content:"";position:absolute;left:2px;right:2px;top:38px;height:3px;background:rgba(0,0,0,.45);filter:blur(1px)}
+/* 走路动画 */
+.sx-player.walk .leg.l{animation:wl .32s steps(2,end) infinite}
+.sx-player.walk .leg.r{animation:wr .32s steps(2,end) infinite}
+.sx-player.walk .arm.l{animation:al .32s steps(2,end) infinite}
+.sx-player.walk .arm.r{animation:ar .32s steps(2,end) infinite}
+@keyframes wl{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}
+@keyframes wr{0%,100%{transform:translateY(2px)}50%{transform:translateY(0)}}
+@keyframes al{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+@keyframes ar{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+/* 楼梯 */
+.sx-stairs{position:absolute;z-index:7;width:44px;height:64px;cursor:pointer;background:#5a3a2a;border:4px solid #3a2418;border-radius:2px;box-shadow:4px 4px 0 rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.sx-stairs::before{content:"";position:absolute;left:4px;right:4px;top:4px;bottom:4px;border:2px solid #8a6a4a;border-radius:1px;background:repeating-linear-gradient(0deg,#7a5a3a 0 6px,#6a4a30 6px 12px)}
+.sx-stairs::after{content:"🚪";position:absolute;font-size:20px;filter:drop-shadow(0 0 2px rgba(0,0,0,.6))}
+.sx-stairs.locked{opacity:.4;cursor:not-allowed}
+.sx-stairs.locked::after{content:"🔒"}
+.sx-stairs.open{border-color:var(--amber);box-shadow:0 0 14px rgba(255,179,64,.65),4px 4px 0 rgba(0,0,0,.45);animation:stNext 1.6s ease-in-out infinite}
+.sx-stairs.open::before{box-shadow:0 0 10px rgba(255,179,64,.5)}
+.sx-stairs.open::after{content:"🚪"}
+.sx-door-tip{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);white-space:nowrap;text-shadow:0 1px 0 #000}
+.sx-rotate{position:absolute;top:36px;left:50%;transform:translateX(-50%);z-index:13;font-size:11px;color:var(--amber);background:rgba(13,16,34,.94);border:1px solid var(--amber);padding:4px 12px;border-radius:3px;display:none;white-space:nowrap;pointer-events:none}
+.sx-rotate.show{display:block;animation:startPulse 1.8s ease-in-out infinite}
+/* 竖屏/窄屏：场景保持较高 */
+@media (max-width:700px){
+  .sx-scene{height:500px}
+}
+/* ===== 房间界面 ===== */
+#room{position:fixed;inset:0;background:rgba(4,6,12,.84);display:none;align-items:center;justify-content:center;z-index:70;padding:14px}
+#room.show{display:flex}
+.room-panel{width:min(600px,96vw);max-height:92vh;overflow:auto;background:#10162a;border:2px solid var(--border);border-radius:10px;box-shadow:0 0 40px rgba(0,0,0,.6)}
+.room-head{display:flex;align-items:center;gap:12px;padding:16px 18px 12px;border-bottom:1px solid #223050;position:sticky;top:0;background:#10162a;z-index:2}
+.room-logo{width:46px;height:46px;background:#0a0e1c;border:1px solid var(--rc);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px var(--rcg);flex:none}
+.room-logo .b-logo{transform:scale(2.1)}
+.room-title{flex:1}
+.rt-name{font-size:18px;color:var(--text);letter-spacing:1px}
+.rt-sub{font-size:11px;color:var(--dim);margin-top:2px}
+.room-close{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:0 4px}
+.room-close:hover{color:var(--amber)}
+.room-progress{padding:14px 18px 0}
+.rp-bar{height:10px;background:#0a0e1c;border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.rp-fill{height:100%;background:var(--rc);width:0%;box-shadow:0 0 8px var(--rcg)}
+.rp-txt{font-size:11px;color:var(--dim);margin-top:5px;text-align:right}
+.room-narr{padding:11px 14px;font-size:13px;color:#cdd8ea;line-height:1.7;border-left:3px solid var(--rc);margin:12px 18px 6px;background:rgba(10,14,28,.5);border-radius:0 6px 6px 0}
+.room-narr .rt-who{font-size:11px;color:var(--rc);font-weight:bold;margin-bottom:4px;letter-spacing:1px}
+.room-tasks{padding:6px 18px 12px}
+.rt-sec{font-size:12px;color:var(--dim);margin:16px 0 8px;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.rt-sec::after{content:"";flex:1;height:1px;background:#223050}
+.rt-sec .sec-count{font-size:10px;color:var(--green);background:#0a0e1c;border:1px solid #223050;padding:1px 7px;border-radius:8px;margin-left:auto;flex:none}
+/* 走动厂长 */
+.boss{display:flex;align-items:center;gap:8px;pointer-events:none;flex:none;min-width:0}
+.boss-sprite{font-size:26px;filter:drop-shadow(0 0 6px rgba(255,179,64,.5));animation:npcBob 2.2s ease-in-out infinite}
+.boss-bubble{font-size:11px;color:var(--amber);background:rgba(11,14,26,.94);border:1px solid var(--amber);padding:5px 10px;border-radius:8px;max-width:150px;line-height:1.5;box-shadow:0 0 10px rgba(255,179,64,.3)}
+.task-card{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:6px 0;border-radius:8px;border:1px solid #223050;background:#0a0e1c;transition:border-color .2s}
+.task-card .tc-icon{font-size:16px;width:24px;text-align:center;flex:none}
+.task-card .tc-title{flex:1;font-size:13px;color:#9aa3bd;line-height:1.3}
+.task-card .tc-xp{font-size:10px;color:#7c8ca6;background:#10172c;border:1px solid #223050;padding:2px 6px;border-radius:8px;flex:none}
+.task-card .tc-state{font-size:14px;flex:none;width:22px;text-align:center}
+.task-card{cursor:pointer}
+.task-card:hover{border-color:var(--rc);transform:translateX(2px)}
+.task-card.todo .tc-icon,.task-card.todo .tc-title{filter:grayscale(1);opacity:.55}
+.task-card.next{border-color:var(--amber);box-shadow:0 0 10px rgba(255,179,64,.28)}
+.task-card.next .tc-title{color:var(--amber);font-weight:bold}
+.task-card.next .tc-state{color:var(--amber);animation:startPulse 1.8s ease-in-out infinite}
+.task-card.done{border-color:var(--rc);background:linear-gradient(90deg,var(--rcg2),transparent 60%)}
+.task-card.done .tc-title{color:var(--text)}
+.task-card.done .tc-state{color:var(--rc);animation:doneFlash 1.6s ease-in-out infinite}
+@keyframes doneFlash{0%,100%{filter:drop-shadow(0 0 2px var(--rc));transform:scale(1)}50%{filter:drop-shadow(0 0 9px var(--rc));transform:scale(1.18)}}
+.room-foot{display:flex;gap:10px;padding:2px 18px 16px}
+.room-back{flex:1;padding:11px;font-size:14px;font-family:inherit;background:#0a0e1c;color:var(--dim);border:1px solid var(--border);cursor:pointer;border-radius:6px}
+.room-back:hover{color:var(--text);border-color:var(--amber)}
+.room-go{flex:1.6;padding:11px;font-size:14px;font-family:inherit;background:var(--rc);color:#0a0e1c;border:none;cursor:pointer;font-weight:bold;letter-spacing:1px;border-radius:6px}
+.room-go:hover{filter:brightness(1.12)}
+.room-go.locked{background:#2a3852;color:#9aa3bd}
+.room-panel.done{border-color:var(--rc);box-shadow:0 0 30px var(--rcg)}
+.room-cleared{display:inline-block;font-size:11px;color:#04140b;background:var(--green);padding:2px 10px;border-radius:10px;font-weight:bold;animation:startPulse 1.8s ease-in-out infinite;margin-top:3px}
+/* ===== 过场动画页 ===== */
+.transit{position:fixed;inset:0;z-index:99999;background:
+  repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 2px, transparent 2px 4px), #06080f;
+  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.transit.show{opacity:1;pointer-events:auto}
+.tr-inner{text-align:center;font-family:"Courier New",ui-monospace,monospace}
+.tr-icon{font-size:52px;filter:drop-shadow(0 0 14px rgba(0,188,212,.6));animation:trSpin 1.2s linear infinite}
+@keyframes trSpin{to{transform:rotate(360deg)}}
+.tr-bar{width:220px;height:12px;background:#0a0e1c;border:1px solid #2a3852;margin:18px auto 0;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.tr-fill{height:100%;width:0%;background:linear-gradient(90deg,#00bcd4,#e040fb,#ffb340);background-size:200% 100%;animation:trFill 1.3s ease forwards}
+@keyframes trFill{0%{width:0%}60%{width:78%}100%{width:100%}}
+.tr-text{margin-top:12px;color:#9aa3bd;font-size:14px;letter-spacing:2px}
+.tr-text b{color:var(--amber)}
+/* ===== 手机横屏：房间面板左右分栏，场景完整显示 ===== */
+@media (orientation:landscape) and (max-width:960px) and (max-height:600px){
+  #room{padding:8px}
+  .room-panel{width:100%;max-height:calc(100vh - 16px);display:grid;
+    grid-template-columns:minmax(210px,38%) 1fr;grid-template-rows:auto auto auto 1fr auto;
+    overflow:hidden;border-radius:6px}
+  .room-head{grid-column:1;grid-row:1}
+  .room-progress{grid-column:1;grid-row:2;padding-top:10px}
+  .room-narr{grid-column:1;grid-row:3;margin:8px 10px 4px;overflow:auto}
+  .rs-foot{grid-column:1;grid-row:4;overflow:auto;margin:0 10px 6px}
+  .room-foot{grid-column:1;grid-row:5;padding:0 10px 10px}
+  .room-scene,.sx-scene{grid-column:2;grid-row:1/6;margin:8px 10px 8px 6px;
+    width:auto;align-self:center;justify-self:stretch}
+  .room-scene{height:340px}
+  .sx-scene{height:calc(100vh - 40px);max-height:440px}
+}
+/* ===== room.html 页面级 ===== */
+body{min-height:100vh;overflow-x:hidden}
+.room-mus{position:fixed;right:12px;top:12px;z-index:80;background:#10162a;border:1px solid var(--border);color:var(--text);
+  font-family:inherit;font-size:15px;padding:6px 10px;border-radius:4px;cursor:pointer;opacity:.85}
+.room-mus:hover{opacity:1;border-color:var(--amber)}
+@media (max-width:700px){ .room-mus{font-size:13px;padding:5px 8px} }
+
+</style>
+</head>
+<body>
+<div id="transit" class="transit"><div class="tr-inner">
+  <div class="tr-icon">⚙️</div><div class="tr-bar"><div class="tr-fill"></div></div>
+  <div class="tr-text" id="trText">正在进入…</div>
+</div></div>
+<button class="room-mus" id="roomMus" onclick="musToggle()" title="背景音乐开关">🎵</button>
+<div id="room"></div>
+<script>
+(function(){
+  var t=document.getElementById('transit');
+  if(t){ var e=document.getElementById('trText'); if(e) e.innerHTML='正在进入 <b>车间</b>…'; t.classList.add('show'); }
+})();
+const API = location.origin;
+const $=id=>document.getElementById(id);
+const RANKS=[{min:0,t:'实习生',e:'🔰'},{min:1000,t:'学徒',e:'🔧'},{min:2500,t:'技工',e:'⚙️'},{min:4500,t:'工程师',e:'🛠️'},{min:7000,t:'专家',e:'🏆'}];
+
+const AREA_COLOR={control_room:'#00bcd4',console:'#ffd400',workshop:'#00e676',edge_cabinet:'#ff5252',
+  cloud_platform:'#1565c0',big_screen:'#e040fb',data_pipe:'#ff6d00',ai_lab:'#9c27b0'};
+
+const LAYER_SONG={L1:'workshop',L2:'control_room',L3:'big_screen',L4:'cloud_platform'};
+
+const ISA_LAYERS=[
+  {level:'L4',name:'云与智能层',sub:'☁️云平台 · 🤖AI分析 · 业务决策',areas:['cloud_platform','ai_lab'],flow:'数据上云 · 智能分析'},
+  {level:'L3',name:'数据贯通层',sub:'📊监控大屏 · 🔗数据管道 · 实时流',areas:['big_screen','data_pipe'],flow:'监控上送 · 实时流转'},
+  {level:'L2',name:'控制操作层',sub:'🖥️中控室 · 🎛️操作台 · SCADA/HMI',areas:['control_room','console'],flow:'状态采集 · 控制指令'},
+  {level:'L1',name:'现场接入层',sub:'⚙️车间设备 · 📦边缘网关 · 数据源头',areas:['workshop','edge_cabinet'],flow:'物理过程 · 数据源头'}
+];
+
+const LOGOS={
+  control_room:'<span class="b-logo lg-term"><i class="lt-screen"></i><i class="lt-line l1"></i><i class="lt-line l2"></i><i class="lt-line l3"></i></span>',
+  console:'<span class="b-logo lg-console"><i class="lc-body"></i><i class="lc-btn b1"></i><i class="lc-btn b2"></i><i class="lc-knob"></i></span>',
+  workshop:'<span class="b-logo lg-gear"><i class="lg-hub"></i><i class="lg-tooth t1"></i><i class="lg-tooth t2"></i><i class="lg-tooth t3"></i><i class="lg-tooth t4"></i></span>',
+  edge_cabinet:'<span class="b-logo lg-cabinet"><i class="lcab-body"></i><i class="lcab-led"></i><i class="lcab-vents"></i></span>',
+  cloud_platform:'<span class="b-logo lg-cloud"><i class="lcl-b b1"></i><i class="lcl-b b2"></i><i class="lcl-b b3"></i><i class="lcl-drop"></i></span>',
+  big_screen:'<span class="b-logo lg-chart"><i class="lch-body"></i><i class="lch-bar b1"></i><i class="lch-bar b2"></i><i class="lch-bar b3"></i></span>',
+  data_pipe:'<span class="b-logo b-pipe-logo"><i class="pl-pipe"></i><i class="pl-dot"></i><i class="pl-dot d2"></i><i class="pl-dot d3"></i></span>',
+  ai_lab:'<span class="b-logo lg-chip"><i class="lchp-body"></i><i class="lchp-core"></i><i class="lchp-pin p1"></i><i class="lchp-pin p2"></i><i class="lchp-pin p3"></i><i class="lchp-pin p4"></i></span>'
+};
+
+const RS_SPRITES={ "S_0": ["....................", ".......HHhHHH.......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "..BBBHHHHHHHHBBB....", ".KBBBBHHHHHHBBBBK...", ".KBBBBHHHHHHBBBBK...", ".KBBBBBHHHHBBBBBK...", ".KBBBBBBBBBBBBBBK...", "..BBBBBBBBBBBBBB....", "...BBBBBBBBBBBB.....", "....BBBBBBBBBB......", "....sssss..sssss....", ".....sss....sss.....", "....................", "...................."], "S_1": ["....................", ".......HHhHHH.......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "..BBBHHHHHHHHBBB....", "..BBBBHHHHHHBBBBK...", ".KBBBBHHHHHHBBBB....", ".KBBBBBHHHHBBBB.....", ".KBBBBBBBBBBBBB.....", ".KBBBBBBBBBBBBB.....", "....BBBBBB...sssss..", "....BBBBB....sss....", "....sssss...........", ".....sss............", "....................", "...................."], "N_0": ["....................", ".......HHhHHH.......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "..BBBHHHHHHHHBBB....", ".KBBBBHHHHHHBBBBK...", ".KBBBBHHHHHHBBBBK...", ".KBBBBBHHHHBBBBBK...", ".KBBBBBBBBBBBBBBK...", "..BBBBBBBBBBBBBB....", "...BBBBBBBBBBBB.....", "....BBBBBBBBBB......", ".....sss....sss.....", "....sssss..sssss....", "....................", "...................."], "N_1": ["....................", ".......HHhHHH.......", ".....HHHHHHHHHH.....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", "....HHHHHHHHHHHH....", ".....HHHHHHHHHH.....", "..BBBHHHHHHHHBBB....", "..BBBBHHHHHHBBBBK...", ".KBBBBHHHHHHBBBB....", ".KBBBBBHHHHBBBB.....", ".KBBBBBBBBBBBBB.....", ".KBBBBBBBBBBBBB.....", ".....sss............", "....sssss...........", "....BBBBB....sss....", "....BBBBBB...sssss..", "....................", "...................."] }
+
+const RS_COLORS={'H':'#4a3524','h':'#2a1d12','B':'#3d6bd4','b':'#2a4aa0','K':'#e8c090','s':'#2f2f38','L':'#3a2a55','X':'#14141f'};
+
+const ROOM_VIEW={workshop:'top',edge_cabinet:'top',control_room:'top',console:'top',
+  data_pipe:'side',big_screen:'side',cloud_platform:'top',ai_lab:'top'};
+
+const TASK_ICON={install_wizard:'🖥️',terminal:'⌨️',chain_quiz:'💬',quiz:'💬',fill_blank:'✍️',sort:'🔀',diagnosis_tree:'🩺',progress_bar:'📊',scenario_match:'🔗',code_review:'📝',ethics:'⚖️',drag_classify:'🗂️',boss_fight:'💥'};
+
+const GAME_TAGS={
+  control_room:['翻牌·看清你的网卡','2048·数据融合','术语防御战'],
+  console:['快打·指令','连连看','黑客终端'],
+  workshop:['翻牌·车间术语','工厂大亨','数据迷宫'],
+  edge_cabinet:['快打·边缘计算','愤怒的厂长'],
+  cloud_platform:['快打·云平台','消消乐'],
+  big_screen:['快打·监控','数据蜂群'],
+  data_pipe:['快打·管道','激光反射','管道工'],
+  ai_lab:['快打·AI','数据蜂群']
+};
+
+const MUSIC_KEYS=['hub','control_room','console','workshop','edge_cabinet','cloud_platform','big_screen','data_pipe','ai_lab','tetris','mario','dkc','kirby','pokemon'];
+
+let content=null, me=null, token='';
+
+let rsDir='S', rsFrame=0;
+
+let rsLoop=null, rsGo=null, rsStageEl=null, rsSceneEl=null;
+
+let sxGame=null, sxKeys=null, sxGo=null;
+
+let rsCamX=0, rsCamY=0;
+
+let musCtx=null,musSrc=null,musGain=null,musOn=true,musIdx=0;
+
+function hex2rgb(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+
+function isTaskDone(tid){ return !!(me.check && me.check[''+tid]); }
+
+function levelProgress(lv){
+  let done=0,total=0;
+  (lv.tasks||[]).forEach(t=>{ if(t.auto)return; total++; if(isTaskDone(t.id))done++; });
+  return {done,total,pct:total?Math.round(done/total*100):0,completed:total>0&&done>=total};
+}
+
+function accessOf(lv,idx){
+  if(idx===0) return 'open';
+  const prev=content.levels[idx-1];
+  return levelProgress(prev).completed ? 'open' : 'locked';
+}
+
+function areaStars(lv){
+  const st=(me.stars&&me.stars[lv.id])||{};
+  return {self:st.self||0, peer:st.peer||0, teacher:st.teacher||0};
+}
+
+function starStr(v){ let s=''; for(let i=0;i<5;i++) s+= i<v?'★':'☆'; return s; }
+
+function logoHTML(area,color){
+  const [r,g,b]=hex2rgb(color);
+  return `<span style="--c:${color};--cg:rgba(${r},${g},${b},.5);display:inline-block">${LOGOS[area]||''}</span>`;
+}
+
+function rsDraw(dir, frame){
+  const p=document.getElementById('rsPlayer');
+  if(!p) return;
+  let cv=p.querySelector('canvas');
+  if(!cv){ cv=document.createElement('canvas'); cv.width=20; cv.height=20; p.appendChild(cv); }
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,20,20);
+  const key=dir+'_'+(frame||0);
+  const rows=RS_SPRITES[key]||RS_SPRITES[dir+'_0']||RS_SPRITES.S_0;
+  for(let y=0;y<20;y++){
+    const row=rows[y];
+    for(let x=0;x<20;x++){
+      const ch=row[x];
+      if(ch!=='.'){ ctx.fillStyle=RS_COLORS[ch]||'#fff'; ctx.fillRect(x,y,1,1); }
+    }
+  }
+}
+
+function rsSetDir(dx,dy){
+  // 只做上下两个方向：dy 决定朝上(N)/朝下(S)，左右保持当前朝向
+  if(dx===0&&dy===0) return;
+  if(Math.abs(dy)>=Math.abs(dx)){
+    rsDir = dy<0 ? 'N' : 'S';
+  }
+  rsDraw(rsDir, rsFrame);
+}
+
+function sxGoTask(lvId, taskId, el){
+  const tx=parseFloat(el.style.left)+33, ty=parseFloat(el.style.top)+28;
+  const platY = el.getAttribute('data-plat')==='1' ? (parseFloat(el.dataset.platY)||0) : 0;
+  sxGo={lvId, taskId, x:tx, y:ty, platY};
+}
+
+function rsStart(){
+  const scene=document.getElementById('rsScene'); if(!scene) return;
+  const stage=document.getElementById('rsStage'); if(!stage) return;
+  const player=document.getElementById('rsPlayer'); if(!player) return;
+  rsSceneEl=scene; rsStageEl=stage;
+  const rw=scene.clientWidth, rh=scene.clientHeight;
+  const stageW=stage.clientWidth, stageH=stage.clientHeight;
+  const rt=window._rtRoom||{};
+  // 小人初始位置：门口（房间左下角）
+  let px=60, py=stageH-120, tx=null, ty=null, speed=2.6;
+  rsCamX=0; rsCamY=0;
+  rsDraw('S',0);
+  player.style.left=px+'px'; player.style.top=py+'px';
+  // 点哪走哪：点击场景（非设备/楼梯/家具）→ 小人走到点击位置
+  // 注意：stage 有 transform 平移，getBoundingClientRect 是可视位置；内容坐标 = 可视坐标 + 摄像机偏移
+  scene.addEventListener('pointerdown', function(e){
+    const t=e.target;
+    if(t.closest&&(t.closest('.rs-task')||t.closest('.rs-stairs')||t.closest('.rs-furn')||t.closest('.rs-door')||t.closest('.rs-npc')||t.closest('.rs-label'))) return;
+    const rect=scene.getBoundingClientRect();
+    tx=Math.max(6, Math.min((e.clientX-rect.left)+rsCamX, stageW-40));
+    ty=Math.max(6, Math.min((e.clientY-rect.top)+rsCamY, stageH-30));
+    rsGo=null;
+  }, true);
+  function setDir(dx, dy){
+    if(Math.abs(dx)<0.5&&Math.abs(dy)<0.5) return;
+    rsSetDir(dx, dy);
+  }
+  function frame(){
+    let moving=false, ldx=0, ldy=0;
+    // 走动：朝目标(x,y)移动
+    if(tx!==null&&ty!==null){
+      const dx=tx-px, dy=ty-py, dist=Math.hypot(dx,dy);
+      if(dist<=speed){ px=tx; py=ty; tx=null; ty=null; }
+      else { px+=dx/dist*speed; py+=dy/dist*speed; moving=true; ldx=dx; ldy=dy; }
+    }
+    // 走到设备跟前 → 自动进任务
+    if(rsGo){
+      const dx=rsGo.x-px, dy=rsGo.y-py, dist=Math.hypot(dx,dy);
+      if(dist<=speed+1){ enterLevel(rsGo.lvId, rsGo.taskId); rsGo=null; tx=null; ty=null; return; }
+      else { px+=dx/dist*speed; py+=dy/dist*speed; moving=true; ldx=dx; ldy=dy; }
+    }
+    if(moving) setDir(ldx, ldy);
+    player.classList.toggle('walk', moving);
+    // 走路时手前后摆动（两帧交替）
+    if(moving){ rsFrame=(rsFrame+1)%2; rsDraw(rsDir, rsFrame); }
+    player.style.left=px+'px'; player.style.top=py+'px';
+    // 摄像机跟随：stage 平移使小人居中（x/y 双向）
+    rsCamX=px-rw/2+12; rsCamX=Math.max(0, Math.min(rsCamX, stageW-rw));
+    rsCamY=py-rh/2+12; rsCamY=Math.max(0, Math.min(rsCamY, stageH-rh));
+    stage.style.transform='translate('+(-rsCamX)+'px,'+(-rsCamY)+'px)';
+    rsLoop=requestAnimationFrame(frame);
+  }
+  rsLoop=requestAnimationFrame(frame);
+}
+
+function rsStop(){
+  if(rsLoop){ cancelAnimationFrame(rsLoop); rsLoop=null; }
+  rsGo=null; tx=null; ty=null;
+}
+
+function roomGoTask(lvId, taskId, el){
+  const sc=document.getElementById('rsStage');
+  if(!sc){ enterLevel(lvId,taskId); return; }
+  const sr=sc.getBoundingClientRect(), er=el.getBoundingClientRect();
+  const txx=(er.left-sr.left+er.width/2);
+  const tyy=(er.top-sr.top+er.height/2);
+  rsGo={lvId, taskId, x:txx, y:tyy};
+}
+
+function roomGoPoint(ev){
+  const sc=document.getElementById('rsScene'); if(!sc) return;
+  const sr=sc.getBoundingClientRect();
+  const f=ev.target.closest&&ev.target.closest('[data-name]');
+  const name=f?f.getAttribute('data-name'):'';
+  tx=Math.max(6, Math.min((ev.clientX-sr.left)+rsCamX, (window._rtRoom&&window._rtRoom.stageW||600)-40));
+  ty=Math.max(6, Math.min((ev.clientY-sr.top)+rsCamY, (window._rtRoom&&window._rtRoom.stageH||420)-30));
+  if(rsGo) rsGo=null;
+  if(name&&typeof showToast==='function') setTimeout(()=>showToast('走近'+name), 600);
+}
+
+function sxStart(){
+  const scene=document.getElementById('sxScene'); if(!scene) return;
+  const stage=document.getElementById('sxStage'); if(!stage) return;
+  const player=document.getElementById('sxPlayer'); if(!player) return;
+  // 动态坐标：HUD 52px + 地面 46px，跑动区居中
+  const H=scene.clientHeight;
+  const groundH=46, groundTop=H-52-groundH;
+  const platTop=Math.max(110, groundTop-150);
+  const g=0.42, jumpV=-12.5, speed=4.6, ph=38;
+  const gap=250, baseX=140;
+  let x=40, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
+  const keys={left:false,right:false,jump:false};
+  // 摆放任务设备 + 平台 + 楼梯
+  const plats=[];
+  const taskEls=[].slice.call(scene.querySelectorAll('.sx-task'));
+  taskEls.forEach((el,i)=>{
+    const onPlat=el.getAttribute('data-plat')==='1';
+    const tx=baseX+i*gap;
+    const tTop=onPlat?(platTop-56):(groundTop-56);
+    el.style.left=tx+'px'; el.style.top=tTop+'px';
+    el.dataset.platY=onPlat?platTop:0;
+    if(onPlat){
+      const pe=scene.querySelector('.sx-platform[data-idx="'+i+'"]');
+      if(pe){ pe.style.left=(tx-16)+'px'; pe.style.top=platTop+'px'; pe.style.width='100px';
+        plats.push({x:tx-16, y:platTop, w:100}); }
+    }
+    // 地面静态道具：放到地面上（与设备错开，x 避开设备位置）
+    const props=scene.querySelectorAll('.sx-prop');
+    for(let pi=0;pi<props.length;pi++){
+      const px=Math.round(60+pi*130+40);
+      props[pi].style.left=px+'px';
+      props[pi].style.top=(groundTop-26)+'px';
+    }
+  });
+  // 楼梯：放长廊末端
+  const stairsEl=document.getElementById('sxStairs');
+  if(stairsEl){
+    const sx=window._sxRoom||{};
+    const sCls=sx.flrDone&&sx.hasNext?'open':'locked';
+    stairsEl.className='sx-stairs '+sCls;
+    stairsEl.style.left=(baseX+taskEls.length*gap+70)+'px';
+    stairsEl.style.top=(groundTop-64)+'px';
+    if(sx.flrDone&&sx.hasNext){
+      stairsEl.onclick=function(){ nextRoomFloor(); };
+      const tip=document.createElement('div'); tip.className='sx-door-tip'; tip.textContent='出门 · 下一层';
+      stairsEl.appendChild(tip);
+    }
+  }
+  const rw=scene.clientWidth, stageW=stage.clientWidth;
+  // 点哪儿走哪儿：点击场景（非设备/楼梯/按钮）→ 小人走到该水平位置
+  scene.addEventListener('pointerdown', function(e){
+    const t=e.target;
+    if(t.closest&&(t.closest('.sx-task')||t.closest('.sx-stairs')||t.closest('.sx-btn'))) return;
+    const rect=stage.getBoundingClientRect();
+    moveTarget=Math.max(6, Math.min(e.clientX-rect.left, stageW-30));
+    sxGo=null;
+  }, true);
+  function frame(){
+    // 点击任务设备：自动走过去，到跟前进入任务
+    if(sxGo){
+      moveTarget=sxGo.x;
+      const dx=Math.abs((x+12)-sxGo.x);
+      if(dx<14){
+        // 设备在平台上且玩家还在下面 → 自动跳上去
+        if(sxGo.platY && onGround && y > sxGo.platY-46){ vy=jumpV; onGround=false; }
+        const dy=Math.abs((y+17)-sxGo.y);
+        if(dy<34){ enterLevel(sxGo.lvId,sxGo.taskId); sxGo=null; moveTarget=null; return; }
+      }
+    }
+    // 键盘方向优先，按方向键清除点击目标
+    if(keys.left){ x-=speed; moveTarget=null; sxGo=null; }
+    if(keys.right){ x+=speed; moveTarget=null; sxGo=null; }
+    // 点击移动：朝目标走，到达后停
+    if(!keys.left&&!keys.right&&moveTarget!==null){
+      const d=moveTarget-x;
+      if(Math.abs(d)<=speed){ x=moveTarget; moveTarget=null; }
+      else { x+=Math.sign(d)*speed; }
+    }
+    // 跳跃：可按住蓄力（在平台上也能再次跳——简化体验）
+    if(keys.jump&&onGround){ vy=jumpV; onGround=false; }
+    vy+=g; y+=vy;
+    // 地面
+    if(y+ph>=groundTop){ y=groundTop-ph; vy=0; onGround=true; }
+    // 平台：宽松落点（玩家身体中段接触即可站上）
+    for(const p of plats){
+      if(vy>=0 && x+5<p.x+p.w && x+19>p.x && y+ph>=p.y-8 && y+ph<=p.y+20){ y=p.y-ph; vy=0; onGround=true; }
+    }
+    if(x<4) x=4; if(x>stageW-30) x=stageW-30;
+    player.style.left=x+'px'; player.style.top=y+'px';
+    if(keys.left){ player.classList.add('flip'); player.classList.add('walk'); }
+    else if(keys.right){ player.classList.remove('flip'); player.classList.add('walk'); }
+    else if(moveTarget!==null||sxGo){ player.classList.add('walk'); }
+    else { player.classList.remove('walk'); }
+    let cam=x-rw/2+13; cam=Math.max(0,Math.min(cam,stageW-rw));
+    stage.style.transform='translateX('+(-cam)+'px)';
+    taskEls.forEach(el=>{
+      const tx=parseFloat(el.style.left)+33, ty=parseFloat(el.style.top)+28;
+      const dx=Math.abs(tx-(x+12)), dy=Math.abs(ty-(y+17));
+      const near=dx<64&&dy<74;
+      el.classList.toggle('near',near);
+    });
+    sxGame=requestAnimationFrame(frame);
+  }
+  function kd(e){
+    if(e.key==='ArrowLeft'||e.key==='a'){ keys.left=true; e.preventDefault(); }
+    if(e.key==='ArrowRight'||e.key==='d'){ keys.right=true; e.preventDefault(); }
+    if(e.key==='ArrowUp'||e.key===' '||e.key==='w'){ keys.jump=true; e.preventDefault(); }
+  }
+  function ku(e){
+    if(e.key==='ArrowLeft'||e.key==='a') keys.left=false;
+    if(e.key==='ArrowRight'||e.key==='d') keys.right=false;
+    if(e.key==='ArrowUp'||e.key===' '||e.key==='w') keys.jump=false;
+  }
+  scene.querySelectorAll('.sx-btn').forEach(b=>{
+    const k=b.getAttribute('data-k');
+    const dn=ev=>{ ev.preventDefault(); keys[k]=true; };
+    const up=ev=>{ ev.preventDefault(); keys[k]=false; };
+    b.addEventListener('pointerdown',dn);
+    b.addEventListener('pointerup',up);
+    b.addEventListener('pointerleave',up);
+    b.addEventListener('pointercancel',up);
+  });
+  sxKeys={kd,ku};
+  window.addEventListener('keydown',kd); window.addEventListener('keyup',ku);
+  // 手机竖屏提示横屏
+  if(window.innerHeight>window.innerWidth && matchMedia('(hover:none),(pointer:coarse)').matches){
+    const r=scene.querySelector('.sx-rotate'); if(r){ r.classList.add('show'); setTimeout(()=>r.classList.remove('show'),4500); }
+  }
+  sxGame=requestAnimationFrame(frame);
+}
+
+function sxStop(){
+  if(sxGame){ cancelAnimationFrame(sxGame); sxGame=null; }
+  if(sxKeys){ window.removeEventListener('keydown',sxKeys.kd); window.removeEventListener('keyup',sxKeys.ku); sxKeys=null; }
+}
+
+function musAudio(){ if(!musCtx){musCtx=new(window.AudioContext||window.webkitAudioContext)();} if(musCtx.state==='suspended')musCtx.resume(); return musCtx; }
+
+function musPlay(k){
+  if(!window.MUSIC_SONGS||!window.MUSIC_SONGS[k])return;
+  try{
+    const c=musAudio();
+    if(musSrc){try{musSrc.stop();}catch(e){} musSrc=null;}
+    const data=zzfxM.apply(null,window.MUSIC_SONGS[k]);
+    const buf=c.createBuffer(data.length,data[0].length,zzfxR);
+    for(let i=0;i<data.length;i++)buf.getChannelData(i).set(data[i]);
+    if(!musGain){musGain=c.createGain();musGain.gain.value=.5;musGain.connect(c.destination);}
+    const src=c.createBufferSource();src.buffer=buf;src.loop=true;src.connect(musGain);src.start();musSrc=src;
+  }catch(e){}
+}
+
+function musNext(){ musIdx=(musIdx+1)%MUSIC_KEYS.length; musPlay(MUSIC_KEYS[musIdx]); }
+
+function musToggle(){
+  musOn=!musOn;
+  const btn=document.getElementById('musicBtn');
+  if(musOn){ musPlay(MUSIC_KEYS[musIdx]); btn.textContent='♫ 开'; }
+  else { if(musSrc){try{musSrc.stop();}catch(e){}} musSrc=null; btn.textContent='♪ 关'; }
+}
+
+function musStart(){ if(musOn){ try{musAudio(); musPlay(MUSIC_KEYS[musIdx]);}catch(e){} } }
+
+let currentRoomId=null;
+function renderRoom(id){
+  if(currentRoomId!==id){ currentRoomId=id; try{ window._roomFlr=0; }catch(e){} }
+  const lv=content.levels.find(l=>l.id==id); if(!lv) return;
+  const color=AREA_COLOR[lv.factoryArea]||lv.color;
+  const [r,g,b]=hex2rgb(color);
+  const rc=color, rcg=`rgba(${r},${g},${b},.5)`, rcg2=`rgba(${r},${g},${b},.13)`;
+  const prog=levelProgress(lv); const st=areaStars(lv);
+  const idx=content.levels.indexOf(lv);
+  const locked=idx>0&&!levelProgress(content.levels[idx-1]).completed;
+  const layer=ISA_LAYERS.find(L=>L.areas.includes(lv.factoryArea));
+  const tasks=(lv.tasks||[]).filter(t=>!t.auto);
+  const totalXP=tasks.reduce((s,t)=>s+(t.xp||0),0);
+  const earnedXP=tasks.filter(t=>isTaskDone(t.id)).reduce((s,t)=>s+(t.xp||0),0);
+  let cur=null; tasks.forEach(t=>{ if(cur===null&&!isTaskDone(t.id)) cur=t; });
+  // RPG 室内场景：任务=房间里的设备，按楼层摆放，楼梯上楼
+  // 楼层切分：普通任务分到各层，隐藏挑战放最后一层
+  const regs=tasks.filter(t=>!String(t.id).includes('hidden'));
+  const hiddens=tasks.filter(t=>String(t.id).includes('hidden'));
+  const nFlr = Math.min(3, Math.max(2, Math.ceil(regs.length/7)));
+  const perFlr = Math.ceil(regs.length/nFlr);
+  const flrTasks=[];
+  for(let fi=0;fi<nFlr;fi++) flrTasks.push(regs.slice(fi*perFlr, (fi+1)*perFlr));
+  if(hiddens.length) flrTasks[flrTasks.length-1] = flrTasks[flrTasks.length-1].concat(hiddens);
+  window._roomFlr = Math.min(window._roomFlr||0, flrTasks.length-1);
+  const fi = window._roomFlr;
+  const ft = flrTasks[fi]||[];
+  const flrDone = ft.length>0 && ft.every(t=>isTaskDone(t.id));
+  const hasNext = fi < flrTasks.length-1;
+  // 俯视矩形房间：任务设备按网格分散（每行3个），房间是方形大空间，摄像机跟随
+  const rtCols=3, rtGX=230, rtGY=150, rtBX=150, rtBY=70;
+  const rtRows=Math.ceil(ft.length/rtCols);
+  const stageW=Math.max(520, rtBX+rtCols*rtGX+60);
+  const stageH=Math.max(420, rtBY+rtRows*rtGY+130);
+  const ftHTML = ft.map((t,i)=>{
+    const done=isTaskDone(t.id), next=(!done&&t===cur);
+    const cls=done?'done':(next?'next':'todo');
+    const r=Math.floor(i/rtCols), c=i%rtCols;
+    const x=rtBX+c*rtGX, y=rtBY+r*rtGY;
+    return `<div class="rs-task ${cls}" style="left:${x}px;top:${y}px" onclick="roomGoTask('${lv.id}','${t.id}',this)" title="${t.title||t.name||t.label||''}">
+      <span class="rt-icon">${TASK_ICON[t.type]||'📌'}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
+    </div>`;
+  }).join('');
+  const stairsCls = (flrDone&&hasNext)?'open':'locked';
+  const stairsHTML = hasNext ? `<div class="rs-stairs ${stairsCls}" style="left:${stageW-120}px;top:${stageH-90}px" ${flrDone&&hasNext?'onclick="nextRoomFloor()"':''}>🪜</div>` : '';
+  window._rtRoom={stageW:stageW, stageH:stageH};
+  const doneCnt=ft.filter(t=>isTaskDone(t.id)).length;
+  const viewType = ROOM_VIEW[lv.factoryArea]||'top';
+  let sceneHTML;
+  if(viewType==='side'){
+    // 横版过关：室内房间剖面，任务设备分散在长廊各处，小人左右移动
+    // 坐标在 sxStart 里根据场景实际高度动态计算（groundTop/平台/设备）
+    const gap=250, baseX=140;
+    const stageW=Math.max(900, ft.length*gap+260);
+    let platHTML='', taskElsHTML='';
+    ft.forEach((t,i)=>{
+      const done=isTaskDone(t.id), next=(!done&&t===cur);
+      const cls=done?'done':(next?'next':'todo');
+      const onPlat=(i%2===1);
+      taskElsHTML+=`<div class="sx-task ${cls}" data-plat="${onPlat?1:0}" data-idx="${i}" onclick="sxGoTask('${lv.id}','${t.id}',this)" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}">
+        <span class="rt-icon">${TASK_ICON[t.type]||'📌'}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
+      </div>`;
+      if(onPlat) platHTML+=`<div class="sx-platform" data-idx="${i}"></div>`;
+    });
+    // 室内墙面装饰：窗户 + 时钟 + 挂画 + 仪表盘 + 横管（挂在墙裙上方）
+    const decoKinds=['win','clock','pic','gauge','pipe','win','clock','pic'];
+    let decoHTML='';
+    for(let k=0;k<decoKinds.length;k++){
+      const dx=Math.round(70+k*250);
+      const kind=decoKinds[k];
+      const dy = kind==='pipe' ? 150 : (46+((k*37)%90));
+      decoHTML+=`<div class="sx-deco ${kind}" style="left:${dx}px;top:${dy}px"></div>`;
+    }
+    // 地面静态道具：木箱/木桶（放在设备之间的空隙，与设备错开）
+    let propHTML='';
+    for(let k=0;k<ft.length;k++){
+      const px=Math.round(60+k*130+40);
+      const kind=(k%2===0)?'crate':'barrel';
+      propHTML+=`<div class="sx-prop ${kind}" style="left:${px}px"></div>`;
+    }
+    window._sxRoom={flrDone:flrDone, hasNext:hasNext};
+    sceneHTML=`<div class="sx-scene" id="sxScene">
+      <div class="sx-bg"></div>
+      <div class="sx-ceil"></div>
+      ${decoHTML}
+      <div class="sx-stage" id="sxStage" style="width:${stageW}px">
+        <div class="sx-ground"></div>${propHTML}${platHTML}${taskElsHTML}
+        <div class="sx-stairs" id="sxStairs"></div>
+        <div class="sx-player" id="sxPlayer">
+          <span class="pl hair"></span>
+          <span class="pl face"></span><span class="pl eye"></span>
+          <span class="pl body"></span><span class="pl belt"></span>
+          <span class="pl arm l"></span><span class="pl hand l"></span>
+          <span class="pl arm r"></span><span class="pl hand r"></span>
+          <span class="pl leg l"></span><span class="pl boot l"></span>
+          <span class="pl leg r"></span><span class="pl boot r"></span>
+        </div>
+      </div>
+      <div class="sx-hud"><div class="sx-hint">点击地面小人走过去 · <b>←→</b> 移动 · <b>↑</b> 跳跃</div><div class="sx-btns">
+        <button class="sx-btn" data-k="left">◀</button><button class="sx-btn" data-k="jump">▲</button><button class="sx-btn" data-k="right">▶</button></div></div>
+      <div class="sx-rotate">📱 建议横屏游玩</div>
+    </div>`;
+  } else {
+    // 俯视工坊风：墙+地板+家具+任务设备
+    sceneHTML = `<div class="room-scene" id="rsScene">
+      <div class="rs-stage" id="rsStage" style="width:${window._rtRoom.stageW}px;height:${window._rtRoom.stageH}px">
+        <div class="rs-floor" id="rsFloor"></div>
+        <div class="rs-wall t"></div><div class="rs-wall b"></div>
+        <div class="rs-door"></div>
+        <div class="rs-label">${fi+1}F · ${flrDone?'✅ 本层完成':doneCnt+'/'+ft.length}</div>
+        <div class="rs-furn rs-furnace" data-name="熔炉" onclick="roomGoPoint(event)"></div>
+        <div class="rs-furn rs-bench" data-name="工作台" onclick="roomGoPoint(event)"></div>
+        <div class="rs-furn rs-crate c1" data-name="木箱" onclick="roomGoPoint(event)"></div>
+        <div class="rs-furn rs-crate c2" data-name="木箱" onclick="roomGoPoint(event)"></div>
+        ${ftHTML}
+        ${stairsHTML}
+        <div class="rs-npc">👷</div>
+                <div class="rs-player" id="rsPlayer"><canvas width="20" height="20"></canvas></div>
+      </div>
+    </div>`;
+  }
+  const rfHint = flrDone&&hasNext ? '本层任务完成，点击🪜楼梯上楼 →' : (cur?'点发光的设备开始任务':'本层已完成');
+  const games=GAME_TAGS[lv.factoryArea]||[];
+  const narr=(lv.narrative&&typeof lv.narrative==='object'&&lv.narrative.intro)?lv.narrative.intro:(typeof lv.narrative==='string'?lv.narrative:'');
+  const room=$('room');
+  room.style.setProperty('--rc',rc); room.style.setProperty('--rcg',rcg); room.style.setProperty('--rcg2',rcg2);
+  if(musOn&&layer){ const song=LAYER_SONG[layer.level]; if(song) try{ musPlay(song); }catch(e){} }
+  room.innerHTML=`<div class="room-panel ${prog.completed?'done':''}">
+    <div class="room-head">
+      <div class="room-logo">${logoHTML(lv.factoryArea,color)}</div>
+      <div class="room-title"><div class="rt-name">${lv.areaName} ${prog.completed?'<span class="room-cleared">🎉 全通关</span>':''}</div><div class="rt-sub">${lv.name} · ${layer?layer.level+' '+layer.name:'厂区'}</div></div>
+      <button class="room-close" onclick="goBack()">✕</button>
+    </div>
+    <div class="room-progress"><div class="rp-bar"><div class="rp-fill" style="width:${prog.pct}%"></div></div><div class="rp-txt">已完成 ${prog.done}/${prog.total}（${prog.pct}%） · ⚡ ${earnedXP}/${totalXP} XP · 🏆 ${starStr(Math.max(st.self||0,st.teacher||0))}</div></div>
+    <div class="room-narr"><div class="rt-who">👷 厂长</div>${narr||'加油，把这一层的任务打通！'}</div>
+    ${sceneHTML}
+    <div class="rs-foot">
+      <div class="rt-sec">🎮 关联小游戏</div>
+      <div class="games">${games.length?games.map(g=>`<span class="game-chip">${g}</span>`).join(''):'<span class="game-chip">-</span>'}</div>
+    </div>
+    <div class="room-foot">
+      <button class="room-back" onclick="goBack()">← 返回厂区</button>
+      <button class="room-go ${locked?'locked':''}" onclick="enterLevel('${lv.id}','${cur?cur.id:''}')">${locked?'🔒 未解锁':(cur?'▶ 进入「'+cur.title+'」':'✅ 已通关')}</button>
+    </div>
+  </div>`;
+  room.classList.add('show');
+  if(viewType==='side'){ sxStop(); setTimeout(()=>sxStart(),60); }
+  if(viewType==='top'){ rsStop(); setTimeout(()=>rsStart(),60); }
+}
+
+function goPage(url, title){
+  const t=document.getElementById('transit');
+  if(t){ const e=document.getElementById('trText'); if(e) e.innerHTML='正在'+(title?'进入 <b>'+title+'</b>':'切换')+'…'; t.classList.add('show'); }
+  setTimeout(()=>{ location.href=url; }, 500);
+}
+function goBack(){
+  try{ sessionStorage.removeItem('mapRoom'); }catch(e){}
+  const t=document.getElementById('transit');
+  if(t){ const e=document.getElementById('trText'); if(e) e.innerHTML='正在返回 <b>厂区地图</b>…'; t.classList.add('show'); }
+  setTimeout(()=>{ location.href='map_proto.html'; }, 500);
+}
+function enterLevel(id, taskId){
+  try{ if(id) sessionStorage.setItem('mapRoom', id); }catch(e){}
+  const q=new URLSearchParams();
+  if(taskId) q.set('task', taskId);
+  else if(id) q.set('level', id);
+  const qs=q.toString()?'?'+q.toString():'';
+  let title='任务';
+  if(id){ const lv=content&&content.levels&&content.levels.find(l=>l.id==id); if(lv) title=lv.areaName; }
+  goPage('student.html'+qs, title);
+}
+function hideTransit(){ const t=document.getElementById('transit'); if(t){ setTimeout(()=>{ t.classList.remove('show'); }, 150); } }
+function doLogout(){
+  try{ sessionStorage.removeItem('token'); sessionStorage.removeItem('role'); sessionStorage.removeItem('name');
+    sessionStorage.removeItem('mapFlow'); sessionStorage.removeItem('mapRoom'); sessionStorage.removeItem('lastCompleted'); }catch(e){}
+  try{ if(musOn&&musSrc){ musSrc.stop(); musSrc=null; } }catch(e){}
+  const t=document.getElementById('transit');
+  if(t){ const e=document.getElementById('trText'); if(e) e.innerHTML='正在退出…'; t.classList.add('show'); }
+  setTimeout(()=>{ location.href='index.html'; }, 400);
+}
+function showToast(msg){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#121830;border:2px solid var(--amber);color:var(--text);padding:10px 16px;font-size:13px;z-index:80;border-radius:4px;font-family:inherit;animation:toastIn .25s ease';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+async function init(){
+  const t=sessionStorage.getItem('token');
+  if(!t){ location.href='map_proto.html'; return; }
+  try{
+    const mr=await fetch(API+'/api/student/me',{headers:{Authorization:'Bearer '+t}});
+    if(mr.status===401){ try{ sessionStorage.removeItem('token'); }catch(e){} location.href='map_proto.html'; return; }
+    const j=await mr.json();
+    if(!j.ok){ location.href='map_proto.html'; return; }
+    token=t; me=j.data;
+    const cr=await fetch(API+'/api/game/content').then(r=>r.json());
+    content=cr.data||cr;
+    if(!content||!content.levels){ location.href='map_proto.html'; return; }
+    const p=new URLSearchParams(location.search);
+    const rid=p.get('room');
+    const lv=content.levels.find(l=>String(l.id)===String(rid));
+    if(!lv){ location.href='map_proto.html'; return; }
+    renderRoom(lv.id);
+    try{ musStart(); }catch(e){}
+    hideTransit();
+  }catch(e){ console.error('room init fail:', e); location.href='map_proto.html'; }
+}
+init();
+
+</script>
+<script src="/data/music.js"></script>
+</body>
+</html>
