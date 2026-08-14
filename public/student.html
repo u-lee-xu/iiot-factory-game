@@ -1210,7 +1210,7 @@ body.map-flow .header .director-avatar { display: none !important; }
   <div class="modal-box">
     <div class="modal-head">
       <h3 id="modalTitle">任务</h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeTaskModal()">✕</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-foot" id="modalFoot"></div>
@@ -2429,6 +2429,11 @@ function closeModal() {
   el.classList.remove('show');
   currentTaskId = null;
   playAreaMusic();
+}
+/* 右上角 ✕：叉掉任务。若从厂区地图进入任务，则带过场返回厂区（autoLogin 凭 mapRoom 自动重开刚才的房间），不再停留空白过渡页 */
+function closeTaskModal(){
+  closeModal();
+  if (sessionStorage.getItem('mapFlow') === '1') { goMap(); }
 }
 
 window.__closeOverlay = function(el){ var o = el.closest('.mm-overlay'); if (o) o.remove(); };
@@ -10719,7 +10724,9 @@ function goMap(){
 }
 function logout() {
   sessionStorage.clear();
-  location.href = 'index.html';
+  var t=document.getElementById('transit');
+  if(t){ var e=document.getElementById('trText'); if(e) e.innerHTML='正在退出…'; t.classList.add('show'); }
+  setTimeout(function(){ location.href='index.html'; }, 400);
 }
 
 // =========================================================================
