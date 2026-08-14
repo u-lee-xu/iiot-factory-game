@@ -7018,6 +7018,7 @@ function openPacman(cfg, onComplete) {
   ];
   let map=[], dots=0, level=1, lives=3, score=0, ended=false;
   let px,py,pdir={x:1,y:0}, nextDir={x:1,y:0}, mouth=0;
+  let moveTimer=0, ghostTimer=0;   // 移动节奏计时器（降低速度）
   let ghosts=[], power=0;
   let particles=[], floats=[];
   let currentCmd='', specials=[], paired=0;
@@ -7030,7 +7031,7 @@ function openPacman(cfg, onComplete) {
     function place(kind,cmd,label){ if(!cands.length)return; const i=Math.floor(Math.random()*cands.length); const a=cands.splice(i,1)[0]; map[a[1]][a[0]]=' '; dots--; specials.push({x:a[0],y:a[1],kind:kind,cmd:cmd,label:label}); }
     pairs.slice(0,2).forEach(function(p){ place('cmd', p.t, p.t); place('act', p.t, p.h); });
     px=1; py=1; pdir={x:1,y:0}; nextDir={x:1,y:0};
-    ghosts=[{x:9,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[0]},{x:10,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[1]},{x:11,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[2]}];
+    ghosts=[{x:9,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[0]},{x:11,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[1]}];
     power=0;
   }
   build();
@@ -7056,18 +7057,24 @@ function openPacman(cfg, onComplete) {
     else if(k==='Escape')closeGame(false);
   });
   let sw=null;
-  cv.addEventListener('pointerdown',e=>{sw={x:e.clientX,y:e.clientY};});
-  cv.addEventListener('pointerup',e=>{ if(!sw)return; const dx=e.clientX-sw.x,dy=e.clientY-sw.y; if(Math.abs(dx)>Math.abs(dy))nextDir={x:Math.sign(dx),y:0}; else if(dy!==0)nextDir={x:0,y:Math.sign(dy)}; sw=null; });
+  const swipeDist=22;   // 滑动判定阈值（px）
+  cv.addEventListener('pointerdown',e=>{ sw={x:e.clientX,y:e.clientY}; try{ cv.setPointerCapture&&cv.setPointerCapture(e.pointerId); }catch(_){ } });
+  cv.addEventListener('pointermove',e=>{ if(!sw)return; const dx=e.clientX-sw.x,dy=e.clientY-sw.y; if(Math.abs(dx)<swipeDist&&Math.abs(dy)<swipeDist)return; if(Math.abs(dx)>Math.abs(dy)) nextDir={x:Math.sign(dx),y:0}; else if(dy!==0) nextDir={x:0,y:Math.sign(dy)}; sw=null; });
+  cv.addEventListener('pointerup',e=>{ if(!sw)return; const dx=e.clientX-sw.x,dy=e.clientY-sw.y; if(Math.abs(dx)>swipeDist||Math.abs(dy)>swipeDist){ if(Math.abs(dx)>Math.abs(dy))nextDir={x:Math.sign(dx),y:0}; else nextDir={x:0,y:Math.sign(dy)}; } sw=null; });
   function addParticles(cx,cy,c){ for(let i=0;i<10;i++)particles.push({x:cx,y:cy,vx:(Math.random()-.5)*140,vy:(Math.random()-.5)*140,t:0,color:c}); }
   function update(dt){
     if(ended)return;
     mouth+=dt*6;
     if(power>0)power-=dt;
-    // 移动
-    if(!(nextDir.x===-pdir.x&&nextDir.y===-pdir.y)) pdir=nextDir;
-    const nx=px+pdir.x, ny=py+pdir.y;
-    if(map[ny] && map[ny][nx]!=='1'){ px=nx; py=ny; }
-    else { pdir={x:0,y:0}; }
+    // 移动（计时器控制节奏：初始间隔 0.13s，随关卡略快）
+    moveTimer-=dt;
+    if(moveTimer<=0){
+      moveTimer = Math.max(0.09, 0.13 - level*0.008);
+      if(!(nextDir.x===-pdir.x&&nextDir.y===-pdir.y)) pdir=nextDir;
+      const nx=px+pdir.x, ny=py+pdir.y;
+      if(map[ny] && map[ny][nx]!=='1'){ px=nx; py=ny; }
+      else { pdir={x:0,y:0}; }
+    }
     // 吃镜像层
     if(map[py] && map[py][px]==='0'){ map[py][px]=' '; dots--; score+=5; scoreEl.textContent=score; playSound('success');
       if((px+py)%13===0){ power=6; playSound('levelup'); }   // 能量点（端口映射）
@@ -7082,7 +7089,9 @@ function openPacman(cfg, onComplete) {
         else { score=Math.max(0,score-5); scoreEl.textContent=score; currentCmd=''; if(termEl)termEl.textContent='—'; playSound('error'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'❌ 命令不匹配',t:0,col:'#ff5252'}); }
       }
     }
-    // 幽灵移动（简化 AI：向玩家方向走，随机绕）
+    // 幽灵移动（计时器控制，速度比玩家慢，简化 AI）
+    ghostTimer-=dt;
+    if(ghostTimer>0){ } else {
     ghosts.forEach(g=>{
       if(g.flee && power<=0) g.flee=false;
       if(power>0 && !g.flee){ // 朝远离玩家走
@@ -7091,11 +7100,13 @@ function openPacman(cfg, onComplete) {
       } else {
         const opts=[]; [[0,-1],[0,1],[-1,0],[1,0]].forEach(d=>{ const nx2=g.x+d[0],ny2=g.y+d[1]; if(map[ny2]&&map[ny2][nx2]!=='1') opts.push(d); });
         if(Math.random()<0.12 && opts.length) g.dir=opts[Math.floor(Math.random()*opts.length)];
-        else { const dx=px-g.x, dy=py-g.y; const cands=opts.filter(d=>Math.abs(d[0]*dy)>=0 && Math.abs(d[1]*dx)>=0); if(cands.length) g.dir=Math.random()<0.5?cands[0]:cands[1]; }
+        else { const dx=px-g.x, dy=py-g.y; const cands=opts.filter(d=>Math.abs(d[0]*dy)>=0 && Math.abs(d[1]*dx)>=0); if(cands.length) g.dir=cands[Math.floor(Math.random()*cands.length)]; }
       }
       const gx=g.x+g.dir[0], gy=g.y+g.dir[1];
       if(map[gy] && map[gy][gx]!=='1'){ g.x=gx; g.y=gy; }
     });
+    ghostTimer = Math.max(0.14, 0.20 - level*0.01);
+    }
     // 碰撞
     ghosts.forEach(g=>{
       if(g.x===px&&g.y===py){
