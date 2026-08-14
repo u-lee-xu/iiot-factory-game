@@ -52,6 +52,8 @@ def main():
             else: failed.append((g, info, errs[:1]))
             page.evaluate("()=>{ document.querySelectorAll('.mm-overlay').forEach(o=>o.remove()); }")
             page.wait_for_timeout(200)
+            page.goto(SERVER+"/student.html?level=5")
+            page.wait_for_load_state("networkidle"); page.wait_for_timeout(300)
         b.close()
     print(f"\n===== 移动端检查: {len(passed)} 通过 / {len(failed)} 失败 =====")
     if passed: print("通过:", " ".join(sorted(passed)))

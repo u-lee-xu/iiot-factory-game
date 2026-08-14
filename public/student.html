@@ -887,6 +887,13 @@ body:has(.mm-overlay) { overflow: hidden; }
 .ty-bullet { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle, #fff, var(--amber)); box-shadow: 0 0 10px var(--amber); transition: transform .24s linear; z-index: 5; }
 .ty-field.ty-hit { box-shadow: inset 0 0 40px rgba(255,85,85,.35); }
 .ty-field.ty-err { box-shadow: inset 0 0 24px rgba(255,85,85,.4); }
+/* 术语防御战：打爆得分/连击飘字 */
+.ty-score-float{position:absolute;transform:translateX(-50%);color:#ffd700;font-weight:bold;font-size:20px;pointer-events:none;z-index:9;
+  text-shadow:0 0 8px rgba(255,215,0,.8),0 1px 3px #000;animation:tyScoreF .7s ease-out forwards}
+@keyframes tyScoreF{0%{transform:translate(-50%,0) scale(1);opacity:1}100%{transform:translate(-50%,-40px) scale(1.2);opacity:0}}
+.ty-combo-float{position:absolute;transform:translateX(-50%);color:#ff7a00;font-weight:bold;font-size:15px;pointer-events:none;z-index:9;
+  text-shadow:0 0 8px rgba(255,122,0,.8),0 1px 3px #000;animation:tyComboF .8s ease-out forwards}
+@keyframes tyComboF{0%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,-40px);opacity:0}}
 .ty-result { background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; padding: 30px 44px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(0,188,212,.22); }
 .tut-box { background: #12121a; border: 2px solid var(--amber); border-radius: 12px; padding: 28px 34px; max-width: 460px; width: 92%; text-align: center; box-shadow: 0 0 60px rgba(255,176,0,.2); }
 .tut-title { font-size: 20px; color: var(--amber); font-weight: bold; margin-bottom: 14px; }
@@ -4904,6 +4911,23 @@ function openTypingDefense(cfg, onComplete) {
       score += gain; scoreEl.textContent = score;
       comboEl.textContent = combo>=2 ? 'x'+combo : '';
       playSound('success');
+      // —— 打爆飘字：得分 + 连击提示 ——
+      try{
+        const s2=document.createElement('div');
+        s2.className='ty-score-float';
+        s2.textContent = '+'+gain;
+        s2.style.cssText='left:'+(tx)+'px;top:'+(ty-8)+'px';
+        field.appendChild(s2);
+        setTimeout(()=>{ try{s2.remove();}catch(e){} }, 800);
+        if(combo>=3){
+          const c2=document.createElement('div');
+          c2.className='ty-combo-float';
+          c2.textContent = '🔥 连击 x'+combo;
+          c2.style.cssText='left:'+(tx)+'px;top:'+(ty-30)+'px';
+          field.appendChild(c2);
+          setTimeout(()=>{ try{c2.remove();}catch(e){} }, 900);
+        }
+      }catch(e3){}
       if (w.boss) {
         // 清屏 → 下一波 / 通关
         clearScreen();
@@ -5952,6 +5976,15 @@ function openShooter(cfg, onComplete) {
     score += gain; scoreEl.textContent = score;
     comboEl.textContent = combo >= 2 ? 'x'+combo : '';
     playSound('success');
+    // —— 击碎粒子 + 得分飘字 ——
+    try{
+      for(let k=0;k<10;k++){
+        const ang=Math.random()*Math.PI*2, sp=80+Math.random()*140;
+        floatTexts.push({ x: e.x+e.w/2, y: e.y+e.h/2, t: 0, txt: '✦', col:'#7ee8fa', vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp-40 });
+      }
+      floatTexts.push({ x: e.x+e.w/2, y: e.y+e.h/2-10, t: 0, txt: '+' + gain, col:'#ffd700' });
+      if(combo>=2) floatTexts.push({ x: e.x+e.w/2, y: e.y+e.h/2-28, t: 0, txt: '🔥 x'+combo, col:'#ff7a00' });
+    }catch(e2){}
     e.active = false;
     spawnDrop(e);
     if (!enemies.some(x => x.active && x.term === targetTerm)) {
@@ -6335,11 +6368,13 @@ function openShooter(cfg, onComplete) {
     });
     // 拾取飘字
     floatTexts.forEach(f => {
-      ctx.globalAlpha = Math.max(0, 1 - f.t/1.3);
+      // 粒子型(带vx/vy)：做抛物线飘散
+      if (f.vx) { f.x += f.vx*dt; f.y += f.vy*dt; f.vy += 220*dt; }
+      ctx.globalAlpha = Math.max(0, 1 - f.t/1.2);
       ctx.fillStyle = f.col;
       ctx.font = 'bold ' + Math.round(15/sf) + 'px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(f.txt, f.x, f.y - f.t*42);
+      ctx.fillText(f.txt, f.x, f.y - (f.vx ? 0 : f.t*42));
       ctx.globalAlpha = 1;
     });
     // 爆炸
