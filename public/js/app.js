@@ -19,6 +19,7 @@ import { useTaskPass } from './ui/main.js';
 import { addTaskItemBar } from './ui/main.js';
 import { completeTask } from './ui/main.js';
 import { toggleTask } from './ui/main.js';
+import { finishTaskFlow } from './ui/main.js';
 import { renderTypeTerminal } from './ui/main.js';
 import { getLevelTasks } from './core/state.js';
 import { isTaskDone } from './core/state.js';
@@ -1016,6 +1017,7 @@ Object.assign(window, {
   toggleMusic,
   toggleSound,
   toggleTask,
+  finishTaskFlow,
   token,
   tutMark,
   tutSeen,

@@ -121,9 +121,9 @@ export function achievementContext() {
   ctx.lzrBest = gs.lzrBest || 0;
   ctx.bossWins = gs.bossWins || 0;
   ctx.bossBest = gs.bossBest || 0;
-  ctx.gameTypes = countUnlockedGameTypes();
+  ctx.gameTypes = window.countUnlockedGameTypes();
   ctx.lvlWins = gs.lvlWins || {};
-  ctx.pediaCount = getPediaCount();
+  ctx.pediaCount = window.getPediaCount();
   window.content.levels.forEach(lv => {
     const prog = window.levelProgress(lv.id);
     ctx.doneCount += prog.done;

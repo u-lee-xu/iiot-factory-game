@@ -17,9 +17,9 @@ export function renderFactory() {
     row.areas.forEach(areaKey => {
       const lv = window.content.levels.find(l => l.factoryArea === areaKey);
       if (!lv) return;
-      const prog = levelProgress(lv.id);
+      const prog = window.levelProgress(lv.id);
       const prevLv = window.content.levels.find(l => l.id === lv.id - 1);
-      const canAccess = lv.id === 1 || (prevLv && levelProgress(prevLv.id).completed);
+      const canAccess = lv.id === 1 || (prevLv && window.levelProgress(prevLv.id).completed);
       let cls = 'area locked';
       if (prog.completed) cls = 'area completed';
       else if (canAccess) cls = 'area active';
@@ -49,7 +49,7 @@ export function renderFactory() {
         const a1 = row.areas[i];
         const a2 = window.content.factory.rows[ri + 1].areas[i];
         const lv1 = window.content.levels.find(l => l.factoryArea === a1);
-        const done = lv1 && levelProgress(lv1.id).completed;
+        const done = lv1 && window.levelProgress(lv1.id).completed;
         cell.innerHTML = `<div class="h-line ${done ? 'done' : ''}"></div><div class="v-line ${done ? 'done' : ''}"></div><div class="arrow ${done ? 'done' : ''}"></div>`;
         pipeDiv.appendChild(cell);
       }
@@ -63,12 +63,12 @@ export function selectLevel(lvId, skipIntro) {
   if (!lv) return;
   window.currentLevelId = lvId;
   window.setArea(lvId); window.playAreaMusic();
-  const renderAll = () => { renderFactory(); renderMission(); renderHeader(); };
+  const renderAll = () => { renderFactory(); renderMission(); window.renderHeader(); };
   // 直接从厂区地图进入某个任务时跳过“幕intro”（任务前言会单独讲解），
   // 避免与蓝色任务前言两个弹窗叠加；进入关卡本身仍保留幕intro
   if (skipIntro) { renderAll(); return; }
   // 幕intro 也排进登录弹窗队列，保证全局一次只弹一个（不与成就/欢迎/前言叠加）
-  enqueueLoginPopup(done => showLevelIntro(lv, () => { renderAll(); done(); }));
+  window.enqueueLoginPopup(done => window.showLevelIntro(lv, () => { renderAll(); done(); }));
 }
 
 export function renderMission() {
@@ -79,7 +79,7 @@ export function renderMission() {
   title.innerHTML = `<span class="lv-tag">L${lv.id}</span> ${lv.name}`;
 
   const story = document.getElementById('missionStory');
-  const prog = levelProgress(lv.id);
+  const prog = window.levelProgress(lv.id);
   if (!prog.completed) {
     story.style.display = 'block';
     story.textContent = lv.narrative.intro;
@@ -105,7 +105,7 @@ export function renderMission() {
   const list = document.getElementById('taskList');
   list.innerHTML = '';
   // 构建"块最后一个任务 -> 复习翻牌"映射
-  const tl = getTermLevel(lv.id);
+  const tl = window.getTermLevel(lv.id);
   const reviewAfter = {};
   if (tl) tl.warmups.forEach(w => {
     const last = w.blockTasks[w.blockTasks.length - 1];
@@ -115,7 +115,7 @@ export function renderMission() {
     }
   });
   lv.tasks.forEach(t => {
-    const done = isTaskDone(t.id);
+    const done = window.isTaskDone(t.id);
     const _ck = window.gameState.check[taskKey(t.id)];
     const isHalf = done && _ck && _ck.half;
     const li = document.createElement('li');
@@ -136,7 +136,7 @@ export function renderMission() {
         if (t.hidden && !done) {
           // check if all non-hidden tasks are done
           const nonHidden = lv.tasks.filter(x => !x.hidden);
-          const allDone = nonHidden.every(x => isTaskDone(x.id));
+          const allDone = nonHidden.every(x => window.isTaskDone(x.id));
           if (!allDone) { window.showToast('先完成所有普通任务再挑战隐藏', 'info'); return; }
         }
         // 已完成的任务点击 = 重做（重刷拿满分），未完成 = 直接做
@@ -151,7 +151,7 @@ export function renderMission() {
     // 块最后一个任务后，紧跟一行对应的复习翻牌
     if (reviewAfter[t.id]) {
       reviewAfter[t.id].forEach(w => {
-      const unlocked = w.blockTasks.every(tid => isTaskDone(tid));
+      const unlocked = w.blockTasks.every(tid => window.isTaskDone(tid));
       const wType = w.type || 'memory';
       const isQuick = wType === 'quick';
       const isMatch = wType === 'match';
@@ -207,35 +207,35 @@ export function renderMission() {
       else if (isBossS) _meta = (w.shots||5) + ' 发';
       else if (w.rounds) _meta = w.rounds.map(function(r){return r * 2;}).join('→') + ' 张';
       else _meta = (w.size * 2) + ' 张';
-      row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
+      row.innerHTML = '<span class="ri-emoji">' + (unlocked ? _emoji : '🔒') + '</span><span class="ri-name">' + _name + window.miniTierBadge(w.id) + '</span><span class="ri-meta">' + _meta + ' · ' + (unlocked ? '可玩' : '完成本块任务解锁') + '</span>';
       row.onclick = () => {
         if (!unlocked) { window.showToast('还没有解锁，先完成对应任务', 'error'); return; }
-        if (isQuick) openQuickMatch(w, (win)=>{ gzAfter(win,'⚡ 快打完成'); });
-        else if (isMatch) openMatchGame(w, (win)=>{ gzAfter(win,'🔗 连线完成'); });
-        else if (isStorm) openStormDefense(w, (win)=>{ gzAfter(win,'🌪️ 数据风暴守住了'); });
-        else if (isAlarm) openAlarmRush(w, (win)=>{ gzAfter(win,'🚨 产线守住了'); });
-        else if (isTyping) openTypingDefense(w, (win)=>{ gzAfter(win,'🔫 术语防线守住了'); });
-        else if (isShooter) openShooter(w, (win)=>{ gzAfter(win,'🛸 数据蜂群清空！'); });
-        else if (isRacing) openDataRacing(w, (win)=>{ gzAfter(win,'🏎️ 数据狂飙通关！'); });
-        else if (isSnake) openSnake(w, (win)=>{ gzAfter(win,'🐍 网线畅通！'); });
-        else if (isFlappy) openFlappy(w, (win)=>{ gzAfter(win,'🦅 云端到达！'); });
-        else if (isMole) openMole(w, (win)=>{ gzAfter(win,'🔨 异常全清！'); });
-        else if (isPacman) openPacman(w, (win)=>{ gzAfter(win,'👾 镜像吃光！'); });
-        else if (isTank) openTank(w, (win)=>{ gzAfter(win,'🎯 Broker 保住了！'); });
-        else if (isBreakout) openBreakout(w, (win)=>{ gzAfter(win,'🧱 故障全消！'); });
-        else if (isSorter) openSorter(w, (win)=>{ gzAfter(win,'📦 全部归位！'); });
-        else if (isForge) openForge(w, (win)=>{ gzAfter(win,'🔥 合成成功！'); });
-        else if (isLl) openLianLian(w, (win)=>{ gzAfter(win,'🔗 全部配对！'); });
-        else if (isPipe) openPipe(w, (win)=>{ gzAfter(win,'🔧 数据通路接通！'); });
-        else if (isM3) openMatch3(w, (win)=>{ gzAfter(win,'🍬 三连清场！'); });
-        else if (isTd) openTowerDefense(w, (win)=>{ gzAfter(win,'🛡️ 车间防线守住！'); });
-        else if (isT48) openTile2048(w, (win)=>{ gzAfter(win,'🔢 合成'+ (w.target||'TB') +'！'); });
-        else if (isMaze) openMaze(w, (win)=>{ gzAfter(win,'🌐 数据包送达！'); });
-        else if (isHack) openHacknet(w, (win)=>{ gzAfter(win,'🕹️ 全网络拿下！'); });
-        else if (isTyc) openTycoon(w, (win)=>{ gzAfter(win,'🏭 产值达标！'); });
-        else if (isLzr) openLaser(w, (win)=>{ gzAfter(win,'🔦 光束连通！'); });
-        else if (isBossS) openBoss(w, (win)=>{ gzAfter(win,'🎯 故障砸掉了！'); });
-        else openMemoryMatch(w, (win)=>{ gzAfter(win,'🧠 翻牌完成'); });
+        if (isQuick) window.openQuickMatch(w, (win)=>{ window.gzAfter(win,'⚡ 快打完成'); });
+        else if (isMatch) window.openMatchGame(w, (win)=>{ window.gzAfter(win,'🔗 连线完成'); });
+        else if (isStorm) window.openStormDefense(w, (win)=>{ window.gzAfter(win,'🌪️ 数据风暴守住了'); });
+        else if (isAlarm) window.openAlarmRush(w, (win)=>{ window.gzAfter(win,'🚨 产线守住了'); });
+        else if (isTyping) window.openTypingDefense(w, (win)=>{ window.gzAfter(win,'🔫 术语防线守住了'); });
+        else if (isShooter) window.openShooter(w, (win)=>{ window.gzAfter(win,'🛸 数据蜂群清空！'); });
+        else if (isRacing) window.openDataRacing(w, (win)=>{ window.gzAfter(win,'🏎️ 数据狂飙通关！'); });
+        else if (isSnake) window.openSnake(w, (win)=>{ window.gzAfter(win,'🐍 网线畅通！'); });
+        else if (isFlappy) window.openFlappy(w, (win)=>{ window.gzAfter(win,'🦅 云端到达！'); });
+        else if (isMole) window.openMole(w, (win)=>{ window.gzAfter(win,'🔨 异常全清！'); });
+        else if (isPacman) window.openPacman(w, (win)=>{ window.gzAfter(win,'👾 镜像吃光！'); });
+        else if (isTank) window.openTank(w, (win)=>{ window.gzAfter(win,'🎯 Broker 保住了！'); });
+        else if (isBreakout) window.openBreakout(w, (win)=>{ window.gzAfter(win,'🧱 故障全消！'); });
+        else if (isSorter) window.openSorter(w, (win)=>{ window.gzAfter(win,'📦 全部归位！'); });
+        else if (isForge) window.openForge(w, (win)=>{ window.gzAfter(win,'🔥 合成成功！'); });
+        else if (isLl) window.openLianLian(w, (win)=>{ window.gzAfter(win,'🔗 全部配对！'); });
+        else if (isPipe) window.openPipe(w, (win)=>{ window.gzAfter(win,'🔧 数据通路接通！'); });
+        else if (isM3) window.openMatch3(w, (win)=>{ window.gzAfter(win,'🍬 三连清场！'); });
+        else if (isTd) window.openTowerDefense(w, (win)=>{ window.gzAfter(win,'🛡️ 车间防线守住！'); });
+        else if (isT48) window.openTile2048(w, (win)=>{ window.gzAfter(win,'🔢 合成'+ (w.target||'TB') +'！'); });
+        else if (isMaze) window.openMaze(w, (win)=>{ window.gzAfter(win,'🌐 数据包送达！'); });
+        else if (isHack) window.openHacknet(w, (win)=>{ window.gzAfter(win,'🕹️ 全网络拿下！'); });
+        else if (isTyc) window.openTycoon(w, (win)=>{ window.gzAfter(win,'🏭 产值达标！'); });
+        else if (isLzr) window.openLaser(w, (win)=>{ window.gzAfter(win,'🔦 光束连通！'); });
+        else if (isBossS) window.openBoss(w, (win)=>{ window.gzAfter(win,'🎯 故障砸掉了！'); });
+        else window.openMemoryMatch(w, (win)=>{ window.gzAfter(win,'🧠 翻牌完成'); });
       };
       list.appendChild(row);
       });
@@ -243,13 +243,13 @@ export function renderMission() {
   });
   // 番外：记忆大师挑战（本关通关后解锁，放在列表最后）
   if (tl && tl.bonus) {
-    const lvDone = levelProgress(lv.id).completed;
+    const lvDone = window.levelProgress(lv.id).completed;
     const row = document.createElement('li');
     row.className = 'review-inline review-bonus' + (lvDone ? ' unlocked' : ' locked');
     row.innerHTML = '<span class="ri-emoji">' + (lvDone ? '🏆' : '🔒') + '</span><span class="ri-name">记忆大师挑战 · 5 层递进</span><span class="ri-meta">' + (lvDone ? '可玩' : '通关本关解锁') + '</span>';
     row.onclick = () => {
       if (!lvDone) { window.showToast('通关本关后才能挑战记忆大师', 'error'); return; }
-      openMemoryMatch(tl.bonus, (win)=>{ gzAfter(win,'🏆 记忆大师完成！'); });
+      window.openMemoryMatch(tl.bonus, (win)=>{ window.gzAfter(win,'🏆 记忆大师完成！'); });
     };
     list.appendChild(row);
   }
@@ -287,13 +287,13 @@ export function openTaskModal(lvId, taskId, onOpen) {
 
     // 如果该类型自带讲解则直接委托渲染
     if (window.selfTeachTypes.indexOf(task.type) >= 0) {
-      const handler = getInteraction(task.type);
+      const handler = window.getInteraction(task.type);
       if (handler) {
         handler.render(body, task);
       }
     } else {
       // 通用模式：直接渲染交互（教学已在前置弹窗完成）
-      const handler = getInteraction(task.type);
+      const handler = window.getInteraction(task.type);
       if (!handler) {
         body.innerHTML = '<div style="text-align:center;padding:20px;color:var(--dim)">⚠️ 未知任务类型: ' + task.type + '</div>';
         if (typeof onOpen === 'function') onOpen();
@@ -360,12 +360,12 @@ export function showTaskHintPopup(msg) {
 export function useTaskHint(task) {
   var inv = window.gameState.inventory || {};
   if (!(inv['hint_card'] > 0)) return;
-  api('/api/student/consume-item', { method:'POST', body:JSON.stringify({itemId:'hint_card'}) }).then(function(r){
+  window.api('/api/student/consume-item', { method:'POST', body:JSON.stringify({itemId:'hint_card'}) }).then(function(r){
     if (r && r.ok) {
       window.gameState.inventory['hint_card']--; if (window.gameState.inventory['hint_card'] <= 0) delete window.gameState.inventory['hint_card'];
-      renderHeader();
+      window.renderHeader();
       var ans = findTaskAnswer(task);
-      var teach = generateTeach(task) || '厂长：再想想，答案在任务标题和提示里。';
+      var teach = window.generateTeach(task) || '厂长：再想想，答案在任务标题和提示里。';
       showTaskHintPopup(teach + (ans ? '\n\n✅ 答案参考：\n' + ans : ''));
       var btn = document.getElementById('taskHintBtn'); if (btn) { btn.style.opacity = '.4'; btn.disabled = true; }
     } else window.showToast((r && r.error) || '使用失败', 'error');
@@ -375,10 +375,10 @@ export function useTaskHint(task) {
 export function useTaskPass() {
   var inv = window.gameState.inventory || {};
   if (!(inv['pass_card'] > 0)) return;
-  api('/api/student/consume-item', { method:'POST', body:JSON.stringify({itemId:'pass_card'}) }).then(function(r){
+  window.api('/api/student/consume-item', { method:'POST', body:JSON.stringify({itemId:'pass_card'}) }).then(function(r){
     if (r && r.ok) {
       window.gameState.inventory['pass_card']--; if (window.gameState.inventory['pass_card'] <= 0) delete window.gameState.inventory['pass_card'];
-      renderHeader();
+      window.renderHeader();
       window.__passActive = true;
       var btn = document.getElementById('taskPassBtn'); if (btn) { btn.style.opacity = '.4'; btn.disabled = true; }
       window.showToast('🛡 免错金牌已启用：本关答错也拿满经验', 'success');
@@ -402,6 +402,34 @@ export function addTaskItemBar(task) {
   if (hasPass) document.getElementById('taskPassBtn').onclick = function(){ useTaskPass(); };
 }
 
+// 统一刷新主界面（关卡页 / 任务列表 / 页头）
+function refreshMainUI() {
+  renderFactory();
+  renderMission();
+  window.renderHeader();
+}
+
+// 统一"任务完成后的界面流转"出口：关弹窗 → 刷新 → XP 反馈 → 按进入模式返回。
+// 不管从哪进任务（旧版关卡页 / 厂区地图房间），完成任务后都走这里，杜绝"漏返回 → 空白"。
+export function finishTaskFlow(taskId, xp) {
+  closeModal();
+  refreshMainUI();
+  window.showToast('+' + xp + 'XP', 'success');
+  window.checkLevelUp();
+  // 地图流程：本层全部打完 → 弹通关庆祝；整层未完 → 点击领取后立即显示"正在返回"过渡
+  // 盖住弹窗关闭后露出的空白任务页壳子，再延迟 goMap（XP toast 仍可见，过渡期间不闪空白）
+  if (sessionStorage.getItem('mapFlow') === '1') {
+    const lv = window.content.levels.find(l => l.tasks.some(t => t.id === taskId));
+    if (lv && window.levelProgress(lv.id).completed) {
+      window.showLevelComplete(lv, null);
+    } else {
+      const _t = document.getElementById('transit');
+      if (_t) { const _e = document.getElementById('trText'); if (_e) _e.innerHTML = '正在返回 <b>房间</b>…'; _t.classList.add('show'); }
+      setTimeout(function(){ window.goMap(); }, 900);
+    }
+  }
+}
+
 export function completeTask(taskId, xp) {
   try {
     // 经验减半：命令猜错多次时 xp 低于满值，存 half 标记（影响实际总分，可重刷拿满分）
@@ -410,35 +438,18 @@ export function completeTask(taskId, xp) {
     if (window.__passActive && xp < tFullXp) { window.__passActive = false; xp = tFullXp; }   // 免错金牌：答错也拿满经验
     if (xp < tFullXp) window.gameState.check[taskId] = { half: true };
     else window.gameState.check[taskId] = true;
-    closeModal();
-    renderFactory();
-    renderMission();
-    renderHeader();
-    window.showToast('+' + xp + 'XP', 'success');
-    checkLevelUp();
-    saveState();
-    evaluateAchievements(true);
-    refreshLeaderboard().then(() => evaluateAchievements(true));
+    // 业务收尾：存档 / 成就 / 排行
+    window.saveState();
+    window.evaluateAchievements(true);
+    window.refreshLeaderboard().then(() => window.evaluateAchievements(true));
     // 记录最近完成的任务（回厂区地图弹庆祝 toast）
     try {
       const _lv = window.content.levels.find(l => l.tasks.some(t => t.id === taskId));
       const _t = _lv && _lv.tasks.find(t => t.id === taskId);
       sessionStorage.setItem('lastCompleted', JSON.stringify({ title: (_t&&_t.title)||'', xp }));
     } catch(e){}
-    // 地图流程：本层全部打完 → 弹通关庆祝；整层未完 → 完成后自动回房间/厂区，
-    // 避免停在 body.map-flow 隐藏旧版页后只剩空壳的"空白界面"
-    if (sessionStorage.getItem('mapFlow') === '1') {
-      const lv = window.content.levels.find(l => l.tasks.some(t => t.id === taskId));
-      if (lv && levelProgress(lv.id).completed) {
-        showLevelComplete(lv, null);
-      } else {
-        // 点击领取后立即显示"正在返回"过渡，盖住弹窗关闭后露出的空白任务页壳子，
-        // 再延迟 goMap（XP toast 仍可见，且过渡期间不闪空白）
-        var _t = document.getElementById('transit');
-        if (_t) { var _e = document.getElementById('trText'); if (_e) _e.innerHTML = '正在返回 <b>房间</b>…'; _t.classList.add('show'); }
-        setTimeout(function(){ window.goMap(); }, 900);
-      }
-    }
+    // 界面流转统一出口（关弹窗 / 刷新 / 反馈 / 返回）
+    finishTaskFlow(taskId, xp);
   } catch (e) {
     console.error('completeTask error:', e);
     window.showToast('保存失败，请重试', 'error');
@@ -447,10 +458,8 @@ export function completeTask(taskId, xp) {
 
 export function toggleTask(taskId) {
   delete window.gameState.check[taskId];
-  renderFactory();
-  renderMission();
-  renderHeader();
-  saveState();
+  refreshMainUI();
+  window.saveState();
 }
 
 export function renderTypeTerminal(container, task, cfg) {
@@ -472,7 +481,7 @@ export function renderTypeTerminal(container, task, cfg) {
     ''
   ];
 
-  const teachText = generateTeach(task);
+  const teachText = window.generateTeach(task);
 
   container.innerHTML = `
     <div id="termTeachArea"></div>
@@ -501,8 +510,8 @@ export function renderTypeTerminal(container, task, cfg) {
     <button class="btn" onclick="closeModal()">取消</button>
   `;
   // 初始 mood：首次进关卡 -> thinking
-  const initialMood = getDirectorMood(task, { firstTime: true });
-  addDirectorBox(teachArea, teachText, () => startBoot(), initialMood);
+  const initialMood = window.getDirectorMood(task, { firstTime: true });
+  window.addDirectorBox(teachArea, teachText, () => startBoot(), initialMood);
 
   function startBoot() {
   document.getElementById('termRoot').style.display = 'block';
@@ -679,7 +688,7 @@ export function renderTypeTerminal(container, task, cfg) {
         const idx = Math.min(attempts - 1, hints.length - 1);
         hint.textContent = '💡 ' + hints[idx];
         hint.style.color = 'var(--amber)';
-        shakeScreen();
+        window.shakeScreen();
         input.value = '';
         input.focus();
       }

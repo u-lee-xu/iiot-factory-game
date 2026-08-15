@@ -180,7 +180,7 @@ export function gzPlay(idx) {
     const tl = getTermLevel(it.lvId);
     if (!tl || !tl.bonus) return;
     if (!window.levelProgress(it.lvId).completed) { window.showToast('通关本关后才能挑战记忆大师', 'error'); return; }
-    openMemoryMatch(tl.bonus, (win)=>{ gzAfter(win,'🏆 记忆大师完成！'); });
+    window.openMemoryMatch(tl.bonus, (win)=>{ gzAfter(win,'🏆 记忆大师完成！'); });
     return;
   }
   const w = it.w;
@@ -188,32 +188,32 @@ export function gzPlay(idx) {
     window.showToast('先完成对应任务解锁这个小游戏', 'error'); return;
   }
   const t = w.type || 'memory';
-  if (t==='quick') openQuickMatch(w, (win)=>{ gzAfter(win,'⚡ 快打完成'); });
-  else if (t==='match') openMatchGame(w, (win)=>{ gzAfter(win,'🔗 连线完成'); });
-  else if (t==='storm') openStormDefense(w, (win)=>{ gzAfter(win,'🌪️ 数据风暴守住了'); });
-  else if (t==='alarm') openAlarmRush(w, (win)=>{ gzAfter(win,'🚨 产线守住了'); });
-  else if (t==='typing') openTypingDefense(w, (win)=>{ gzAfter(win,'🔫 术语防线守住了'); });
-  else if (t==='shooter') openShooter(w, (win)=>{ gzAfter(win,'🛸 数据蜂群清空！'); });
-  else if (t==='racing') openDataRacing(w, (win)=>{ gzAfter(win,'🏎️ 数据狂飙通关！'); });
-  else if (t==='snake') openSnake(w, (win)=>{ gzAfter(win,'🐍 网线畅通！'); });
-  else if (t==='flappy') openFlappy(w, (win)=>{ gzAfter(win,'🦅 云端到达！'); });
-  else if (t==='mole') openMole(w, (win)=>{ gzAfter(win,'🔨 异常全清！'); });
-  else if (t==='pacman') openPacman(w, (win)=>{ gzAfter(win,'👾 镜像吃光！'); });
-  else if (t==='tank') openTank(w, (win)=>{ gzAfter(win,'🎯 Broker 保住了！'); });
-  else if (t==='breakout') openBreakout(w, (win)=>{ gzAfter(win,'🧱 故障全消！'); });
-  else if (t==='sorter') openSorter(w, (win)=>{ gzAfter(win,'📦 全部归位！'); });
-  else if (t==='forge') openForge(w, (win)=>{ gzAfter(win,'🔥 合成成功！'); });
-  else if (t==='ll') openLianLian(w, (win)=>{ gzAfter(win,'🔗 全部配对！'); });
-  else if (t==='pipe') openPipe(w, (win)=>{ gzAfter(win,'🔧 数据通路接通！'); });
-  else if (t==='m3') openMatch3(w, (win)=>{ gzAfter(win,'🍬 三连清场！'); });
-  else if (t==='td') openTowerDefense(w, (win)=>{ gzAfter(win,'🛡️ 车间防线守住！'); });
-  else if (t==='t48') openTile2048(w, (win)=>{ gzAfter(win,'🔢 合成'+ (w.target||'TB') +'！'); });
-  else if (t==='maze') openMaze(w, (win)=>{ gzAfter(win,'🌐 数据包送达！'); });
-  else if (t==='hack') openHacknet(w, (win)=>{ gzAfter(win,'🕹️ 全网络拿下！'); });
-  else if (t==='tyc') openTycoon(w, (win)=>{ gzAfter(win,'🏭 产值达标！'); });
-  else if (t==='lzr') openLaser(w, (win)=>{ gzAfter(win,'🔦 光束连通！'); });
-  else if (t==='boss') openBoss(w, (win)=>{ gzAfter(win,'🎯 故障砸掉了！'); });
-  else openMemoryMatch(w, (win)=>{ gzAfter(win,'🧠 翻牌完成'); });
+  if (t==='quick') window.openQuickMatch(w, (win)=>{ gzAfter(win,'⚡ 快打完成'); });
+  else if (t==='match') window.openMatchGame(w, (win)=>{ gzAfter(win,'🔗 连线完成'); });
+  else if (t==='storm') window.openStormDefense(w, (win)=>{ gzAfter(win,'🌪️ 数据风暴守住了'); });
+  else if (t==='alarm') window.openAlarmRush(w, (win)=>{ gzAfter(win,'🚨 产线守住了'); });
+  else if (t==='typing') window.openTypingDefense(w, (win)=>{ gzAfter(win,'🔫 术语防线守住了'); });
+  else if (t==='shooter') window.openShooter(w, (win)=>{ gzAfter(win,'🛸 数据蜂群清空！'); });
+  else if (t==='racing') window.openDataRacing(w, (win)=>{ gzAfter(win,'🏎️ 数据狂飙通关！'); });
+  else if (t==='snake') window.openSnake(w, (win)=>{ gzAfter(win,'🐍 网线畅通！'); });
+  else if (t==='flappy') window.openFlappy(w, (win)=>{ gzAfter(win,'🦅 云端到达！'); });
+  else if (t==='mole') window.openMole(w, (win)=>{ gzAfter(win,'🔨 异常全清！'); });
+  else if (t==='pacman') window.openPacman(w, (win)=>{ gzAfter(win,'👾 镜像吃光！'); });
+  else if (t==='tank') window.openTank(w, (win)=>{ gzAfter(win,'🎯 Broker 保住了！'); });
+  else if (t==='breakout') window.openBreakout(w, (win)=>{ gzAfter(win,'🧱 故障全消！'); });
+  else if (t==='sorter') window.openSorter(w, (win)=>{ gzAfter(win,'📦 全部归位！'); });
+  else if (t==='forge') window.openForge(w, (win)=>{ gzAfter(win,'🔥 合成成功！'); });
+  else if (t==='ll') window.openLianLian(w, (win)=>{ gzAfter(win,'🔗 全部配对！'); });
+  else if (t==='pipe') window.openPipe(w, (win)=>{ gzAfter(win,'🔧 数据通路接通！'); });
+  else if (t==='m3') window.openMatch3(w, (win)=>{ gzAfter(win,'🍬 三连清场！'); });
+  else if (t==='td') window.openTowerDefense(w, (win)=>{ gzAfter(win,'🛡️ 车间防线守住！'); });
+  else if (t==='t48') window.openTile2048(w, (win)=>{ gzAfter(win,'🔢 合成'+ (w.target||'TB') +'！'); });
+  else if (t==='maze') window.openMaze(w, (win)=>{ gzAfter(win,'🌐 数据包送达！'); });
+  else if (t==='hack') window.openHacknet(w, (win)=>{ gzAfter(win,'🕹️ 全网络拿下！'); });
+  else if (t==='tyc') window.openTycoon(w, (win)=>{ gzAfter(win,'🏭 产值达标！'); });
+  else if (t==='lzr') window.openLaser(w, (win)=>{ gzAfter(win,'🔦 光束连通！'); });
+  else if (t==='boss') window.openBoss(w, (win)=>{ gzAfter(win,'🎯 故障砸掉了！'); });
+  else window.openMemoryMatch(w, (win)=>{ gzAfter(win,'🧠 翻牌完成'); });
 }
 
 export function refreshGameZone() {

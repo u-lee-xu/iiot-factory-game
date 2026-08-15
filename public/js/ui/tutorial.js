@@ -93,7 +93,7 @@ export function showShooterLoadout(cfg, onComplete) {
     window._shooterSkipLoadout=true;
     ov.remove();
     window.renderHeader();
-    openShooter(cfg, onComplete);
+    window.openShooter(cfg, onComplete);
   };
-  window.__lodSkip=function(){ window._shooterSkipLoadout=true; ov.remove(); openShooter(cfg, onComplete); };
+  window.__lodSkip=function(){ window._shooterSkipLoadout=true; ov.remove(); window.openShooter(cfg, onComplete); };
 }
