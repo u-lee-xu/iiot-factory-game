@@ -994,7 +994,7 @@ body:has(.mm-overlay) { overflow: hidden; }
 .task-undo:hover { color: var(--red); border-color: var(--red); }
 .task-half { color: var(--amber); cursor: default; margin-left: 4px; flex-shrink: 0; }
 /* ===== Quick Match (产线快打) ===== */
-.qk-box { width: min(680px, 94vw); }
+.qk-box { width: min(680px, 94vw); position: relative; }
 .qk-stats { display: flex; gap: 18px; font-size: 15px; color: var(--text); margin-bottom: 14px; }
 .qk-timerbar { height: 8px; background: #0d0d14; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; margin-bottom: 12px; }
 .mm-timerbar { height: 8px; background: #0d0d14; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; margin-bottom: 12px; }
@@ -1012,8 +1012,23 @@ body:has(.mm-overlay) { overflow: hidden; }
 .qk-q { font-size: 17px; color: var(--green); line-height: 1.6; }
 .qk-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .qk-btn { padding: 12px; background: #1a1a26; border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 16px; cursor: pointer; border-radius: 6px; transition: all .15s; }
-.qk-btn:hover { border-color: var(--cyan); color: var(--cyan); }
-.qk-btn.wrong { border-color: var(--red); color: var(--red); background: rgba(255,85,85,.1); }
+/* 快打：打击感 + 连击特效 + UI 美化 */
+.qk-btn { position: relative; padding: 13px 14px; background: linear-gradient(180deg,#20243a,#181c30); border: 1px solid #3a4a6a; color: var(--text); font-family: inherit; font-size: 16px; cursor: pointer; border-radius: 8px; transition: transform .12s, border-color .12s, box-shadow .12s; }
+.qk-btn::before { content: ""; position: absolute; left: 8px; right: 8px; top: 2px; height: 2px; background: rgba(255,255,255,.12); border-radius: 2px; }
+.qk-btn:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); box-shadow: 0 0 14px rgba(0,188,212,.25); }
+.qk-btn:active { transform: scale(.94); }
+.qk-btn.hit { border-color: var(--green); color: var(--green); background: rgba(0,230,118,.15); transform: scale(1.06); box-shadow: 0 0 22px rgba(0,230,118,.5); animation: qkHit .3s; }
+.qk-btn.wrong { border-color: var(--red); color: var(--red); background: rgba(255,85,85,.12); animation: qkShake .3s; }
+@keyframes qkHit { 0%{transform:scale(.85)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+@keyframes qkShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+/* 连击爆发：整卡+连击环+飘字 */
+.qk-burst { position:fixed; width:7px; height:7px; border-radius:50%; pointer-events:none; z-index:40; animation:qkBurst .55s ease-out forwards; }
+@keyframes qkBurst { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(calc(-50% + var(--mx)),calc(-50% + var(--my))) scale(.3);opacity:0} }
+.qk-combo-float { position:fixed; transform:translateX(-50%); color:#ffd700; font-weight:bold; font-size:22px; pointer-events:none; z-index:50; text-shadow:0 0 10px rgba(255,215,0,.8),0 2px 4px #000; animation:qkComboFloat .8s ease-out forwards; }
+@keyframes qkComboFloat { 0%{transform:translate(-50%,0) scale(.6);opacity:0} 20%{transform:translate(-50%,-8px) scale(1.2);opacity:1} 100%{transform:translate(-50%,-60px) scale(1);opacity:0} }
+.qk-msg { min-height: 30px; margin-top: 14px; font-size: 15px; text-align: center; font-weight: bold; }
+.qk-ok { color: var(--green); text-shadow: 0 0 8px rgba(0,230,118,.5); }
+.qk-err { color: var(--red); }
 .qk-msg { min-height: 24px; margin-top: 12px; font-size: 14px; text-align: center; }
 .qk-ok { color: var(--green); }
 .qk-err { color: var(--red); }
@@ -10369,6 +10384,28 @@ function openQuickMatch(cfg, onComplete) {
           overlay.querySelector('#qkCombo').textContent = combo;
           if (combo >= 2) playSound('combo', combo); else playSound('success');
           overlay.querySelector('#qkMsg').innerHTML = '<span class="qk-ok">✓ 正确！' + (q.cmd ? ' 示例：' + escHtml(q.cmd) : '') + '</span>';
+          // —— 打击感：按钮爆发 + 粒子 + 连击飘字 ——
+          try{
+            b.classList.add('hit');
+            const bb=b.getBoundingClientRect();
+            const bx=bb.left+bb.width/2, by=bb.top+bb.height/2;
+            // 粒子：fixed 定位到按钮中心（视口坐标）
+            for(let k=0;k<10;k++){
+              const sp=document.createElement('span');
+              sp.className='qk-burst';
+              sp.style.cssText='left:'+bx+'px;top:'+by+'px;--mx:'+((Math.random()*90-45))+'px;--my:'+((Math.random()*-70-10))+'px;background:'+['#00e676','#ffd700','#7ee8fa'][k%3];
+              document.body.appendChild(sp);
+              setTimeout(()=>{ try{sp.remove();}catch(e){} }, 550);
+            }
+            if(combo>=2){
+              const fl=document.createElement('div');
+              fl.className='qk-combo-float';
+              fl.textContent = '🔥 连击 x'+combo;
+              fl.style.cssText='left:'+bx+'px;top:'+(by-10)+'px';
+              document.body.appendChild(fl);
+              setTimeout(()=>{ try{fl.remove();}catch(e){} }, 800);
+            }
+          }catch(e2){}
           if (q.id) unlockPedia(currentLevelId, [q.id]);
           cur++;
           if (cur >= cfg.size) {
