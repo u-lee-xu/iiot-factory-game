@@ -82,6 +82,7 @@ import { gzMeta } from './ui/gamezone.js';
 import { gzName } from './ui/gamezone.js';
 import { renderGameZone } from './ui/gamezone.js';
 import { gzPlay } from './ui/gamezone.js';
+import { isUnlocked } from './ui/gamezone.js';
 import { refreshGameZone } from './ui/gamezone.js';
 import { gzAfter } from './ui/gamezone.js';
 import { buildGameZone } from './ui/gamezone.js';
@@ -938,6 +939,7 @@ Object.assign(window, {
   gzMeta,
   gzName,
   gzPlay,
+  isUnlocked,
   hideTransit,
   init,
   interactions,

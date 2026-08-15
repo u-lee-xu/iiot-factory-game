@@ -50,6 +50,16 @@ export function countUnlockedGameTypes() {
   } catch (e) { return 0; }
 }
 
+// 解锁判断：普通游戏需完成全部 blockTasks；幕级/综合复习游戏(_review/all_review)放宽到 80%
+export function isUnlocked(w){
+  const bt = w.blockTasks || [];
+  if (!Array.isArray(bt) || !bt.length) return false;
+  const done = bt.filter(tid => window.isTaskDone(tid)).length;
+  const review = /_review$/.test(w.id || '') || (w.id === 'all_review');
+  if (review) return done >= Math.ceil(bt.length * 0.8);
+  return done >= bt.length;
+}
+
 export function gzEmoji(w) {
   const t = w.type || 'memory';
   return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':t==='tyc'?'🏭':t==='lzr'?'🔦':t==='boss'?'🎯':'🃏';
@@ -162,7 +172,7 @@ export function renderGameZone(body) {
         return;
       }
       const w = it.w;
-      const unlocked = Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => window.isTaskDone(tid));
+      const unlocked = isUnlocked(w);
       const advTag = w.advanced ? ' · <span style="color:var(--cyan)">进阶</span>' : '';
       const tBadge = window.miniTierBadge(w.id);
       rows.push('<div class="gz-row' + (unlocked ? '' : ' locked') + (w.advanced ? ' pc-only' : '') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
@@ -200,11 +210,11 @@ export function gzPlay(idx) {
     return;
   }
   const w = it.w;
-  if (!(Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => window.isTaskDone(tid)))) {
+  if (!isUnlocked(w)) {
     window.showToast('先完成对应任务解锁这个小游戏', 'error'); return;
   }
-  // 幕级/综合词库：打乱顺序，让每次玩的词汇子集不同（游戏按 size 取前 N 对）
-  if (w.pairsFrom && (w.pairsFrom.act || w.pairsFrom.all) && Array.isArray(w.pairs)) {
+  // 词库型游戏：打乱词库顺序，让每次玩的词汇子集不同（游戏按 size 取前 N 对）
+  if (w.pairsFrom && Array.isArray(w.pairs) && w.pairs.length > 1) {
     for (let i=w.pairs.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const _t=w.pairs[i]; w.pairs[i]=w.pairs[j]; w.pairs[j]=_t; }
   }
   const t = w.type || 'memory';
