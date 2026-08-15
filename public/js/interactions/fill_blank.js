@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('fill_blank', {
   render(container, task) {
@@ -47,7 +48,11 @@ registerInteraction('fill_blank', {
       window.streak = 0;
         window.shakeScreen();
         playSound('error');
-        window.showToast('报警灯亮了！重新填写', 'error');
+        // 厂长解释：cfg.hint 优先，否则告知正确答案
+        var _ansIdx = (typeof cfg.answer === 'number') ? cfg.answer : cfg.options.indexOf(cfg.answer);
+        var _ansText = (_ansIdx >= 0 && cfg.options[_ansIdx]) ? cfg.options[_ansIdx] : '';
+        var _txt = cfg.hint || ('正确答案是「' + _ansText + '」，再试试？');
+        showWrongExplain(container, '厂长：' + _txt, null);
       }
     };
   }

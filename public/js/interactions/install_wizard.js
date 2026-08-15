@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('install_wizard', {
   render(container, task) {
@@ -153,7 +154,7 @@ registerInteraction('install_wizard', {
       window.streak = 0;
         correct = step.options[answer].correct;
       }
-      handleStepResult(correct);
+      handleStepResult(correct, step.inputType === 'number' ? null : answer);
     };
 
     function runTerminalSim(cmd) {
@@ -323,12 +324,13 @@ registerInteraction('install_wizard', {
         window.shakeScreen();
         playSound('error');
         var step = steps[current];
-        var hint = '机器不认这个输入——再试一次';
-        if (step.options) {
-          var correctOpt = step.options.find(function(o) { return o.correct; });
-          if (correctOpt && correctOpt.hint) hint = correctOpt.hint;
-        }
-        window.showToast(hint, 'error');
+        // 厂长针对所点选项解释（explain > 正确项 hint > 正确答案兜底）
+        var wrongOpt = (arguments.length >= 2 && arguments[1] != null && step.options) ? step.options[arguments[1]] : null;
+        var correctOpt = step.options ? step.options.find(function(o) { return o.correct; }) : null;
+        var _txt = (wrongOpt && wrongOpt.explain) ? wrongOpt.explain
+                 : (correctOpt && correctOpt.hint) ? correctOpt.hint
+                 : ('正确答案是「' + (correctOpt ? correctOpt.text : '') + '」，再试试？');
+        showWrongExplain(document.getElementById('wizardStage'), '厂长：' + _txt, null);
         if (step.options && !step.multiSelect) {
           document.querySelectorAll('#wizOpts .quiz-opt').forEach(function(el, i) {
             el.style.pointerEvents = 'none';
