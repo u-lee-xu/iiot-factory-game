@@ -254,7 +254,7 @@ export function showAchievementUnlock(ach, cb, source) {
       window.playAreaMusic(); overlay.remove(); window.achShowing = false;
       // 登录签到成就：提示一次后标记服务端已提示，确保换设备/清缓存也不再重复弹
       if (source === 'auto' && ach && ach.id) {
-        try { fetch(window.API + '/window.api/student/notify-login-ach', { method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer '+window.token}, body: JSON.stringify({ ids: [ach.id] }) }); } catch(e){}
+        try { fetch(window.API + '/api/student/notify-login-ach', { method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer '+window.token}, body: JSON.stringify({ ids: [ach.id] }) }); } catch(e){}
       }
       if (cb) cb();
     }, 300);

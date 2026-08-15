@@ -6,7 +6,7 @@ import { _fmtTime, escHtml } from '../core/utils.js';
 
 export async function refreshLeaderboard() {
   try {
-    const res = await window.api('/window.api/game/leaderboard');
+    const res = await window.api('/api/game/leaderboard');
     if (res && res.ok) window.leaderboardCache = res.data;
   } catch (e) { /* 网络失败静默，打开面板时重试 */ }
 }

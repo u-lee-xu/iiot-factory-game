@@ -6,7 +6,7 @@ import { escHtml } from '../core/utils.js';
 
 export function loadShop() {
   if (window.SHOP_CACHE) return Promise.resolve(window.SHOP_CACHE);
-  return window.api('/window.api/student/shop').then(r => { window.SHOP_CACHE = (r && r.ok) ? r.data : []; return window.SHOP_CACHE; }).catch(() => []);
+  return window.api('/api/student/shop').then(r => { window.SHOP_CACHE = (r && r.ok) ? r.data : []; return window.SHOP_CACHE; }).catch(() => []);
 }
 
 export function walletRank(xp) {
@@ -70,7 +70,7 @@ export function renderWallet() {
 }
 
 export function claimSalaryNow() {
-  window.api('/window.api/student/claim-salary', { method:'POST', body:'{}' }).then(function(r){
+  window.api('/api/student/claim-salary', { method:'POST', body:'{}' }).then(function(r){
     if (r && r.ok) {
       window.gameState.coins=r.data.coins;
       window.gameState.salaryInfo=Object.assign({}, window.gameState.salaryInfo, { monthTotal:r.data.monthTotal, rate:r.data.rate, claimedToday:true });
@@ -81,7 +81,7 @@ export function claimSalaryNow() {
 }
 
 export function buyItem(itemId) {
-  window.api('/window.api/student/buy', { method:'POST', body:JSON.stringify({itemId:itemId}) }).then(function(r){
+  window.api('/api/student/buy', { method:'POST', body:JSON.stringify({itemId:itemId}) }).then(function(r){
     if (r && r.ok) {
       window.gameState.coins=r.data.coins; window.gameState.inventory=r.data.inventory;
       window.showToast('🛒 购买成功！','success');

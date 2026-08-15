@@ -432,7 +432,11 @@ export function completeTask(taskId, xp) {
       if (lv && levelProgress(lv.id).completed) {
         showLevelComplete(lv, null);
       } else {
-        setTimeout(function(){ window.goMap(); }, 900);   // 留时间看 XP 反馈，再带过渡动画返回
+        // 点击领取后立即显示"正在返回"过渡，盖住弹窗关闭后露出的空白任务页壳子，
+        // 再延迟 goMap（XP toast 仍可见，且过渡期间不闪空白）
+        var _t = document.getElementById('transit');
+        if (_t) { var _e = document.getElementById('trText'); if (_e) _e.innerHTML = '正在返回 <b>房间</b>…'; _t.classList.add('show'); }
+        setTimeout(function(){ window.goMap(); }, 900);
       }
     }
   } catch (e) {

@@ -79,7 +79,7 @@ export function showShooterLoadout(cfg, onComplete) {
     opts.forEach(function(o,i){ const cb=document.getElementById('lod_'+i); if(cb && cb.checked) use.push(o); });
     const buff={lives:0,pLevel:0,slow:0};
     use.forEach(function(o){
-      window.api('/window.api/student/consume-item',{method:'POST',body:JSON.stringify({itemId:o.id})}).then(function(r){
+      window.api('/api/student/consume-item',{method:'POST',body:JSON.stringify({itemId:o.id})}).then(function(r){
         if (r && r.ok && window.gameState.inventory[o.id]) {
           window.gameState.inventory[o.id]--;
           if (window.gameState.inventory[o.id]<=0) delete window.gameState.inventory[o.id];

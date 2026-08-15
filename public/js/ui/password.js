@@ -29,7 +29,7 @@ export async function savePassword() {
   if (pw1 !== pw2) { err.textContent = '两次输入的新密码不一致'; return; }
   const btn = document.getElementById('pwSaveBtn');
   btn.disabled = true; btn.textContent = '保存中…';
-  const res = await window.api('/window.api/student/password', {
+  const res = await window.api('/api/student/password', {
     method: 'PUT',
     body: JSON.stringify({ oldPassword, newPassword: pw1 })
   });
