@@ -21,6 +21,20 @@ const SHOP_ITEMS = {
   enemy_lava:  { id: 'enemy_lava',  name: '岩浆橙',   emoji: '🌋', price: 600,  desc: '蜂群敌人岩浆橙（永久）', type: 'enemy_skin' },
   enemy_ice:   { id: 'enemy_ice',   name: '寒冰蓝',   emoji: '🧊', price: 600,  desc: '蜂群敌人寒冰蓝（永久）', type: 'enemy_skin' },
   enemy_void:  { id: 'enemy_void',  name: '紫雾',     emoji: '🟣', price: 600,  desc: '蜂群敌人紫雾（永久）', type: 'enemy_skin' },
+  snake_gold:  { id: 'snake_gold',  name: '黄金蛇',   emoji: '🐍', price: 600,  desc: '贪吃蛇黄金涂装（永久）', type: 'snake_skin' },
+  snake_ember: { id: 'snake_ember', name: '熔岩蛇',   emoji: '🌋', price: 600,  desc: '贪吃蛇熔岩橙涂装（永久）', type: 'snake_skin' },
+  snake_ice:   { id: 'snake_ice',   name: '冰晶蛇',   emoji: '❄️', price: 600,  desc: '贪吃蛇冰晶蓝涂装（永久）', type: 'snake_skin' },
+  snake_void:  { id: 'snake_void',  name: '紫晶蛇',   emoji: '💜', price: 800,  desc: '贪吃蛇紫晶涂装（永久）', type: 'snake_skin' },
+  snake_neon:  { id: 'snake_neon',  name: '霓虹蛇',   emoji: '🌈', price: 1200, desc: '贪吃蛇霓虹粉涂装（永久）', type: 'snake_skin' },
+  snake_coal:  { id: 'snake_coal',  name: '暗夜蛇',   emoji: '🌑', price: 600,  desc: '贪吃蛇暗夜黑涂装（永久）', type: 'snake_skin' },
+  snake_mint:  { id: 'snake_mint',  name: '薄荷蛇',   emoji: '🍃', price: 600,  desc: '贪吃蛇薄荷涂装（永久）', type: 'snake_skin' },
+  snake_sakura:{ id: 'snake_sakura',name: '樱花蛇',   emoji: '🌸', price: 600,  desc: '贪吃蛇樱花粉涂装（永久）', type: 'snake_skin' },
+  snake_bamboo:{ id: 'snake_bamboo',name: '竹节蛇',   emoji: '🎋', price: 600,  desc: '一节节竹节身（永久）', type: 'snake_skin' },
+  snake_bamboo_tea:{ id: 'snake_bamboo_tea', name: '竹节茶', emoji: '🍵', price: 800, desc: '竹节身·茶色（永久）', type: 'snake_skin' },
+  snake_bamboo_purple:{ id: 'snake_bamboo_purple', name: '竹节紫', emoji: '💜', price: 800, desc: '竹节身·紫色（永久）', type: 'snake_skin' },
+  snake_comet: { id: 'snake_comet', name: '彗星蛇',   emoji: '☄️', price: 800,  desc: '发光彗星拖尾（永久）', type: 'snake_skin' },
+  snake_comet_pink:{ id: 'snake_comet_pink', name: '彗星粉', emoji: '🌌', price: 1000, desc: '彗星拖尾·粉色（永久）', type: 'snake_skin' },
+  snake_comet_green:{ id: 'snake_comet_green', name: '彗星绿', emoji: '☄️', price: 1000, desc: '彗星拖尾·绿色（永久）', type: 'snake_skin' },
   title_badge: { id: 'title_badge', name: '专属称号', emoji: '🏅', price: 1000, desc: '排行榜显示「厂级先锋」头衔（永久）', type: 'title' }
 };
 function shopCatalog() { return Object.values(SHOP_ITEMS); }

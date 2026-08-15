@@ -391,6 +391,27 @@ const ENEMY_SKIN_COLORS = {
   enemy_ice:    { name:'寒冰蓝', col:'#4fc3f7' },
   enemy_void:   { name:'紫雾', col:'#ab6cff' }
 };
+// 蛇皮肤：style 决定画风（smooth=朴素等粗线 / bamboo=竹节 / comet=彗星拖尾），col/dark/glow 为配色
+const SNAKE_SKINS = {
+  // —— smooth：一根等粗线，蛇头深色 ——
+  default:       { name:'网线青绿', col:'#8cff5e', dark:'#1fa84f', belly:'#b9f6a5', glow:'#00e676', style:'smooth' },
+  snake_gold:    { name:'黄金',     col:'#ffd54f', dark:'#c58a00', belly:'#ffe9b0', glow:'#ffb300', style:'smooth' },
+  snake_ember:   { name:'熔岩橙',   col:'#ff8a50', dark:'#c23500', belly:'#ffd2b3', glow:'#ff5722', style:'smooth' },
+  snake_ice:     { name:'冰晶蓝',   col:'#6ed7ff', dark:'#1f8fc2', belly:'#c8f0ff', glow:'#40c4ff', style:'smooth' },
+  snake_void:    { name:'紫晶',     col:'#c79bff', dark:'#7c3fd0', belly:'#e6d4ff', glow:'#b388ff', style:'smooth' },
+  snake_neon:    { name:'霓虹粉',   col:'#ff7ad9', dark:'#c2185b', belly:'#ffd9f0', glow:'#ff6ec7', style:'smooth' },
+  snake_coal:    { name:'暗夜黑',   col:'#9ea7b3', dark:'#3d454f', belly:'#d0d6de', glow:'#58d0ff', style:'smooth' },
+  snake_mint:    { name:'薄荷',     col:'#7df5c1', dark:'#1fa36a', belly:'#d0ffea', glow:'#2ce0a4', style:'smooth' },
+  snake_sakura:  { name:'樱花',     col:'#ffa8c8', dark:'#d24b78', belly:'#ffe3ee', glow:'#ff8fb3', style:'smooth' },
+  // —— bamboo：一节节圆球竹节 ——
+  snake_bamboo:      { name:'竹节青',   col:'#7ccd4f', dark:'#3e7a2a', belly:'#d4e8b8', glow:'#9cef66', style:'bamboo' },
+  snake_bamboo_tea:  { name:'竹节茶',   col:'#c8b06a', dark:'#7a6230', belly:'#e8dcc0', glow:'#e2cf8a', style:'bamboo' },
+  snake_bamboo_purple:{ name:'竹节紫',  col:'#b08fe0', dark:'#6a46a8', belly:'#e2d4f5', glow:'#cdb4ff', style:'bamboo' },
+  // —— comet：发光彗星拖尾 ——
+  snake_comet:   { name:'彗星蓝',   col:'#7be3ff', dark:'#1f7ea8', belly:'#d0f3ff', glow:'#66e0ff', style:'comet' },
+  snake_comet_pink:{ name:'彗星粉', col:'#ff9fe0', dark:'#b04a8f', belly:'#ffe0f3', glow:'#ff8fd8', style:'comet' },
+  snake_comet_green:{ name:'彗星绿',col:'#8ff7a0', dark:'#2e9c4c', belly:'#d9ffdf', glow:'#5df28a', style:'comet' }
+};
 
 // Director mini-avatar mood sync
 let directorMood = 'neutral';
@@ -855,6 +876,7 @@ Object.assign(window, {
   PASSWORD_ENABLED,
   PLANE_SKINS,
   RANKS,
+  SNAKE_SKINS,
   TY_HINTS,
   _fmtTime,
   achievementContext,

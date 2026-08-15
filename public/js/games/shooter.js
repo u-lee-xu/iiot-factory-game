@@ -64,7 +64,7 @@ export function openShooter(cfg, onComplete) {
         <span>🔥 <b id="shCombo" style="color:#ff7a00"></b></span>
       </div>
       <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 20%, #101a2e, #06070d);cursor:crosshair;touch-action:none"><canvas id="shCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
-      <div class="sh-tip">${advanced ? '↑/↓ 切换炮口名词，匹配到敌人名词才打得动 · ←/→ 移动 · 自动开火' : '看飞机上的解释 → 打对应名词（非配对自动穿透） · ←/→移动 自动开火'}</div>
+      <div class="sh-tip">${advanced ? 'PC:↑/↓ 切炮口 ←/→移动 手机:左右拖移动·上下滑切炮口 自动开火' : '看飞机上的解释 → 打对应名词（非配对自动穿透） · ←/→移动/拖动 自动开火'}</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick = () => closeGame(false);
@@ -307,10 +307,34 @@ export function openShooter(cfg, onComplete) {
   }
   function ku(e){ if (e.key==='ArrowLeft'||e.key==='a') keys.left=false; else if (e.key==='ArrowRight'||e.key==='d') keys.right=false; }
   let dragging = false;
-  cv.addEventListener('pointerdown', e => { dragging = true; e.preventDefault(); });
-  cv.addEventListener('pointermove', e => { if (dragging) { const r=cv.getBoundingClientRect(); player.x = Math.max(20, Math.min(W-20, (e.clientX-r.left)/sfx)); } });
-  cv.addEventListener('pointerup', () => { dragging = false; });
-  cv.addEventListener('pointercancel', () => { dragging = false; });
+  // 触摸手势（进阶模式同样适用）：
+  //  水平拖动 = 移动飞机（躲子弹），垂直滑动 = 切换炮口（up=下一个 / down=上一个）
+  //  首次位移超阈值锁定手势方向，防止斜滑误触
+  let gesture = null, gX = 0, gY = 0, gAcc = 0;
+  cv.addEventListener('pointerdown', e => { dragging = true; gesture = null; gX = e.clientX; gY = e.clientY; gAcc = 0; e.preventDefault(); });
+  cv.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const r = cv.getBoundingClientRect();
+    const dx = e.clientX - gX, dy = e.clientY - gY;
+    if (!gesture) {
+      if (Math.abs(dx) < 14 && Math.abs(dy) < 14) return;
+      gesture = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';   // 锁定水平/垂直
+    }
+    if (gesture === 'h') {
+      player.x = Math.max(20, Math.min(W-20, (e.clientX - r.left) / sfx));
+      gX = e.clientX; gY = e.clientY;
+    } else {
+      // 垂直：累计位移超阈值切换一次炮口（防抖），可连续滑连续切
+      gAcc += dy;
+      if (Math.abs(gAcc) >= 34) {
+        if (advanced) cycleTerm(gAcc > 0 ? 1 : -1);
+        gAcc = 0; gX = e.clientX; gY = e.clientY;
+      }
+    }
+    e.preventDefault();
+  });
+  cv.addEventListener('pointerup', () => { dragging = false; gesture = null; });
+  cv.addEventListener('pointercancel', () => { dragging = false; gesture = null; });
 
   function update(dt) {
     if (ended) return;
@@ -398,7 +422,7 @@ export function openShooter(cfg, onComplete) {
     }
   }
 
-  function draw() {
+  function draw(dt) {
     ctx.clearRect(0,0,W,H);
     const sf = Math.max(0.6, cw / W);   // 显示缩放（手机端字也跟着变大）
     // 背景网格
@@ -597,7 +621,8 @@ export function openShooter(cfg, onComplete) {
     if (ended) return;
     const dt = Math.min(0.05, (now - last)/1000);
     last = now;
-    update(dt); draw();
+    try { update(dt); draw(dt); }
+    catch(e){ console.error('[数据蜂群] 循环异常：', e); }
     raf = requestAnimationFrame(loop);
   }
   let raf;

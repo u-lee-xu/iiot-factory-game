@@ -65,6 +65,11 @@ export function renderWallet() {
       var sk=window.ENEMY_SKIN_COLORS[id], owned=(id==='default')||(inv[id]>0), eq=getEquippedSkin('enemy')===id;
       html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji" style="background:'+sk.col+';width:18px;height:18px;border-radius:4px;display:inline-block"></span><span class="gz-name">'+sk.name+'</span><span class="gz-meta">'+(eq?'已装备':(owned?'已拥有':'未拥有'))+'</span><span>'+(owned&&!eq?'<button class="mm-btn" data-type="enemy" data-id="'+id+'" onclick="equipSkin(this.dataset.type,this.dataset.id)">装备</button>':'')+'</span></div>';
     });
+    html+='<div class="gz-row" style="cursor:default;background:none"><span class="gz-name" style="font-size:13px;color:var(--cyan)">🐍 蛇皮肤</span></div>';
+    Object.keys(window.SNAKE_SKINS||{}).forEach(function(id){
+      var sk=window.SNAKE_SKINS[id], owned=(id==='default')||(inv[id]>0), eq=getEquippedSkin('snake')===id;
+      html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji" style="background:'+sk.col+';width:18px;height:18px;border-radius:4px;display:inline-block"></span><span class="gz-name">🐍 '+sk.name+'</span><span class="gz-meta">'+(eq?'已装备':(owned?'已拥有':'未拥有'))+'</span><span>'+(owned&&!eq?'<button class="mm-btn" data-type="snake" data-id="'+id+'" onclick="equipSkin(this.dataset.type,this.dataset.id)">装备</button>':'')+'</span></div>';
+    });
     body.innerHTML=html;
   });
 }
@@ -98,7 +103,9 @@ export function equipSkin(type, id){
   var inv=window.gameState.inventory||{};
   if (id!=='default' && !(inv[id]>0)) { window.showToast('还没有这个皮肤，先去商城买', 'error'); return; }
   try{ localStorage.setItem('skin_'+type, id); }catch(e){}
-  var nm = type==='plane' ? ((window.PLANE_SKINS[id]||{}).name) : ((window.ENEMY_SKIN_COLORS[id]||{}).name);
+  var nm = type==='plane' ? ((window.PLANE_SKINS[id]||{}).name)
+            : type==='snake' ? ((window.SNAKE_SKINS[id]||{}).name)
+            : ((window.ENEMY_SKIN_COLORS[id]||{}).name);
   window.showToast('🎨 已装备：'+(nm||id), 'success');
   renderWallet();
 }

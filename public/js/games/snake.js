@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// games/snake — 拆自 app.js（openSnake）
+// games/snake — 网线贪吃蛇（滚轴大世界 + 平滑移动 + 皮肤 + 配对规则）
 // 依赖 core/utils、core/sound；其余公共函数经 window（app.js 挂载）
 // ═══════════════════════════════════════════════════════════════════
 import { escHtml } from '../core/utils.js';
@@ -9,12 +9,19 @@ export function openSnake(cfg, onComplete) {
   // ================= 难度与配置 =================
   window.applyMiniTier(cfg);
   if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
+  const WIN = cfg.win || 6;   // 提前定义，教程文案也要用
   if (!window.tutSeen('snake')) {
     window.showGameTutorial('snake', '🐍 网线贪吃蛇', [
-      '用 <b>←/→/↑/↓</b>（手机<b>滑动</b>）控制蛇，撞墙/撞自己 -1 命',
-      '<b>吃蓝色术语</b>（如「网关」）带着它，头顶会显示当前带的词',
-      '再吃<b>黄色解释</b>——<b>匹配</b>当前术语就配对成功 +25 连击；吃错解释会清掉带的词',
-      '配对 <b>6 对</b> 通关；每 3 对厂长会出题，答对给奖励'
+      '用 <b>←/→/↑/↓</b>（手机<b>滑动</b>）控制蛇，撞墙/撞自己/撞边界 -1 命',
+      '地图上会有<b>墙体</b>（砖块）挡路，配对越多墙越多——绕开它们',
+      '<b>蓝色术语</b>（如「网关」）<b>可以随便吃</b>——吃下就「带着」它，头顶显示当前带的词',
+      '<b>黄色解释要配对才能吃</b>：带着匹配的蓝色术语，再去吃对应的黄色解释 → 配对成功 +连击',
+      '没带词吃黄色=吃不到（提示先吃蓝）；吃错解释会清空带的词',
+      '<b>一开始场上只有 1 对</b>（1 蓝 + 1 黄）——先找蓝吃，再去吃它对应的黄',
+      '配对越多难度越高：场上蓝黄对数变多，还会出现<b>多余的黄色干扰</b>，看准对应关系再吃',
+      '世界很大，镜头会跟着蛇走；节奏也随配对加快',
+      '<b>右上角小地图</b>看全局；配对 <b>'+WIN+' 对</b> 通关',
+      '每 3 对厂长会出题，答对给奖励'
     ], function(){ openSnake(cfg, onComplete); });
     return;
   }
@@ -25,18 +32,67 @@ export function openSnake(cfg, onComplete) {
   const terms = pairs.map(p=>p.t), hints = pairs.map(p=>p.h);
   const hintOf = {}, idOf = {};
   pairs.forEach(p=>{ hintOf[p.t]=p.h; idOf[p.t]=p.id; });
-  const WIN = cfg.win || 6;
 
-  // ---- 画布 / 网格（文字整体放大）----
-  const W = 840, H = 560, cell = 30, COLS = Math.floor(W/cell), ROWS = Math.floor(H/cell);
-  const F_FOOD = 15, F_FLOAT = 19;      // 屏上字号(px)：旧版 8/13 过小，明显放大
+  // ===== 皮肤（钱包装备的蛇皮肤）=====
+  const skid = (window.getEquippedSkin ? window.getEquippedSkin('snake') : 'default') || 'default';
+  const SK = (window.SNAKE_SKINS && window.SNAKE_SKINS[skid]) || (window.SNAKE_SKINS && window.SNAKE_SKINS.default) || { name:'网线青绿', col:'#8cff5e', dark:'#1fa84f', belly:'#b9f6a5', glow:'#00e676', eye:'#ffffff' };
 
-  // ---- 游戏状态 ----
+  // ================= 世界 / 视口（滚轴大世界）=================
+  const cell = 30;
+  const VIEW_COLS = 28, VIEW_ROWS = 18;
+  const W = VIEW_COLS*cell, H = VIEW_ROWS*cell;      // 画布 840×540
+  let worldW = 52, worldH = 36;                       // 世界：初期小，配对越多逐步扩大
+  function worldSizeFor(paired){
+    // 地图从小到大：配对越多，世界越大（配合蛇的行进/难度）
+    if(paired>=6) return {w:140, h:88};
+    if(paired>=4) return {w:108, h:70};
+    if(paired>=2) return {w:80, h:52};
+    return {w:52, h:36};
+  }
+  function expandWorld(){
+    const s=worldSizeFor(paired);
+    if(s.w!==worldW || s.h!==worldH){
+      worldW=s.w; worldH=s.h;
+      float(grid[0][0], grid[0][1], '🌍 地图扩大了！', '#7ee8fa');
+    }
+    spawnWalls();   // 墙随配对逐渐变多，地形有变化
+  }
+  // 墙体：避开蛇头附近与食物，生成 1~3 格小墙段；配对越多墙越多
+  function spawnWalls(){
+    const want = paired>=1 ? Math.min(2 + paired*2, 16) : 0;   // 后期墙多（上限16），初期少/无
+    let guard=0;
+    while(walls.length < want && guard++ < 60){
+      const hx=grid[0][0], hy=grid[0][1];
+      const wx=1 + Math.floor(Math.random()*(worldW-2));
+      const wy=1 + Math.floor(Math.random()*(worldH-2));
+      if(Math.abs(wx-hx)<7 && Math.abs(wy-hy)<7) continue;      // 蛇头周围留空
+      const len=1+Math.floor(Math.random()*3);
+      const horiz=Math.random()<0.5;
+      let ok=true; const seg=[];
+      for(let k=0;k<len;k++){
+        const cx=wx+(horiz?k:0), cy=wy+(horiz?0:k);
+        if(cx<1||cx>=worldW-1||cy<1||cy>=worldH-1){ ok=false; break; }
+        if(isOnSnake(cx,cy) || foods.some(f=>f.x===cx&&f.y===cy) || walls.some(w=>w.x===cx&&w.y===cy)){ ok=false; break; }
+        seg.push({x:cx,y:cy});
+      }
+      if(ok) seg.forEach(w=>walls.push(w));
+    }
+  }
+  const F_FOOD = 15, F_FLOAT = 19;
+
+  // ================= 游戏状态 =================
   let lives = 3, score = 0, combo = 0, paired = 0, ended = false, quizLock = false;
+  let dt = 0;   // 帧间隔（模块级，step 也要用）
   let currentTerm = '';
-  let snake = [{x:6,y:6},{x:5,y:6},{x:4,y:6}], dir = {x:1,y:0}, nextDir = {x:1,y:0};
-  let speed = 4, timer = 0, invuln = 0, spawnTimer = 0;
-  let foods = [], particles = [], floats = [];
+  // 蛇：grid 为整数格序列（头在[0]）；headPos 为蛇头平滑浮点位置（格），蛇身沿路径回溯——保证移动连续无回跳
+  const cx0 = Math.floor(worldW/2), cy0 = Math.floor(worldH/2);
+  let grid = [[cx0,cy0],[cx0-1,cy0],[cx0-2,cy0]];
+  let headPos = {x:cx0, y:cy0};
+  let frac = 0;   // 本格推进进度 0~1
+  let dir = {x:1,y:0}, nextDir = {x:1,y:0};
+  let speed = 3.0, timer = 0, invuln = 0, spawnTimer = 0;   // speed: 格/秒（横纵一致）
+  let foods = [], particles = [], floats = [], walls = [];
+  let camX = 0, camY = 0;
 
   // ================= 界面 =================
   const overlay = document.createElement('div');
@@ -53,7 +109,7 @@ export function openSnake(cfg, onComplete) {
         <span>🔥 <b id="snCombo" style="color:#ff7a00"></b></span>
       </div>
       <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#050a12;touch-action:none"><canvas id="snCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
-      <div class="sh-tip">吃蓝色术语带着它 → 吃黄色解释配对 · 每3对厂长出题</div>
+      <div class="sh-tip">蓝色随便吃 · 黄色配对才吃 · 镜头跟随 · 小地图看全局</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick = () => closeGame(false);
@@ -71,58 +127,86 @@ export function openSnake(cfg, onComplete) {
     else if(e.key==='Escape') closeGame(false);
   }
   document.addEventListener('keydown', kd);
-  let swipeStart=null;
-  cv.addEventListener('pointerdown', e=>{ if(quizLock) return; swipeStart={x:e.clientX,y:e.clientY}; });
-  cv.addEventListener('pointerup', e=>{ if(!swipeStart) return; const dx=e.clientX-swipeStart.x, dy=e.clientY-swipeStart.y; if(Math.abs(dx)>Math.abs(dy)) nextDir={x:Math.sign(dx),y:0}; else if(dy!==0) nextDir={x:0,y:Math.sign(dy)}; swipeStart=null; });
+  // 触摸/鼠标滑动：pointermove 实时转向（不必等抬手），阈值触发，可连续滑动连续转向
+  let swipeStart=null, swipeActive=false;
+  cv.addEventListener('pointerdown', e=>{ if(quizLock) return; swipeActive=true; swipeStart={x:e.clientX,y:e.clientY}; });
+  cv.addEventListener('pointermove', e=>{
+    if(!swipeActive || !swipeStart || quizLock) return;
+    const dx=e.clientX-swipeStart.x, dy=e.clientY-swipeStart.y;
+    const T=24;   // 转向阈值(px)，超过即转
+    if(Math.abs(dx)<T && Math.abs(dy)<T) return;
+    if(Math.abs(dx)>Math.abs(dy)) nextDir={x:Math.sign(dx),y:0};
+    else nextDir={x:0,y:Math.sign(dy)};
+    swipeStart={x:e.clientX,y:e.clientY};   // 允许连续滑动连续转向
+    e.preventDefault();
+  });
+  cv.addEventListener('pointerup', e=>{ swipeActive=false; swipeStart=null; });
+  cv.addEventListener('pointercancel', e=>{ swipeActive=false; swipeStart=null; });
 
-  // ================= 食物 =================
-  function isOnSnake(x,y){ return snake.some(s=>s.x===x&&s.y===y); }
-  function spawnFood(kind){
-    // 找一个空位（避开蛇身和已有食物），最多试 60 次
-    // 避开边缘 2 格：食物上方的文字不会被顶部/两侧裁掉
-    const X_MIN=2, X_MAX=COLS-3, Y_MIN=1, Y_MAX=ROWS-2;
+  // ================= 食物（对数驱动：引导"先吃蓝、再找对应黄配对"）=================
+  // 目标对数：初期 1 对（1 蓝 + 1 对应黄）→ 配对越多场上对数越多（最多 4 对）
+  function targetPairs(){ return Math.min(1 + Math.floor(paired/3), 4); }   // 每 3 对 +1，放缓增量
+  function isOnSnake(x,y){ return grid.some(g=>g[0]===x&&g[1]===y); }
+  function pickSpot(){
+    // 蛇头附近找空位（避开蛇身、已有食物、文字重叠），最多 90 次
+    const h={x:grid[0][0], y:grid[0][1]};
     let x,y,tries=0;
-    do { x=X_MIN+Math.floor(Math.random()*(X_MAX-X_MIN+1)); y=Y_MIN+Math.floor(Math.random()*(Y_MAX-Y_MIN+1)); tries++; }
-    // 避开蛇身、已有食物、以及与已有食物文字重叠（x/y 至少隔 2 格，文字在上方不打架）
-    while((isOnSnake(x,y) || foods.some(f=>f.x===x&&f.y===y) || foods.some(f=>Math.abs(f.x-x)<2&&Math.abs(f.y-y)<2)) && tries<90);
-    // 场上不要出现两个一样的词/解释，避免配对歧义
-    const busy = {}; foods.forEach(f=>{ busy[f.label]=true; });
-    if(kind==='term'){
-      const pool = terms.filter(t=>!busy[t]);
-      const t = pool.length ? pool[Math.floor(Math.random()*pool.length)] : terms[Math.floor(Math.random()*terms.length)];
-      foods.push({x,y,kind:'term',label:t});
-    } else {
-      // 优先放"场上已有术语对应的解释"，保证蓝黄能配对
-      const fieldTerm = foods.find(f=>f.kind==='term');
-      let h = null;
-      if(fieldTerm && !busy[hintOf[fieldTerm.label]]) h = hintOf[fieldTerm.label];
-      if(!h){
-        // 否则从场上所有术语的解释里选一个还没在场的
-        const fieldHints = foods.filter(f=>f.kind==='term').map(f=>hintOf[f.label]).filter(hh=>!busy[hh]);
-        if(fieldHints.length) h = fieldHints[Math.floor(Math.random()*fieldHints.length)];
-      }
-      if(!h){ const pool = hints.filter(hh=>!busy[hh]); h = pool.length ? pool[Math.floor(Math.random()*pool.length)] : hints[Math.floor(Math.random()*hints.length)]; }
-      foods.push({x,y,kind:'hint',label:h});
-    }
+    do {
+      x = Math.max(1, Math.min(worldW-2, h.x + Math.floor((Math.random()*2-1)*22)));
+      y = Math.max(1, Math.min(worldH-2, h.y + Math.floor((Math.random()*2-1)*14)));
+      tries++;
+    } while((isOnSnake(x,y) || foods.some(f=>f.x===x&&f.y===y) || foods.some(f=>Math.abs(f.x-x)<2&&Math.abs(f.y-y)<2)) && tries<90);
+    return {x:x, y:y};
+  }
+  function spawnHint(label){
+    const p=pickSpot(); foods.push({x:p.x, y:p.y, kind:'hint', label:label});
+  }
+  // 放一对（蓝 + 对应黄），优先选场上/玩家身上都没有的新术语
+  function spawnPair(){
+    const busy={}; foods.forEach(f=>{ busy[f.label]=true; });
+    if(currentTerm) busy[currentTerm]=true;
+    const pool=terms.filter(t=>!busy[t]);
+    const t=pool.length ? pool[Math.floor(Math.random()*pool.length)] : terms[Math.floor(Math.random()*terms.length)];
+    const p1=pickSpot(), p2=pickSpot();
+    foods.push({x:p1.x, y:p1.y, kind:'term', label:t});
+    foods.push({x:p2.x, y:p2.y, kind:'hint', label:hintOf[t]});
+  }
+  // 干扰黄：难度提升后场上黄色变多（不对应任何场上蓝的陷阱，黄色多于蓝色）
+  function distractorCount(){ return Math.min(Math.floor(paired/3), 3); }
+  function spawnDistractorHint(){
+    // 只从"可用且不对应任何场上蓝"的黄色里选；没货返回 false（干扰黄数量自适应词库大小）
+    const busy={}; foods.forEach(f=>{ busy[f.label]=true; });
+    const termLabels = foods.filter(f=>f.kind==='term').map(f=>f.label);
+    const protectedHints = {}; termLabels.forEach(t=>{ protectedHints[hintOf[t]]=true; });
+    const pool = hints.filter(h=>!busy[h] && !protectedHints[h]);
+    if(!pool.length) return false;
+    const h = pool[Math.floor(Math.random()*pool.length)];
+    const p=pickSpot(); foods.push({x:p.x, y:p.y, kind:'hint', label:h});
+    return true;
   }
   function ensureFoods(){
-    if(!foods.some(f=>f.kind==='term')) spawnFood('term');
-    if(!foods.some(f=>f.kind==='hint')) spawnFood('hint');
-    // 若玩家正带着词，确保场上出现它对应的解释（能完成配对）
-    if(currentTerm && !foods.some(f=>f.kind==='hint' && f.label===hintOf[currentTerm])){
-      const busy={}; foods.forEach(f=>{busy[f.label]=true;});
-      if(!busy[hintOf[currentTerm]]) spawnFood('hint');
+    // 1) 玩家带词时，确保场上出现它对应的黄（配对可达，引导去找"合适的黄"）
+    if(currentTerm){
+      const th=hintOf[currentTerm];
+      if(!foods.some(f=>f.kind==='hint' && f.label===th)) spawnHint(th);
     }
-    while(foods.length<5){
-      // 补位时也优先凑可配对的一对（蓝+对应黄）
-      const ft=foods.find(f=>f.kind==='term');
-      const hasMatch = ft && foods.some(f=>f.kind==='hint'&&f.label===hintOf[ft.label]);
-      if(ft && !hasMatch) spawnFood('hint');
-      else spawnFood(Math.random()<0.5?'term':'hint');
+    // 2) 场上蓝数不足目标对数 → 补新对（吃蓝后"再给一个蓝"，配对后"再补一对"）
+    while(foods.filter(f=>f.kind==='term').length < targetPairs()){
+      spawnPair();
+    }
+    // 3) 每个场上的蓝都要有对应黄在场（不出现"孤儿蓝"，保证可配对通关）
+    foods.filter(f=>f.kind==='term').forEach(function(ft){
+      if(!foods.some(g=>g.kind==='hint' && g.label===hintOf[ft.label])) spawnHint(hintOf[ft.label]);
+    });
+    // 4) 干扰黄：难度提升后黄色明显多于蓝色（吃错会清词，需要分辨）；词库不足则少放
+    const wantHints = targetPairs() + distractorCount();
+    for(let i=0; i<wantHints; i++){
+      const have = foods.filter(f=>f.kind==='hint').length;
+      if(have >= wantHints) break;
+      if(!spawnDistractorHint()) break;
     }
   }
   function addParticles(x,y,c){ for(let i=0;i<14;i++)particles.push({x:x*cell+cell/2,y:y*cell+cell/2,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220,t:0,color:c}); }
-  // 飘字：注意参数是 txt，对象里写 txt:txt（旧版误写 txt:t → 吃食物即 ReferenceError 死机）
   function float(x,y,txt,c){ floats.push({x:x*cell+cell/2,y:y*cell+cell/2,txt:txt,color:c,t:0}); }
 
   // ================= 厂长问答（每 3 对）=================
@@ -144,165 +228,317 @@ export function openSnake(cfg, onComplete) {
       b.textContent=h;
       b.onclick=function(){
         ov.remove(); quizLock=false;
-        if(h===q.h){ lives=Math.min(6,lives+1); livesEl.textContent=lives; score+=30; scoreEl.textContent=score; playSound('fanfare'); float(snake[0].x,snake[0].y,'✅ 答对 +1命/+30！','#00e676'); }
-        else { playSound('click'); float(snake[0].x,snake[0].y,'厂长：再想想，是「'+hintOf[q.t]+'」','#ffd27d'); }
+        if(h===q.h){ lives=Math.min(6,lives+1); livesEl.textContent=lives; score+=30; scoreEl.textContent=score; playSound('fanfare'); float(grid[0][0],grid[0][1],'✅ 答对 +1命/+30！','#00e676'); }
+        else { playSound('click'); float(grid[0][0],grid[0][1],'厂长：再想想，是「'+hintOf[q.t]+'」','#ffd27d'); }
       };
       box.appendChild(b);
     });
   }
 
-  // ================= 吃食物 / 配对 =================
+  // ================= 吃食物 / 配对（规则明确：蓝随便吃 · 黄配对才吃）=================
   function eat(f){
     if(f.kind==='term'){
-      // 吃蓝色术语：带着它（若已带别的词则换带）
+      // 蓝色术语：随便吃，带着它（若已带别的词则换带）
+      f.hit=true;
       const prev = currentTerm;
       currentTerm=f.label; termEl.textContent=f.label; termEl.style.color='#7ee8fa';
       score+=5; scoreEl.textContent=score; playSound('click');
-      float(f.x,f.y, prev ? '换带「'+f.label+'」' : '带着「'+f.label+'」，去找解释', '#7ee8fa');
+      float(f.x,f.y, prev ? '换带「'+f.label+'」' : '带着「'+f.label+'」，去找黄色解释', '#7ee8fa');
     } else if(currentTerm && hintOf[currentTerm]===f.label){
-      // 配对成功
+      // 黄色解释：与带的词匹配 → 配对成功
+      f.hit=true;
       combo++; score += 25 + (combo>=5?10:combo>=3?5:0); paired++;
       scoreEl.textContent=score; comboEl.textContent=combo>=2?'x'+combo:''; pairEl.textContent=paired;
       addParticles(f.x,f.y,'#00e676'); float(f.x,f.y,'✅ '+currentTerm+'='+hintOf[currentTerm],'#00e676');
       playSound('success');
       if(idOf[currentTerm]) window.unlockPedia(window.currentLevelId, [idOf[currentTerm]]);   // 收录图鉴
       currentTerm=''; termEl.textContent='—'; termEl.style.color='#7ee8fa';
+      expandWorld();   // 地图随配对逐渐扩大
       if(paired>=WIN){ endGame(true); return; }
-      if(paired%3===0) setTimeout(askFactoryQuiz, 350);   // 特效播完再出题，避免打断
+      if(paired%3===0) setTimeout(askFactoryQuiz, 350);
     } else if(currentTerm){
-      // 吃错解释：清掉带的词
+      // 黄色解释：与带的词不匹配 → 配对失败，清空带的词（明确反馈）
+      f.hit=true;
       score+=2; scoreEl.textContent=score; combo=0; if(comboEl)comboEl.textContent='';
-      float(f.x,f.y,'❌ 不是「'+currentTerm+'」的解释','#ff5252'); playSound('error');
+      float(f.x,f.y,'❌ 不是「'+currentTerm+'」的解释，带的词清了','#ff5252'); playSound('error');
       currentTerm=''; termEl.textContent='—';
     } else {
-      score+=2; scoreEl.textContent=score; float(f.x,f.y,'先吃蓝色术语，再吃解释','#ffd27d');
+      // 没带词吃黄色：不消耗食物，只提示
+      float(f.x,f.y,'先吃蓝色术语，再吃解释','#ffd27d'); playSound('click');
+      return;   // 注意：这里不标记 hit，食物保留
     }
   }
 
-  // ================= 移动 / 碰撞 =================
+  // ================= 移动 / 碰撞（滚轴世界）=================
   function loseLife(){
-    playSound('error'); invuln=1.5; lives--; livesEl.textContent=lives; addParticles(snake[0].x,snake[0].y,'#ff5252');
+    playSound('error'); invuln=1.5; lives--; livesEl.textContent=lives; addParticles(grid[0][0],grid[0][1],'#ff5252');
     if(lives<=0){ endGame(false); return; }
-    snake=snake.slice(0,3); currentTerm=''; termEl.textContent='—';
+    // 蛇身重置为 3 节，带词清空
+    const h=grid[0];
+    grid = [[h[0],h[1]],[h[0]-1,h[1]],[h[0]-2,h[1]]];
+    headPos={x:h[0], y:h[1]}; frac=0;
+    currentTerm=''; termEl.textContent='—';
   }
   function step(){
-    const head={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
-    if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){ loseLife(); return; }
-    if(snake.some(s=>s.x===head.x&&s.y===head.y)){ loseLife(); return; }
-    snake.unshift(head);
+    // 转向只在本格走完（step）时生效，保证蛇头插值沿固定方向、移动连续
+    if(!(nextDir.x===-dir.x && nextDir.y===-dir.y)) dir={x:nextDir.x, y:nextDir.y};
+    const head=grid[0];
+    const nx=head[0]+dir.x, ny=head[1]+dir.y;
+    if(nx<0||nx>=worldW||ny<0||ny>=worldH){ loseLife(); return; }
+    if(grid.some(g=>g[0]===nx&&g[1]===ny)){ loseLife(); return; }
+    if(walls.some(w=>w.x===nx&&w.y===ny)){ loseLife(); return; }   // 撞墙掉命
+    grid.unshift([nx,ny]);
     let ate=null;
-    for(let i=0;i<foods.length;i++){ const f=foods[i]; if(!f.hit && f.x===head.x && f.y===head.y){ f.hit=true; ate=f; break; } }
+    for(let i=0;i<foods.length;i++){ const f=foods[i]; if(!f.hit && f.x===nx && f.y===ny){ ate=f; break; } }
     if(ate){ eat(ate); if(ended) return; }
-    foods=foods.filter(f=>!f.hit);
-    if(!ate) snake.pop();
-    // 补充食物
+    foods=foods.filter(f=>!f.hit);   // 只有 eat 里标记 hit 的才被消耗
+    if(!ate) grid.pop();
     spawnTimer-=dt; if(spawnTimer<=0){ ensureFoods(); spawnTimer=0.6; }
-    if(cfg._endless && paired>0 && paired%10===0) speed = 1.9 + paired*0.2;   // 无限战略快
   }
   function update(dt){
     if(ended || quizLock) return;
     if(invuln>0) invuln-=dt;
-    if(!(nextDir.x===-dir.x && nextDir.y===-dir.y)) dir=nextDir;
-    speed = 1.9 + paired*0.1; timer += dt; const stepT=1/speed;
-    if(timer<stepT) return; timer-=stepT;
-    step();
+    speed = (cfg._endless && paired>0 ? 2.6+paired*0.2 : 3.0 + paired*0.1);   // 格/秒，平缓提速
+    const stepT = 1/speed;
+    timer += dt;
+    // 掉帧可累积多步：用 while 保证 timer<stepT，蛇头位置连续不跳变
+    while(timer >= stepT){ timer -= stepT; step(); if(ended) return; }
+    frac = timer/stepT;   // 0 <= frac < 1
+    // 蛇头平滑位置：从 grid[0] 沿 dir（进入本格的方向）走 frac——step 后方向更新、位置自然衔接
+    headPos.x = grid[0][0] + dir.x*frac;
+    headPos.y = grid[0][1] + dir.y*frac;
+    // 相机跟随蛇头（平滑）
+    const tcx = clamp(headPos.x - VIEW_COLS/2, 0, worldW - VIEW_COLS);
+    const tcy = clamp(headPos.y - VIEW_ROWS/2, 0, worldH - VIEW_ROWS);
+    camX += (tcx - camX)*Math.min(1, dt*7);
+    camY += (tcy - camY)*Math.min(1, dt*7);
   }
 
   // ================= 渲染 =================
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  // 蛇身第 i 节位置：从蛇头 headPos 沿 grid 路径往回走 i 格（浮点，随蛇头连续）
+  function bodyPos(i){
+    let rem=i, a={x:headPos.x, y:headPos.y};
+    for(let k=1;k<grid.length && rem>0;k++){
+      const b={x:grid[k][0], y:grid[k][1]};
+      const d=Math.hypot(b.x-a.x, b.y-a.y);
+      if(d>=rem){ const t=rem/(d||1); return {x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t}; }
+      rem-=d; a=b;
+    }
+    return {x:grid[grid.length-1][0], y:grid[grid.length-1][1]};
+  }
+
   function draw(){
     ctx.clearRect(0,0,W,H);
+    const offX = Math.round(camX*cell), offY = Math.round(camY*cell);
+    // 世界底纹（淡色棋盘随镜头）
+    ctx.fillStyle='rgba(0,188,212,.025)';
+    for(let gy=Math.floor(camY); gy<camY+VIEW_ROWS+1; gy++){
+      for(let gx=Math.floor(camX); gx<camX+VIEW_COLS+1; gx++){
+        if((gx+gy)%2===0){ ctx.fillRect(gx*cell-offX, gy*cell-offY, cell, cell); }
+      }
+    }
+    // 网格线（只画视口内，浅色）
     ctx.strokeStyle='rgba(0,188,212,.06)'; ctx.lineWidth=1;
-    for(let x=0;x<=W;x+=cell){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for(let y=0;y<=H;y+=cell){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-    // 底部网格微光
-    ctx.fillStyle='rgba(0,188,212,.03)'; ctx.fillRect(0,0,W,H);
-    // 食物：蓝=术语 / 黄=解释，圆点 + 上方完整文字（深色描边便于阅读）
+    const sx0=Math.floor(camX), sy0=Math.floor(camY);
+    for(let gx=sx0; gx<=sx0+VIEW_COLS; gx++){ ctx.beginPath(); ctx.moveTo(gx*cell-offX,0); ctx.lineTo(gx*cell-offX,H); ctx.stroke(); }
+    for(let gy=sy0; gy<=sy0+VIEW_ROWS; gy++){ ctx.beginPath(); ctx.moveTo(0,gy*cell-offY); ctx.lineTo(W,gy*cell-offY); ctx.stroke(); }
+    // 世界边界提示线（当镜头贴边时）
+    if(camX<=0){ ctx.fillStyle='rgba(255,82,82,.35)'; ctx.fillRect(0,0,3,H); }
+    if(camX>=worldW-VIEW_COLS){ ctx.fillStyle='rgba(255,82,82,.35)'; ctx.fillRect(W-3,0,3,H); }
+    if(camY<=0){ ctx.fillStyle='rgba(255,82,82,.35)'; ctx.fillRect(0,0,W,3); }
+    if(camY>=worldH-VIEW_ROWS){ ctx.fillStyle='rgba(255,82,82,.35)'; ctx.fillRect(0,H-3,W,3); }
+
+    // 墙体：砖块 + 边框 + 纹理
+    walls.forEach(function(w){
+      const wx=w.x*cell-offX, wy=w.y*cell-offY;
+      if(wx<-cell||wx>W||wy<-cell||wy>H) return;
+      ctx.fillStyle='#33424f';
+      ctx.fillRect(wx,wy,cell,cell);
+      ctx.strokeStyle='#1d262e'; ctx.lineWidth=2;
+      ctx.strokeRect(wx,wy,cell,cell);
+      // 砖缝纹理
+      ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(wx,wy+cell/2); ctx.lineTo(wx+cell,wy+cell/2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(wx+cell/2,wy); ctx.lineTo(wx+cell/2,wy+cell); ctx.stroke();
+    });
+    // 食物：蓝=术语(随便吃) / 黄=解释(配对才吃)；配对目标高亮
     foods.forEach(function(f){
-      const fx=f.x*cell+cell/2, fy=f.y*cell+cell/2;
+      const fx=f.x*cell+cell/2-offX, fy=f.y*cell+cell/2-offY;
+      if(fx<-40||fx>W+40||fy<-40||fy>H+40) return;   // 视口外不画
       const isTerm = f.kind==='term';
+      const matchTarget = !isTerm && currentTerm && hintOf[currentTerm]===f.label;   // 正是当前要配对的解释
       const pulse = 1 + 0.12*Math.sin(performance.now()/260 + f.x*1.7 + f.y*2.3);
       const rad = 12*pulse;
+      const base = isTerm ? '#2196f3' : '#ffb300';
       // 外发光环
       ctx.fillStyle = isTerm ? 'rgba(33,150,243,.22)' : 'rgba(255,179,0,.22)';
+      if(matchTarget){ ctx.fillStyle='rgba(0,230,118,.35)'; }
       ctx.beginPath(); ctx.arc(fx,fy,rad+7,0,Math.PI*2); ctx.fill();
       // 主体
-      ctx.fillStyle = isTerm ? '#2196f3' : '#ffb300';
-      ctx.shadowColor = isTerm ? '#2196f3' : '#ffb300'; ctx.shadowBlur=12;
+      ctx.fillStyle = matchTarget ? '#00e676' : base;
+      ctx.shadowColor = matchTarget ? '#00e676' : base; ctx.shadowBlur= matchTarget?18:12;
       ctx.beginPath(); ctx.arc(fx,fy,rad,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
       // 高光
       ctx.fillStyle='rgba(255,255,255,.55)';
       ctx.beginPath(); ctx.arc(fx-rad*0.3,fy-rad*0.35,rad*0.28,0,Math.PI*2); ctx.fill();
+      // 文字（上方）
       ctx.font='bold '+Math.round(F_FOOD/sf)+'px sans-serif';
       ctx.textAlign='center'; ctx.textBaseline='alphabetic';
       ctx.lineWidth=4; ctx.strokeStyle='rgba(0,0,0,.88)';
       ctx.strokeText(f.label, fx, fy-20);
-      ctx.fillStyle='#fff'; ctx.fillText(f.label, fx, fy-20);
+      ctx.fillStyle = matchTarget ? '#b9ffdd' : '#fff';
+      ctx.fillText(f.label, fx, fy-20);
     });
-    // 蛇身：卡通圆润——身体用带内高光的圆角胶囊，尾部渐细，蛇头大圆+大眼睛+腮红+小舌头
-    const segN=snake.length;
-    // 身体关节：为让身体连贯，取每段中心画圆角胶囊
-    const drawSeg = function(s,i){
-      const isHead = (i===0);
-      const cx=s.x*cell+cell/2, cy=s.y*cell+cell/2;
-      const tailT = Math.max(0.35, 1 - i/segN);           // 尾部略小
-      const r = isHead ? cell*0.5 : cell*0.38*tailT;
-      // 前一节（用于连接圆角）
-      const prev = snake[i+1];
-      const bodyColor = isHead ? (currentTerm?'#00e5ff':'#8cff5e') : 'rgba(0,205,102,'+(0.4+0.6*tailT).toFixed(2)+')';
-      ctx.fillStyle = bodyColor;
-      if(isHead && currentTerm){ ctx.shadowColor='#4dd0e1'; ctx.shadowBlur=16; }
-      if(prev){
-        // 在两节之间画一个胶囊（连接相邻节，使身体连续）
-        const pcx=prev.x*cell+cell/2, pcy=prev.y*cell+cell/2;
-        const ang=Math.atan2(cy-pcy, cx-pcx);
-        const len=Math.hypot(cx-pcx, cy-pcy);
-        const rr=r*0.8;
-        ctx.beginPath();
-        ctx.moveTo(cx+Math.cos(ang+Math.PI/2)*rr, cy+Math.sin(ang+Math.PI/2)*rr);
-        ctx.lineTo(pcx+Math.cos(ang+Math.PI/2)*rr, pcy+Math.sin(ang+Math.PI/2)*rr);
-        ctx.lineTo(pcx+Math.cos(ang-Math.PI/2)*rr, pcy+Math.sin(ang-Math.PI/2)*rr);
-        ctx.lineTo(cx+Math.cos(ang-Math.PI/2)*rr, cy+Math.sin(ang-Math.PI/2)*rr);
-        ctx.closePath(); ctx.fill();
+
+    // ===== 蛇身：按皮肤样式绘制（smooth 连续 / bamboo 竹节 / comet 彗星拖尾）=====
+    const style = SK.style || 'smooth';
+    const segN=grid.length;
+    const pts=[];
+    for(let i=0;i<segN;i++){ pts.push(i===0?{x:headPos.x,y:headPos.y}:bodyPos(i)); }
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    if(style==='bamboo'){
+      // 竹节：一节节圆球 + 连接胶囊，带亮色节环
+      for(let i=0;i<segN;i++){
+        const pt=pts[i];
+        const x=pt.x*cell+cell/2-offX, y=pt.y*cell+cell/2-offY;
+        const tailT=Math.max(0.42, 1-i/segN);
+        const r=cell*0.42*tailT;
+        if(i>0){
+          const p2=pts[i-1];
+          const p2x=p2.x*cell+cell/2-offX, p2y=p2.y*cell+cell/2-offY;
+          const a2=Math.atan2(y-p2y, x-p2x);
+          const rr=r*0.8;
+          ctx.fillStyle=mixColor(SK.col, SK.dark, i/segN);
+          ctx.beginPath();
+          ctx.moveTo(x+Math.cos(a2+Math.PI/2)*rr, y+Math.sin(a2+Math.PI/2)*rr);
+          ctx.lineTo(p2x+Math.cos(a2+Math.PI/2)*rr, p2y+Math.sin(a2+Math.PI/2)*rr);
+          ctx.lineTo(p2x+Math.cos(a2-Math.PI/2)*rr, p2y+Math.sin(a2-Math.PI/2)*rr);
+          ctx.lineTo(x+Math.cos(a2-Math.PI/2)*rr, y+Math.sin(a2-Math.PI/2)*rr);
+          ctx.closePath(); ctx.fill();
+        }
+        ctx.fillStyle = (i===0 && currentTerm) ? SK.glow : (i===0 ? SK.col : mixColor(SK.col, SK.dark, i/segN));
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+        // 节环（浅色环纹）
+        ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=1.6;
+        ctx.beginPath(); ctx.arc(x,y,r*0.92,0,Math.PI*2); ctx.stroke();
+        // 高光
+        ctx.fillStyle='rgba(255,255,255,.22)';
+        ctx.beginPath(); ctx.arc(x-r*0.3,y-r*0.35,r*0.3,0,Math.PI*2); ctx.fill();
       }
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
-      // 内高光（顶部小圆）卡通质感
-      ctx.fillStyle='rgba(255,255,255,.28)';
-      ctx.beginPath(); ctx.arc(cx-r*0.28, cy-r*0.32, r*0.32, 0, Math.PI*2); ctx.fill();
-      if(isHead){
-        ctx.shadowBlur=0;
-        const ex = dir.x, ey = dir.y;
-        const eo = cell*0.30, er = 4.2;
-        // 大眼睛（两个，朝方向偏移）
-        [[-0.5,0.6],[0.5,0.6]].forEach(function(off){
-          const exx = ex*eo + off[0]*cell*0.26;
-          const eyy = ey*eo + off[1]*cell*0.26;
-          const eX=cx+exx, eY=cy+eyy;
-          ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(eX,eY,er,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle='#123'; ctx.beginPath(); ctx.arc(eX+ex*1.2,eY+ey*1.2,er*0.62,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle='rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(eX+ex*2.2-eY*0+ex*0.4,eY+ey*2.2-2,1.4,0,Math.PI*2); ctx.fill();
-        });
-        // 腮红
-        ctx.fillStyle='rgba(255,120,120,.4)';
-        ctx.beginPath(); ctx.arc(cx - cell*0.42, cy+cell*0.34, 3.4, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(cx + cell*0.42, cy+cell*0.34, 3.4, 0, Math.PI*2); ctx.fill();
-        // 小舌头（朝方向）
-        ctx.strokeStyle='#ff5a5a'; ctx.lineWidth=2; ctx.lineCap='round';
-        ctx.beginPath(); ctx.moveTo(cx+ex*cell*0.42, cy+ey*cell*0.42);
-        ctx.lineTo(cx+ex*cell*0.62, cy+ey*cell*0.62); ctx.stroke();
-        // 头顶呆毛
-        ctx.strokeStyle='rgba(140,255,94,.9)'; ctx.lineWidth=2.4; ctx.lineCap='round';
-        ctx.beginPath(); ctx.moveTo(cx - cell*0.15, cy - cell*0.5);
-        ctx.quadraticCurveTo(cx - cell*0.28, cy - cell*0.72, cx - cell*0.05, cy - cell*0.6); ctx.stroke();
+    } else if(style==='comet'){
+      // 彗星：发光拖尾——尾巴渐细、渐淡，带光晕
+      for(let i=0;i<segN-1;i++){
+        const a=pts[i], b=pts[i+1];
+        const ax=a.x*cell+cell/2-offX, ay=a.y*cell+cell/2-offY;
+        const bx=b.x*cell+cell/2-offX, by=b.y*cell+cell/2-offY;
+        const tailT=Math.max(0.4, 1-i/segN);
+        const w=cell*(0.92*tailT);
+        ctx.strokeStyle=mixColor(SK.col, SK.dark, i/segN);
+        ctx.globalAlpha=0.3+0.7*tailT;
+        ctx.shadowColor=SK.glow; ctx.shadowBlur=16;
+        ctx.lineWidth=w;
+        ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
       }
-      ctx.shadowBlur=0;
-    };
-    for(let i=0;i<segN;i++){ const s=snake[i]; drawSeg(s,i); }
+      ctx.shadowBlur=0; ctx.globalAlpha=1;
+    } else {
+      // smooth（默认）：朴素——一根等粗的线，不渐变、无高光/鳞片
+      ctx.strokeStyle = currentTerm ? SK.glow : SK.col;
+      ctx.lineWidth = cell*0.8;
+      ctx.beginPath();
+      pts.forEach(function(pt,i){
+        const x=pt.x*cell+cell/2-offX, y=pt.y*cell+cell/2-offY;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+    }
+    // ===== 蛇头（大圆 + 五官）=====
+    const hx=headPos.x*cell+cell/2-offX, hy=headPos.y*cell+cell/2-offY;
+    const hr=cell*0.5;
+    ctx.fillStyle = currentTerm ? SK.glow : (style==='smooth' ? SK.dark : SK.col);
+    ctx.shadowColor=SK.glow; ctx.shadowBlur=(currentTerm||style==='comet')?16:0;
+    ctx.beginPath(); ctx.arc(hx,hy,hr,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // 头顶高光
+    ctx.fillStyle='rgba(255,255,255,.25)';
+    ctx.beginPath(); ctx.arc(hx-hr*0.26, hy-hr*0.32, hr*0.3, 0, Math.PI*2); ctx.fill();
+    // 大眼睛（朝方向）
+    const ex=dir.x, ey=dir.y, eo=cell*0.30;
+    [[-0.52,0.62],[0.52,0.62]].forEach(function(off){
+      const eX=hx+ex*eo+off[0]*cell*0.26, eY=hy+ey*eo+off[1]*cell*0.26;
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.ellipse(eX,eY,5.2,5.8,Math.atan2(ey,ex),0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#1b2a3a'; ctx.beginPath(); ctx.arc(eX+ex*1.4,eY+ey*1.4,3.0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.95)'; ctx.beginPath(); ctx.arc(eX+ex*2.4-1,eY+ey*2.4-1.6,1.3,0,Math.PI*2); ctx.fill();
+    });
+    // 腮红
+    ctx.fillStyle='rgba(255,110,110,.4)';
+    ctx.beginPath(); ctx.arc(hx-cell*0.42, hy+cell*0.34, 3.4, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(hx+cell*0.42, hy+cell*0.34, 3.4, 0, Math.PI*2); ctx.fill();
+    // 微笑嘴
+    ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=2; ctx.lineCap='round';
+    ctx.beginPath(); ctx.arc(hx+ex*cell*0.06, hy+ey*cell*0.18+cell*0.12, 5, 0.15*Math.PI, 0.85*Math.PI); ctx.stroke();
+    // 小舌头（朝方向）
+    ctx.strokeStyle='#ff5a5a'; ctx.lineWidth=2.2; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(hx+ex*cell*0.46, hy+ey*cell*0.46);
+    ctx.lineTo(hx+ex*cell*0.66, hy+ey*cell*0.66); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hx+ex*cell*0.6, hy+ey*cell*0.56); ctx.lineTo(hx+ex*cell*0.72, hy+ey*cell*0.5); ctx.stroke();
+    // 头顶呆毛（皮肤色）
+    ctx.strokeStyle=SK.col; ctx.lineWidth=2.4; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(hx-cell*0.12, hy-cell*0.5);
+    ctx.quadraticCurveTo(hx-cell*0.3, hy-cell*0.74, hx-cell*0.02, hy-cell*0.62); ctx.stroke();
+
+    // 小地图（右上角）
+    drawMinimap();
+
     // 粒子
-    particles.forEach(function(p){ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
+    particles.forEach(function(p){ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x-offX,p.y-offY,5,5); });
     ctx.globalAlpha=1; particles=particles.filter(function(p){return p.t<0.5;});
-    // 飘字（放大）
-    floats.forEach(function(f){ f.t+=dt; ctx.globalAlpha=Math.max(0,1-f.t/1.3); ctx.fillStyle=f.color; ctx.font='bold '+Math.round(F_FLOAT/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.fillText(f.txt, f.x, f.y-f.t*40); });
+    // 飘字（相对世界坐标，用食物所在世界格转屏幕）
+    floats.forEach(function(f){ f.t+=dt; ctx.globalAlpha=Math.max(0,1-f.t/1.3); ctx.fillStyle=f.color; ctx.font='bold '+Math.round(F_FLOAT/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.fillText(f.txt, f.x-offX, f.y-offY-f.t*40); });
     ctx.globalAlpha=1; floats=floats.filter(function(f){return f.t<1.3;});
+  }
+
+  function mixColor(c1, c2, t){
+    // 简单的 hex 颜色插值
+    const p=function(h){ return [parseInt(h.substr(1,2),16), parseInt(h.substr(3,2),16), parseInt(h.substr(5,2),16)]; };
+    const a=p(c1), b=p(c2);
+    const r=Math.round(a[0]+(b[0]-a[0])*t), g=Math.round(a[1]+(b[1]-a[1])*t), bl=Math.round(a[2]+(b[2]-a[2])*t);
+    return 'rgb('+r+','+g+','+bl+')';
+  }
+
+  function drawMinimap(){
+    const mw=116, mh=Math.round(mw*(worldH/worldW)), mx=W-mw-12, my=12;
+    ctx.globalAlpha=0.85;
+    ctx.fillStyle='rgba(4,10,20,.72)';
+    ctx.fillRect(mx-4,my-4,mw+8,mh+8);
+    ctx.strokeStyle='rgba(0,188,212,.5)'; ctx.lineWidth=1; ctx.strokeRect(mx,my,mw,mh);
+    // 食物点
+    foods.forEach(function(f){
+      ctx.fillStyle = f.kind==='term' ? '#2196f3' : '#ffb300';
+      ctx.fillRect(mx + (f.x/worldW)*mw -1, my + (f.y/worldH)*mh -1, 2.4, 2.4);
+    });
+    // 墙点
+    ctx.fillStyle='#5a6b78';
+    walls.forEach(function(w){
+      ctx.fillRect(mx + (w.x/worldW)*mw -1, my + (w.y/worldH)*mh -1, 2, 2);
+    });
+    // 视口范围
+    ctx.strokeStyle='rgba(255,255,255,.35)';
+    ctx.strokeRect(mx + (camX/worldW)*mw, my + (camY/worldH)*mh, (VIEW_COLS/worldW)*mw, (VIEW_ROWS/worldH)*mh);
+    // 蛇（画整条线）
+    if(grid.length){
+      ctx.strokeStyle=SK.col; ctx.lineWidth=2.6; ctx.lineCap='round';
+      ctx.beginPath();
+      grid.forEach(function(g,i){
+        const px=mx+(g[0]/worldW)*mw, py=my+(g[1]/worldH)*mh;
+        if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      });
+      ctx.stroke();
+    }
+    // 蛇头点
+    const hx=mx+(grid[0][0]/worldW)*mw, hy=my+(grid[0][1]/worldH)*mh;
+    ctx.fillStyle=SK.glow; ctx.beginPath(); ctx.arc(hx,hy,2.6,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
   }
 
   // ================= 结算 =================
@@ -321,9 +557,10 @@ export function openSnake(cfg, onComplete) {
   window.snDone=function(){ cleanup(); if(onComplete)onComplete(paired>=WIN); overlay.remove(); window.playAreaMusic(); };
   function closeGame(manual){ if(ended) return; ended=true; cancelAnimationFrame(raf); cleanup(); overlay.remove(); if(manual){ if(onComplete)onComplete(false); window.playAreaMusic(); } }
 
-  // ================= 主循环（try/catch 防御：单点异常不再死机）=================
+  // ================= 主循环 =================
+  spawnWalls();
   ensureFoods();
-  let last=performance.now(), dt=0;
+  let last=performance.now();
   function loop(now){
     dt=Math.min(0.05,(now-last)/1000); last=now;
     try { update(dt); draw(); }
