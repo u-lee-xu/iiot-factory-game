@@ -6,6 +6,31 @@
 // ═══════════════════════════════════════════════════════════════════════
 
 import { escHtml, dstr, _fmtTime, starStr, taskKey, taskXP } from './core/utils.js';
+import { checkLevelUp } from './ui/modals.js';
+import { showLevelUp } from './ui/modals.js';
+import { showWelcomeDialog } from './ui/modals.js';
+import { showLevelIntro } from './ui/modals.js';
+import { showLevelComplete } from './ui/modals.js';
+import { tutSeen } from './ui/tutorial.js';
+import { tutMark } from './ui/tutorial.js';
+import { showGameTutorial } from './ui/tutorial.js';
+import { showTypingTutorial } from './ui/tutorial.js';
+import { showShooterLoadout } from './ui/tutorial.js';
+import { loadTermCards } from './ui/gamezone.js';
+import { getTermLevel } from './ui/gamezone.js';
+import { termWarmupDone } from './ui/gamezone.js';
+import { markTermWarmupDone } from './ui/gamezone.js';
+import { countUnlockedGameTypes } from './ui/gamezone.js';
+import { gzEmoji } from './ui/gamezone.js';
+import { gzMeta } from './ui/gamezone.js';
+import { gzName } from './ui/gamezone.js';
+import { renderGameZone } from './ui/gamezone.js';
+import { gzPlay } from './ui/gamezone.js';
+import { refreshGameZone } from './ui/gamezone.js';
+import { gzAfter } from './ui/gamezone.js';
+import { buildGameZone } from './ui/gamezone.js';
+import { openGameZone } from './ui/gamezone.js';
+import { closeGameZone } from './ui/gamezone.js';
 import { loadShop } from './ui/wallet.js';
 import { walletRank } from './ui/wallet.js';
 import { buildWallet } from './ui/wallet.js';
@@ -1749,362 +1774,27 @@ function renderAchBar() {
 // 9d. MINI GAMES — memory_match（术语翻牌热身）
 // =========================================================================
 
-function loadTermCards() {
-  return fetch('/data/term-cards.json').then(r => r.json()).then(d => {
-    window.TERM_CARDS = d;
-    try { if (typeof evaluateAchievements === 'function') evaluateAchievements(false); } catch (e) {}
-  }).catch(() => { window.TERM_CARDS = null; });
-}
 // 提前发起加载并保存 promise，init 里 await 后再渲染关卡（避免首次刷新小游戏不显示）
 const termCardsPromise = loadTermCards();
 
-function getTermLevel(levelId) {
-  if (!window.TERM_CARDS) return null;
-  return window.TERM_CARDS.levels.find(l => l.levelId === levelId) || null;
-}
-function termWarmupDone(key) { return localStorage.getItem('term_' + key) === '1'; }
-function markTermWarmupDone(key) { localStorage.setItem('term_' + key, '1'); }
 // 统计当前已解锁的小游戏类型数（按任务块完成判定）
-function countUnlockedGameTypes() {
-  try {
-    if (!window.TERM_CARDS || !window.TERM_CARDS.levels) return 0;
-    const set = new Set();
-    window.TERM_CARDS.levels.forEach(lv => {
-      (lv.warmups || []).forEach(w => {
-        const bt = w.blockTasks;
-        if (Array.isArray(bt) && bt.length && bt.every(tid => isTaskDone(tid))) set.add(w.type || 'memory');
-      });
-    });
-    return set.size;
-  } catch (e) { return 0; }
-}
 // ===== 游戏专区：解锁后直接选玩 =====
 let gzList = [];
 let _mapFlowFeature = null;   // 本次由厂区地图 ?open=xxx 进入的功能（关闭时回地图，避免露旧界面）
-function gzEmoji(w) {
-  const t = w.type || 'memory';
-  return t==='quick'?'⚡':t==='match'?'🔗':t==='storm'?'🌪️':t==='alarm'?'🚨':t==='typing'?'🔫':t==='shooter'?'🛸':t==='racing'?'🏎️':t==='snake'?'🐍':t==='flappy'?'🦅':t==='mole'?'🔨':t==='pacman'?'👾':t==='tank'?'🎯':t==='breakout'?'🧱':t==='sorter'?'📦':t==='forge'?'🔥':t==='ll'?'🔗':t==='pipe'?'🔧':t==='m3'?'🍬':t==='td'?'🛡️':t==='t48'?'🔢':t==='maze'?'🌐':t==='hack'?'🕹️':t==='tyc'?'🏭':t==='lzr'?'🔦':t==='boss'?'🎯':'🃏';
-}
-function gzMeta(w) {
-  const t = w.type || 'memory';
-  if (t==='quick') return (w.size||0) + ' 题';
-  if (t==='match') return (w.size||0) + ' 组';
-  if (t==='storm') return (w.waves||0) + ' 波';
-  if (t==='alarm') return (w.devices||0) + ' 台';
-  if (t==='typing') return ((w.words||[]).length) + ' 词';
-  if (t==='shooter') return (w.waves||4) + ' 波编队';
-  if (t==='racing') return '坚持 45s 通关';
-  if (t==='snake') return '吃网络三件套';
-  if (t==='flappy') return '躲断线黑洞';
-  if (t==='mole') return '点掉异常数据';
-  if (t==='pacman') return '吃镜像层';
-  if (t==='tank') return '守卫 Broker';
-  if (t==='breakout') return '消设备故障';
-  if (t==='sorter') return (w.waves||3) + ' 波分类';
-  if (t==='forge') return '合成' + (w.target||'TB');
-  if (t==='ll') return ((w.pairs||[]).length) + ' 组配对';
-  if (t==='pipe') return (w.cols||4) + '×' + (w.rows||4) + ' 管道';
-  if (t==='m3') return (w.waves||3) + ' 波消消乐';
-  if (t==='td') return (w.waves||3) + ' 波防线';
-  if (t==='t48') return '合成' + (w.target||'TB');
-  if (t==='maze') return '迷宫寻路';
-  if (t==='hack') return ((w.nodes||[]).length) + ' 个节点';
-  if (t==='tyc') return '目标' + (w.target||50000);
-  if (t==='lzr') return '光束路由';
-  if (t==='boss') return (w.shots||5) + ' 发';
-  if (w.rounds) return w.rounds.map(r=>r*2).join('→') + ' 张';
-  return (w.size*2) + ' 张';
-}
-function gzName(w) {
-  const t = w.type || 'memory';
-  const special = t==='quick'||t==='match'||t==='storm'||t==='alarm'||t==='typing'||t==='shooter'||t==='racing'||t==='snake'||t==='flappy'||t==='mole'||t==='pacman'||t==='tank'||t==='breakout'||t==='sorter'||t==='forge'||t==='ll'||t==='pipe'||t==='m3'||t==='td'||t==='t48'||t==='maze'||t==='hack'||t==='tyc'||t==='lzr'||t==='boss';
-  return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
-}
-function renderGameZone(body) {
-  if (!window.TERM_CARDS || !content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
-  gzList = [];
-  // 按游戏类型分组排序：同一类型排一起，方便按类型测试、不重不漏
-  const TYPE_ORDER = [
-    ['memory','🧠','翻牌配对'],
-    ['quick','⚡','快打'],
-    ['typing','🔫','术语防御战'],
-    ['shooter','🛸','数据蜂群'],
-    ['td','🛡️','车间防线'],
-    ['snake','🐍','网线贪吃蛇'],
-    ['pacman','👾','容器吃豆人'],
-    ['ll','🔗','连连看'],
-    ['match','🔗','连线匹配'],
-    ['sorter','📦','数据分类'],
-    ['forge','🔥','数据熔炉'],
-    ['t48','🔢','2048·数据融合'],
-    ['racing','🏎️','数据狂飙'],
-    ['flappy','🦅','云端跳跃'],
-    ['mole','🔨','边缘打地鼠'],
-    ['storm','🌪️','数据风暴'],
-    ['alarm','🚨','值班抢险'],
-    ['maze','🌐','数据迷宫'],
-    ['hack','🕹️','黑客终端'],
-    ['tyc','🏭','工厂大亨'],
-    ['pipe','🔧','管道工'],
-    ['lzr','🔦','激光反射'],
-    ['tank','🎯','消息守卫'],
-    ['breakout','🧱','AI打砖块'],
-    ['m3','🍬','消消乐'],
-    ['boss','💥','厂长Boss战']
-  ];
-  // 先收集: 类型 -> [游戏]
-  const byType = {};
-  content.levels.forEach(lv => {
-    const tl = getTermLevel(lv.id);
-    if (!tl) return;
-    (tl.warmups || []).forEach(w => {
-      const t = w.type || 'memory';
-      if (!byType[t]) byType[t] = [];
-      byType[t].push({ lvId: lv.id, w: w });
-    });
-    if (tl.bonus) {
-      const t='memory';
-      if (!byType['__bonus']) byType['__bonus'] = [];
-      byType['__bonus'].push({ lvId: lv.id, bonus: true });
-    }
-  });
-  let html = '';
-  // 遍历固定类型顺序（未列出的类型放最后）
-  const ordered = TYPE_ORDER.map(x=>x[0]).filter(t=>byType[t]);
-  const rest = Object.keys(byType).filter(t=>t!=='__bonus' && !ordered.includes(t)).sort();
-  const allTypes = ordered.concat(rest);
-  allTypes.forEach(t => {
-    const items = byType[t] || [];
-    const label = (TYPE_ORDER.find(x=>x[0]===t) || [t, gzEmoji(byType[t]&&byType[t][0]?byType[t][0].w:{}), t])[2];
-    const emoji = (TYPE_ORDER.find(x=>x[0]===t) || [t,'🎮',t])[1];
-    const rows = [];
-    items.forEach(it => {
-      const idx = gzList.length;
-      gzList.push(it);
-      if (it.bonus) {
-        const lvDone = levelProgress(it.lvId).completed;
-        rows.push('<div class="gz-row' + (lvDone ? '' : ' locked') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
-          '<span class="gz-emoji">' + (lvDone ? '🏆' : '🔒') + '</span>' +
-          '<span class="gz-name">记忆大师挑战 · 5 层递进</span>' +
-          '<span class="gz-meta">第'+it.lvId+'幕 · ' + (lvDone ? '可玩' : '通关本关解锁') + '</span></div>');
-        return;
-      }
-      const w = it.w;
-      const unlocked = Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => isTaskDone(tid));
-      const advTag = w.advanced ? ' · <span style="color:var(--cyan)">进阶</span>' : '';
-      const tBadge = miniTierBadge(w.id);
-      rows.push('<div class="gz-row' + (unlocked ? '' : ' locked') + (w.advanced ? ' pc-only' : '') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
-        '<span class="gz-emoji">' + (unlocked ? gzEmoji(w) : '🔒') + '</span>' +
-        '<span class="gz-name">' + gzName(w) + tBadge + '</span>' +
-        '<span class="gz-meta">第'+it.lvId+'幕' + advTag + ' · ' + (unlocked ? (w._tier>=1?'可挑战':'可玩') : '未解锁') + '</span></div>');
-    });
-    if (!rows.length) return;
-    html += '<div class="gz-section">' + emoji + ' ' + label + ' <span class="sec-count">' + rows.length + '</span></div>' + rows.join('');
-  });
-  // 记忆大师挑战统一放最后
-  if (byType['__bonus']) {
-    const rows=[];
-    byType['__bonus'].forEach(it=>{
-      const idx = gzList.length; gzList.push(it);
-      const lvDone = levelProgress(it.lvId).completed;
-      rows.push('<div class="gz-row' + (lvDone ? '' : ' locked') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
-        '<span class="gz-emoji">' + (lvDone ? '🏆' : '🔒') + '</span>' +
-        '<span class="gz-name">记忆大师挑战 · 5 层递进</span>' +
-        '<span class="gz-meta">第'+it.lvId+'幕 · ' + (lvDone ? '可玩' : '通关本关解锁') + '</span></div>');
-    });
-    if (rows.length) html += '<div class="gz-section">🏆 记忆大师挑战 <span class="sec-count">'+rows.length+'</span></div>' + rows.join('');
-  }
-  body.innerHTML = html || '<div class="lb-empty">还没有可玩的小游戏，先去闯关吧！</div>';
-}
-function gzPlay(idx) {
-  const it = gzList[idx];
-  if (!it) return;
-  if (it.bonus) {
-    const tl = getTermLevel(it.lvId);
-    if (!tl || !tl.bonus) return;
-    if (!levelProgress(it.lvId).completed) { showToast('通关本关后才能挑战记忆大师', 'error'); return; }
-    openMemoryMatch(tl.bonus, (win)=>{ gzAfter(win,'🏆 记忆大师完成！'); });
-    return;
-  }
-  const w = it.w;
-  if (!(Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => isTaskDone(tid)))) {
-    showToast('先完成对应任务解锁这个小游戏', 'error'); return;
-  }
-  const t = w.type || 'memory';
-  if (t==='quick') openQuickMatch(w, (win)=>{ gzAfter(win,'⚡ 快打完成'); });
-  else if (t==='match') openMatchGame(w, (win)=>{ gzAfter(win,'🔗 连线完成'); });
-  else if (t==='storm') openStormDefense(w, (win)=>{ gzAfter(win,'🌪️ 数据风暴守住了'); });
-  else if (t==='alarm') openAlarmRush(w, (win)=>{ gzAfter(win,'🚨 产线守住了'); });
-  else if (t==='typing') openTypingDefense(w, (win)=>{ gzAfter(win,'🔫 术语防线守住了'); });
-  else if (t==='shooter') openShooter(w, (win)=>{ gzAfter(win,'🛸 数据蜂群清空！'); });
-  else if (t==='racing') openDataRacing(w, (win)=>{ gzAfter(win,'🏎️ 数据狂飙通关！'); });
-  else if (t==='snake') openSnake(w, (win)=>{ gzAfter(win,'🐍 网线畅通！'); });
-  else if (t==='flappy') openFlappy(w, (win)=>{ gzAfter(win,'🦅 云端到达！'); });
-  else if (t==='mole') openMole(w, (win)=>{ gzAfter(win,'🔨 异常全清！'); });
-  else if (t==='pacman') openPacman(w, (win)=>{ gzAfter(win,'👾 镜像吃光！'); });
-  else if (t==='tank') openTank(w, (win)=>{ gzAfter(win,'🎯 Broker 保住了！'); });
-  else if (t==='breakout') openBreakout(w, (win)=>{ gzAfter(win,'🧱 故障全消！'); });
-  else if (t==='sorter') openSorter(w, (win)=>{ gzAfter(win,'📦 全部归位！'); });
-  else if (t==='forge') openForge(w, (win)=>{ gzAfter(win,'🔥 合成成功！'); });
-  else if (t==='ll') openLianLian(w, (win)=>{ gzAfter(win,'🔗 全部配对！'); });
-  else if (t==='pipe') openPipe(w, (win)=>{ gzAfter(win,'🔧 数据通路接通！'); });
-  else if (t==='m3') openMatch3(w, (win)=>{ gzAfter(win,'🍬 三连清场！'); });
-  else if (t==='td') openTowerDefense(w, (win)=>{ gzAfter(win,'🛡️ 车间防线守住！'); });
-  else if (t==='t48') openTile2048(w, (win)=>{ gzAfter(win,'🔢 合成'+ (w.target||'TB') +'！'); });
-  else if (t==='maze') openMaze(w, (win)=>{ gzAfter(win,'🌐 数据包送达！'); });
-  else if (t==='hack') openHacknet(w, (win)=>{ gzAfter(win,'🕹️ 全网络拿下！'); });
-  else if (t==='tyc') openTycoon(w, (win)=>{ gzAfter(win,'🏭 产值达标！'); });
-  else if (t==='lzr') openLaser(w, (win)=>{ gzAfter(win,'🔦 光束连通！'); });
-  else if (t==='boss') openBoss(w, (win)=>{ gzAfter(win,'🎯 故障砸掉了！'); });
-  else openMemoryMatch(w, (win)=>{ gzAfter(win,'🧠 翻牌完成'); });
-}
 
-function refreshGameZone() {
-  // 过关后立即重绘游戏专区列表，让「✓ 已通关/∞ 无限战」标记即时出现，无需刷新
-  const ov = document.getElementById('gzOverlay');
-  const body = document.getElementById('gzBody');
-  if (ov && body && ov.classList.contains('show')) {
-    renderGameZone(body);
-  }
-}
 // 统一结算回调：提示 + 刷新专区列表 & 关卡内嵌小游戏行
-function gzAfter(win, msg) {
-  if (win) showToast(msg, 'success');
-  refreshGameZone();
-  try {
-    // 关卡页里嵌的小游戏行（复习翻牌等）也要即时更新「已通关」标记
-    if (typeof renderMission === 'function' && document.getElementById('taskList')) renderMission();
-  } catch (e) {}
-}
 
-function buildGameZone() {
-  if (document.getElementById('gzOverlay')) return;
-  const ov = document.createElement('div');
-  ov.className = 'gz-overlay';
-  ov.id = 'gzOverlay';
-  ov.innerHTML = `
-    <div class="gz-box">
-      <div class="pd-head">
-        <div><div class="pd-title">🎮 游戏专区</div><div class="pd-sub">解锁后直接来玩，通关的也能反复刷分</div></div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <button class="mm-btn" onclick="closeGameZone()" style="font-size:12px;padding:6px 12px">🗺️ 返回厂区地图</button>
-          <div class="pd-close" onclick="closeGameZone()">✕</div>
-        </div>
-      </div>
-      <div class="pd-body" id="gzBody"></div>
-    </div>`;
-  document.body.appendChild(ov);
-}
-function openGameZone() {
-  buildGameZone();
-  renderGameZone(document.getElementById('gzBody'));
-  document.getElementById('gzOverlay').classList.add('show');
-}
-function closeGameZone() {
-  // 地图流程：关闭=回厂区地图，避免露出旧版页面
-  if (_mapFlowFeature) { goMap(); return; }
-  const ov = document.getElementById('gzOverlay');
-  if (ov) ov.classList.remove('show');
-}
 
 // 打开翻牌小游戏（memory_match）
 
 // ===== 小游戏首次引导 =====
-function tutSeen(t){ try{ return localStorage.getItem('game_tut_'+t)==='1'; }catch(e){ return false; } }
-function tutMark(t){ try{ localStorage.setItem('game_tut_'+t,'1'); }catch(e){} }
-function showGameTutorial(type, title, steps, onDone){
-  const ov=document.createElement('div');
-  ov.className='mm-overlay';
-  ov.innerHTML='<div class="tut-box"><div class="tut-title">'+title+'</div>'+
-    steps.map(s=>'<div class="tut-step">'+s+'</div>').join('')+
-    // （去掉“仅首次显示”提示）
-    '<button class="mm-btn primary" id="tutStart" style="margin-top:14px;font-size:16px">开始游戏 →</button></div>';
-  document.body.appendChild(ov);
-  ov.querySelector('#tutStart').onclick=()=>{ ov.remove(); tutMark(type); onDone(); };
-}
 // 打字游戏引导：慢速掉一个词→提示打字→打爆→正式开战
-function showTypingTutorial(cfg, onDone){
-  const words=(cfg.words||[]).filter(Boolean); const word=String(words[Math.floor(Math.random()*words.length)]||'ping');
-  const ov=document.createElement('div');
-  ov.className='mm-overlay';
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
-  ov.innerHTML='<div class="ty-box">'+
-    '<div class="mm-head"><div><div class="mm-title">🔫 术语防御战 · 新手上路</div><div class="mm-sub">关键词往下掉，敲出完整命令把它打下来！先试一个，跟着打：</div></div>'+
-    '<div class="mm-close" id="tutX">✕</div></div>'+
-    '<div class="ty-stats"><span>⌨️ 请打出：<b style="color:var(--amber)">'+escHtml(word)+'</b></span></div>'+
-    '<div class="ty-field" id="tutField" style="min-height:180px"></div>'+
-    '<div class="ty-cannon">🔫</div>'+
-    '<input id="tutInput" autocomplete="off" spellcheck="false" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none"></div>';
-  document.body.appendChild(ov);
-  const field=ov.querySelector('#tutField'); const input=ov.querySelector('#tutInput');
-  const el=document.createElement('div'); el.className='ty-word'; el.textContent=word;
-  el.style.left='30%'; el.style.top='24px'; field.appendChild(el);
-  input.focus();
-  let typed='';
-  ov.querySelector('#tutX').onclick=()=>{ ov.remove(); tutMark('typing'); onDone(); };
-  input.addEventListener('keydown', function(e){
-    e.preventDefault(); if(e.key.length!==1) return; playSound('type');
-    if(word.indexOf(typed+e.key)===0){
-      typed+=e.key;
-      el.innerHTML='<span class="ty-prefix">'+escHtml(typed)+'</span>'+escHtml(word.slice(typed.length));
-      if(typed===word){
-        playSound('success'); el.classList.add('ty-boom');
-        setTimeout(function(){
-          ov.innerHTML='<div class="ty-result"><div style="font-size:46px">🎉</div>'+
-            '<div style="font-size:20px;color:var(--green);font-weight:bold;margin-top:8px">太棒了！打爆一个</div>'+
-            '<div style="font-size:15px;color:var(--dim);margin-top:6px;line-height:1.7">接下来正式开战：词会越来越快<br>记住——输错就重新开始</div>'+
-            '<button class="mm-btn primary" id="tutGo" style="margin-top:16px;font-size:16px">正式开战 →</button></div>';
-          ov.querySelector('#tutGo').onclick=function(){ ov.remove(); tutMark('typing'); onDone(); };
-        }, 700);
-      }
-    } else {
-      typed=''; el.innerHTML=escHtml(word); playSound('error');
-    }
-  });
-}
 
 // =========================================================================
 // 9g. SHOOTER — 数据蜂群 · 保卫工厂（小蜜蜂/Galaxian 风格）
 // =========================================================================
 let shooterBuff = null;   // 商城道具·本局开局加成
 let _shooterSkipLoadout = false;   // 本局已选择“不用道具”，不再弹装备窗
-function showShooterLoadout(cfg, onComplete) {
-  const inv = gameState.inventory || {};
-  const opts = [];
-  if ((inv['power_card']||0) > 0) opts.push({id:'power_card', e:'🚀', name:'火力礼包', desc:'开局直接 2 级火力', key:'pLevel'});
-  if ((inv['shield_card']||0) > 0) opts.push({id:'shield_card', e:'❤️', name:'开局护盾', desc:'开局 +1 命', key:'lives'});
-  if ((inv['slow_card']||0) > 0) opts.push({id:'slow_card', e:'⏳', name:'慢速卡', desc:'敌人全场缓速 8 秒', key:'slow'});
-  const ov=document.createElement('div');
-  ov.className='mm-overlay';
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9550;display:flex;align-items:center;justify-content:center';
-  let boxes='';
-  opts.forEach(function(o,i){ boxes+='<label class="gz-row" style="cursor:pointer;flex:1;min-width:130px;margin:0"><input type="checkbox" id="lod_'+i+'" checked> <span class="gz-emoji">'+o.e+'</span> <span class="gz-name">'+o.name+'<span style="display:block;font-size:12px;color:var(--dim)">'+o.desc+'</span></span></label>'; });
-  ov.innerHTML='<div class="mm-box mm-fill" style="width:min(480px,92vw)"><div class="mm-head"><div><div class="mm-title">🎒 装备道具</div><div class="mm-sub">开局选商城买的一次性道具，更顺手</div></div></div><div class="mm-stats" style="margin-bottom:10px;flex-wrap:wrap">'+boxes+'</div><div style="display:flex;gap:10px;justify-content:center;margin-top:6px"><button class="mm-btn" onclick="window.__lodSkip()">不用道具</button><button class="mm-btn primary" onclick="window.__lodStart()">开始游戏</button></div></div>';
-  document.body.appendChild(ov);
-  window.__lodCfg=cfg; window.__lodDone=onComplete;
-  window.__lodStart=function(){
-    const use=[];
-    opts.forEach(function(o,i){ const cb=document.getElementById('lod_'+i); if(cb && cb.checked) use.push(o); });
-    const buff={lives:0,pLevel:0,slow:0};
-    use.forEach(function(o){
-      api('/api/student/consume-item',{method:'POST',body:JSON.stringify({itemId:o.id})}).then(function(r){
-        if (r && r.ok && gameState.inventory[o.id]) {
-          gameState.inventory[o.id]--;
-          if (gameState.inventory[o.id]<=0) delete gameState.inventory[o.id];
-        }
-      });
-      if (o.key==='lives') buff.lives=1;
-      else if (o.key==='pLevel') buff.pLevel=1;
-      else if (o.key==='slow') buff.slow=1;
-    });
-    shooterBuff=buff;
-    _shooterSkipLoadout=true;
-    ov.remove();
-    renderHeader();
-    openShooter(cfg, onComplete);
-  };
-  window.__lodSkip=function(){ _shooterSkipLoadout=true; ov.remove(); openShooter(cfg, onComplete); };
-}
 
 
 
@@ -2170,175 +1860,20 @@ function showShooterLoadout(cfg, onComplete) {
 // =========================================================================
 let prevRank = null;
 
-function checkLevelUp() {
-  const xp = calcTotalXP();
-  const rank = getRank(xp);
-  if (prevRank && prevRank.title !== rank.title) {
-    playSound('levelup');
-    showLevelUp(rank);
-  }
-  prevRank = rank;
-}
 
-function showLevelUp(rank) {
-  const overlay = document.getElementById('levelUpOverlay');
-  document.getElementById('levelUpRank').textContent = rank.emoji;
-  document.getElementById('levelUpLabel').innerHTML = `🏅 ${rank.title}<br><span style="font-size: 14px;color:var(--dim);margin-top:6px;display:inline-block">厂长拍了拍你的肩膀</span>`;
-  overlay.classList.add('show');
-  setTimeout(() => overlay.classList.remove('show'), 3000);
-}
 
 // =========================================================================
 // 11. TOAST
 // =========================================================================
 
-function showWelcomeDialog(msg, done) {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:8px;padding:24px 32px;max-width:460px;width:90%;box-shadow:0 0 40px rgba(255,176,0,.15)';
-  box.innerHTML = `
-    <div style="font-size:15px;line-height:1.8;color:var(--text);margin-bottom:20px">${msg}</div>
-    <button style="display:block;margin:0 auto;padding:8px 28px;background:var(--amber);color:#000;border:none;border-radius:4px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit">知道了</button>
-  `;
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  box.querySelector('button').onclick = () => {
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity .3s';
-    setTimeout(() => { overlay.remove(); if (done) setTimeout(done, 50); }, 300);
-    playSound('click');
-  };
-  playSound('boot');
-}
 
 // =========================================================================
 // P2 NARRATIVE SYSTEM: Level Entry Dialogue
 // =========================================================================
-function showLevelIntro(lv, onStart) {
-  // Check if already seen this level intro this session
-  const seenKey = 'levelIntroSeen_' + lv.id;
-  const isReturning = sessionStorage.getItem(seenKey) === 'true';
-  
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center';
-  
-  const box = document.createElement('div');
-  box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:8px;padding:0;max-width:520px;width:90%;box-shadow:0 0 60px rgba(255,176,0,.2);overflow:hidden';
-  
-  const introText = lv.narrative.intro;
-  const mood = isReturning ? 'neutral' : 'thinking';
-  const moodEmoji = { proud: '😎', stern: '😤', awkward: '😅', thinking: '🤔', neutral: '👨‍💼' }[mood];
-  const moodLine = getRandomMoodLine(mood);
-  
-  box.innerHTML = `
-    <div class="director-box director-mood-${mood}" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border);padding:16px 20px">
-      <div class="director-portrait">${moodEmoji}</div>
-      <div class="director-bubble">
-        <div class="director-name">厂长</div>
-        <div class="director-mood-line" style="font-size:13px;color:var(--accent);margin-bottom:4px;font-style:italic">${moodLine}</div>
-        <div class="director-text" id="levelIntroText" style="font-size:15px;line-height:1.7;color:var(--text)"></div>
-      </div>
-    </div>
-    <div style="padding:16px 20px;text-align:center;border-top:1px solid var(--border);background:rgba(0,0,0,.2)">
-      <button id="levelIntroBtn" style="display:block;margin:0 auto;padding:10px 32px;background:var(--amber);color:#000;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;opacity:0.5" disabled>
-        ${isReturning ? '跳过 → 开始任务' : '正在交代任务...'}
-      </button>
-    </div>
-  `;
-  
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  
-  const textEl = box.querySelector('#levelIntroText');
-  const btn = box.querySelector('#levelIntroBtn');
-  
-  typewrite(textEl, introText, isReturning ? 5 : 25, () => {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.textContent = isReturning ? '跳过 → 开始任务' : '收到，开始任务';
-    playSound('click');
-  });
-  
-  btn.onclick = () => {
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity .3s';
-    setTimeout(() => overlay.remove(), 300);
-    playSound('click');
-    sessionStorage.setItem(seenKey, 'true');
-    if (onStart) onStart();
-  };
-}
 
 // =========================================================================
 // P2 NARRATIVE SYSTEM: Level Complete Dialogue
 // =========================================================================
-function showLevelComplete(lv, done) {
-  const xpEarned = calculateLevelXP(lv.id);
-  const totalXP = calcTotalXP();
-  const rank = getRank(totalXP);
-  const nextRank = RANKS.find(r => r.min > totalXP);
-  const maxXP = nextRank ? nextRank.min : 8000;
-  const minXP = rank.min;
-  const pct = nextRank ? Math.round((totalXP - minXP) / (maxXP - minXP) * 100) : 100;
-  
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center';
-  
-  const box = document.createElement('div');
-  box.style.cssText = 'background:#12121a;border:2px solid var(--green);border-radius:8px;padding:0;max-width:520px;width:90%;box-shadow:0 0 60px rgba(0,230,118,.25);overflow:hidden;text-align:center';
-  
-  const moodEmoji = '😎';
-  const moodLine = getRandomMoodLine('proud');
-  
-  box.innerHTML = `
-    <div class="director-box director-mood-proud" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border);padding:16px 20px;text-align:left">
-      <div class="director-portrait">${moodEmoji}</div>
-      <div class="director-bubble">
-        <div class="director-name">厂长</div>
-        <div class="director-mood-line" style="font-size:13px;color:var(--green);margin-bottom:4px;font-style:italic">${moodLine}</div>
-        <div class="director-text" id="levelCompleteText" style="font-size:15px;line-height:1.7;color:var(--text)"></div>
-      </div>
-    </div>
-    <div style="padding:20px;background:rgba(0,230,118,.05);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-      <div style="font-size:14px;color:var(--dim);margin-bottom:8px">本关获得经验</div>
-      <div style="font-size:36px;font-weight:bold;color:var(--green);margin-bottom:16px">+${xpEarned} XP</div>
-      <div style="font-size:14px;color:var(--dim);margin-bottom:8px">总经验：<span style="color:var(--amber)">${totalXP}</span> / ${maxXP === 8000 ? 'MAX' : maxXP}</div>
-      <div style="height:8px;background:#1a1a24;border-radius:4px;overflow:hidden;margin-top:8px">
-        <div style="width:${Math.min(pct,100)}%;height:100%;background:linear-gradient(90deg,var(--amber),var(--green));transition:width .8s"></div>
-      </div>
-      <div style="font-size:13px;color:var(--dim);margin-top:6px">段位：${rank.emoji} ${rank.title} (${Math.min(pct,100)}%)</div>
-    </div>
-    <div style="padding:16px 20px;text-align:center">
-      <button id="levelCompleteBtn" style="display:block;margin:0 auto;padding:10px 32px;background:var(--green);color:#000;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit">
-        返回工厂查看
-      </button>
-    </div>
-  `;
-  
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  
-  const textEl = box.querySelector('#levelCompleteText');
-  const btn = box.querySelector('#levelCompleteBtn');
-  
-  const completeText = lv.narrative.complete || '关卡完成，产线又亮了一盏灯。';
-  typewrite(textEl, completeText, 25, () => {
-    playSound('success');
-  });
-  
-  if (sessionStorage.getItem('mapFlow') === '1') {
-    btn.textContent = '🗺️ 回厂区继续';
-    btn.onclick = () => { playSound('click'); goMap(); };
-  } else {
-    btn.onclick = () => {
-      overlay.style.opacity = '0';
-      overlay.style.transition = 'opacity .3s';
-      setTimeout(() => { overlay.remove(); if (done) setTimeout(done, 50); }, 300);
-      playSound('click');
-    };
-  }
-}
 
 function calculateLevelXP(levelId) {
   const lv = content.levels.find(l => l.id === levelId);
