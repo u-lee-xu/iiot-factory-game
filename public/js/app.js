@@ -10149,8 +10149,11 @@ init().then(() => {
 
 
 // ═══════════════════════════════════════════════════════════════════
-// ES Module 全局挂载（function + async function + 顶层变量全覆盖）
-// 兼容 onclick / window.openXxx 测试调用；后续拆子模块后逐步收敛
+// ES Module 全局挂载
+//  - 函数 & 常量 → Object.assign 值挂载（onclick / window.openXxx 测试调用）
+//  - 可变状态(let/var) → defineProperty getter 挂载（始终反映模块变量当前值，
+//    避免 Object.assign 挂在 init() 之前的初始值导致的 stale 问题）
+// 后续拆子模块后逐步收敛为"只挂 onclick 需要的"
 // ═══════════════════════════════════════════════════════════════════
 Object.assign(window, {
   ACHIEVEMENTS,
@@ -10161,22 +10164,14 @@ Object.assign(window, {
   PASSWORD_ENABLED,
   PLANE_SKINS,
   RANKS,
-  SHOP_CACHE,
   TY_HINTS,
   _fmtTime,
-  _mapFlowFeature,
-  _shooterSkipLoadout,
-  achDraining,
-  achQueue,
-  achShowing,
   achievementContext,
   addDirectorBox,
   addTaskItemBar,
   api,
   applyMiniTier,
   areaStars,
-  audioCtx,
-  bgIdx,
   buildGameZone,
   buildWallet,
   bumpGameStats,
@@ -10195,15 +10190,8 @@ Object.assign(window, {
   closeTaskModal,
   closeWallet,
   completeTask,
-  content,
   countUnlockedGameTypes,
-  currentAreaKey,
-  currentLevelId,
-  currentTaskId,
-  currentTrack,
   detectNewServerAchievements,
-  directorMood,
-  directorMoodLines,
   drainAchQueue,
   drainLoginPopups,
   dstr,
@@ -10211,13 +10199,11 @@ Object.assign(window, {
   enqueueLoginPopup,
   equipSkin,
   equippedEnemySkin,
-  errors,
   escHtml,
   evaluateAchievements,
   findTaskAnswer,
   focusResultPrimary,
   gameSong,
-  gameState,
   generateTeach,
   getAudioCtx,
   getDirectorMood,
@@ -10236,7 +10222,6 @@ Object.assign(window, {
   goMap,
   gzAfter,
   gzEmoji,
-  gzList,
   gzMeta,
   gzName,
   gzPlay,
@@ -10244,16 +10229,12 @@ Object.assign(window, {
   init,
   interactions,
   isTaskDone,
-  lbTab,
-  leaderboardCache,
   levelProgress,
   loadGameContent,
   loadKnowledgeTags,
   loadShop,
   loadState,
   loadTermCards,
-  loginPopActive,
-  loginPopQueue,
   logout,
   markPopupToday,
   markTermWarmupDone,
@@ -10261,9 +10242,6 @@ Object.assign(window, {
   miniMarkClear,
   miniTier,
   miniTierBadge,
-  musicEnabled,
-  musicGainNode,
-  musicSrc,
   myName,
   nextMusic,
   openAchievements,
@@ -10303,12 +10281,10 @@ Object.assign(window, {
   openTypingDefense,
   openWallet,
   pediaCount,
-  pendingLevelComplete,
   playAreaMusic,
   playMusic,
   playSound,
   popupShownToday,
-  prevRank,
   recordGameWin,
   refreshGameZone,
   refreshLeaderboard,
@@ -10331,11 +10307,9 @@ Object.assign(window, {
   savePedia,
   saveState,
   selectLevel,
-  selfTeachTypes,
   setArea,
   setSeenAch,
   shakeScreen,
-  shooterBuff,
   showAchievementUnlock,
   showGameTutorial,
   showLevelComplete,
@@ -10348,9 +10322,7 @@ Object.assign(window, {
   showToast,
   showTypingTutorial,
   showWelcomeDialog,
-  soundEnabled,
   starStr,
-  streak,
   submitBugReport,
   switchLbTab,
   taskKey,
@@ -10370,3 +10342,35 @@ Object.assign(window, {
   useTaskPass,
   walletRank
 });
+
+Object.defineProperty(window, 'SHOP_CACHE', { get: () => SHOP_CACHE, configurable: true });
+Object.defineProperty(window, '_mapFlowFeature', { get: () => _mapFlowFeature, configurable: true });
+Object.defineProperty(window, '_shooterSkipLoadout', { get: () => _shooterSkipLoadout, configurable: true });
+Object.defineProperty(window, 'achDraining', { get: () => achDraining, configurable: true });
+Object.defineProperty(window, 'achQueue', { get: () => achQueue, configurable: true });
+Object.defineProperty(window, 'achShowing', { get: () => achShowing, configurable: true });
+Object.defineProperty(window, 'audioCtx', { get: () => audioCtx, configurable: true });
+Object.defineProperty(window, 'bgIdx', { get: () => bgIdx, configurable: true });
+Object.defineProperty(window, 'content', { get: () => content, configurable: true });
+Object.defineProperty(window, 'currentAreaKey', { get: () => currentAreaKey, configurable: true });
+Object.defineProperty(window, 'currentLevelId', { get: () => currentLevelId, configurable: true });
+Object.defineProperty(window, 'currentTaskId', { get: () => currentTaskId, configurable: true });
+Object.defineProperty(window, 'currentTrack', { get: () => currentTrack, configurable: true });
+Object.defineProperty(window, 'directorMood', { get: () => directorMood, configurable: true });
+Object.defineProperty(window, 'directorMoodLines', { get: () => directorMoodLines, configurable: true });
+Object.defineProperty(window, 'errors', { get: () => errors, configurable: true });
+Object.defineProperty(window, 'gameState', { get: () => gameState, configurable: true });
+Object.defineProperty(window, 'gzList', { get: () => gzList, configurable: true });
+Object.defineProperty(window, 'lbTab', { get: () => lbTab, configurable: true });
+Object.defineProperty(window, 'leaderboardCache', { get: () => leaderboardCache, configurable: true });
+Object.defineProperty(window, 'loginPopActive', { get: () => loginPopActive, configurable: true });
+Object.defineProperty(window, 'loginPopQueue', { get: () => loginPopQueue, configurable: true });
+Object.defineProperty(window, 'musicEnabled', { get: () => musicEnabled, configurable: true });
+Object.defineProperty(window, 'musicGainNode', { get: () => musicGainNode, configurable: true });
+Object.defineProperty(window, 'musicSrc', { get: () => musicSrc, configurable: true });
+Object.defineProperty(window, 'pendingLevelComplete', { get: () => pendingLevelComplete, configurable: true });
+Object.defineProperty(window, 'prevRank', { get: () => prevRank, configurable: true });
+Object.defineProperty(window, 'selfTeachTypes', { get: () => selfTeachTypes, configurable: true });
+Object.defineProperty(window, 'shooterBuff', { get: () => shooterBuff, configurable: true });
+Object.defineProperty(window, 'soundEnabled', { get: () => soundEnabled, configurable: true });
+Object.defineProperty(window, 'streak', { get: () => streak, configurable: true });
