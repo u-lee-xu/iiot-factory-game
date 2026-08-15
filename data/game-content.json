@@ -1103,27 +1103,27 @@
        {
         "title": "DNS 是什么",
         "narrative": "厂长：DNS 就是互联网电话本——把好记的域名（www.baidu.com）翻译成机器用的 IP（39.156.66.18）。",
-        "question": "DNS 的作用是？",
+        "question": "域名解析为了加快重复访问，系统会先查哪里？",
         "options": [
          {
-          "text": "把域名翻译成 IP 地址",
+          "text": "本地 DNS 缓存",
           "correct": true,
-          "hint": "DNS = 互联网电话本"
+          "hint": "解析过的域名会缓存在本地，下次直接取，不用再查一遍"
          },
          {
-          "text": "加密数据",
+          "text": "服务器硬盘",
           "correct": false,
-          "hint": "加密是 TLS"
+          "hint": "硬盘存文件，不存解析结果"
          },
          {
-          "text": "加速网速",
+          "text": "路由表",
           "correct": false,
-          "hint": "不是这个"
+          "hint": "路由表管去哪个网络"
          },
          {
-          "text": "分配 MAC 地址",
+          "text": "MAC 地址表",
           "correct": false,
-          "hint": "MAC 是网卡出厂就有"
+          "hint": "MAC 表管二层转发"
          }
         ]
        },
@@ -2561,7 +2561,7 @@
        },
        {
         "title": "动手敲命令：SSH 登录云服务器",
-        "narrative": "厂长：云服务器创建好了（示例公网 IP 120.78.20.10，用户名 student）。动手用 SSH 登录它验证一下。",
+        "narrative": "厂长：云服务器创建好了（示例公网 IP 120.78.20.10，用户名 student）。动手用之前学的 ssh 命令登录它验证一下——格式还记得吗：ssh 用户名@IP。",
         "question": "在终端输入命令，SSH 登录云服务器（用户名 student，IP 120.78.20.10）：",
         "inputType": "command",
         "correctCommand": "ssh student@120.78.20.10",
