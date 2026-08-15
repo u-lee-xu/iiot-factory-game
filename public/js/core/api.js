@@ -22,7 +22,7 @@ export async function api(path, options) {
 }
 
 export async function loadGameContent() {
-  const result = await api('/api/game/window.content');
+  const result = await api('/api/game/content');
   if (result && result.ok) window.content = result.data;
 }
 

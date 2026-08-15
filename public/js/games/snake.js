@@ -41,7 +41,7 @@ export function openSnake(cfg, onComplete) {
   // ================= 界面 =================
   const overlay = document.createElement('div');
   overlay.className = 'mm-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML = `
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🐍 网线贪吃蛇</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 吃术语，配对解释</div></div><div class="mm-close" title="关闭">✕</div></div>
@@ -52,7 +52,7 @@ export function openSnake(cfg, onComplete) {
         <span>🎯 <b id="snScore">0</b></span>
         <span>🔥 <b id="snCombo" style="color:#ff7a00"></b></span>
       </div>
-      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-window.content:center;overflow:hidden;background:#050a12;touch-action:none"><canvas id="snCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#050a12;touch-action:none"><canvas id="snCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">吃蓝色术语带着它 → 吃黄色解释配对 · 每3对厂长出题</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -135,7 +135,7 @@ export function openSnake(cfg, onComplete) {
     for(let i=opts.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [opts[i],opts[j]]=[opts[j],opts[i]]; }
     const ov=document.createElement('div');
     ov.className='mm-overlay';
-    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9700;display:flex;align-items:center;justify-window.content:center';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9700;display:flex;align-items:center;justify-content:center';
     ov.innerHTML='<div class="mm-box" style="width:min(480px,92vw)"><div class="mm-head"><div><div class="mm-title">🤔 厂长提问</div><div class="mm-sub">答对额外 +1 命 / +30 分</div></div></div><div class="pd-body"><div style="font-size:16px;font-weight:bold;color:var(--amber);margin-bottom:10px">「'+escHtml(q.t)+'」是什么意思？</div><div style="display:flex;flex-direction:column;gap:8px" id="snqOpts"></div></div></div>';
     document.body.appendChild(ov);
     const box=ov.querySelector('#snqOpts');
@@ -311,7 +311,7 @@ export function openSnake(cfg, onComplete) {
     if(isWin){ window.recordGameWin('snake'); window.miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(function(){
       const res=document.createElement('div'); res.className='ty-result';
-      res.innerHTML='<div style="font-size:46px;line-height:1">🐍</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'网络三件套配对完成！':'网线断了，重接一下')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">配对 <b style="color:var(--amber)">'+paired+'</b> 对 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="font-size:13px;color:var(--dim);margin-top:4px">'+'记住的术语已收录图鉴'+(isWin?'':'，配对 '+WIN+' 对即通关')+'</div><div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.snAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.snDone()">收下奖励</button></div>';
+      res.innerHTML='<div style="font-size:46px;line-height:1">🐍</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'网络三件套配对完成！':'网线断了，重接一下')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">配对 <b style="color:var(--amber)">'+paired+'</b> 对 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="font-size:13px;color:var(--dim);margin-top:4px">'+'记住的术语已收录图鉴'+(isWin?'':'，配对 '+WIN+' 对即通关')+'</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.snAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.snDone()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     },300);

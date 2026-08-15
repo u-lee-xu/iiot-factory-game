@@ -131,7 +131,7 @@ export function openTile2048(cfg, onComplete) {
       res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'合成出 '+escHtml(TARGET)+'！':'格子满了')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 步数 <b style="color:var(--amber)">'+moves+'</b></div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.t48Again()">🔁 再来一局</button><button class="mm-btn primary" onclick="window.t48Done()">收下奖励</button></div>';
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.t48Again()">🔁 再来一局</button><button class="mm-btn primary" onclick="window.t48Done()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     }, 300);

@@ -17,7 +17,7 @@ registerInteraction('config_debug', {
 
     container.innerHTML = `
       <div style="margin-bottom:10px;font-size: 14px;color:var(--dim)">
-        <div style="display:flex;justify-window.content:space-between;align-items:center;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <span>🛠 修复配置文件</span>
           <span id="cfgStatus" style="font-size: 14px;color:var(--amber)">待修复</span>
         </div>

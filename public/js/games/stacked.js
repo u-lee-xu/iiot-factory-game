@@ -176,7 +176,7 @@ export function openStackedMatch(cfg, onComplete) {
         <div class="xp">+${cfg.xp || 0} XP</div>
         <div style="font-size:14px;color:var(--dim)">三层全破，${totalPairs} 对全认全</div>
         <div class="note">挑战奖励不计入排行榜，重在混个脸熟</div>
-        <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
       overlay.appendChild(res);
@@ -189,7 +189,7 @@ export function openStackedMatch(cfg, onComplete) {
         <div class="big">⏰</div>
         <div style="font-size:20px;font-weight:bold;color:var(--red);margin-top:6px">时间到，还差 ${totalPairs - totalMatched} 对</div>
         <div style="font-size:14px;color:var(--dim);margin-top:8px">混个脸熟就行，再来一次吧！</div>
-        <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn primary" data-act="retry">🔁 再来一次</button>
           <button class="mm-btn" data-act="skip">先干正事</button>
         </div>`;

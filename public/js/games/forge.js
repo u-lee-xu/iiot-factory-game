@@ -191,7 +191,7 @@ export function openForge(cfg, onComplete) {
       res.innerHTML = '<div style="font-size:46px;line-height:1">'+(win?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(win?'var(--green)':'var(--red)')+';margin-top:8px">'+(win?'合成出 '+escHtml(cfg.target||units[TARGET_LV].name)+'！':'熔炉溢出了')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 最高连击 <b style="color:var(--amber)">'+combo+'</b></div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.fgAgain()">🔁 再来一炉</button><button class="mm-btn primary" onclick="window.fgDone()">收下奖励</button></div>';
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.fgAgain()">🔁 再来一炉</button><button class="mm-btn primary" onclick="window.fgDone()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     }, 300);

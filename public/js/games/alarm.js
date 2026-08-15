@@ -251,7 +251,7 @@ export function openAlarmRush(cfg, onComplete) {
         <div class="xp">+${cfg.xp || 0} XP</div>
         <div style="font-size:14px;color:var(--dim)">得分 ${score} · 处理成功 ${saves}/${totalEvents} 起 · 宕机 ${crashes} 台 · ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
         <div class="note">看准冒烟变红的盒子再点，连击越多分越高</div>
-        <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn" data-act="again">🔁 再守一次</button>
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
@@ -266,7 +266,7 @@ export function openAlarmRush(cfg, onComplete) {
         <div class="big">💥</div>
         <div style="font-size:20px;font-weight:bold;color:var(--red);margin-top:6px">产线瘫痪了！</div>
         <div style="font-size:14px;color:var(--dim);margin-top:8px">宕机 ${crashes}/${CRASH_LIMIT} 台 · 再来一次，盯紧冒烟的盒子</div>
-        <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn primary" data-act="retry">🔁 再来一次</button>
           <button class="mm-btn" data-act="skip">先干正事</button>
         </div>`;

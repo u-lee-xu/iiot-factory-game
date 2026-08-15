@@ -117,7 +117,7 @@ export function openBoss(cfg, onComplete) {
       res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'故障块砸掉了！':'命令弹打光了')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">用了 <b style="color:var(--amber)">'+used+'</b> 发</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.bzAgain()">🔁 再砸一轮</button><button class="mm-btn primary" onclick="window.bzDone()">收下奖励</button></div>';
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.bzAgain()">🔁 再砸一轮</button><button class="mm-btn primary" onclick="window.bzDone()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     }, 300);

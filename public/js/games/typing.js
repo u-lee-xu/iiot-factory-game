@@ -41,7 +41,7 @@ export function openTypingDefense(cfg, onComplete) {
 
   const overlay = document.createElement('div');
   overlay.className = 'mm-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML = `
     <div class="ty-box">
       <div class="mm-head">
@@ -338,7 +338,7 @@ export function openTypingDefense(cfg, onComplete) {
         '<div style="font-size:46px;line-height:1">'+(win?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(win?'var(--green)':'var(--red)')+';margin-top:8px">'+(win?'全部防线守住！':'防线失守')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">击落 <b style="color:var(--amber)">'+score+'</b> · 打到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波 · 剩余 ❤️ '+Math.max(0,lives)+' · 用时 <b style="color:var(--amber)">'+Math.ceil(elapsed)+'</b>s</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
           '<button class="mm-btn" onclick="window.tyAgain()">🔁 再玩一次</button>'+
           '<button class="mm-btn primary" onclick="window.tyDone()">收下奖励</button>'+
         '</div>';

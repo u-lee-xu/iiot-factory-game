@@ -24,7 +24,7 @@ export function showLevelUp(rank) {
 
 export function showWelcomeDialog(msg, done) {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center';
   const box = document.createElement('div');
   box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:8px;padding:24px 32px;max-width:460px;width:90%;box-shadow:0 0 40px rgba(255,176,0,.15)';
   box.innerHTML = `
@@ -48,7 +48,7 @@ export function showLevelIntro(lv, onStart) {
   const isReturning = sessionStorage.getItem(seenKey) === 'true';
   
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center';
   
   const box = document.createElement('div');
   box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:8px;padding:0;max-width:520px;width:90%;box-shadow:0 0 60px rgba(255,176,0,.2);overflow:hidden';
@@ -107,7 +107,7 @@ export function showLevelComplete(lv, done) {
   const pct = nextRank ? Math.round((totalXP - minXP) / (maxXP - minXP) * 100) : 100;
   
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center';
   
   const box = document.createElement('div');
   box.style.cssText = 'background:#12121a;border:2px solid var(--green);border-radius:8px;padding:0;max-width:520px;width:90%;box-shadow:0 0 60px rgba(0,230,118,.25);overflow:hidden;text-align:center';

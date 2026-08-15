@@ -35,7 +35,7 @@ export function openDataRacing(cfg, onComplete) {
 
   const overlay = document.createElement('div');
   overlay.className = 'mm-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML = `
     <div class="sh-box">
       <div class="mm-head">
@@ -49,7 +49,7 @@ export function openDataRacing(cfg, onComplete) {
         <span>🎯 <b id="rrScore">0</b></span>
         <span>🔥 <b id="rrCombo" style="color:#ff7a00"></b></span>
       </div>
-      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-window.content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 10%, #0a1428, #04060c);cursor:pointer;touch-action:none"><canvas id="rrCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 10%, #0a1428, #04060c);cursor:pointer;touch-action:none"><canvas id="rrCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">←/→ 或 点屏幕两侧切换车道 · 读数 ≤${mx}${unit} 才吃 · 超限躲开</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -182,7 +182,7 @@ export function openDataRacing(cfg, onComplete) {
         '<div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">数据狂飙结束</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">坚持 <b style="color:var(--amber)">'+Math.floor(survived)+'</b> 秒 · 得分 <b style="color:var(--amber)">'+score+'</b> · 最高连击 <b style="color:var(--amber)">'+combo+'</b></div>'+
         '<div style="font-size:13px;color:var(--dim);margin-top:4px">'+(survived>=45?'🏆 已通关，下次挑战二周目/无限战！':'坚持 45 秒即可通关')+'</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
           '<button class="mm-btn" onclick="window.rrAgain()">🔁 再飙一次</button>'+
           '<button class="mm-btn primary" onclick="window.rrDone()">收下奖励</button>'+
         '</div>';

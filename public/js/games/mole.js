@@ -26,12 +26,12 @@ export function openMole(cfg, onComplete) {
   let moles=[], spawnTimer=0.2, speed=1, particles=[];
   const overlay=document.createElement('div');
   overlay.className='mm-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML=`
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🔨 边缘打地鼠</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 点掉异常，别点正常</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>❤️ <b id="moLives">3</b></span><span>🌡️ 正常 ≤<b id="moThr">${thr}</b>${unit}</span><span>🎯 <b id="moScore">0</b></span><span>🔨 <b id="moKill">0</b>/20</span><span>🔥 <b id="moCombo" style="color:#ff7a00"></b></span></div>
-      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-window.content:center;overflow:hidden;background:#0a0f16;cursor:pointer;touch-action:none"><canvas id="moCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#0a0f16;cursor:pointer;touch-action:none"><canvas id="moCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">读数 <b>超过阈值</b>(${thr}${unit})就点掉 · 范围内别点 · ⭐金包必点 · 越冒越快</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -109,7 +109,7 @@ export function openMole(cfg, onComplete) {
     if(isWin){ window.recordGameWin('mole'); window.miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
-      res.innerHTML='<div style="font-size:46px;line-height:1">🔨</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'边缘过滤完成！':'被正常数据骗了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">点掉异常 <b style="color:var(--amber)">'+killed+'</b> 个 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.moAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.moDone()">收下奖励</button></div>';
+      res.innerHTML='<div style="font-size:46px;line-height:1">🔨</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'边缘过滤完成！':'被正常数据骗了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">点掉异常 <b style="color:var(--amber)">'+killed+'</b> 个 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.moAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.moDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
   window.moAgain=()=>{ overlay.remove(); openMole(cfg,onComplete); };

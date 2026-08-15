@@ -48,7 +48,7 @@ export function openShooter(cfg, onComplete) {
 
   const overlay = document.createElement('div');
   overlay.className = 'mm-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML = `
     <div class="sh-box">
       <div class="mm-head">
@@ -63,7 +63,7 @@ export function openShooter(cfg, onComplete) {
         <span>🚀 <b id="shPower" style="color:#7ee8fa">x1</b></span>
         <span>🔥 <b id="shCombo" style="color:#ff7a00"></b></span>
       </div>
-      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-window.content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 20%, #101a2e, #06070d);cursor:crosshair;touch-action:none"><canvas id="shCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 20%, #101a2e, #06070d);cursor:crosshair;touch-action:none"><canvas id="shCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">${advanced ? '↑/↓ 切换炮口名词，匹配到敌人名词才打得动 · ←/→ 移动 · 自动开火' : '看飞机上的解释 → 打对应名词（非配对自动穿透） · ←/→移动 自动开火'}</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -277,7 +277,7 @@ export function openShooter(cfg, onComplete) {
         '<div style="font-size:46px;line-height:1">'+(win?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(win?'var(--green)':'var(--red)')+';margin-top:8px">'+(win?'编队全清！工厂安全！':'防线被突破')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">配对命中 <b style="color:var(--amber)">'+score+'</b> 分 · 打到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">'+
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
           '<button class="mm-btn" onclick="window.shAgain()">🔁 再玩一次</button>'+
           '<button class="mm-btn primary" onclick="window.shDone()">收下奖励</button>'+
         '</div>';

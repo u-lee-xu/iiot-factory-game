@@ -69,7 +69,7 @@ export function openMaze(cfg, onComplete) {
     const opts = [q.hint].concat(pairs.filter(p=>p.term!==q.term).map(p=>p.hint).slice(0,3));
     for (let i=opts.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [opts[i],opts[j]]=[opts[j],opts[i]]; }
     const ov=document.createElement('div');
-    ov.className='mm-overlay'; ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9700;display:flex;align-items:center;justify-window.content:center';
+    ov.className='mm-overlay'; ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9700;display:flex;align-items:center;justify-content:center';
     ov.innerHTML='<div class="mm-box" style="width:min(460px,92vw)"><div class="mm-head"><div><div class="mm-title">🚪 协议门</div><div class="mm-sub">答对才能通过这个门</div></div></div><div class="pd-body"><div style="font-size:16px;font-weight:bold;color:var(--amber);margin-bottom:10px">「'+escHtml(q.term)+'」是什么？</div><div style="display:flex;flex-direction:column;gap:8px" id="mzOpts"></div></div></div>';
     document.body.appendChild(ov);
     const box=ov.querySelector('#mzOpts');
@@ -141,7 +141,7 @@ export function openMaze(cfg, onComplete) {
       res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'数据包送达服务器！':'数据包丢了')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">步数 <b style="color:var(--amber)">'+moves+'</b> · 剩余 ❤️ '+Math.max(0,lives)+'</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.mzAgain()">🔁 再送一程</button><button class="mm-btn primary" onclick="window.mzDone()">收下奖励</button></div>';
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.mzAgain()">🔁 再送一程</button><button class="mm-btn primary" onclick="window.mzDone()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     }, 300);

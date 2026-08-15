@@ -41,7 +41,7 @@ registerInteraction('log_forensics', {
       el.style.cssText = 'padding:10px 12px;background:#12121a;border:2px solid var(--border);border-radius:4px;cursor:pointer;transition:all .2s;font-size: 14px';
       el.innerHTML = `
         <div style="display:flex;align-items:center;gap:8px">
-          <span class="opt-mark" style="width:18px;height:18px;border:2px solid var(--border);border-radius:${allowMulti ? '2px' : '50%'};display:flex;align-items:center;justify-window.content:center;font-size: 14px;color:var(--green)"></span>
+          <span class="opt-mark" style="width:18px;height:18px;border:2px solid var(--border);border-radius:${allowMulti ? '2px' : '50%'};display:flex;align-items:center;justify-content:center;font-size: 14px;color:var(--green)"></span>
           <span>${opt.text}</span>
         </div>
       `;

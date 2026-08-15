@@ -27,12 +27,12 @@ export function openTank(cfg, onComplete) {
   let bullets=[], foes=[], spawnT=0, toSpawn=6, particles=[];
   const overlay=document.createElement('div');
   overlay.className='mm-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML=`
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🎯 消息守卫战</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 坦克守 Broker</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>🚗 <b id="tkLives">3</b></span><span>🏰 <b id="tkBase">3</b></span><span>🎯 <b id="tkTopic" style="color:#7ee8fa">${cannonTopic}</b></span><span>🌊 第 <b id="tkWave">1</b> 波</span></div>
-      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-window.content:center;overflow:hidden;background:#071019;touch-action:none"><canvas id="tkCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#071019;touch-action:none"><canvas id="tkCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">↑/↓ 切炮口主题 · 只打<b>匹配主题</b>的消息 · 守 Broker 别漏</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -100,7 +100,7 @@ export function openTank(cfg, onComplete) {
   function endGame(isWin){ if(ended)return; ended=true; if(isWin){window.recordGameWin('tank');window.miniMarkClear(cfg.id);playSound('fanfare');}
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
-      res.innerHTML='<div style="font-size:46px;line-height:1">🎯</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(base>0?'Broker 守住了！':'Broker 被攻破了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">守到第 <b style="color:var(--amber)">'+wave+'</b> 波 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.tkAgain()">🔁 再战</button><button class="mm-btn primary" onclick="window.tkDone()">收下奖励</button></div>';
+      res.innerHTML='<div style="font-size:46px;line-height:1">🎯</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(base>0?'Broker 守住了！':'Broker 被攻破了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">守到第 <b style="color:var(--amber)">'+wave+'</b> 波 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.tkAgain()">🔁 再战</button><button class="mm-btn primary" onclick="window.tkDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300); }
   window.tkAgain=()=>{ overlay.remove(); openTank(cfg,onComplete); };
   window.tkDone=()=>{ if(onComplete)onComplete(base>0); overlay.remove(); window.playAreaMusic(); };

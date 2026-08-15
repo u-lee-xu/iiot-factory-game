@@ -44,7 +44,7 @@ registerInteraction('boss_fight', {
 
       container.innerHTML = `
         <div style="margin-bottom:10px">
-          <div style="display:flex;justify-window.content:space-between;align-items:center;margin-bottom:4px;font-size: 14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size: 14px">
             <span>${cfg.bossEmoji || '👾'} <strong>${cfg.bossName}</strong></span>
             <span>${'❤️'.repeat(playerHP)}${'🖤'.repeat(Math.max(0,3-playerHP))}</span>
           </div>
@@ -52,7 +52,7 @@ registerInteraction('boss_fight', {
             <div class="boss-hp-fill" id="bossHPFill" style="width:${Math.round(bossHP/maxBossHP*100)}%"></div>
             <span class="boss-hp-label">${cfg.bossName} HP ${bossHP}/${maxBossHP}</span>
           </div>
-          <div style="font-size: 14px;color:var(--dim);margin-top:4px;display:flex;justify-window.content:space-between">
+          <div style="font-size: 14px;color:var(--dim);margin-top:4px;display:flex;justify-content:space-between">
             <span>阶段 ${phase+1}/${cfg.phases.length}: ${p.name}</span>
             <span>${qIdx+1}/${p.questions.length}</span>
           </div>

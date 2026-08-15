@@ -100,7 +100,7 @@ export function openMatchGame(cfg, onComplete) {
       playSound('fanfare');
       const res = document.createElement('div');
       res.className = 'mm-result';
-      res.innerHTML = `<div class="big">🔗</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:6px">${escHtml(cfg.name)} 完成！</div><div class="xp">+${cfg.xp || 0} XP</div><div style="font-size:14px;color:var(--dim)">${cfg.size} 组全部配对成功</div><div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" data-act="again">🔁 再玩一次</button><button class="mm-btn primary" data-act="done">收下奖励</button></div>`;
+      res.innerHTML = `<div class="big">🔗</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:6px">${escHtml(cfg.name)} 完成！</div><div class="xp">+${cfg.xp || 0} XP</div><div style="font-size:14px;color:var(--dim)">${cfg.size} 组全部配对成功</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" data-act="again">🔁 再玩一次</button><button class="mm-btn primary" data-act="done">收下奖励</button></div>`;
       overlay.appendChild(res);
       overlay.querySelector('[data-act="again"]').onclick = () => { window.playAreaMusic(); overlay.remove(); openMatchGame(cfg, onComplete); };
       overlay.querySelector('[data-act="done"]').onclick = () => { window.playAreaMusic(); overlay.remove(); window.recordGameWin('match'); window.miniMarkClear(cfg.id); if (onComplete) onComplete(true); };

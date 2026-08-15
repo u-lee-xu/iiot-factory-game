@@ -86,7 +86,7 @@ export function openTycoon(cfg, onComplete) {
       res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'数据产值达标，工厂转起来了！':'还没达标')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">总数据 <b style="color:var(--amber)">'+Math.round(total).toLocaleString()+'</b> · 用时 <b style="color:var(--amber)">'+Math.round(elapsed)+'</b>s</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.tycAgain()">🔁 再经营一轮</button><button class="mm-btn primary" onclick="window.tycDone()">收下奖励</button></div>';
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.tycAgain()">🔁 再经营一轮</button><button class="mm-btn primary" onclick="window.tycDone()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     }, 300);

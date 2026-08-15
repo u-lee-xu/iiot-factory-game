@@ -27,12 +27,12 @@ export function openBreakout(cfg, onComplete) {
   const colors=['#ff5252','#ff7043','#ffb300','#7ee8fa','#ab6cff'];
   const overlay=document.createElement('div');
   overlay.className='mm-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML=`
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🧱 AI 打砖块</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 板=你的 AI 决策，消掉故障砖</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>❤️ <b id="brLives">3</b></span><span>🎯 <b id="brScore">0</b></span><span>🏆 第 <b id="brLevel">1</b> 关</span></div>
-      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-window.content:center;overflow:hidden;background:#04060c;cursor:none;touch-action:none"><canvas id="brCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#04060c;cursor:none;touch-action:none"><canvas id="brCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">←/→ 或 拖动 移动板 · 接球消砖 · 漏球 -1 命</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -94,7 +94,7 @@ export function openBreakout(cfg, onComplete) {
   function endGame(isWin){ if(ended)return; ended=true; if(isWin){window.recordGameWin('breakout');window.miniMarkClear(cfg.id);playSound('fanfare');}
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
-      res.innerHTML='<div style="font-size:46px;line-height:1">🧱</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(isWin?'故障全消！':'AI 决策失误，球漏了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 <b style="color:var(--amber)">'+level+'</b> 关</div><div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.brAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.brDone()">收下奖励</button></div>';
+      res.innerHTML='<div style="font-size:46px;line-height:1">🧱</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(isWin?'故障全消！':'AI 决策失误，球漏了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 <b style="color:var(--amber)">'+level+'</b> 关</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.brAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.brDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300); }
   window.brAgain=()=>{ overlay.remove(); openBreakout(cfg,onComplete); };
   window.brDone=()=>{ if(onComplete)onComplete(score>=50); overlay.remove(); window.playAreaMusic(); };

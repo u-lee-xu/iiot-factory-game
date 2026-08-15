@@ -167,7 +167,7 @@ export function openQuickMatch(cfg, onComplete) {
         <div class="xp">+${cfg.xp || 0} XP</div>
         <div style="font-size:14px;color:var(--dim)">得分 ${score} · 最高连击 ${bestCombo} · 评价 ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
         <div class="note">快打奖励不计入排行榜，重在认熟命令</div>
-        <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn" data-act="again">🔁 再打一次</button>
           <button class="mm-btn primary" data-act="done">收下奖励</button>
         </div>`;
@@ -182,7 +182,7 @@ export function openQuickMatch(cfg, onComplete) {
         <div class="big">⏰</div>
         <div style="font-size:20px;font-weight:bold;color:var(--red);margin-top:6px">时间到，答对 ${cur}/${cfg.size} 题</div>
         <div style="font-size:14px;color:var(--dim);margin-top:8px">再打一次，手感会更好！</div>
-        <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn primary" data-act="retry">🔁 再来一次</button>
           <button class="mm-btn" data-act="skip">先干正事</button>
         </div>`;

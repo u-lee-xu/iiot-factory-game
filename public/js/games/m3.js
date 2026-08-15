@@ -169,7 +169,7 @@ export function openMatch3(cfg, onComplete) {
       res.innerHTML = '<div style="font-size:46px;line-height:1">'+(isWin?'🎉':'💥')+'</div>'+
         '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'三连清场，车间转起来了！':'步数用完')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.m3Again()">🔁 再来一局</button><button class="mm-btn primary" onclick="window.m3Done()">收下奖励</button></div>';
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.m3Again()">🔁 再来一局</button><button class="mm-btn primary" onclick="window.m3Done()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     }, 300);

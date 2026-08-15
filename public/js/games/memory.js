@@ -36,7 +36,7 @@ export function openMemoryMatch(cfg, onComplete) {
       const totalCards = sizes.reduce(function(a, b, i){ return a + roundCards(i); }, 0);
       const ov = document.createElement('div');
       ov.className = 'mm-overlay';
-      ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-window.content:center';
+      ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
       const rowsHtml = run.rounds.map(function(r){
         return '<div style="font-size:14px;color:var(--dim);margin-top:5px">第 ' + r.index + ' 关（' + (r.size * 2 + (r.size >= 3 ? 2 : 0)) + ' 张）：' + (r.win ? '✅ 用 ' + r.moves + ' 步 · ' + '★'.repeat(r.stars) + '☆'.repeat(3 - r.stars) : '❌ 失败') + '</div>';
       }).join('');
@@ -49,7 +49,7 @@ export function openMemoryMatch(cfg, onComplete) {
       const btns = allWin
         ? '<button class="mm-btn" data-act="again">🔁 再来一次</button><button class="mm-btn primary" data-act="done">收下奖励</button>'
         : '<button class="mm-btn primary" data-act="retry">🔁 再来一次</button><button class="mm-btn" data-act="skip">跳过，先干正事</button>';
-      ov.innerHTML = '<div class="mm-box" style="width:min(480px,92vw)"><div class="mm-head"><div><div class="mm-title">🧠 ' + escHtml(base.name) + '</div><div class="mm-sub">连续 ' + sizes.length + ' 关 · 共 ' + totalCards + ' 张卡</div></div></div><div class="pd-body" style="text-align:center">' + headHtml + statHtml + rowsHtml + '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">' + btns + '</div></div></div>';
+      ov.innerHTML = '<div class="mm-box" style="width:min(480px,92vw)"><div class="mm-head"><div><div class="mm-title">🧠 ' + escHtml(base.name) + '</div><div class="mm-sub">连续 ' + sizes.length + ' 关 · 共 ' + totalCards + ' 张卡</div></div></div><div class="pd-body" style="text-align:center">' + headHtml + statHtml + rowsHtml + '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">' + btns + '</div></div></div>';
       document.body.appendChild(ov);
       if (allWin) { window.recordGameWin('mm'); window.miniMarkClear(base.id); }
       const bind = function(act, fn){ const el = ov.querySelector('[data-act="' + act + '"]'); if (el) el.onclick = fn; };
@@ -360,7 +360,7 @@ export function openMemoryMatch(cfg, onComplete) {
           <div style="font-size:14px;color:var(--dim)">用 ${moves} 步配对 ${matched} 对 · 评价 ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
           <div style="font-size:13px;color:var(--cyan);margin-top:4px">厂长：术语全部入库！再看到它们就不会陌生了</div>
           <div class="note">热身奖励不计入排行榜，重在混个脸熟</div>
-          <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
             <button class="mm-btn" data-act="again">🔁 再玩一次</button>
             <button class="mm-btn primary" data-act="done">${cfg._doneText || '收下奖励继续'}</button>
           </div>`;
@@ -383,7 +383,7 @@ export function openMemoryMatch(cfg, onComplete) {
         <div class="big">⏰</div>
         <div style="font-size:20px;font-weight:bold;color:var(--red);margin-top:6px">时间到，还差 ${totalPairs - matched} 对</div>
         <div style="font-size:14px;color:var(--dim);margin-top:8px">混个脸熟就行，再试一次吧！</div>
-        <div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
           <button class="mm-btn primary" data-act="retry">🔁 再来一次</button>
           <button class="mm-btn" data-act="skip">跳过，先干正事</button>
         </div>`;

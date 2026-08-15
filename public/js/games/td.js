@@ -331,7 +331,7 @@ export function openTowerDefense(cfg, onComplete) {
         '<div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'车间防线守住！':'防线被攻破')+'</div>'+
         '<div style="font-size:15px;color:var(--dim);margin-top:6px">守到第 '+Math.min(wave,WAVES)+'/'+WAVES+' 波 · 剩余 💰 '+money+'</div>'+
         '<div style="font-size:13px;color:var(--dim);margin-top:4px">记住：DDoS→防火墙 · 端口扫描→IDS · ARP欺骗→安全网关</div>'+
-        '<div style="display:flex;gap:10px;justify-window.content:center;margin-top:16px"><button class="mm-btn" onclick="window.tdAgain()">🔁 再守一轮</button><button class="mm-btn primary" onclick="window.tdDone()">收下奖励</button></div>';
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.tdAgain()">🔁 再守一轮</button><button class="mm-btn primary" onclick="window.tdDone()">收下奖励</button></div>';
       window.focusResultPrimary(overlay);
       overlay.innerHTML=''; overlay.appendChild(res);
     }, 300);
