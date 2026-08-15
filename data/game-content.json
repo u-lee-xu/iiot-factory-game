@@ -4007,6 +4007,81 @@
      }
     },
     {
+     "id": "3-3b",
+     "title": "华山论剑：协议家族补全",
+     "type": "chain_quiz",
+     "config": {
+      "questions": [
+       {
+        "question": "Profibus（老款现场总线）的识别特点是什么？",
+        "options": [
+         "紫色线、RS-485、西门子主导",
+         "绿色工业网线、以太网",
+         "CAN 总线、5 芯圆头",
+         "开源实时以太网"
+        ],
+        "answer": 0,
+        "hint": "Profibus = 紫色线 = 老款总线，西门子主导，存量巨大",
+        "teach": "记住一条线：Profibus 是紫色线、RS-485、老款总线，存量巨大；它的新款 ProfiNet 是绿色工业网线、以太网、毫秒级实时。"
+       },
+       {
+        "question": "哪个协议主打「开源实时以太网 + 等时同步」，由贝加莱/ABB 推动？",
+        "options": [
+         "Powerlink",
+         "DeviceNet",
+         "EtherNet/IP",
+         "ModbusTCP"
+        ],
+        "answer": 0,
+        "hint": "Powerlink = EPSG(贝加莱/ABB) · 标准硬件+开源协议栈 · 等时同步",
+        "teach": "Powerlink 的卖点是「开源实时以太网」：用标准硬件+开源协议栈实现等时同步，运动控制友好。"
+       },
+       {
+        "question": "DeviceNet 用的物理层/接头特点是什么？",
+        "options": [
+         "CAN 总线 / 5 芯圆头",
+         "以太网 / RJ45",
+         "RS-485 / DB9",
+         "光纤 / LC"
+        ],
+        "answer": 0,
+        "hint": "DeviceNet = CAN 总线 / 5 芯圆头，罗克韦尔主导，北美旧款",
+        "teach": "DeviceNet 是北美的老款：CAN 总线、5 芯圆头接头，汽车电子常见。看接头就能认。"
+       },
+       {
+        "question": "EtherNet/IP 的核心特点是？",
+        "options": [
+         "CIP 协议、罗克韦尔、北美新厂标配",
+         "紫色线、老款总线",
+         "CAN 总线、北美旧款",
+         "开源实时以太网"
+        ],
+        "answer": 0,
+        "hint": "EtherNet/IP = ODVA(罗克韦尔) · CIP 协议 · 北美新厂标配",
+        "teach": "EtherNet/IP 是北美的「新厂标配」：CIP 协议（显式/隐式消息），罗克韦尔生态。记住：北美=CIP=EtherNet/IP。"
+       },
+       {
+        "question": "八大协议里，哪两个是「重中之重」（有实战、市场占有率高）？",
+        "options": [
+         "Modbus 和 ProfiNet",
+         "Powerlink 和 DeviceNet",
+         "EtherCAT 和 CC-Link",
+         "EtherNet/IP 和 Profibus"
+        ],
+        "answer": 0,
+        "hint": "教材学习策略：Modbus、ProfiNet 重中之重（有实战、市场占有率高）",
+        "teach": "八大协议不用全背：Modbus 和 ProfiNet 是重中之重（有实战、市场大），EtherCAT、CC-Link 掌握特点，其余（Powerlink/DeviceNet/EtherNet/IP/Profibus）了解定位就行。"
+       }
+      ]
+     },
+     "xp": 100,
+     "tags": [
+      "protocol",
+      "fieldbus",
+      "ethernet_industrial"
+     ]
+    },
+    {
      "id": "3-4",
      "type": "scenario_match",
      "title": "华山论剑：协议特征匹配",
