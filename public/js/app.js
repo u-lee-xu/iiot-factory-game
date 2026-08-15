@@ -10149,8 +10149,8 @@ init().then(() => {
 
 
 // ═══════════════════════════════════════════════════════════════════
-// ES Module 全局挂载（第一刀：兼容 onclick / window.openXxx 测试调用）
-// 后续拆子模块后，各模块继续在此挂载需要暴露给 onclick 的函数
+// ES Module 全局挂载（function + async function + 顶层变量全覆盖）
+// 兼容 onclick / window.openXxx 测试调用；后续拆子模块后逐步收敛
 // ═══════════════════════════════════════════════════════════════════
 Object.assign(window, {
   ACHIEVEMENTS,
@@ -10172,6 +10172,7 @@ Object.assign(window, {
   achievementContext,
   addDirectorBox,
   addTaskItemBar,
+  api,
   applyMiniTier,
   areaStars,
   audioCtx,
@@ -10240,12 +10241,16 @@ Object.assign(window, {
   gzName,
   gzPlay,
   hideTransit,
+  init,
   interactions,
   isTaskDone,
   lbTab,
   leaderboardCache,
   levelProgress,
+  loadGameContent,
+  loadKnowledgeTags,
   loadShop,
+  loadState,
   loadTermCards,
   loginPopActive,
   loginPopQueue,
@@ -10306,6 +10311,7 @@ Object.assign(window, {
   prevRank,
   recordGameWin,
   refreshGameZone,
+  refreshLeaderboard,
   registerInteraction,
   registerMiniGame,
   renderAchBar,
@@ -10321,7 +10327,9 @@ Object.assign(window, {
   renderWallet,
   role,
   saveGameStats,
+  savePassword,
   savePedia,
+  saveState,
   selectLevel,
   selfTeachTypes,
   setArea,
@@ -10343,6 +10351,7 @@ Object.assign(window, {
   soundEnabled,
   starStr,
   streak,
+  submitBugReport,
   switchLbTab,
   taskKey,
   taskXP,

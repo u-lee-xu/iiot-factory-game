@@ -9,7 +9,8 @@ app.use(express.static(path.join(__dirname, 'public'), {
   etag: false,
   lastModified: false,
   setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
+    // 开发期：html/js/css 全部禁用缓存，改完刷新即生效（模块化后 js 频繁变动）
+    if (path.endsWith('.html') || path.endsWith('.js') || path.endsWith('.css') || path.endsWith('.json')) {
       res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
   }
