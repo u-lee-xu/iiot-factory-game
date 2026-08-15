@@ -516,13 +516,56 @@ function rsStart(){
       rsObs.push({x:px0, y:(wr.top-sr.top)+rsCamY, w:pr.width, h:wr.height});
     });
   });
+  // ===== 障碍网格（A* 寻路用）：家具+内墙覆盖格标记不可通行，门洞区自然可通行 =====
+  const CELL=16;
+  const gCols=Math.max(1,Math.ceil(stageW/CELL)), gRows=Math.max(1,Math.ceil(stageH/CELL));
+  const blocked=[]; for(let r=0;r<gRows;r++){ blocked.push(new Array(gCols).fill(false)); }
+  rsObs.forEach(o=>{
+    for(let yy=o.y; yy<o.y+o.h; yy+=CELL) for(let xx=o.x; xx<o.x+o.w; xx+=CELL){
+      const gc=Math.floor(xx/CELL), gr=Math.floor(yy/CELL);
+      if(gc>=0&&gc<gCols&&gr>=0&&gr<gRows) blocked[gr][gc]=true;
+    }
+  });
+  // A* 寻路（4 方向）：返回像素路径点列表；不可达返回 null
+  function findPath(sx,sy,ex,ey){
+    let sc=Math.max(0,Math.min(gCols-1,Math.floor(sx/CELL)));
+    let sr=Math.max(0,Math.min(gRows-1,Math.floor(sy/CELL)));
+    let ec=Math.max(0,Math.min(gCols-1,Math.floor(ex/CELL)));
+    let er=Math.max(0,Math.min(gRows-1,Math.floor(ey/CELL)));
+    if(blocked[sr][sc]||blocked[er][ec]) return null;
+    if(sc===ec&&sr===er) return [{x:sc*CELL+CELL/2, y:sr*CELL+CELL/2}];
+    const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+    const open=[{c:sc,r:sr,g:0,h:Math.abs(ec-sc)+Math.abs(er-sr),f:0,p:null}];
+    const gs={}; gs[sc+','+sr]=0;
+    while(open.length){
+      open.sort((a,b)=>a.f-b.f);
+      const cur=open.shift();
+      if(cur.c===ec&&cur.r===er){
+        const path=[]; let n=cur;
+        while(n){ path.unshift({x:n.c*CELL+CELL/2, y:n.r*CELL+CELL/2}); n=n.p; }
+        return path;
+      }
+      for(const [dc,dr] of dirs){
+        const nc=cur.c+dc, nr=cur.r+dr;
+        if(nc<0||nc>=gCols||nr<0||nr>=gRows) continue;
+        if(blocked[nr][nc]) continue;
+        const nk=nc+','+nr, ng=cur.g+1;
+        if(gs[nk]===undefined||ng<gs[nk]){
+          gs[nk]=ng;
+          const h=Math.abs(ec-nc)+Math.abs(er-nr);
+          open.push({c:nc,r:nr,g:ng,h:h,f:ng+h,p:cur});
+        }
+      }
+    }
+    return null;
+  }
   // 小人初始位置：门口（房间左下角）
   let px=60, py=stageH-120, tx=null, ty=null, speed=2.6;
+  let navPath=null;   // 寻路路径点（像素）
   rsCamX=0; rsCamY=0;
   rsDraw('S',0);
   player.style.left=px+'px'; player.style.top=py+'px';
-  // 点哪走哪：点击场景（非设备/楼梯/家具）→ 小人走到点击位置
-  // 注意：stage 有 transform 平移，getBoundingClientRect 是可视位置；内容坐标 = 可视坐标 + 摄像机偏移
+  // 点哪走哪：点击场景（非设备/楼梯/家具）→ A* 寻路走过去（有墙自动绕）
   scene.addEventListener('pointerdown', function(e){
     const t=e.target;
     if(t.closest&&(t.closest('.rs-task')||t.closest('.rs-stairs')||t.closest('.rs-furn')||t.closest('.rs-door')||t.closest('.rs-exit')||t.closest('.rs-npc')||t.closest('.rs-label'))) return;
@@ -530,12 +573,12 @@ function rsStart(){
     tx=Math.max(6, Math.min((e.clientX-rect.left)+rsCamX, stageW-40));
     ty=Math.max(6, Math.min((e.clientY-rect.top)+rsCamY, stageH-30));
     rsGo=null;
+    navPath=findPath(px,py, tx,ty) || [{x:px,y:py}];   // 可达则寻路，不可达原地不动
   }, true);
   function setDir(dx, dy){
     if(Math.abs(dx)<0.5&&Math.abs(dy)<0.5) return;
     rsSetDir(dx, dy);
   }
-  // 圆与矩形碰撞：人物(半径~12)与家具矩形
   function rsCollide(x,y){
     for(const o of rsObs){
       const cx=Math.max(o.x, Math.min(x, o.x+o.w));
@@ -545,37 +588,33 @@ function rsStart(){
     }
     return false;
   }
+  // 沿路径走一步；返回是否到达终点
+  function stepAlong(){
+    if(!navPath||!navPath.length) return true;
+    const pt=navPath[0];
+    const dx=pt.x-px, dy=pt.y-py, dist=Math.hypot(dx,dy);
+    if(dist<=speed){
+      px=pt.x; py=pt.y; navPath.shift();
+      return navPath.length===0;
+    }
+    px+=dx/dist*speed; py+=dy/dist*speed;
+    return false;
+  }
   function frame(){
     let moving=false, ldx=0, ldy=0;
-    // 走动：朝目标(x,y)移动（碰障碍物则停下，需绕过）
-    if(tx!==null&&ty!==null){
-      const dx=tx-px, dy=ty-py, dist=Math.hypot(dx,dy);
-      if(dist<=speed){ if(!rsCollide(tx,ty)){ px=tx; py=ty; } tx=null; ty=null; }
-      else {
-        let nx=px+dx/dist*speed, ny=py+dy/dist*speed;
-        if(rsCollide(nx,ny)){ nx=px; ny=py; tx=null; ty=null; }
-        else { px=nx; py=ny; moving=true; ldx=dx; ldy=dy; }
-      }
-    }
-    // 走到设备跟前 → 自动进任务
-    if(rsGo){
-      const dx=rsGo.x-px, dy=rsGo.y-py, dist=Math.hypot(dx,dy);
-      if(dist<=speed+1){ enterLevel(rsGo.lvId, rsGo.taskId); rsGo=null; tx=null; ty=null; return; }
-      else {
-        let nx=px+dx/dist*speed, ny=py+dy/dist*speed;
-        if(rsCollide(nx,ny)){ nx=px; ny=py; rsGo=null; tx=null; ty=null; }
-        else { px=nx; py=ny; moving=true; ldx=dx; ldy=dy; }
-      }
-    }
-    if(moving) setDir(ldx, ldy);
+    // 点设备：先寻路到设备，沿路径走，到跟前自动进任务
+    if(rsGo && !navPath){ navPath=findPath(px,py, rsGo.x, rsGo.y); }
+    const arrived=stepAlong();
+    if(arrived && rsGo){ enterLevel(rsGo.lvId, rsGo.taskId); rsGo=null; navPath=null; tx=null; ty=null; return; }
+    if(arrived){ tx=null; ty=null; navPath=null; }
+    moving = !!(navPath && navPath.length);
+    if(moving){ ldx=navPath[0].x-px; ldy=navPath[0].y-py; setDir(ldx, ldy); }
     player.classList.toggle('walk', moving);
-    // 走路时手前后摆动（两帧交替）
     if(moving){ rsFrame=(rsFrame+1)%2; rsDraw(rsDir, rsFrame); }
     player.style.left=px+'px'; player.style.top=py+'px';
     // 走近任务设备 → 显示任务名
     scene.querySelectorAll('.rs-task').forEach(el=>{
       const r=el.getBoundingClientRect(), sr=scene.getBoundingClientRect();
-      // 转成 stage 内容坐标再与人物(px,py)比较
       const cx=(r.left-sr.left)+rsCamX, cy=(r.top-sr.top)+rsCamY;
       const near=Math.abs(cx-(px+6))<64 && Math.abs(cy-(py+6))<64;
       el.classList.toggle('near',near);
@@ -660,18 +699,22 @@ function sxStart(){
     props[pi].style.top=(groundTop-h)+'px';
     obstacles.push({x:px, y:groundTop-h, w:w, h:h});
   }
-  // 楼梯：放长廊末端
+  // 楼梯：放长廊末端；顶层（hasNext=false）不设计楼梯
   const stairsEl=document.getElementById('sxStairs');
   if(stairsEl){
     const sx=window._sxRoom||{};
-    const sCls=sx.flrDone&&sx.hasNext?'open':'locked';
-    stairsEl.className='sx-stairs '+sCls;
-    stairsEl.style.left=(baseX+taskEls.length*gap+70)+'px';
-    stairsEl.style.top=(groundTop-48)+'px';
-    if(sx.flrDone&&sx.hasNext){
-      stairsEl.onclick=function(){ nextRoomFloor(); };
-      const tip=document.createElement('div'); tip.className='sx-door-tip'; tip.textContent='出门 · 下一层';
-      stairsEl.appendChild(tip);
+    if(!sx.hasNext){
+      stairsEl.style.display='none';   // 顶层：上面没有层了，不显示楼梯
+    } else {
+      const sCls=sx.flrDone?'open':'locked';
+      stairsEl.className='sx-stairs '+sCls;
+      stairsEl.style.left=(baseX+taskEls.length*gap+70)+'px';
+      stairsEl.style.top=(groundTop-48)+'px';
+      if(sx.flrDone){
+        stairsEl.onclick=function(){ nextRoomFloor(); };
+        const tip=document.createElement('div'); tip.className='sx-door-tip'; tip.textContent='出门 · 下一层';
+        stairsEl.appendChild(tip);
+      }
     }
   }
   // 出厂区门：场景左端（小人出生点旁），点击返回厂区
@@ -854,22 +897,23 @@ function renderRoom(id){
   const hasNext = fi < flrTasks.length-1;
   // 俯视建筑：外轮廓墙 + 内部隔成 2-3 间小房间（内墙带门洞），任务设备分布各房间
   const WT=12, WB=12, WV=16, DH=96, ROOM_W=330, ROOM_H=430;
-  const nRoom = Math.max(2, Math.min(3, Math.ceil(ft.length/2)));   // 每间最多2个任务
-  const perRoom = 2;
+  const nRoom = Math.max(2, Math.min(3, Math.ceil(ft.length/2)));   // 2~3 间房
+  const perRoom = Math.max(2, Math.ceil(ft.length / nRoom));          // 动态每间任务数，避免任务数超过容量导致越界
   const rooms=[];
   for(let ri=0;ri<nRoom;ri++) rooms.push({x:WV + ri*(ROOM_W+WV), w:ROOM_W});
   const stageW = WV + nRoom*ROOM_W + (nRoom-1)*WV + WV;
   const stageH = WT + ROOM_H + WB;
   const roomTasks=[];
   for(let ri=0;ri<nRoom;ri++) roomTasks.push(ft.slice(ri*perRoom, (ri+1)*perRoom));
-  // 任务设备：每间房间放 perRoom 个，左右错开、居中偏下
+  // 任务设备：每间房间放若干，左右错开、居中偏下
   const ftHTML = ft.map((t,i)=>{
     const done=isTaskDone(t.id), next=(!done&&t===cur);
     const cls=done?'done':(next?'next':'locked');
     const locked=!done&&!next;
-    const ri=Math.floor(i/perRoom), j=i-ri*perRoom;
-    const cnt=roomTasks[ri].length;
-    const cx=rooms[ri].x+ROOM_W/2 + (cnt>1 ? (j===0?-48:48) : 0);
+    const ri=Math.min(Math.floor(i/perRoom), nRoom-1), j=i-ri*perRoom;
+    const cnt=(roomTasks[ri]||[]).length;
+    // 1个居中；2个左右分；3个三档错开
+    const cx=rooms[ri].x+ROOM_W/2 + (cnt>2 ? (j-1)*56 : cnt>1 ? (j===0?-48:48) : 0);
     const cy=WT+ROOM_H*0.62;
     return `<div class="rs-task ${locked?'locked':cls}" style="left:${cx-29}px;top:${cy-25}px" onclick="roomGoTask('${lv.id}','${t.id}',this)" title="${t.title||t.name||t.label||''}" ${locked?'data-locked="1"':''}>
       <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
