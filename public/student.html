@@ -382,8 +382,8 @@ body {
 .mz-box { width: 560px; max-width: 96vw; background: #12121a; border: 2px solid var(--green); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,230,118,.18); display: flex; flex-direction: column; }
 .mz-stats { display: flex; gap: 12px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; align-items: center; }
 .mz-stats b { color: var(--green); }
-.mz-grid { display: grid; gap: 2px; padding: 10px; margin: 0 auto; background:#0a0d14; border-radius: 8px; }
-.mz-cell { width: 40px; height: 40px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.mz-grid { display: grid; gap: 2px; padding: 10px; margin: 0 auto; background:#0a0d14; border-radius: 8px; grid-template-columns: repeat(var(--mzc, 11), 1fr); width: min(94vw, 470px); touch-action: none; user-select: none; }
+.mz-cell { width: auto; aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 4.2vw, 22px); }
 .mz-wall { background:#1a2230; }
 .mz-open { background:#0d141f; }
 .mz-gate { background:rgba(255,176,0,.25); box-shadow: inset 0 0 0 2px rgba(255,176,0,.6); }
@@ -400,7 +400,7 @@ body {
 .t48-box { width: 460px; max-width: 96vw; background: #12121a; border: 2px solid var(--cyan); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,188,212,.2); display: flex; flex-direction: column; }
 .t48-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
 .t48-stats b { color: var(--cyan); }
-.t48-grid { display: grid; gap: 6px; padding: 12px; background:#0a0d14; margin: 10px auto; border-radius: 8px; }
+.t48-grid { display: grid; gap: 6px; padding: 12px; background:#0a0d14; margin: 10px auto; border-radius: 8px; touch-action: none; user-select: none; }
 .t48-cell { width: 70px; height: 70px; border-radius: 8px; background: #151a24; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; transition: all .12s; }
 .t48-0 { background:#151a24; color:var(--dim); }
 .t48-1 { background:#7ee8fa; color:#04303a; }
@@ -485,7 +485,7 @@ body {
 .ll-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; align-items: center; }
 .ll-stats b { color: var(--cyan); }
 .ll-grid { display: grid; gap: 6px; padding: 12px; justify-content: center; margin: 0 auto; }
-.ll-tile { width: 74px; height: 54px; border-radius: 6px; border: 2px solid var(--border); background: #1a1a24; color: var(--text); font-size: 13px; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; line-height: 1.25; transition: all .15s; }
+.ll-tile { width: 74px; height: 54px; border-radius: 6px; border: 2px solid var(--border); background: #1a1a24; color: var(--text); font-size: 13px; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; line-height: 1.2; transition: all .15s; padding: 2px 3px; word-break: break-all; overflow-wrap: anywhere; box-sizing: border-box; }
 .ll-tile.sel { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,188,212,.5); transform: scale(1.05); }
 .ll-tile.removed { visibility: hidden; pointer-events: none; }
 .ll-tile.wrong { border-color: var(--red); animation: soShake .3s; }
@@ -501,15 +501,18 @@ body {
 .fg-next { display: inline-block; min-width: 30px; text-align: center; }
 /* ===== Interaction: Install Wizard ===== */
 /* ===== 数据分类大师（传送带分拣）===== */
-.so-box { width: 680px; max-width: 96vw; background: #12121a; border: 2px solid var(--amber); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(255,176,0,.2); display: flex; flex-direction: column; }
-.so-stats { display: flex; gap: 16px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; }
+.so-box { width: 420px; max-width: 96vw; background: #12121a; border: 2px solid var(--amber); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(255,176,0,.2); display: flex; flex-direction: column; }
+.so-stats { display: flex; gap: 14px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; }
 .so-stats b { color: var(--amber); }
-.so-belt { position: relative; height: 130px; margin: 10px 12px; background: repeating-linear-gradient(90deg,#15151f 0 24px,#12121a 24px 48px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.so-item { position: absolute; top: 30px; background: #1e2a3a; border: 2px solid #4db6ff; color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 15px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+.so-belt { position: relative; height: 300px; margin: 10px 12px; background: repeating-linear-gradient(180deg,#15151f 0 26px,#12121a 26px 52px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.so-belt::after { content: ''; position: absolute; left: 0; right: 0; top: 232px; height: 2px; background: rgba(255,176,0,.55); box-shadow: 0 0 10px rgba(255,176,0,.4); }
+.so-item { position: absolute; left: 50%; transform: translateX(-50%); background: #1e2a3a; border: 2px solid #4db6ff; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 15px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.4); max-width: 92%; overflow: hidden; text-overflow: ellipsis; }
 .so-item.so-urgent { border-color: var(--amber); box-shadow: 0 0 12px rgba(255,176,0,.5); }
 .so-item.so-wrong { border-color: var(--red); background: rgba(255,85,85,.15); animation: soShake .3s; }
 .so-item.so-leak { border-color: var(--red); opacity: .5; }
 .so-bins { display: flex; gap: 10px; justify-content: center; padding: 12px; flex-wrap: wrap; }
+.so-judge { position: absolute; left: 0; right: 0; top: 12px; text-align: center; font-size: 20px; font-weight: bold; letter-spacing: 4px; pointer-events: none; opacity: 0; transition: opacity .2s; }
+.so-judge.on { opacity: 1; }
 .so-bin { background: #1a1a24; border: 2px solid var(--border); border-radius: 8px; padding: 10px 12px; cursor: pointer; color: var(--text); font-size: 14px; display: flex; align-items: center; gap: 6px; transition: all .2s; font-family: inherit; }
 .so-bin:hover { border-color: var(--amber); transform: translateY(-2px); }
 .so-bin-icon { font-size: 18px; }
@@ -862,6 +865,14 @@ body:has(.mm-overlay) { overflow: hidden; }
 .sh-stats { display: flex; gap: 16px; padding: 8px 14px; background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap; }
 .sh-stats b { color: var(--cyan); }
 .sh-tip { padding: 6px 14px; font-size: 12px; color: var(--dim); text-align: center; border-top: 1px solid var(--border); }
+
+.sh-box canvas, .sh-box .canvas-wrap { touch-action: none; }
+.canvas-wrap { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.canvas-wrap canvas { width: auto; height: auto; max-width: 100%; max-height: 100%; display: block; }
+@media (max-width: 720px) {
+  .canvas-wrap canvas { max-width: 100%; max-height: 100%; }
+}
+
 @media (max-width:700px){
   .sh-box { width: 96vw; height: 92dvh; max-height: none; }
   .sh-stats { font-size: 13px; gap: 10px; }
@@ -1089,6 +1100,9 @@ body:has(.mm-overlay) { overflow: hidden; }
 .ar-card.saved { border-color: var(--green); background: rgba(0,230,118,.1); }
 @keyframes arPulse { 0%,100% { box-shadow: 0 0 0 rgba(255,85,85,0); } 50% { box-shadow: 0 0 18px rgba(255,85,85,.6); } }
 .ar-card.shake { animation: arShake .3s; }
+.ar-card .ar-cool { margin-top: 6px; padding: 4px 12px; border-radius: 6px; border: 1px solid #7ee8fa; background: rgba(126,232,250,.12); color: #7ee8fa; font-size: 12px; cursor: pointer; font-family: inherit; }
+.ar-card .ar-cool:hover { background: rgba(126,232,250,.28); }
+.ar-card .ar-cool:disabled { opacity: .35; cursor: default; }
 @keyframes arShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 .ar-msg { min-height: 22px; font-size: 13px; text-align: center; margin-top: 10px; color: var(--amber); }
 
@@ -5950,7 +5964,7 @@ function openShooter(cfg, onComplete) {
         <span>🚀 <b id="shPower" style="color:#7ee8fa">x1</b></span>
         <span>🔥 <b id="shCombo" style="color:#ff7a00"></b></span>
       </div>
-      <canvas id="shCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:radial-gradient(ellipse at 50% 20%, #101a2e, #06070d);cursor:crosshair;touch-action:none"></canvas>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 20%, #101a2e, #06070d);cursor:crosshair;touch-action:none"><canvas id="shCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">${advanced ? '↑/↓ 切换炮口名词，匹配到敌人名词才打得动 · ←/→ 移动 · 自动开火' : '看飞机上的解释 → 打对应名词（非配对自动穿透） · ←/→移动 自动开火'}</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -5969,6 +5983,7 @@ function openShooter(cfg, onComplete) {
   let player = { x: W/2, w: 34, h: 18 };
   let bullets = [], ebullets = [], booms = [], drops = [], floatTexts = [];
   let enemies = [], targetTerm = terms[0];
+  const XSP = 96, EW = 78;                                  // 编队列间距 / 敌人宽度（让编队左右摆动而非贴边速降）
   let formX = 50, formY = 44, formDir = 1, formStep = 6;   // 下压步进放缓
   let fireCd = 0, efireCd = 0, invuln = 0, muzzle = 0;
   let pLevel = (shooterBuff && shooterBuff.pLevel) ? 1 : 0, picked = 0;   // 火力等级 0..3（显示 x1..x4）、本局拾取道具数
@@ -6014,7 +6029,7 @@ function openShooter(cfg, onComplete) {
     skin = _esCol ? { col: _esCol } : ENEMY_SKINS[(wave - 1) % ENEMY_SKINS.length];   // 装备的敌人皮肤优先，否则每波轮换
     for(let r=0;r<ROWS;r++){
       for(let c=0;c<COLS;c++){
-        enemies.push({ r, c, x: formX + c*118, y: formY + r*ROW_PITCH, w: 96, h: 26,
+        enemies.push({ r, c, x: formX + c*XSP, y: formY + r*ROW_PITCH, w: EW, h: 26,
           term: terms[(r*COLS+c) % terms.length], active:true, hp:3, maxHp:3, flash:0 });
       }
     }
@@ -6513,11 +6528,12 @@ function openDataRacing(cfg, onComplete) {
   const accel = cfg._hard ? 6.5 : 4.5;
 
   let lives = LIVES, score = 0, combo = 0, ended = false, survived = 0, clearedMarked = false;
-  let speed = baseSpeed, elapsed = 0;
-  let lane = Math.floor(LANES / 2), invuln = 0, shield = false;
+  let speed = baseSpeed, elapsed = 0, bgScroll = 0;
+  let lane = Math.floor(LANES / 2), carX = 0, invuln = 0, shield = false;
   let items = [], spawnTimer = 0, particles = [], trail = [];
   let keys = { left:false, right:false };
   const laneW = W / LANES;
+  carX = laneW*lane + laneW/2;   // 初始车在中间道
 
   const overlay = document.createElement('div');
   overlay.className = 'mm-overlay';
@@ -6535,7 +6551,7 @@ function openDataRacing(cfg, onComplete) {
         <span>🎯 <b id="rrScore">0</b></span>
         <span>🔥 <b id="rrCombo" style="color:#ff7a00"></b></span>
       </div>
-      <canvas id="rrCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:radial-gradient(ellipse at 50% 10%, #0a1428, #04060c);cursor:pointer;touch-action:none"></canvas>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 10%, #0a1428, #04060c);cursor:pointer;touch-action:none"><canvas id="rrCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">←/→ 或 点屏幕两侧切换车道 · 读数 ≤${mx}${unit} 才吃 · 超限躲开</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -6572,7 +6588,7 @@ function openDataRacing(cfg, onComplete) {
     let label = metric+' '+val+unit;
     if (type==='drop') label='🎁';
     else type = (val <= mx) ? 'good' : 'bad';   // 读数判断：超上限=异常
-    items.push({ x, y:-30, type, label, vy: speed, val });
+    items.push({ x, y:-30, type, label, vy: speed, val });   // vy 仅作初始值，下落统一按当前 speed
   }
 
   function update(dt){
@@ -6586,9 +6602,11 @@ function openDataRacing(cfg, onComplete) {
     if (keys.right) goLane(1);
     spawnTimer -= dt;
     if (spawnTimer <= 0){ spawnItem(); spawnTimer = Math.max(0.25, 0.85 - elapsed*0.004); }
-    items.forEach(it => { it.y += it.vy*dt; });
+    items.forEach(it => { it.y += speed*dt; });           // 障碍随当前车速下落（与速度读数一致）
     items = items.filter(it => it.y < H+40);
-    const px = laneW*lane + laneW/2, py = H-70;
+    const targetX = laneW*lane + laneW/2;
+    carX += (targetX - carX) * Math.min(1, dt*9);          // 平滑变道
+    const px = carX, py = H-70;
     items.forEach(it => {
       if (it.hit) return;
       if (Math.abs(it.x-px) < 36 && Math.abs(it.y-py) < 36) {
@@ -6619,8 +6637,9 @@ function openDataRacing(cfg, onComplete) {
     ctx.strokeStyle='rgba(0,188,212,.15)'; ctx.lineWidth=1;
     for(let i=1;i<LANES;i++){ ctx.beginPath(); ctx.moveTo(i*laneW,0); ctx.lineTo(i*laneW,H); ctx.stroke(); }
     ctx.fillStyle='rgba(0,188,212,.07)';
-    for(let j=0;j<14;j++){ const yy=((j*60 + elapsed*160)%H); ctx.fillRect(0,yy,W,2); }
-    const px = laneW*lane + laneW/2, py = H-70;
+    bgScroll += speed*dt;                                 // 路面随车速滚动
+    for(let j=0;j<14;j++){ const yy=((j*60 + bgScroll*0.9)%H); ctx.fillRect(0,yy,W,2); }
+    const px = carX, py = H-70;
     if (invuln<=0 || Math.floor(invuln*8)%2===0) {
       ctx.fillStyle='#00e676';
       ctx.fillRect(px-22, py-16, 44, 30);
@@ -6734,7 +6753,7 @@ function openSnake(cfg, onComplete) {
         <span>🎯 <b id="snScore">0</b></span>
         <span>🔥 <b id="snCombo" style="color:#ff7a00"></b></span>
       </div>
-      <canvas id="snCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#050a12;touch-action:none"></canvas>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#050a12;touch-action:none"><canvas id="snCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">吃蓝色术语带着它 → 吃黄色解释配对 · 每3对厂长出题</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -7021,8 +7040,8 @@ function openFlappy(cfg, onComplete) {
   if (!tutSeen('flappy')) {
     showGameTutorial('flappy', '🦅 云端跳跃 · 命令三选一', [
       '每根云柱是一道<b>命令选择题</b>：题目在上方，3 条飞行道各标一个选项',
-      '飞到<b>正确选项那条道</b>的缺口穿过 → +10；进错道撞云柱 -1 命',
-      '<b>点击/空格/↑</b> 起飞；看题选道，别只看缺口的颜色'
+      '三条道<b>都能穿过</b>，但只有<b>答案正确那条道</b>是安全的——飞错道会撞上隐形云墙 <b>-1 命</b>',
+      '<b>点击/空格/↑</b> 起飞；先读题、再选道，安全穿过 +10'
     ], function(){ openFlappy(cfg, onComplete); });
     return;
   }
@@ -7042,8 +7061,8 @@ function openFlappy(cfg, onComplete) {
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🦅 云端跳跃</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 看题，飞到正确命令的道</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>❤️ <b id="fpLives">3</b></span><span>🎯 <b id="fpScore">0</b></span><span>⚡ <b id="fpSpeed">0</b></span></div>
-      <canvas id="fpCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:linear-gradient(#7ec8ff,#cfe9ff);touch-action:none"></canvas>
-      <div class="sh-tip">点击/空格/↑ 起飞 · 看题目选正确命令的道 · 进错道-1命</div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:linear-gradient(#7ec8ff,#cfe9ff);touch-action:none"><canvas id="fpCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="sh-tip">点击/空格/↑ 起飞 · 先读题，飞进答案正确那条道 · 飞错道撞隐形云墙-1命</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick=()=>closeGame(false);
@@ -7056,7 +7075,7 @@ function openFlappy(cfg, onComplete) {
   function addParticles(x,y,c){ for(let i=0;i<8;i++)particles.push({x,y,vx:(Math.random()-.5)*100,vy:(Math.random()-.5)*100,t:0,color:c}); }
   function spawnPipe(){
     const q=questions[Math.floor(Math.random()*questions.length)];
-    pipes.push({x:W+60, q, ans:q.ans, scored:false});
+    pipes.push({x:W+60, q, ans:q.ans, scored:false, hitDone:false});
   }
   function update(dt){
     if(ended)return;
@@ -7068,11 +7087,12 @@ function openFlappy(cfg, onComplete) {
     pipes = pipes.filter(p=>p.x>-70);
     const cy = py+13;
     pipes.forEach(p=>{
-      if(!p.scored && p.x < 70){ p.scored=true; score+=10; scoreEl.textContent=score; playSound('success'); addParticles(70, cy, '#fff'); }
-      if(p.x < 126 && p.x+60 > 60){
-        let inOpen=false;
-        for(let i=0;i<3;i++){ if(Math.abs(cy - laneYs[i]) < gapHalf && i===p.ans) inOpen=true; }
-        if(!inOpen){ hit(); }
+      // 整根管道安全通过小鸟位置 → +10
+      if(!p.scored && p.x+60 < 70){ p.scored=true; score+=10; scoreEl.textContent=score; playSound('success'); addParticles(70, cy, '#fff'); }
+      // 管道覆盖小鸟位置：只有在「正确选项那道」的空隙才安全，其余都是隐形云墙（每根只判一次）
+      if(!p.hitDone && p.x < 70 && p.x+60 > 70){
+        let inOpen = Math.abs(cy - laneYs[p.ans]) < gapHalf;
+        if(!inOpen){ p.hitDone=true; hit(); }
       }
     });
     if(py<-10||py>H-10){ hit(); }
@@ -7087,29 +7107,25 @@ function openFlappy(cfg, onComplete) {
     ctx.clearRect(0,0,W,H);
     for(let i=0;i<6;i++){ const cx=((i*160 - (performance.now()/20)%160)%W), cy=40+i*90; ctx.fillStyle='rgba(255,255,255,.6)'; ctx.beginPath(); ctx.arc(cx,cy,24,0,Math.PI*2); ctx.arc(cx+20,cy-8,18,0,Math.PI*2); ctx.arc(cx+40,cy,22,0,Math.PI*2); ctx.fill(); }
     pipes.forEach(p=>{
-      // 画管道（正确缺口开放，其余两段实心）
-      ctx.fillStyle='#4caf50';
-      let prevBottom=-10;
+      // 三条云道都画成「可穿过」的缺口，不暴露答案——只有答对的选项那道才真正安全
+      ctx.fillStyle='rgba(76,175,80,.35)';
       for(let i=0;i<3;i++){
         const y0=laneYs[i]-gapHalf, y1=laneYs[i]+gapHalf;
-        ctx.fillRect(p.x, prevBottom, 60, y0-prevBottom);
-        ctx.fillRect(p.x, y1, 60, (i===2?H+10:laneYs[i+1]-gapHalf)-y1);
-        prevBottom = i===2 ? H+10 : laneYs[i+1]-gapHalf;
+        ctx.fillRect(p.x, y0-3, 60, 6);                       // 道上沿
+        ctx.fillRect(p.x, y1-3, 60, 6);                       // 道下沿
+        // 道内：半透明云（可穿过）
+        ctx.fillStyle='rgba(255,255,255,.10)';
+        ctx.fillRect(p.x, y0+3, 60, (y1-y0)-6);
+        ctx.fillStyle='rgba(76,175,80,.35)';
       }
-      // 缺口标线：正确=绿，错误=红
-      for(let i=0;i<3;i++){
-        const y0=laneYs[i]-gapHalf;
-        ctx.fillStyle = (i===p.ans) ? 'rgba(102,187,106,.8)' : 'rgba(255,82,82,.6)';
-        ctx.fillRect(p.x-7, y0, 4, gapHalf*2);
-      }
-      // 选项标签（缺口左侧）
+      // 每条道左侧标选项
       p.q.opts.forEach(function(o,i){
-        ctx.fillStyle = (i===p.ans) ? '#1b5e20' : '#795548';
-        ctx.font='bold '+Math.round(10/sf)+'px sans-serif'; ctx.textAlign='right';
-        ctx.fillText(o, p.x-12, laneYs[i]);
+        ctx.fillStyle='#1b5e20';
+        ctx.font='bold '+Math.round(11/sf)+'px sans-serif'; ctx.textAlign='right';
+        ctx.fillText(o, p.x-12, laneYs[i]+4);
       });
-      // 题目（云柱上方）
-      ctx.fillStyle='#fff'; ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.lineWidth=2;
+      // 题目显示在云柱上方
+      ctx.fillStyle='#fff'; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=2;
       ctx.font='bold '+Math.round(13/sf)+'px sans-serif'; ctx.textAlign='center';
       ctx.strokeText('❓ '+p.q.q, p.x+30, 22); ctx.fillText('❓ '+p.q.q, p.x+30, 22);
     });
@@ -7143,8 +7159,8 @@ function openMole(cfg, onComplete) {
     showGameTutorial('mole', '🔨 边缘打地鼠', [
       '传感器不断<b>冒出异常数据</b>（超温/爆振/毛刺），<b>点掉</b>它们 = 边缘过滤',
       '看准了再点：冒出的是<b>正常数据</b>就别点，点错 -1 命',
-      '连点有连击加分；异常越冒越快',
-      '点掉 20 个异常即通关'
+      '<b>⭐ 金色包</b>是奖励，点它 +50 分、直接算 2 个异常；连点有连击加分',
+      '难度会提升：同时冒出更多、消失更快；点掉 20 个异常即通关'
     ], function(){ openMole(cfg, onComplete); });
     return;
   }
@@ -7154,7 +7170,7 @@ function openMole(cfg, onComplete) {
   const hw=160, hh=150;   // 每格大小
   const ox=(W-COLS*hw)/2, oy=(H-ROWS*hh)/2;
   let lives=3, score=0, combo=0, killed=0, ended=false;
-  let active=null, spawnTimer=0, speed=1, particles=[];
+  let moles=[], spawnTimer=0.2, speed=1, particles=[];
   const overlay=document.createElement('div');
   overlay.className='mm-overlay';
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9500;display:flex;align-items:center;justify-content:center';
@@ -7162,8 +7178,8 @@ function openMole(cfg, onComplete) {
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🔨 边缘打地鼠</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 点掉异常，别点正常</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>❤️ <b id="moLives">3</b></span><span>🌡️ 正常 ≤<b id="moThr">${thr}</b>${unit}</span><span>🎯 <b id="moScore">0</b></span><span>🔨 <b id="moKill">0</b>/20</span><span>🔥 <b id="moCombo" style="color:#ff7a00"></b></span></div>
-      <canvas id="moCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#0a0f16;cursor:pointer;touch-action:none"></canvas>
-      <div class="sh-tip">读数 <b>超过阈值</b>(${thr}${unit})就点掉 · 在范围内别点 · 越冒越快</div>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#0a0f16;cursor:pointer;touch-action:none"><canvas id="moCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
+      <div class="sh-tip">读数 <b>超过阈值</b>(${thr}${unit})就点掉 · 范围内别点 · ⭐金包必点 · 越冒越快</div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick=()=>closeGame(false);
@@ -7171,47 +7187,67 @@ function openMole(cfg, onComplete) {
   const cw=cv.clientWidth||W; const sf=Math.max(0.6,cw/W);
   const livesEl=document.getElementById('moLives'), scoreEl=document.getElementById('moScore'), killEl=document.getElementById('moKill'), comboEl=document.getElementById('moCombo');
   function centerOf(i){ return { x: ox + hw*(i%COLS) + hw/2, y: oy + hh*Math.floor(i/COLS) + hh/2 }; }
+  function freeSpot(i){ return !moles.some(m=>m.i===i); }
   function spawn(){
-    const i=Math.floor(Math.random()*(COLS*ROWS));
+    // 难度：越往后同时冒得越多（2~3 个），消失更快
+    const maxSim = speed >= 2.4 ? 3 : speed >= 1.6 ? 2 : 1;
+    if (moles.length >= maxSim) return;
+    let tries=0, i=Math.floor(Math.random()*(COLS*ROWS));
+    while (!freeSpot(i) && tries<20){ i=Math.floor(Math.random()*(COLS*ROWS)); tries++; }
+    if (!freeSpot(i)) return;
     const c=centerOf(i);
-    const val = 5 + Math.floor(Math.random()*(thr*1.5));   // 随机读数
-    const isGood = val <= thr;   // 读数在阈值内=正常
-    active={ i, x:c.x, y:c.y, isGood, val, t:0, dur: Math.max(0.7, 1.5 - speed*0.15), label: metric+' '+val+unit };
+    const isGold = Math.random() < 0.10;                      // ⭐ 金色奖励包
+    let isGood=false, val=0;
+    if (!isGold) { val = 5 + Math.floor(Math.random()*(thr*1.5)); isGood = val <= thr; }
+    moles.push({ i, x:c.x, y:c.y, isGood, isGold, val, t:0, dur: Math.max(0.6, 1.5 - speed*0.16), label: isGold ? '⭐ 奖励' : (metric+' '+val+unit) });
   }
-  function addParticles(x,y,c){ for(let k=0;k<12;k++)particles.push({x,y,vx:(Math.random()-.5)*200,vy:(Math.random()-.5)*200-60,t:0,color:c}); }
+  function addParticles(x,y,c){ for(let k=0;k<12;k++)particles.push({x,y,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220-60,t:0,color:c}); }
   cv.addEventListener('pointerdown', e=>{
     if(ended)return;
     const r=cv.getBoundingClientRect(); const x=(e.clientX-r.left)/sf, y=(e.clientY-r.top)/sf;
-    if(!active)return;
-    if(Math.abs(x-active.x)<46 && Math.abs(y-active.y)<46){
-      if(active.isGood){ lives--; livesEl.textContent=lives; playSound('error'); addParticles(active.x,active.y,'#ff5252'); if(lives<=0){endGame(false);return;} }
-      else { combo++; score+=10+(combo>=5?5:combo>=3?3:0); killed++; scoreEl.textContent=score; killEl.textContent=killed; comboEl.textContent=combo>=2?'x'+combo:''; playSound('success'); addParticles(active.x,active.y,'#ffb000'); if(killed>=20){endGame(true);return;} }
-      active=null; spawnTimer=0.35;
+    let hitMole=null;
+    for (const m of moles) if (Math.abs(x-m.x)<46 && Math.abs(y-m.y)<46){ hitMole=m; break; }
+    if (!hitMole) return;
+    if (hitMole.isGold) {
+      combo++; score+=50; killed+=2;
+      scoreEl.textContent=score; killEl.textContent=killed; comboEl.textContent=combo>=2?'x'+combo:'';
+      playSound('fanfare'); addParticles(hitMole.x,hitMole.y,'#ffd700');
+      moles = moles.filter(m=>m!==hitMole);
+      if (killed>=20){ endGame(true); return; }
+      return;
     }
+    if(hitMole.isGood){ lives--; livesEl.textContent=lives; playSound('error'); addParticles(hitMole.x,hitMole.y,'#ff5252'); if(lives<=0){endGame(false);return;} }
+    else { combo++; score+=10+(combo>=5?5:combo>=3?3:0); killed++; scoreEl.textContent=score; killEl.textContent=killed; comboEl.textContent=combo>=2?'x'+combo:''; playSound('success'); addParticles(hitMole.x,hitMole.y,'#ffb000'); if(killed>=20){endGame(true);return;} }
+    moles = moles.filter(m=>m!==hitMole);
   });
   function update(dt){
     if(ended)return;
     spawnTimer-=dt;
-    if(!active && spawnTimer<=0){ spawn(); }
-    if(active){ active.t+=dt; if(active.t>=active.dur){ active=null; spawnTimer=0.3; combo=0; if(comboEl)comboEl.textContent=''; } }
-    speed = 1 + (killed*0.08);
+    if(spawnTimer<=0){ spawn(); spawnTimer = Math.max(0.28, 0.6 - speed*0.06); }
+    moles.forEach(m=>{ m.t+=dt; });
+    const before=moles.length;
+    moles = moles.filter(m=>m.t<m.dur);
+    if (moles.length < before) { combo=0; if(comboEl)comboEl.textContent=''; }   // 消失=漏掉，断连击
+    speed = 1 + (killed*0.07);
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle='rgba(0,188,212,.06)';
     for(let i=0;i<COLS*ROWS;i++){ const c=centerOf(i); ctx.beginPath(); ctx.arc(c.x,c.y,46,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='rgba(0,188,212,.25)'; ctx.stroke(); }
-    if(active){
+    moles.forEach(active=>{
       const a = Math.sin(active.t*10)*0.12+0.9;
       ctx.globalAlpha=a;
-      ctx.fillStyle = 'rgba(255,152,0,.5)'; ctx.strokeStyle = active.isGood ? 'rgba(0,200,83,.6)' : 'rgba(255,82,82,.7)'; ctx.lineWidth=3; ctx.shadowBlur=12;
+      ctx.fillStyle = active.isGold ? 'rgba(255,193,7,.5)' : 'rgba(255,152,0,.5)';
+      ctx.strokeStyle = active.isGold ? 'rgba(255,215,0,.9)' : active.isGood ? 'rgba(0,200,83,.6)' : 'rgba(255,82,82,.7)';
+      ctx.lineWidth=3; ctx.shadowBlur=12;
       ctx.beginPath(); ctx.arc(active.x, active.y, 42, 0, Math.PI*2); ctx.fill(); ctx.stroke();
       ctx.shadowBlur=0;
       ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(16/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(active.label, active.x, active.y-4);
-      ctx.fillStyle='#ffd27d'; ctx.font='bold '+Math.round(10/sf)+'px sans-serif';
-      ctx.fillText(active.isGood ? '正常' : '异常?', active.x, active.y+16);
+      ctx.fillStyle= active.isGold ? '#ffd700' : '#ffd27d'; ctx.font='bold '+Math.round(10/sf)+'px sans-serif';
+      ctx.fillText(active.isGold ? '+50 算2个' : (active.isGood ? '正常' : '异常?'), active.x, active.y+16);
       ctx.globalAlpha=1;
-    }
+    });
     particles.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
   }
@@ -7224,7 +7260,7 @@ function openMole(cfg, onComplete) {
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
   window.moAgain=()=>{ overlay.remove(); openMole(cfg,onComplete); };
-  window.moDone=()=>{ if(onComplete)onComplete(isWin); overlay.remove(); playAreaMusic(); };
+  window.moDone=()=>{ if(onComplete)onComplete(killed>=20); overlay.remove(); playAreaMusic(); };
   function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); overlay.remove(); if(manual){if(onComplete)onComplete(false);playAreaMusic();} }
   let last=performance.now(), dt=0;
   function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
@@ -7248,16 +7284,16 @@ function openPacman(cfg, onComplete) {
   const hintOf={}; pairs.forEach(function(p){hintOf[p.t]=p.h;});
   const ghostsN=(cfg.ghosts||['清理进程','镜像冲突','端口占用']).map(String);
   const W=840,H=560, COLS=19, ROWS=15, cell=Math.floor(Math.min(W,H)/Math.max(COLS,ROWS));
-  // 迷宫 1=墙
+  // 迷宫 1=墙（简化：更开阔，避免复杂走廊）
   const base=[
-    "1111111111111111111","1000000000000000001","1011110111110111101","1010000100000100001",
-    "1010110111110110101","1010000000000000001","1111110101110101111","1000000000000000001",
-    "1111110101110101111","1000000000000000001","1010110111110110101","1010000100000100001",
-    "1011110111110111101","1000000000000000001","1111111111111111111"
+    "1111111111111111111","1000000000000000001","1000000000000000001","1000011111111000001",
+    "1000000000000000001","1000000000000000001","1000000000000000001","1000000000000000001",
+    "1000000000000000001","1000000000000000001","1000011111111000001","1000000000000000001",
+    "1000000000000000001","1000000000000000001","1111111111111111111"
   ];
   let map=[], dots=0, level=1, lives=3, score=0, ended=false;
   let px,py,pdir={x:1,y:0}, nextDir={x:1,y:0}, mouth=0;
-  let moveTimer=0, ghostTimer=0;   // 移动节奏计时器（降低速度）
+  let moveTimer=0, ghostTimer=0, gameTime=0;   // 移动节奏计时器（降低速度）+ 已游玩秒数
   let ghosts=[], power=0;
   let particles=[], floats=[];
   let currentCmd='', specials=[], paired=0;
@@ -7270,7 +7306,8 @@ function openPacman(cfg, onComplete) {
     function place(kind,cmd,label){ if(!cands.length)return; const i=Math.floor(Math.random()*cands.length); const a=cands.splice(i,1)[0]; map[a[1]][a[0]]=' '; dots--; specials.push({x:a[0],y:a[1],kind:kind,cmd:cmd,label:label}); }
     pairs.slice(0,2).forEach(function(p){ place('cmd', p.t, p.t); place('act', p.t, p.h); });
     px=1; py=1; pdir={x:1,y:0}; nextDir={x:1,y:0};
-    ghosts=[{x:9,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[0]},{x:11,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[1]}];
+    // 只 1 个幽灵，藏在中心，15s 后释放（给玩家熟悉迷宫的时间）
+    ghosts=[{x:9,y:7,dir:{x:0,y:0},flee:false,n:ghostsN[0],sleep:15}];
     power=0;
   }
   build();
@@ -7281,7 +7318,7 @@ function openPacman(cfg, onComplete) {
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">👾 容器吃豆人</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 吃镜像层，躲清理进程</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>❤️ <b id="pcLives">3</b></span><span>🧩 带命令 <b id="pcCmd" style="color:#7ee8fa">—</b></span><span>🎯 <b id="pcScore">0</b></span><span>🏆 第 <b id="pcLevel">1</b> 关</span></div>
-      <canvas id="pcCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#04060c;touch-action:none"></canvas>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#04060c;touch-action:none"><canvas id="pcCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">←/→/↑/↓ 或 滑动 · 吃蓝色命令带着 → 吃对应黄色动作配对</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -7305,10 +7342,13 @@ function openPacman(cfg, onComplete) {
     if(ended)return;
     mouth+=dt*6;
     if(power>0)power-=dt;
-    // 移动（计时器控制节奏：初始间隔 0.13s，随关卡略快）
+    gameTime+=dt;   // 已游玩秒数（用于幽灵延迟出场）
+    // 幽灵延迟出场：前 15s 待在中心屋，不出动
+    ghosts.forEach(function(g){ if(g.sleep>0){ g.sleep-=dt; if(g.sleep<=0){ g.dir={x:0,y:0}; } } });
+    // 移动（计时器控制节奏：初始间隔 0.16s，随关卡略快）
     moveTimer-=dt;
     if(moveTimer<=0){
-      moveTimer = Math.max(0.09, 0.13 - level*0.008);
+      moveTimer = Math.max(0.10, 0.16 - level*0.008);
       if(!(nextDir.x===-pdir.x&&nextDir.y===-pdir.y)) pdir=nextDir;
       const nx=px+pdir.x, ny=py+pdir.y;
       if(map[ny] && map[ny][nx]!=='1'){ px=nx; py=ny; }
@@ -7332,6 +7372,7 @@ function openPacman(cfg, onComplete) {
     ghostTimer-=dt;
     if(ghostTimer>0){ } else {
     ghosts.forEach(g=>{
+      if(g.sleep>0) return;   // 未到出场时间：静止在屋
       if(g.flee && power<=0) g.flee=false;
       if(power>0 && !g.flee){ // 朝远离玩家走
         const opts=[]; [[0,-1],[0,1],[-1,0],[1,0]].forEach(d=>{ const nx2=g.x+d[0],ny2=g.y+d[1]; if(map[ny2]&&map[ny2][nx2]!=='1') opts.push(d); });
@@ -7344,10 +7385,11 @@ function openPacman(cfg, onComplete) {
       const gx=g.x+g.dir[0], gy=g.y+g.dir[1];
       if(map[gy] && map[gy][gx]!=='1'){ g.x=gx; g.y=gy; }
     });
-    ghostTimer = Math.max(0.14, 0.20 - level*0.01);
+    ghostTimer = Math.max(0.16, 0.26 - level*0.01);
     }
     // 碰撞
     ghosts.forEach(g=>{
+      if(g.sleep>0) return;   // 未出场不碰撞
       if(g.x===px&&g.y===py){
         if(power>0 && !g.flee){ score+=50; g.flee=true; playSound('fanfare'); addParticles(px*cell+cell/2,py*cell+cell/2,'#7ee8fa'); }
         else if(!g.flee){ lives--; livesEl.textContent=lives; playSound('error'); addParticles(px*cell+cell/2,py*cell+cell/2,'#ff5252');
@@ -7370,6 +7412,15 @@ function openPacman(cfg, onComplete) {
     ctx.fillStyle='#ffb300'; ctx.beginPath(); ctx.arc(cxp,cyp,c/2-2, mouth*0.8, Math.PI*2-mouth*0.8); ctx.lineTo(cxp,cyp); ctx.fill();
     // 幽灵
     ghosts.forEach(g=>{ const gx=g.x*c+c/2, gy=g.y*c+c/2;
+      if(g.sleep>0){   // 待机：半透明灰，头顶显示倒计时
+        ctx.globalAlpha=0.5;
+        ctx.fillStyle='#9aa3bd';
+        ctx.beginPath(); ctx.arc(gx,gy-3,c/2-2,Math.PI,0); ctx.lineTo(gx+c/2-2,gy+c/2-2); ctx.lineTo(gx-c/2+2,gy+c/2-2); ctx.fill();
+        ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(10/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('⏱ '+Math.ceil(g.sleep), gx, gy-2);
+        ctx.globalAlpha=1;
+        return;
+      }
       ctx.fillStyle = (power>0&&!g.flee) ? '#64b5f6' : g.flee ? '#bdbdbd' : '#ff5252';
       ctx.beginPath(); ctx.arc(gx,gy-3,c/2-2,Math.PI,0); ctx.lineTo(gx+c/2-2,gy+c/2-2); ctx.lineTo(gx-c/2+2,gy+c/2-2); ctx.fill();
       ctx.fillStyle='#fff'; ctx.font='bold '+Math.round(9/sf)+'px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -7433,7 +7484,7 @@ function openTank(cfg, onComplete) {
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🎯 消息守卫战</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 坦克守 Broker</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>🚗 <b id="tkLives">3</b></span><span>🏰 <b id="tkBase">3</b></span><span>🎯 <b id="tkTopic" style="color:#7ee8fa">${cannonTopic}</b></span><span>🌊 第 <b id="tkWave">1</b> 波</span></div>
-      <canvas id="tkCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#071019;touch-action:none"></canvas>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#071019;touch-action:none"><canvas id="tkCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">↑/↓ 切炮口主题 · 只打<b>匹配主题</b>的消息 · 守 Broker 别漏</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -7538,7 +7589,7 @@ function openBreakout(cfg, onComplete) {
     <div class="sh-box">
       <div class="mm-head"><div><div class="mm-title">🧱 AI 打砖块</div><div class="mm-sub">${escHtml(cfg.name||'')} —— 板=你的 AI 决策，消掉故障砖</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="sh-stats"><span>❤️ <b id="brLives">3</b></span><span>🎯 <b id="brScore">0</b></span><span>🏆 第 <b id="brLevel">1</b> 关</span></div>
-      <canvas id="brCanvas" width="${W}" height="${H}" style="width:100%;flex:1;min-height:0;display:block;background:#04060c;cursor:none;touch-action:none"></canvas>
+      <div class="canvas-wrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#04060c;cursor:none;touch-action:none"><canvas id="brCanvas" width="${W}" height="${H}" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block;touch-action:none"></canvas></div>
       <div class="sh-tip">←/→ 或 拖动 移动板 · 接球消砖 · 漏球 -1 命</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -7619,9 +7670,10 @@ function openSorter(cfg, onComplete) {
   if (cfg._tier) cfg.name = (cfg.name || '') + (cfg._endless ? ' ∞ 无限战' : cfg._hard ? ' · 二周目' : '');
   if (!tutSeen('sorter')) {
     showGameTutorial('sorter', '📦 数据分类大师', [
-      '传送带送来带标签的物品，<b>点下方正确的分类筐</b>让它归位',
-      '点错筐，或让它溜到传送带尽头，都会 <b>-1 命</b>',
-      '<b>连续点对</b>有连击加分；清完一波过关，越来越快'
+      '数据<b>从上方落下</b>，在它滑到<b>判定线</b>前，点下方<b>正确的分类筐</b>接住它',
+      '点错筐，或让它滑过判定线漏掉，都会 <b>-1 命</b>',
+      '越接近判定线接住，<b>PERFECT</b> 加分越多；连续接对连击加分',
+      '清完一波过关，越来越快'
     ], function(){ openSorter(cfg, onComplete); });
     return;
   }
@@ -7632,6 +7684,8 @@ function openSorter(cfg, onComplete) {
   const WAVES = cfg._endless ? 999 : (cfg.waves || 3);
   const PER = cfg.perWave || 10;
   const LIVES = cfg._hard ? 2 : (cfg.lives || 3);
+  const HIT_Y = 232;      // 判定线（与 CSS .so-belt::after 对齐）
+  const LEAK_Y = 292;     // 漏接线：滑过即失败
 
   let lives = LIVES, score = 0, combo = 0, wave = 1, done = 0, processed = 0, totalSorted = 0, ended = false;
   let belt = [], queue = [], spawnT = 0, last = 0, raf = 0;
@@ -7648,19 +7702,19 @@ function openSorter(cfg, onComplete) {
         <span>🎯 <b id="soScore">0</b></span>
         <span>🔥 <b id="soCombo" style="color:#ff7a00"></b></span>
       </div>
-      <div class="so-belt" id="soBelt"></div>
+      <div class="so-belt" id="soBelt"><div class="so-judge" id="soJudge"></div></div>
       <div class="so-bins" id="soBins"></div>
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('.mm-close').onclick = () => closeGame(false);
   const beltEl = document.getElementById('soBelt');
+  const judgeEl = document.getElementById('soJudge');
   const livesEl = document.getElementById('soLives');
   const scoreEl = document.getElementById('soScore');
   const comboEl = document.getElementById('soCombo');
   const waveEl = document.getElementById('soWave');
   const doneEl = document.getElementById('soDone');
   const binsEl = document.getElementById('soBins');
-  const END_X = Math.max(120, (beltEl.clientWidth || 620) - 96);
 
   // 分类筐
   cats.forEach((c, ci) => {
@@ -7671,6 +7725,13 @@ function openSorter(cfg, onComplete) {
     binsEl.appendChild(b);
   });
 
+  function judge(txt, col){          // 节奏判定飘字
+    judgeEl.textContent = txt;
+    judgeEl.style.color = col || '#ffd700';
+    judgeEl.classList.add('on');
+    clearTimeout(judge._t);
+    judge._t = setTimeout(() => judgeEl.classList.remove('on'), 500);
+  }
   function pickItem(ci) {
     const pool = items.filter(it => it.cat === ci);
     return (pool[Math.floor(Math.random()*pool.length)] || {label:'?'}).label;
@@ -7686,13 +7747,13 @@ function openSorter(cfg, onComplete) {
     }
     for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [queue[i],queue[j]]=[queue[j],queue[i]]; }
   }
-  function itemSpeed() { return (60 + wave*14) * (cfg._hard ? 1.25 : 1); }   // px/s
-  function spawnGap() { return Math.max(350, 1500 - wave*220); }             // ms
+  function itemSpeed() { return (34 + wave*7) * (cfg._hard ? 1.2 : 1); }   // px/s（纵向更慢，节奏从容）
+  function spawnGap() { return Math.max(420, 1500 - wave*170); }             // ms
   function removeFromBelt(it) { const i = belt.indexOf(it); if (i >= 0) belt.splice(i,1); }
 
   function refreshUrgent() {
     let best = null;
-    belt.forEach(it => { if (!best || it.x > best.x) best = it; });
+    belt.forEach(it => { if (it.y < LEAK_Y && (!best || it.y > best.y)) best = it; });
     belt.forEach(it => { it.el.classList.toggle('so-urgent', it === best); });
   }
   function spawnItem() {
@@ -7701,32 +7762,37 @@ function openSorter(cfg, onComplete) {
     const el = document.createElement('div');
     el.className = 'so-item';
     el.textContent = q.label;
-    el.style.left = '8px';
+    el.title = q.label;
+    el.style.top = '-44px';
     beltEl.appendChild(el);
-    belt.push({ el: el, label: q.label, cat: q.cat, x: 8, speed: itemSpeed() });
+    belt.push({ el: el, label: q.label, cat: q.cat, y: -44, speed: itemSpeed() });
     refreshUrgent();
   }
   function flyTo(it, btn) {
     const r = btn.getBoundingClientRect(), be = beltEl.getBoundingClientRect();
-    it.el.style.transition = 'all .3s ease';
-    it.el.style.left = (r.left - be.left + r.width/2 - it.el.offsetWidth/2) + 'px';
-    it.el.style.top = (r.top - be.top + r.height/2 - it.el.offsetHeight/2) + 'px';
+    it.el.style.transition = 'all .28s ease';
+    it.el.style.left = (r.left - be.left + r.width/2) + 'px';
+    it.el.style.top = (r.top - be.top + r.height/2) + 'px';
     it.el.style.opacity = '0';
-    setTimeout(() => { if (it.el.parentNode) it.el.parentNode.removeChild(it.el); }, 320);
+    setTimeout(() => { if (it.el.parentNode) it.el.parentNode.removeChild(it.el); }, 300);
   }
   function sortTo(ci, btn) {
     if (ended) return;
     let best = null;
-    belt.forEach(it => { if (!best || it.x > best.x) best = it; });
+    belt.forEach(it => { if (it.y < LEAK_Y && (!best || it.y > best.y)) best = it; });
     if (!best) { playSound('click'); return; }
     if (best.cat === ci) {
+      const dist = Math.abs(best.y - HIT_Y);
+      const rating = dist <= 14 ? 'PERFECT' : dist <= 34 ? 'GOOD' : 'OK';
+      const mult = rating === 'PERFECT' ? 3 : rating === 'GOOD' ? 2 : 1;
       combo++; totalSorted++; processed++;
-      score += 10 * (1 + Math.floor(combo/5));
+      score += 10 * mult * (1 + Math.floor(combo/5));
       scoreEl.textContent = score;
       comboEl.textContent = combo >= 2 ? 'x'+combo : '';
       done++; doneEl.textContent = Math.min(done, PER);
       playSound('success');
       removeFromBelt(best); flyTo(best, btn);
+      judge(rating, rating === 'PERFECT' ? '#ffd700' : rating === 'GOOD' ? '#7ee8fa' : '#9aa3bd');
       // —— 分类成功：粒子 + 得分飘字 ——
       try{
         const bb=btn.getBoundingClientRect(), ob=beltEl.getBoundingClientRect();
@@ -7740,7 +7806,7 @@ function openSorter(cfg, onComplete) {
         }
         const fl=document.createElement('div');
         fl.className='so-float';
-        fl.textContent = '+'+ (10 * (1 + Math.floor(combo/5)));
+        fl.textContent = '+'+ (10 * mult * (1 + Math.floor(combo/5)));
         fl.style.cssText='left:'+bx+'px;top:'+(by-16)+'px';
         beltEl.appendChild(fl);
         setTimeout(()=>{ try{fl.remove();}catch(e){} }, 800);
@@ -7753,6 +7819,7 @@ function openSorter(cfg, onComplete) {
       best.el.classList.add('so-wrong');
       playSound('error');
       beltEl.classList.remove('so-hit'); void beltEl.offsetWidth; beltEl.classList.add('so-hit');
+      judge('MISS', '#ff5252');
       removeFromBelt(best);
       setTimeout(() => { if (best.el.parentNode) best.el.parentNode.removeChild(best.el); }, 240);
       refreshUrgent();
@@ -7800,12 +7867,13 @@ function openSorter(cfg, onComplete) {
       if (spawnT <= 0 && queue.length) { spawnItem(); spawnT = spawnGap(); }
       for (let i = belt.length - 1; i >= 0; i--) {
         const it = belt[i];
-        it.x += it.speed * dt;
-        it.el.style.left = it.x + 'px';
-        if (it.x >= END_X) {
+        it.y += it.speed * dt;
+        it.el.style.top = it.y + 'px';
+        if (it.y >= LEAK_Y) {   // 滑过判定线没接住：漏了
           combo = 0; if (comboEl) comboEl.textContent='';
           processed++; lives--; livesEl.textContent = lives;
           it.el.classList.add('so-leak');
+          judge('MISS 漏接', '#ff5252');
           playSound('error');
           removeFromBelt(it);
           setTimeout(() => { if (it.el.parentNode) it.el.parentNode.removeChild(it.el); }, 260);
@@ -8083,22 +8151,49 @@ function openLianLian(cfg, onComplete) {
   gridEl.style.gridTemplateColumns = 'repeat(' + cols + ', 74px)';
   gridEl.style.gridTemplateRows = 'repeat(' + rows + ', 54px)';
   document.getElementById('llShuffle').onclick = shuffleRemaining;
+  // 保证初始盘面至少有一对可消除（否则重排）
+  for (let t=0;t<30;t++) { if (findAnyPair()) break; shuffleRemaining(); }
 
-  function empty(r, c) { return r < 0 || r >= R || c < 0 || c >= C || cells[r][c] === null; }
-  function lineClear(r1,c1,r2,c2) {
-    if (r1 === r2) { const lo=Math.min(c1,c2), hi=Math.max(c1,c2); for (let c=lo+1;c<hi;c++) if (!empty(r1,c)) return false; return true; }
-    if (c1 === c2) { const lo=Math.min(r1,r2), hi=Math.max(r1,r2); for (let r=lo+1;r<hi;r++) if (!empty(r,c1)) return false; return true; }
+  function passable(r, c) { return r < 0 || r >= R || c < 0 || c >= C || cells[r][c] === null; }
+  // 连通判定：允许走外圈空环，最多 2 个拐弯（经典连连看规则）
+  function canConnect(a, b) {
+    if (a.pair !== b.pair) return false;
+    if (a.r===b.r && a.c===b.c) return false;
+    const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+    const stack = [], seen = {};
+    for (let d=0;d<4;d++){ const key=a.r+','+a.c+','+d+',0'; if(!seen[key]){ seen[key]=1; stack.push({r:a.r,c:a.c,d:d,t:0}); } }
+    while (stack.length) {
+      const cur = stack.pop();
+      const dr=dirs[cur.d][0], dc=dirs[cur.d][1];
+      let nr=cur.r+dr, nc=cur.c+dc;
+      while (true) {
+        if (nr===b.r && nc===b.c) return true;
+        if (nr < -1 || nr > R || nc < -1 || nc > C) break;           // 外圈只到 1 格，再远无意义
+        const inB = nr>=0 && nr<R && nc>=0 && nc<C;
+        if (inB && cells[nr][nc]!==null) break;                       // 被其它牌挡住
+        if (cur.t < 2) {
+          for (let nd=0;nd<4;nd++){
+            if (nd===cur.d) continue;
+            const key=nr+','+nc+','+nd+','+(cur.t+1);
+            if(!seen[key]){ seen[key]=1; stack.push({r:nr,c:nc,d:nd,t:cur.t+1}); }
+          }
+        }
+        nr+=dr; nc+=dc;
+      }
+    }
     return false;
   }
-  function canConnect(a, b) {
-    const r1=a.r,c1=a.c,r2=b.r,c2=b.c;
-    if (r1===r2 && lineClear(r1,c1,r2,c2)) return true;
-    if (c1===c2 && lineClear(r1,c1,r2,c2)) return true;
-    if (empty(r1,c2) && lineClear(r1,c1,r1,c2) && lineClear(r1,c2,r2,c2)) return true;
-    if (empty(r2,c1) && lineClear(r1,c1,r2,c1) && lineClear(r2,c1,r2,c2)) return true;
-    for (let c=0;c<C;c++) if (empty(r1,c) && empty(r2,c) && lineClear(r1,c1,r1,c) && lineClear(r1,c,r2,c) && lineClear(r2,c,r2,c2)) return true;
-    for (let r=0;r<R;r++) if (empty(r,c1) && empty(r,c2) && lineClear(r1,c1,r,c1) && lineClear(r,c1,r,c2) && lineClear(r,c2,r2,c2)) return true;
-    return false;
+  // 找一对当前可消除的牌（用于保证盘面始终有解）
+  function findAnyPair() {
+    const pos=[];
+    for (let r=1;r<=rows;r++) for (let c=1;c<=cols;c++) if (cells[r][c]) pos.push({r:r,c:c,pair:cells[r][c].pair});
+    for (let i=0;i<pos.length;i++) for (let j=i+1;j<pos.length;j++) {
+      if (pos[i].pair===pos[j].pair && canConnect(pos[i],pos[j])) return [pos[i],pos[j]];
+    }
+    return null;
+  }
+  function ensureSolvable() {   // 若无解则洗牌，最多尝试 30 次
+    for (let t=0;t<30 && !findAnyPair();t++) shuffleRemaining();
   }
   function render() {
     gridEl.innerHTML = '';
@@ -8109,6 +8204,9 @@ function openLianLian(cfg, onComplete) {
       div.className = 'll-tile' + (sel && sel.pair===cell.pair && sel.r===r && sel.c===c ? ' sel' : '');
       div.dataset.r = r; div.dataset.c = c;
       div.textContent = cell.text;
+      div.title = cell.text;   // 悬停查看完整文字
+      const _len = cell.text.length;   // 长文字自适应字号
+      div.style.fontSize = (_len > 12 ? 10 : _len > 7 ? 11 : _len > 5 ? 12 : 13) + 'px';
       div.onclick = () => pick(r, c, div);
       gridEl.appendChild(div);
     }
@@ -8160,8 +8258,10 @@ function openLianLian(cfg, onComplete) {
         sel = null; playSound('success');
         render();
         if (cleared >= pairs.length) { endGame(true); return; }
+        if (!findAnyPair()) { shuffleRemaining(); showToast('🔀 无路可走，已自动洗牌', 'info'); }
       } else {
         sel = null; render(); playSound('error'); shakeScreen();
+        if (!findAnyPair()) { shuffleRemaining(); showToast('🔀 无路可走，已自动洗牌', 'info'); }
       }
     } else {
       sel = null; render(); playSound('click');
@@ -8975,14 +9075,17 @@ function openTile2048(cfg, onComplete) {
     else if (e.key==='Escape') closeGame(false);
   }
   document.addEventListener('keydown', _k);
-  // 滑动
+  // 滑动（pointermove 立即判定，快速滑动也不会丢）
   let st=null;
   gridEl.addEventListener('pointerdown', e=>{ st={x:e.clientX,y:e.clientY}; });
-  gridEl.addEventListener('pointerup', e=>{
-    if (!st) return; const dx=e.clientX-st.x, dy=e.clientY-st.y; st=null;
+  gridEl.addEventListener('pointermove', e=>{
+    if (!st) return; const dx=e.clientX-st.x, dy=e.clientY-st.y;
     if (Math.abs(dx)<20 && Math.abs(dy)<20) return;
     if (Math.abs(dx)>Math.abs(dy)) slide(dx>0?3:2); else slide(dy>0?1:0);
+    st=null;
   });
+  gridEl.addEventListener('pointerup', e=>{ st=null; });
+  gridEl.addEventListener('pointercancel', e=>{ st=null; });
 
   function endGame(isWin) {
     if (ended) return;
@@ -9038,33 +9141,31 @@ function openMaze(cfg, onComplete) {
   let gateQ = null, timer = 0;
 
   function genMaze() {
+    // 递归回溯生成「完美迷宫」：路径唯一、无死胡同死局，比随机墙更好玩
     grid = [];
-    for (let r=0;r<ROWS;r++) { grid[r]=[]; for (let c=0;c<COLS;c++) grid[r][c] = (r===0||c===0||r===ROWS-1||c===COLS-1) ? 1 : (Math.random()<0.26 ? 1 : 0); }
-    // 起点/终点留空
-    grid[py][px] = 0; grid[sy][sx] = 0;
-    // BFS 保证可达，清掉挡路的墙
-    const q = [[px,py]]; const seen = new Set([''+px+','+py]);
-    while (q.length) {
-      const [x,y] = q.shift();
-      if (x===sx && y===sy) break;
-      [[1,0],[-1,0],[0,1],[0,-1]].forEach(d => {
-        const nx=x+d[0], ny=y+d[1];
-        if (nx<0||ny<0||nx>=COLS||ny>=ROWS) return;
-        if (seen.has(''+nx+','+ny)) return;
-        if (grid[ny][nx]===1) return;
-        seen.add(''+nx+','+ny); q.push([nx,ny]);
+    for (let r=0;r<ROWS;r++){ grid[r]=[]; for (let c=0;c<COLS;c++) grid[r][c]=1; }
+    const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+    const stack=[[px,py]]; grid[py][px]=0;
+    while (stack.length) {
+      const [x,y]=stack[stack.length-1];
+      const opts=[];
+      dirs.forEach(d=>{
+        const nx=x+d[0]*2, ny=y+d[1]*2;
+        if (nx<1||ny<1||nx>=COLS-1||ny>=ROWS-1) return;
+        if (grid[ny][nx]===1) opts.push(d);
       });
+      if (!opts.length){ stack.pop(); continue; }
+      const d=opts[Math.floor(Math.random()*opts.length)];
+      const nx=x+d[0]*2, ny=y+d[1]*2;
+      grid[y+d[1]][x+d[0]]=0; grid[ny][nx]=0;
+      stack.push([nx,ny]);
     }
-    if (!seen.has(''+sx+','+sy)) {
-      // 没有通路，直接打通一条直路（简单兜底）
-      for (let i=1;i<COLS-1;i++) grid[1][i]=0;
-    }
-    // 布知识门（6 个非起终点的空地）
-    let gated=0;
-    for (let r=1;r<ROWS-1 && gated<6;r++) for (let c=1;c<COLS-1 && gated<6;c++) {
-      if ((r!==py||c!==px) && (r!==sy||c!==sx) && grid[r][c]===0 && Math.random()<0.12) { grid[r][c]=2; gated++; }
-    }
-    // 兜底：如果门挡死了必经之路，也允许答对通过（门本身可过）
+    grid[sy][sx]=0; grid[py][px]=0;
+    // 布知识门（挑 6 个非起终点的空地，放在通道上）
+    const empties=[];
+    for (let r=1;r<ROWS-1;r++) for (let c=1;c<COLS-1;c++) if (grid[r][c]===0 && !(r===py&&c===px) && !(r===sy&&c===sx)) empties.push([r,c]);
+    for (let i=empties.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [empties[i],empties[j]]=[empties[j],empties[i]]; }
+    empties.slice(0,6).forEach(function(p){ grid[p[1]][p[0]]=2; });
   }
   function move(dx,dy) {
     if (ended || gateQ) return;
@@ -9115,7 +9216,7 @@ function openMaze(cfg, onComplete) {
     <div class="mz-box">
       <div class="mm-head"><div><div class="mm-title">🌐 ${escHtml(cfg.name)}</div><div class="mm-sub">${escHtml(cfg.subtitle||'')}</div></div><div class="mm-close" title="关闭">✕</div></div>
       <div class="mz-stats"><span>❤️ <b id="mzLives">${lives}</b></span><span>👣 <b id="mzMoves">0</b></span><span>⏱ <b id="mzTime">${TIME}</b>s</span><span>🎯 找 🖥️ 服务器</span></div>
-      <div class="mz-grid" id="mzGrid" style="grid-template-columns:repeat(${COLS},40px)"></div>
+      <div class="mz-grid" id="mzGrid" style="--mzc:${COLS};grid-template-columns:repeat(${COLS},1fr)"></div>
       <div class="mz-tip">←/→/↑/↓ 或滑动移动 · 金色=协议门(答题通过) · 撞墙扣命</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -9133,11 +9234,14 @@ function openMaze(cfg, onComplete) {
   document.addEventListener('keydown', _k);
   let sw=null;
   gridEl.addEventListener('pointerdown', e=>{ sw={x:e.clientX,y:e.clientY}; });
-  gridEl.addEventListener('pointerup', e=>{
-    if (!sw) return; const dx=e.clientX-sw.x, dy=e.clientY-sw.y; sw=null;
-    if (Math.abs(dx)<18&&Math.abs(dy)<18) return;
+  gridEl.addEventListener('pointermove', e=>{
+    if (!sw) return; const dx=e.clientX-sw.x, dy=e.clientY-sw.y;
+    if (Math.abs(dx)<16&&Math.abs(dy)<16) return;
     if (Math.abs(dx)>Math.abs(dy)) move(dx>0?1:-1,0); else move(0,dy>0?1:-1);
+    sw=null;
   });
+  gridEl.addEventListener('pointerup', e=>{ sw=null; });
+  gridEl.addEventListener('pointercancel', e=>{ sw=null; });
   timer = setInterval(()=>{ if(!ended){ timeLeft--; timeEl.textContent=Math.max(0,timeLeft); if(timeLeft<=0) endGame(false); } },1000);
 
   function endGame(isWin) {
@@ -10851,15 +10955,50 @@ function openAlarmRush(cfg, onComplete) {
   for (let i = 0; i < deviceCount; i++) {
     const el = document.createElement('div');
     el.className = 'ar-card normal';
-    el.innerHTML = '<div class="ar-dev-name">边缘盒子 0' + (i + 1) + '</div><div class="ar-temp">--℃</div><div class="ar-bar"><div class="ar-bar-fill" style="width:30%"></div></div><div class="ar-status">正常</div>';
+    el.innerHTML = '<div class="ar-dev-name">边缘盒子 0' + (i + 1) + '</div><div class="ar-temp">--℃</div><div class="ar-bar"><div class="ar-bar-fill" style="width:30%"></div></div><div class="ar-status">正常</div><button class="ar-cool" style="display:none">❄️ 强制降温</button>';
     grid.appendChild(el);
     const d = {
       i, el,
       temp: 52 + Math.random() * 14, state: 'normal', crashTimer: 0, heatRate: 7,
-      tempEl: el.querySelector('.ar-temp'), barEl: el.querySelector('.ar-bar-fill'), statusEl: el.querySelector('.ar-status')
+      tempEl: el.querySelector('.ar-temp'), barEl: el.querySelector('.ar-bar-fill'), statusEl: el.querySelector('.ar-status'),
+      coolEl: el.querySelector('.ar-cool')
     };
+    d.coolEl.onclick = (ev) => { ev.stopPropagation(); coolDevice(d); };
     el.onclick = () => tapDevice(d);
     devices.push(d);
+  }
+
+  // 主动降温：区别于"等到爆表再点"——升温中提前用 ❄️ 压下去，得奖励
+  function coolDevice(d) {
+    if (finished) return;
+    if (d.state === 'heating') {
+      combo++; saves++;
+      const gain = 15 + (combo - 1) * 5;
+      score += gain;
+      flash('❄️ 提前降温 +' + gain, 'ok');
+      if (combo >= 2) playSound('combo', combo); else playSound('success');
+      d.temp = Math.max(38, d.temp - 34);
+      d.state = 'normal';
+      d.el.className = 'ar-card normal'; d.statusEl.textContent = '已降温';
+      d.coolEl.style.display = 'none';
+      try{
+        const rb=d.el.getBoundingClientRect(), ob=overlay.getBoundingClientRect();
+        const bx=rb.left+rb.width/2-ob.left, by=rb.top+rb.height/2-ob.top;
+        for(let k=0;k<8;k++){
+          const sp=document.createElement('span');
+          sp.className='mm-burst';
+          sp.style.cssText='left:'+bx+'px;top:'+by+'px;--mx:'+((Math.random()*80-40))+'px;--my:'+((Math.random()*-70-10))+'px;background:'+['#7ee8fa','#fff','#4dd0e1'][k%3];
+          overlay.appendChild(sp);
+          setTimeout(()=>{ try{sp.remove();}catch(e){} }, 550);
+        }
+      }catch(e2){}
+    } else if (d.state === 'overheat') {
+      // 爆表了必须点卡片本体处理，❄️ 只能压一部分
+      d.temp -= 20;
+      if (d.temp < OVERHEAT_TEMP) { d.state = 'heating'; d.el.className = 'ar-card heating'; d.statusEl.textContent = '降温中…'; flash('❄️ 压住了，但还没完全好', 'warn'); }
+      else flash('❄️ 降温中，别松手…', 'warn');
+    }
+    renderHUD();
   }
 
   function tapDevice(d) {
@@ -10874,6 +11013,7 @@ function openAlarmRush(cfg, onComplete) {
       if (combo >= 2) playSound('combo', combo); else playSound('success');
       d.el.className = 'ar-card saved';
       d.statusEl.textContent = '已处理';
+      d.coolEl.style.display = 'none';
       // 处理成功粒子
       try{
         const rb=d.el.getBoundingClientRect(), ob=overlay.getBoundingClientRect();
@@ -10920,7 +11060,8 @@ function openAlarmRush(cfg, onComplete) {
       d.temp = Math.max(d.temp, 66);
       d.el.className = 'ar-card heating';
       d.statusEl.textContent = '升温中';
-      flash('🌡️ 边缘盒子 0' + (d.i + 1) + ' 开始升温！', 'warn');
+      d.coolEl.style.display = '';
+      flash('🌡️ 边缘盒子 0' + (d.i + 1) + ' 开始升温！快用 ❄️ 降温！', 'warn');
     }
     // 更新每台盒子
     devices.forEach(d => {
@@ -10932,8 +11073,9 @@ function openAlarmRush(cfg, onComplete) {
         if (d.temp >= OVERHEAT_TEMP) {
           d.state = 'overheat'; d.crashTimer = WINDOW;
           d.el.className = 'ar-card overheat';
-          d.statusEl.textContent = '🔥 过热！快处理！';
-          flash('🔥 边缘盒子 0' + (d.i + 1) + ' 爆表了！快点点它！', 'err');
+          d.statusEl.textContent = '🔥 过热！点卡片处理！';
+          d.coolEl.style.display = '';
+          flash('🔥 边缘盒子 0' + (d.i + 1) + ' 爆表了！快点卡片！', 'err');
           playSound('alarm');
         }
       } else if (d.state === 'overheat') {
@@ -10942,6 +11084,7 @@ function openAlarmRush(cfg, onComplete) {
           d.state = 'crashed'; crashes++; combo = 0; score -= 30;
           d.el.className = 'ar-card crashed';
           d.statusEl.textContent = '💥 宕机';
+          d.coolEl.style.display = 'none';
           flash('💥 宕机 -30（共宕机 ' + crashes + '/' + CRASH_LIMIT + '）', 'err');
           shake(d.el); playSound('error');
           if (crashes >= CRASH_LIMIT) { clearInterval(timer); finish(false); return; }
