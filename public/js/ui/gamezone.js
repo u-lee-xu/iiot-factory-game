@@ -10,7 +10,8 @@ function resolveTermPairs(w, lv, all){
   const fr = w.pairsFrom;
   if (!fr) return w.pairs || [];
   if (fr.unit){ const u=(lv.units||[]).find(x=>x.id===fr.unit); return (u && u.pairs) || []; }
-  const arr=[]; const push=(p)=>{ if(!arr.some(q=>q.term===p.term)) arr.push(p); };
+  // act/all 合并池：只收 term/hint 结构（memory/ll/snake/quick 等用）；left/right 匹配词条仅 match 用，不混入
+  const arr=[]; const push=(p)=>{ if(p.term && p.hint && !arr.some(q=>q.term===p.term)) arr.push(p); };
   if (fr.act){ (lv.units||[]).forEach(u=>(u.pairs||[]).forEach(push)); return arr; }
   if (fr.all){ (all||[]).forEach(l=>(l.units||[]).forEach(u=>(u.pairs||[]).forEach(push))); return arr; }
   return w.pairs || [];
@@ -201,6 +202,10 @@ export function gzPlay(idx) {
   const w = it.w;
   if (!(Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => window.isTaskDone(tid)))) {
     window.showToast('先完成对应任务解锁这个小游戏', 'error'); return;
+  }
+  // 幕级/综合词库：打乱顺序，让每次玩的词汇子集不同（游戏按 size 取前 N 对）
+  if (w.pairsFrom && (w.pairsFrom.act || w.pairsFrom.all) && Array.isArray(w.pairs)) {
+    for (let i=w.pairs.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const _t=w.pairs[i]; w.pairs[i]=w.pairs[j]; w.pairs[j]=_t; }
   }
   const t = w.type || 'memory';
   if (t==='quick') window.openQuickMatch(w, (win)=>{ gzAfter(win,'⚡ 快打完成'); });
