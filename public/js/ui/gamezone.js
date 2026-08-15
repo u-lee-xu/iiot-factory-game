@@ -4,8 +4,23 @@
 // ═══════════════════════════════════════════════════════════════════
 import { escHtml } from '../core/utils.js';
 
+// 词库解析：warmup 用 pairsFrom 引用词库池
+//   {unit:id}  单小节池 | {act:true} 幕池 | {all:true} 综合池（全书）
+function resolveTermPairs(w, lv, all){
+  const fr = w.pairsFrom;
+  if (!fr) return w.pairs || [];
+  if (fr.unit){ const u=(lv.units||[]).find(x=>x.id===fr.unit); return (u && u.pairs) || []; }
+  const arr=[]; const push=(p)=>{ if(!arr.some(q=>q.term===p.term)) arr.push(p); };
+  if (fr.act){ (lv.units||[]).forEach(u=>(u.pairs||[]).forEach(push)); return arr; }
+  if (fr.all){ (all||[]).forEach(l=>(l.units||[]).forEach(u=>(u.pairs||[]).forEach(push))); return arr; }
+  return w.pairs || [];
+}
 export function loadTermCards() {
   return fetch('/data/term-cards.json').then(r => r.json()).then(d => {
+    // 加载后统一把引用解析成 pairs，各游戏读取不变
+    (d.levels||[]).forEach(lv=>{
+      (lv.warmups||[]).forEach(w=>{ if (w.pairsFrom) w.pairs = resolveTermPairs(w, lv, d.levels); });
+    });
     window.TERM_CARDS = d;
     try { if (typeof window.evaluateAchievements === 'function') window.evaluateAchievements(false); } catch (e) {}
   }).catch(() => { window.TERM_CARDS = null; });
