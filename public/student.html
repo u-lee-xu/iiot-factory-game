@@ -5595,34 +5595,97 @@ function gzName(w) {
 function renderGameZone(body) {
   if (!window.TERM_CARDS || !content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
   gzList = [];
-  let html = '';
+  // 按游戏类型分组排序：同一类型排一起，方便按类型测试、不重不漏
+  const TYPE_ORDER = [
+    ['memory','🧠','翻牌配对'],
+    ['quick','⚡','快打'],
+    ['typing','🔫','术语防御战'],
+    ['shooter','🛸','数据蜂群'],
+    ['td','🛡️','车间防线'],
+    ['snake','🐍','网线贪吃蛇'],
+    ['pacman','👾','容器吃豆人'],
+    ['ll','🔗','连连看'],
+    ['match','🔗','连线匹配'],
+    ['sorter','📦','数据分类'],
+    ['forge','🔥','数据熔炉'],
+    ['t48','🔢','2048·数据融合'],
+    ['racing','🏎️','数据狂飙'],
+    ['flappy','🦅','云端跳跃'],
+    ['mole','🔨','边缘打地鼠'],
+    ['storm','🌪️','数据风暴'],
+    ['alarm','🚨','值班抢险'],
+    ['maze','🌐','数据迷宫'],
+    ['hack','🕹️','黑客终端'],
+    ['tyc','🏭','工厂大亨'],
+    ['pipe','🔧','管道工'],
+    ['lzr','🔦','激光反射'],
+    ['tank','🎯','消息守卫'],
+    ['breakout','🧱','AI打砖块'],
+    ['m3','🍬','消消乐'],
+    ['boss','💥','厂长Boss战']
+  ];
+  // 先收集: 类型 -> [游戏]
+  const byType = {};
   content.levels.forEach(lv => {
     const tl = getTermLevel(lv.id);
     if (!tl) return;
-    const rows = [];
     (tl.warmups || []).forEach(w => {
+      const t = w.type || 'memory';
+      if (!byType[t]) byType[t] = [];
+      byType[t].push({ lvId: lv.id, w: w });
+    });
+    if (tl.bonus) {
+      const t='memory';
+      if (!byType['__bonus']) byType['__bonus'] = [];
+      byType['__bonus'].push({ lvId: lv.id, bonus: true });
+    }
+  });
+  let html = '';
+  // 遍历固定类型顺序（未列出的类型放最后）
+  const ordered = TYPE_ORDER.map(x=>x[0]).filter(t=>byType[t]);
+  const rest = Object.keys(byType).filter(t=>t!=='__bonus' && !ordered.includes(t)).sort();
+  const allTypes = ordered.concat(rest);
+  allTypes.forEach(t => {
+    const items = byType[t] || [];
+    const label = (TYPE_ORDER.find(x=>x[0]===t) || [t, gzEmoji(byType[t]&&byType[t][0]?byType[t][0].w:{}), t])[2];
+    const emoji = (TYPE_ORDER.find(x=>x[0]===t) || [t,'🎮',t])[1];
+    const rows = [];
+    items.forEach(it => {
       const idx = gzList.length;
-      gzList.push({ lvId: lv.id, w: w });
+      gzList.push(it);
+      if (it.bonus) {
+        const lvDone = levelProgress(it.lvId).completed;
+        rows.push('<div class="gz-row' + (lvDone ? '' : ' locked') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
+          '<span class="gz-emoji">' + (lvDone ? '🏆' : '🔒') + '</span>' +
+          '<span class="gz-name">记忆大师挑战 · 5 层递进</span>' +
+          '<span class="gz-meta">第'+it.lvId+'幕 · ' + (lvDone ? '可玩' : '通关本关解锁') + '</span></div>');
+        return;
+      }
+      const w = it.w;
       const unlocked = Array.isArray(w.blockTasks) && w.blockTasks.length && w.blockTasks.every(tid => isTaskDone(tid));
       const advTag = w.advanced ? ' · <span style="color:var(--cyan)">进阶</span>' : '';
       const tBadge = miniTierBadge(w.id);
       rows.push('<div class="gz-row' + (unlocked ? '' : ' locked') + (w.advanced ? ' pc-only' : '') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
         '<span class="gz-emoji">' + (unlocked ? gzEmoji(w) : '🔒') + '</span>' +
         '<span class="gz-name">' + gzName(w) + tBadge + '</span>' +
-        '<span class="gz-meta">' + gzMeta(w) + advTag + ' · ' + (unlocked ? (w._tier>=1?'可挑战':'可玩') : '未解锁') + '</span></div>');
+        '<span class="gz-meta">第'+it.lvId+'幕' + advTag + ' · ' + (unlocked ? (w._tier>=1?'可挑战':'可玩') : '未解锁') + '</span></div>');
     });
-    if (tl.bonus) {
-      const idx = gzList.length;
-      const lvDone = levelProgress(lv.id).completed;
-      gzList.push({ lvId: lv.id, bonus: true });
+    if (!rows.length) return;
+    html += '<div class="gz-section">' + emoji + ' ' + label + ' <span class="sec-count">' + rows.length + '</span></div>' + rows.join('');
+  });
+  // 记忆大师挑战统一放最后
+  if (byType['__bonus']) {
+    const rows=[];
+    byType['__bonus'].forEach(it=>{
+      const idx = gzList.length; gzList.push(it);
+      const lvDone = levelProgress(it.lvId).completed;
       rows.push('<div class="gz-row' + (lvDone ? '' : ' locked') + '" data-idx="' + idx + '" onclick="gzPlay(' + idx + ')">' +
         '<span class="gz-emoji">' + (lvDone ? '🏆' : '🔒') + '</span>' +
         '<span class="gz-name">记忆大师挑战 · 5 层递进</span>' +
-        '<span class="gz-meta">' + (lvDone ? '可玩' : '通关本关解锁') + '</span></div>');
-    }
-    if (!rows.length) return;
-    html += '<div class="gz-section">第 ' + lv.id + ' 幕 · ' + escHtml(tl.name || lv.name) + '</div>' + rows.join('');
-  });
+        '<span class="gz-meta">第'+it.lvId+'幕 · ' + (lvDone ? '可玩' : '通关本关解锁') + '</span></div>');
+    });
+    if (rows.length) html += '<div class="gz-section">🏆 记忆大师挑战 <span class="sec-count">'+rows.length+'</span></div>' + rows.join('');
+  }
   body.innerHTML = html || '<div class="lb-empty">还没有可玩的小游戏，先去闯关吧！</div>';
 }
 function gzPlay(idx) {
