@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════════════════════
 
 import { escHtml, dstr, _fmtTime, starStr, taskKey, taskXP } from './core/utils.js';
+import { getAudioCtx, toggleSound, getMusicSong, playMusic, toggleMusic, nextMusic, playSound, loadMusicPref, ensureMusicPlayback, BG_TRACKS, bgIdx, soundEnabled, audioCtx, musicEnabled, currentTrack, musicGainNode, musicSrc } from './core/sound.js';
 // 弹窗每日标记（依赖 utils 的 dstr）
 function popupShownToday(t){ try{ return localStorage.getItem('popup_day_'+t)===dstr(); }catch(e){ return false; } }
 
@@ -71,92 +72,6 @@ let achQueue = [];
 let lbTab = 'rank';
 let currentLevelId = 1;
 let currentTaskId = null;
-let soundEnabled = true;
-let audioCtx = null;
-
-// =========================================================================
-// 2a. AUDIO SYSTEM (Web Audio API, no external files)
-// =========================================================================
-function getAudioCtx() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  return audioCtx;
-}
-
-function toggleSound() {
-  soundEnabled = !soundEnabled;
-  document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
-}
-
-// =========================================================================
-// =========================================================================
-// 2b. 8-BIT BACKGROUND MUSIC（ZzFXM 渲染成 AudioBuffer 循环播放，按场景切换）
-// =========================================================================
-let musicEnabled = true;
-let currentTrack = null;
-let musicGainNode = null;
-let musicSrc = null;
-
-function getMusicSong(name) {
-  if (window.MUSIC_SONGS && window.MUSIC_SONGS[name]) return window.MUSIC_SONGS[name];
-  return (window.MUSIC_SONGS && window.MUSIC_SONGS.hub) || null;
-}
-function playMusic(name) {
-  const song = getMusicSong(name);
-  if (!song) return;
-  if (currentTrack === name && musicSrc) return;
-  currentTrack = name;
-  if (!musicEnabled) return;
-  const ctx = getAudioCtx();
-  try { if (ctx.state === 'suspended') ctx.resume(); } catch(e){}
-  if (!musicGainNode) {
-    musicGainNode = ctx.createGain();
-    musicGainNode.gain.value = 0.7;
-    musicGainNode.connect(ctx.destination);
-  }
-  if (musicSrc) { try { musicSrc.stop(); } catch(e){} musicSrc = null; }
-  try {
-    const data = zzfxM.apply(null, song);
-    const buf = ctx.createBuffer(data.length, data[0].length, window.zzfxR);
-    for (let i = 0; i < data.length; i++) buf.getChannelData(i).set(data[i]);
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-    src.connect(musicGainNode);
-    musicSrc = src;
-    musicGainNode.gain.cancelScheduledValues(ctx.currentTime);
-    musicGainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
-    musicGainNode.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.3);
-    src.start();
-  } catch(e) { /* music not critical */ }
-}
-function toggleMusic() {
-  musicEnabled = !musicEnabled;
-  try { localStorage.setItem('music_enabled', musicEnabled ? '1' : '0'); } catch(e){}
-  const el = document.getElementById('musicToggle');
-  if (el) el.textContent = musicEnabled ? '🎵' : '🔕';
-  if (musicEnabled) {
-    if (currentTrack && !musicSrc) playMusic(currentTrack);
-  } else {
-    if (musicSrc) { try { musicSrc.stop(); } catch(e){} musicSrc = null; }
-  }
-}
-
-// 背景曲循环（首页右上角 ⏭ 切换可选曲目）
-const BG_TRACKS = ['hub','control_room','console','workshop','edge_cabinet','cloud_platform','big_screen','data_pipe','ai_lab','cafe_light','night_shift','rush_hour','calm_factory'];
-let bgIdx = 0;
-function nextMusic() {
-  const avail = BG_TRACKS.filter(t => window.MUSIC_SONGS && window.MUSIC_SONGS[t]);
-  if (!avail.length) return;
-  let i = avail.indexOf(currentTrack);
-  if (i < 0) i = bgIdx % avail.length;
-  i = (i + 1) % avail.length;
-  bgIdx = i;
-  const t = avail[i];
-  playMusic(t);
-  showToast('🎵 背景曲：' + t, 'info');
-}
 // ===== 区域(幕)背景音乐 & 按幕选小游戏配乐 =====
 let currentAreaKey = 'hub';
 function setArea(lvId) {
@@ -176,207 +91,6 @@ function gameSong(type) {
   if (window.MUSIC_SONGS && window.MUSIC_SONGS[fb]) return fb;
   return 'match';
 }
-
-function playSound(type, opt) {
-  if (!soundEnabled) return;
-  try {
-    const ctx = getAudioCtx();
-    if (ctx.state === 'suspended') ctx.resume();
-    const now = ctx.currentTime;
-
-    switch (type) {
-      case 'success': {
-        [523, 659, 784].forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(freq, now + i * 0.08);
-          g.gain.setValueAtTime(0.2, now + i * 0.08);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.2);
-          o.start(now + i * 0.08); o.stop(now + i * 0.08 + 0.2);
-        });
-        break;
-      }
-      case 'error': {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sawtooth';
-        o.frequency.setValueAtTime(180, now);
-        o.frequency.linearRampToValueAtTime(80, now + 0.25);
-        g.gain.setValueAtTime(0.15, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        o.start(now); o.stop(now + 0.3);
-        break;
-      }
-      case 'click': {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine';
-        o.frequency.setValueAtTime(900, now);
-        g.gain.setValueAtTime(0.08, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-        o.start(now); o.stop(now + 0.04);
-        break;
-      }
-      case 'type': {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine';
-        o.frequency.setValueAtTime(400 + Math.random() * 300, now);
-        g.gain.setValueAtTime(0.03, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
-        o.start(now); o.stop(now + 0.03);
-        break;
-      }
-      case 'levelup': {
-        [523, 659, 784, 1047].forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(freq, now + i * 0.12);
-          g.gain.setValueAtTime(0.25, now + i * 0.12);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.4);
-          o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.4);
-        });
-        break;
-      }
-      case 'boot': {
-        // rapid boot sequence sounds
-        for (let i = 0; i < 8; i++) {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'square';
-          o.frequency.setValueAtTime(100 + i * 30, now + i * 0.05);
-          g.gain.setValueAtTime(0.02, now + i * 0.05);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.05 + 0.04);
-          o.start(now + i * 0.05); o.stop(now + i * 0.05 + 0.04);
-        }
-        break;
-      }
-      case 'fanfare': {
-        [523, 659, 784, 1047, 1319].forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'triangle';
-          o.frequency.setValueAtTime(freq, now + i * 0.1);
-          g.gain.setValueAtTime(0.22, now + i * 0.1);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.35);
-          o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.35);
-        });
-        break;
-      }
-      case 'fail': {
-        [392, 330, 262, 196].forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(freq, now + i * 0.15);
-          g.gain.setValueAtTime(0.18, now + i * 0.15);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.3);
-          o.start(now + i * 0.15); o.stop(now + i * 0.15 + 0.3);
-        });
-        break;
-      }
-      case 'alarm': {
-        for (let i = 0; i < 6; i++) {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'square';
-          o.frequency.setValueAtTime((i % 2 === 0) ? 660 : 550, now + i * 0.12);
-          g.gain.setValueAtTime(0.07, now + i * 0.12);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.1);
-          o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.11);
-        }
-        break;
-      }
-      case 'tick': {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'square';
-        o.frequency.setValueAtTime(1200, now);
-        g.gain.setValueAtTime(0.06, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-        o.start(now); o.stop(now + 0.05);
-        break;
-      }
-      case 'combo': {
-        const lv = Math.min(Math.max(parseInt(opt) || 1, 1), 20);
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'triangle';
-        o.frequency.setValueAtTime(500 + lv * 40, now);
-        g.gain.setValueAtTime(0.12, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
-        o.start(now); o.stop(now + 0.12);
-        break;
-      }
-      case 'shoot': {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'square';
-        o.frequency.setValueAtTime(340, now);
-        o.frequency.linearRampToValueAtTime(220, now + 0.05);
-        g.gain.setValueAtTime(0.04, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
-        o.start(now); o.stop(now + 0.07);
-        break;
-      }
-      case 'hit': {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'triangle';
-        o.frequency.setValueAtTime(260, now);
-        o.frequency.linearRampToValueAtTime(180, now + 0.08);
-        g.gain.setValueAtTime(0.08, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
-        o.start(now); o.stop(now + 0.1);
-        break;
-      }
-      case 'pickup': {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine';
-        o.frequency.setValueAtTime(880, now);
-        o.frequency.linearRampToValueAtTime(1320, now + 0.1);
-        g.gain.setValueAtTime(0.12, now);
-        g.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
-        o.start(now); o.stop(now + 0.18);
-        break;
-      }
-      case 'toggle': {
-        [440, 660].forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(freq, now + i * 0.05);
-          g.gain.setValueAtTime(0.1, now + i * 0.05);
-          g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.05 + 0.08);
-          o.start(now + i * 0.05); o.stop(now + i * 0.05 + 0.08);
-        });
-        break;
-      }
-    }
-  } catch(e) { /* audio not critical */ }
-}
-
-// =========================================================================
-// 2b. TYPEWRITER EFFECT
-// =========================================================================
 function typewrite(el, text, speed, cb) {
   let idx = 0;
   el.textContent = '';
@@ -10038,7 +9752,7 @@ async function init() {
   renderHeader();
   renderAchBar();
   // 8bit 背景音乐（按场景切换）
-  try { if (localStorage.getItem('music_enabled') === '0') musicEnabled = false; } catch(e){}
+  loadMusicPref();
   const _musicBtn = document.getElementById('musicToggle');
   if (_musicBtn) _musicBtn.textContent = musicEnabled ? '🎵' : '🔕';
   // 按当前进度定位到第一个可进入的幕，播放对应区域背景乐
@@ -10047,7 +9761,7 @@ async function init() {
   playAreaMusic();
   document.addEventListener('pointerdown', function _firstGesture(){
     try { const _c = getAudioCtx(); if (_c && _c.state === 'suspended') _c.resume(); } catch(e){}
-    if (musicEnabled && currentTrack && !musicSrc) playMusic(currentTrack);
+    ensureMusicPlayback();
     document.removeEventListener('pointerdown', _firstGesture);
   });
   // 评估并弹出新解锁成就；异步刷新排行榜后再次评估（捕捉先锋等依赖排行数据的成就）
