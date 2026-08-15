@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { escHtml, taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('chain_quiz', {
   render(container, task) {
@@ -48,7 +49,7 @@ registerInteraction('chain_quiz', {
       q.options.forEach((opt, i) => {
         const div = document.createElement('div');
         div.className = 'quiz-opt';
-        div.textContent = String.fromCharCode(65 + i) + '. ' + opt;
+        div.textContent = String.fromCharCode(65 + i) + '. ' + (typeof opt === 'object' ? opt.text : opt);
         div.onclick = () => {
           opts.querySelectorAll('.quiz-opt').forEach(el => el.classList.remove('selected'));
           div.classList.add('selected');
@@ -80,8 +81,11 @@ registerInteraction('chain_quiz', {
       streak = 0;
         window.shakeScreen();
         playSound('error');
-        document.getElementById('modalFoot').innerHTML = `<button class="btn" onclick="window.closeModal()">关闭</button> <button class="btn btn-primary" onclick="retryChain()">重试</button>`;
-        window.showToast(q.hint || '设备报警了——再试', 'error');
+        document.getElementById('modalFoot').innerHTML = `<button class="btn" onclick="window.closeModal()">关闭</button>`;
+        // 厂长针对所点选项解释（对象选项 explain 优先，否则整体 hint）；点"知道了再试"回到本题重选
+        const _wrongOpt = q.options[choice];
+        const _exp = (typeof _wrongOpt === 'object' && _wrongOpt.explain) ? _wrongOpt.explain : (q.hint || '想岔了，再想想？');
+        showWrongExplain(container, '厂长：' + _exp, () => { showQ(); });
       }
     };
     window.retryChain = () => { window.openTaskModal(window.currentLevelId, window.currentTaskId); };

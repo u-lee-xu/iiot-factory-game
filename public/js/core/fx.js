@@ -3,6 +3,7 @@
 // import core/*；其余公共函数经 window
 // ═══════════════════════════════════════════════════════════════════
 import { playSound } from '../core/sound.js';
+import { escHtml } from './utils.js';
 
 export function typewrite(el, text, speed, cb) {
   let idx = 0;
@@ -215,4 +216,21 @@ export function glowCorrect(el) {
   el.offsetHeight;
   el.classList.add('glow-correct');
   playSound('success');
+}
+
+// 答错提示：厂长气泡 + 针对所点干扰项的解释，点"知道了，再试一次"回到本题
+export function showWrongExplain(container, text, onRetry) {
+  const box = document.createElement('div');
+  box.className = 'director-box director-mood-thinking';
+  box.style.cssText = 'margin-bottom:10px';
+  box.innerHTML =
+    '<div class="director-portrait">🤔</div>' +
+    '<div class="director-bubble">' +
+      '<div class="director-name">厂长</div>' +
+      '<div class="director-text" style="white-space:pre-wrap;line-height:1.7">' + escHtml(String(text || '想岔了，再想想？').replace(/^厂长[:：]\s*/, '')) + '</div>' +
+      '<div style="margin-top:8px;text-align:right"><button class="btn btn-primary">知道了，再试一次</button></div>' +
+    '</div>';
+  box.querySelector('button').onclick = () => { box.remove(); if (onRetry) onRetry(); };
+  container.prepend(box);
+  return box;
 }

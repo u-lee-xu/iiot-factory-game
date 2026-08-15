@@ -186,10 +186,10 @@
        {
         "question": "你知道 Ubuntu 的包管理命令叫什么吗？",
         "options": [
-         "yum（Yellowdog Updater Modified）",
-         "brew（macOS 上的包管理，Linux 也可以装但不是默认的）",
-         "pacman（Arch Linux 的包管理器）",
-         "apt（Advanced Package Tool）"
+         {"text": "yum（Yellowdog Updater Modified）", "explain": "yum 是 RHEL/CentOS 系的包管理，Ubuntu 属于 Debian 系，不走 yum"},
+         {"text": "brew（macOS 上的包管理，Linux 也可以装但不是默认的）", "explain": "brew 是 macOS 的包管理，Linux 上不是默认工具，Ubuntu 不靠它装软件"},
+         {"text": "pacman（Arch Linux 的包管理器）", "explain": "pacman 是 Arch Linux 的包管理器，Ubuntu 不用它"},
+         {"text": "apt（Advanced Package Tool）", "explain": ""}
         ],
         "answer": 3,
         "hint": "Ubuntu 是 Debian 家族，包管理用 apt。yum 是 RHEL/CentOS 的，pacman 是 Arch 的，brew 是 macOS 的",
@@ -198,10 +198,10 @@
        {
         "question": "apt 命令怎么写？",
         "options": [
-         "apt get openssh",
-         "apt download sshd",
-         "apt install openssh-server",
-         "ssh install"
+         {"text": "apt get openssh", "explain": "apt 的子命令是 install / remove / update…，没有 get"},
+         {"text": "apt download sshd", "explain": "download 不是 apt 子命令；OpenSSH 服务器的包名是 openssh-server"},
+         {"text": "apt install openssh-server", "explain": ""},
+         {"text": "ssh install", "explain": "ssh 是远程登录命令，不是包管理工具"}
         ],
         "answer": 2,
         "hint": "安装包用 apt install <包名>。OpenSSH 服务器的包名是 openssh-server",
