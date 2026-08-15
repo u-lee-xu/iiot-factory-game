@@ -111,7 +111,7 @@ export function renderLeaderboard(body) {
 export function renderAchievements(body) {
   const ctx = window.achievementContext();
   let html = '<div class="ach-grid">';
-  ACHIEVEMENTS.forEach(a => {
+  window.ACHIEVEMENTS.forEach(a => {
     const got = !!window.gameState.achievements[a.id];
     const can = a.test(ctx);
     html += `
