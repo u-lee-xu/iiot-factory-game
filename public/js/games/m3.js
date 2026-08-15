@@ -155,8 +155,8 @@ export function openMatch3(cfg, onComplete) {
   const gridEl = document.getElementById('m3Grid');
   const waveEl = document.getElementById('m3Wave'), tgtEl = document.getElementById('m3Tgt');
   const scoreEl = document.getElementById('m3Score'), movesEl = document.getElementById('m3Moves'), comboEl = document.getElementById('m3Combo');
-  gridEl.style.gridTemplateColumns = 'repeat(' + COLS + ', 52px)';
-  gridEl.style.gridTemplateRows = 'repeat(' + ROWS + ', 52px)';
+  gridEl.style.gridTemplateColumns = 'repeat(' + COLS + ', minmax(0, 1fr))';
+  gridEl.style.gridTemplateRows = 'auto';   // 行高由 tile 的 aspect-ratio 决定（方形）
 
   function endGame(isWin) {
     if (ended) return;
