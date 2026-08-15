@@ -704,7 +704,7 @@
       },
       {
        "term": "MAC 地址",
-       "hint": "设备出厂身份证",
+       "hint": "网卡出厂身份证",
        "emoji": "🪪",
        "id": "mac",
        "cmd": "ip link",
@@ -712,7 +712,7 @@
       },
       {
        "term": "子网掩码",
-       "hint": "划清\"自己人\"和\"外人\"",
+       "hint": "划分网段的记号",
        "emoji": "🎭",
        "id": "subnet",
        "cmd": "255.255.255.0",
@@ -837,7 +837,7 @@
       },
       {
        "term": "DNS",
-       "hint": "把网址翻译成 IP 的电话簿",
+       "hint": "把域名翻译成 IP",
        "emoji": "📖",
        "id": "dns",
        "cmd": "nslookup baidu.com",
@@ -979,7 +979,7 @@
       },
       {
        "term": "DNS",
-       "hint": "把网址翻译成 IP 的电话簿",
+       "hint": "把域名翻译成 IP",
        "emoji": "📖",
        "id": "dns",
        "cmd": "nslookup baidu.com",
@@ -1017,13 +1017,13 @@
       },
       {
        "term": "ping",
-       "hint": "喊一声看对方应不应",
+       "hint": "喊一声，看对方应不应",
        "emoji": "📎",
        "id": "ping"
       },
       {
        "term": "DNS",
-       "hint": "域名翻译成 IP",
+       "hint": "把域名翻译成 IP",
        "emoji": "📎",
        "id": "dns"
       }
@@ -1503,7 +1503,7 @@
       },
       {
        "term": "openssh-server",
-       "hint": "SSH 服务的软件包名",
+       "hint": "SSH 服务端软件包",
        "emoji": "📦",
        "id": "pkgssh",
        "cat": "命令"
@@ -1687,7 +1687,7 @@
       },
       {
        "term": "openssh-server",
-       "hint": "SSH 服务的软件包名",
+       "hint": "SSH 服务端软件包",
        "emoji": "📦",
        "id": "pkgssh",
        "cat": "命令"
@@ -1879,12 +1879,12 @@
      "pairs": [
       {
        "term": "私钥",
-       "hint": "自己保存、绝不外传",
+       "hint": "自己保密，绝不外传",
        "emoji": "📎"
       },
       {
        "term": "公钥",
-       "hint": "放到服务器 authorized_keys",
+       "hint": "交给服务器的那把「锁」，不怕公开",
        "emoji": "📎"
       },
       {
@@ -1899,7 +1899,7 @@
       },
       {
        "term": "authorized_keys",
-       "hint": "存放允许登录的公钥",
+       "hint": "服务器上免密公钥白名单",
        "emoji": "📎"
       },
       {
@@ -2252,7 +2252,7 @@
      "pairs": [
       {
        "term": "ProfiNet",
-       "hint": "西门子 · 毫秒级实时控制",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "🔵",
        "id": "profinet",
        "cat": "协议"
@@ -2287,7 +2287,7 @@
       },
       {
        "term": "EtherNet/IP",
-       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "hint": "罗克韦尔 · 基于以太网的工业协议",
        "emoji": "🌐",
        "id": "ethernetip",
        "cat": "协议"
@@ -2336,7 +2336,7 @@
      "pairs": [
       {
        "term": "保持寄存器",
-       "hint": "16 位可读可写，存设定值",
+       "hint": "16 位可读写 · 存设定值",
        "emoji": "📝",
        "id": "holding",
        "cat": "Modbus"
@@ -2357,7 +2357,7 @@
       },
       {
        "term": "离散输入",
-       "hint": "1 位只读，限位开关",
+       "hint": "1 位只读 · 限位开关",
        "emoji": "🚧",
        "id": "discrete",
        "cat": "Modbus"
@@ -2370,14 +2370,14 @@
      "pairs": [
       {
        "term": "ProfiNet",
-       "hint": "西门子 · 毫秒级实时控制",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "🔵",
        "id": "profinet",
        "cat": "协议"
       },
       {
        "term": "EtherCAT",
-       "hint": "倍福 · 快到极致（飞读飞写）",
+       "hint": "倍福 · 快到极致的「飞读飞写」",
        "emoji": "⚡",
        "id": "ethercat",
        "cat": "协议"
@@ -2398,14 +2398,14 @@
       },
       {
        "term": "Powerlink",
-       "hint": "贝加莱/ABB · 标准硬件",
+       "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
        "emoji": "🖧",
        "id": "powerlink",
        "cat": "协议"
       },
       {
        "term": "EtherNet/IP",
-       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "hint": "罗克韦尔 · 基于以太网的工业协议",
        "emoji": "🌐",
        "id": "ethernetip",
        "cat": "协议"
@@ -2425,14 +2425,14 @@
       },
       {
        "term": "输入寄存器",
-       "hint": "16 位只读 · 存测量值",
+       "hint": "16 位只读，存测量值",
        "emoji": "📊",
        "id": "inputreg",
        "cat": "Modbus"
       },
       {
        "term": "线圈",
-       "hint": "1 位可读写 · 开关状态",
+       "hint": "1 位可读可写，开关状态",
        "emoji": "🔘",
        "id": "coil",
        "cat": "Modbus"
@@ -2452,7 +2452,7 @@
      "pairs": [
       {
        "term": "ProfiNet",
-       "hint": "西门子 · 毫秒级实时控制",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "🔵",
        "id": "profinet",
        "cat": "协议"
@@ -2487,7 +2487,7 @@
       },
       {
        "term": "EtherNet/IP",
-       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "hint": "罗克韦尔 · 基于以太网的工业协议",
        "emoji": "🌐",
        "id": "ethernetip",
        "cat": "协议"
@@ -2500,7 +2500,7 @@
      "pairs": [
       {
        "term": "保持寄存器",
-       "hint": "16 位可读可写，存设定值",
+       "hint": "16 位可读写 · 存设定值",
        "emoji": "📝",
        "id": "holding",
        "cat": "Modbus"
@@ -2521,7 +2521,7 @@
       },
       {
        "term": "离散输入",
-       "hint": "1 位只读，限位开关",
+       "hint": "1 位只读 · 限位开关",
        "emoji": "🚧",
        "id": "discrete",
        "cat": "Modbus"
@@ -2534,7 +2534,7 @@
      "pairs": [
       {
        "term": "ProfiNet",
-       "hint": "西门子 · 毫秒级实时控制",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "🔵",
        "id": "profinet",
        "cat": "协议"
@@ -2569,7 +2569,7 @@
       },
       {
        "term": "EtherNet/IP",
-       "hint": "罗克韦尔 · 基于以太网+TCP/IP",
+       "hint": "罗克韦尔 · 基于以太网的工业协议",
        "emoji": "🌐",
        "id": "ethernetip",
        "cat": "协议"
@@ -2582,7 +2582,7 @@
      "pairs": [
       {
        "term": "保持寄存器",
-       "hint": "16 位可读可写，存设定值",
+       "hint": "16 位可读写 · 存设定值",
        "emoji": "📝",
        "id": "holding",
        "cat": "Modbus"
@@ -2603,7 +2603,7 @@
       },
       {
        "term": "离散输入",
-       "hint": "1 位只读，限位开关",
+       "hint": "1 位只读 · 限位开关",
        "emoji": "🚧",
        "id": "discrete",
        "cat": "Modbus"
@@ -2652,7 +2652,7 @@
       },
       {
        "term": "ProfiNet",
-       "hint": "西门子 · 毫秒级实时控制",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "🔵",
        "id": "profinet",
        "cat": "协议"
@@ -2665,22 +2665,22 @@
      "pairs": [
       {
        "term": "Modbus",
-       "hint": "最老最开放，变频器仪表几乎都支持",
+       "hint": "最老最开放 · 变频仪表都支持",
        "emoji": "📎"
       },
       {
        "term": "ProfiNet",
-       "hint": "西门子，毫秒级实时工业以太网",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "📎"
       },
       {
        "term": "EtherCAT",
-       "hint": "倍福，快到极致的飞读飞写",
+       "hint": "倍福 · 快到极致的「飞读飞写」",
        "emoji": "📎"
       },
       {
        "term": "CC-Link IE",
-       "hint": "三菱，环形冗余断线不中断",
+       "hint": "三菱 · 环形冗余断线不中断",
        "emoji": "📎"
       },
       {
@@ -2690,17 +2690,17 @@
       },
       {
        "term": "Node-RED",
-       "hint": "低代码拖拽的数据流工具",
+       "hint": "图形化「搭积木」式编程工具",
        "emoji": "📎"
       },
       {
        "term": "EtherNet/IP",
-       "hint": "罗克韦尔，基于以太网的工业协议",
+       "hint": "罗克韦尔 · 基于以太网的工业协议",
        "emoji": "📎"
       },
       {
        "term": "Powerlink",
-       "hint": "贝加莱，标准硬件上的实时协议",
+       "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
        "emoji": "📎"
       }
      ]
@@ -2711,22 +2711,22 @@
      "pairs": [
       {
        "term": "Modbus",
-       "hint": "最老最开放，变频器仪表几乎都支持",
+       "hint": "最老最开放 · 变频仪表都支持",
        "emoji": "📎"
       },
       {
        "term": "ProfiNet",
-       "hint": "西门子，毫秒级实时工业以太网",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "📎"
       },
       {
        "term": "EtherCAT",
-       "hint": "倍福，快到极致的飞读飞写",
+       "hint": "倍福 · 快到极致的「飞读飞写」",
        "emoji": "📎"
       },
       {
        "term": "CC-Link IE",
-       "hint": "三菱，环形冗余断线不中断",
+       "hint": "三菱 · 环形冗余断线不中断",
        "emoji": "📎"
       },
       {
@@ -2736,17 +2736,17 @@
       },
       {
        "term": "Node-RED",
-       "hint": "低代码拖拽的数据流工具",
+       "hint": "图形化「搭积木」式编程工具",
        "emoji": "📎"
       },
       {
        "term": "EtherNet/IP",
-       "hint": "罗克韦尔，基于以太网的工业协议",
+       "hint": "罗克韦尔 · 基于以太网的工业协议",
        "emoji": "📎"
       },
       {
        "term": "Powerlink",
-       "hint": "贝加莱，标准硬件上的实时协议",
+       "hint": "贝加莱/ABB · 标准硬件跑工业以太网",
        "emoji": "📎"
       }
      ]
@@ -2757,22 +2757,22 @@
      "pairs": [
       {
        "term": "Modbus",
-       "hint": "最老最开放的工业协议",
+       "hint": "最老最开放 · 变频仪表都支持",
        "emoji": "📎"
       },
       {
        "term": "ProfiNet",
-       "hint": "西门子·毫秒级实时",
+       "hint": "西门子 · 毫秒级实时工业以太网",
        "emoji": "📎"
       },
       {
        "term": "EtherCAT",
-       "hint": "倍福·飞读飞写",
+       "hint": "倍福 · 快到极致的「飞读飞写」",
        "emoji": "📎"
       },
       {
        "term": "MQTT",
-       "hint": "发布订阅轻量协议",
+       "hint": "发布-订阅式的轻量物联网通信协议",
        "emoji": "📎"
       },
       {
@@ -3067,7 +3067,7 @@
       },
       {
        "term": "报警阈值",
-       "hint": "超限就报警的设定值",
+       "hint": "超限就报警的设定值，比如 80℃",
        "emoji": "🚨",
        "id": "thr",
        "cat": "边缘"
@@ -3081,7 +3081,7 @@
       },
       {
        "term": "滑动均值",
-       "hint": "取最近 N 个值的平均",
+       "hint": "取最近 N 个值平均，滤掉噪声、压平波动（会滞后）",
        "emoji": "📉",
        "id": "sma",
        "cat": "边缘"
@@ -3473,7 +3473,7 @@
      "pairs": [
       {
        "term": "docker run",
-       "hint": "启动一个容器",
+       "hint": "运行一个容器",
        "emoji": "📎"
       },
       {

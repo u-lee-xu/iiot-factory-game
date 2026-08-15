@@ -28,7 +28,8 @@ export function openSnake(cfg, onComplete) {
   playMusic(window.gameSong('snake') || 'hub');
 
   // ---- 词库 & 配对表 ----
-  const pairs = (cfg.pairs || []).map(function(p){ return {id:p.id||'', t:String(p.t||''), h:String(p.h||'')}; }).filter(function(p){ return p.t && p.h; });
+  // 词库池为富结构 {term,hint,emoji,id}；兼容旧 {t,h}
+  const pairs = (cfg.pairs || []).map(function(p){ return {id:p.id||'', t:String(p.term||p.t||''), h:String(p.hint||p.h||'')}; }).filter(function(p){ return p.t && p.h; });
   const terms = pairs.map(p=>p.t), hints = pairs.map(p=>p.h);
   const hintOf = {}, idOf = {};
   pairs.forEach(p=>{ hintOf[p.t]=p.h; idOf[p.t]=p.id; });

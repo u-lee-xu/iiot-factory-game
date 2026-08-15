@@ -18,7 +18,8 @@ export function openPacman(cfg, onComplete) {
     return;
   }
   playMusic(window.gameSong('pacman') || 'hub');
-  const pairs=(cfg.pairs||[{t:'docker run',h:'启动一个容器'}]).map(function(p){return {t:String(p.t),h:String(p.h)};});
+  // 词库池为富结构 {term,hint}；兼容旧 {t,h}；空则回退默认
+  const pairs=(cfg.pairs||[{t:'docker run',h:'启动一个容器'}]).map(function(p){return {t:String(p.term||p.t||''),h:String(p.hint||p.h||'')};}).filter(function(p){return p.t&&p.h;});
   const hintOf={}; pairs.forEach(function(p){hintOf[p.t]=p.h;});
   const ghostsN=(cfg.ghosts||['清理进程','镜像冲突','端口占用']).map(String);
   const W=840,H=560, COLS=19, ROWS=15, cell=Math.floor(Math.min(W,H)/Math.max(COLS,ROWS));
