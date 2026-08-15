@@ -283,7 +283,13 @@ var directorMoodLines = {
     "厂长看着你乱输挺心累的",
     "建议先收起教学再动手"
   ],
-  thinking: [   // 🤔 思考/提示 - 初次进关卡、收起教学后、请求hint
+  guide: [     // 👨‍💼 开场导语 - 首次进关卡，厂长先讲方法再动手
+    "先听厂长把方法讲清楚，再动手不迟",
+    "这个任务的重点，厂长先给你划出来",
+    "跟紧厂长，一步一个脚印",
+    "记住要点，后面全靠它"
+  ],
+  thinking: [   // 🤔 思考/提示 - 请求hint、收起教学后（首次进关卡走 guide 导语）
     "卡住了？看看上面的提示栏",
     "第一步通常是最关键的",
     "不用急，厂长给你留着灯",
@@ -682,8 +688,8 @@ function calculateLevelXP(levelId) {
 // =========================================================================
 function showTaskPreface(task, onStart) {
   const teachText = generateTeach(task);
-  const mood = 'thinking';
-  const moodEmoji = '🤔';
+  const mood = 'guide';
+  const moodEmoji = '👨‍💼';
   const moodLine = getRandomMoodLine(mood);
   
   const overlay = document.createElement('div');

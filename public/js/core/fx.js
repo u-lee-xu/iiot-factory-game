@@ -168,18 +168,19 @@ export function getDirectorMood(task, context) {
   // context: { window.streak, window.errors, hintUsed, firstTime, wrongCmdType }
   if (!context) return 'neutral';
   
-  // 优先级：尴尬(输错类型) > 严肃(连续错/用hint还错) > 得意(连胜/0失误) > 思考(初次/请求hint) > 中性
+  // 优先级：尴尬(输错类型) > 严肃(连续错/用hint还错) > 得意(连胜/0失误) > 思考(请求hint) > 导语(首次进关卡) > 中性
   if (context.wrongCmdType) return 'awkward';
   if (context.errors >= 2 || (context.hintUsed && context.errors >= 1)) return 'stern';
   if (context.streak >= 3 && context.errors === 0) return 'proud';
-  if (context.firstTime || context.hintUsed) return 'thinking';
+  if (context.hintUsed) return 'thinking';
+  if (context.firstTime) return 'guide';
   return 'neutral';
 }
 
 export function addDirectorBox(container, text, cb, mood) {
   const m = mood || 'neutral';
   const moodLine = getRandomMoodLine(m);
-  const moodEmoji = { proud: '😎', stern: '😤', awkward: '😅', thinking: '🤔', neutral: '👨‍💼' }[m];
+  const moodEmoji = { proud: '😎', stern: '😤', awkward: '😅', thinking: '🤔', guide: '👨‍💼', neutral: '👨‍💼' }[m];
   
   const box = document.createElement('div');
   box.className = 'director-box director-mood-' + m;
@@ -230,8 +231,28 @@ export function glowCorrect(el) {
   playSound('success');
 }
 
+// 折叠已展开的教学气泡（隐藏正文与名字，只留"展开"开关）
+function collapseTeachingBox(box) {
+  if (!box) return;
+  const toggle = box.querySelector('.teach-toggle');
+  if (!toggle) return;
+  const textEl = box.querySelector('.director-text');
+  const nameEl = box.querySelector('.director-name');
+  const moodLineEl = box.querySelector('.director-mood-line');
+  textEl.style.display = 'none';
+  nameEl.style.display = 'none';
+  if (moodLineEl) moodLineEl.style.display = 'none';
+  toggle.textContent = '▽ 展开教学';
+  toggle.style.marginTop = '0';
+}
+
 // 答错提示：厂长气泡 + 针对所点干扰项的解释，点"知道了，再试一次"回到本题
 export function showWrongExplain(container, text, onRetry) {
+  // 先折叠此前展开的教学气泡，避免两个厂长气泡堆叠
+  const teachToggle = container.querySelector('.director-box .teach-toggle');
+  if (teachToggle && teachToggle.textContent.indexOf('收起') >= 0) {
+    collapseTeachingBox(teachToggle.closest('.director-box'));
+  }
   const box = document.createElement('div');
   box.className = 'director-box director-mood-thinking';
   box.style.cssText = 'margin-bottom:10px';
