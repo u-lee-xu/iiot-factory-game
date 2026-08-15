@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('code_review', {
   render(container, task) {
@@ -57,7 +58,8 @@ registerInteraction('code_review', {
           if (t) window.openTaskModal(window.currentLevelId, window.currentTaskId);
         };
         document.getElementById('modalFoot').innerHTML = `<button class="btn" onclick="window.closeModal()">关闭</button> <button class="btn btn-primary" onclick="resetQuiz()">重试</button>`;
-        window.showToast('终端报错了！仔细看代码缺了什么', 'error');
+        // 厂长解释（cfg.hint 或正确答案）
+        showWrongExplain(container, '厂长：' + (cfg.hint || ('正确答案是「' + (cfg.options[answer] || '') + '」')), null);
       }
     };
   }

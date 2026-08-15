@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('drag_classify', {
   render(container, task) {
@@ -129,7 +130,15 @@ registerInteraction('drag_classify', {
       streak = 0;
         window.shakeScreen();
         playSound('error');
-        window.showToast('分类错误——设备重新报警了！再分类', 'error');
+        // 厂长提示：找到第一个分错的项，应归哪类
+        var _hint = '分类还没完全对，再想想？';
+        for (var _i2=0;_i2<shuffled.length;_i2++) {
+          var _n2 = shuffled[_i2];
+          var _o2 = cfg.items.indexOf(_n2);
+          var _ec2 = cfg.categories[parseInt(answers[_o2])];
+          if (placed[_n2] !== _ec2) { _hint = '「' + _n2 + '」应该归入「' + _ec2 + '」类'; break; }
+        }
+        showWrongExplain(container, '厂长：' + _hint, null);
       }
     };
 

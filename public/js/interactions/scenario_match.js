@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('scenario_match', {
   render(container, task) {
@@ -67,6 +68,10 @@ registerInteraction('scenario_match', {
                 div.classList.add('wrong');
                 window.shakeScreen();
                 playSound('error');
+                // 厂长提示正确配对（pairs 有 explain 则用，否则给正确匹配）
+                var _pr = pairs[selectedItem.pairIdx];
+                var _txt = (_pr && _pr.explain) ? _pr.explain : ('「' + _pr.item + '」对应的匹配是「' + _pr.match + '」，再想想？');
+                showWrongExplain(container, '厂长：' + _txt, null);
                 setTimeout(() => div.classList.remove('wrong'), 300);
               }
           };

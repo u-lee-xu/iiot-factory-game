@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { escHtml, taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('sort', {
   render(container, task) {
@@ -95,7 +96,9 @@ registerInteraction('sort', {
       window.streak = 0;
         window.shakeScreen();
         playSound('error');
-        window.showToast('排错了——车间设备全红了！重新排序', 'error');
+        // 厂长提示正确顺序
+        var _right = cfg.answer.map(function(idx){ return cfg.items[idx]; }).join(' → ');
+        showWrongExplain(container, '厂长：正确顺序是「' + _right + '」，再排一次？', null);
       }
     };
   }

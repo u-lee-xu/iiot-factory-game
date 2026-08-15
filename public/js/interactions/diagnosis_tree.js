@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { showWrongExplain } from '../core/fx.js';
 
 registerInteraction('diagnosis_tree', {
   render(container, task) {
@@ -44,7 +45,8 @@ registerInteraction('diagnosis_tree', {
             div.classList.add('wrong');
             window.shakeScreen();
             playSound('error');
-            window.showToast('方向走错了——设备指示灯没变化，换个排查思路', 'error');
+            // 厂长提示正确答案
+            showWrongExplain(container, '厂长：' + (s.hint || ('这一步正确答案是「' + s.options[s.correct] + '」')), null);
             setTimeout(() => {
               opts.querySelectorAll('.diag-opt').forEach(el => {
                 el.style.pointerEvents = 'auto';
