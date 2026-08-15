@@ -425,10 +425,15 @@ export function completeTask(taskId, xp) {
       const _t = _lv && _lv.tasks.find(t => t.id === taskId);
       sessionStorage.setItem('lastCompleted', JSON.stringify({ title: (_t&&_t.title)||'', xp }));
     } catch(e){}
-    // 地图流程：本层全部打完 → 立刻弹通关庆祝 + 回厂区
+    // 地图流程：本层全部打完 → 弹通关庆祝；整层未完 → 完成后自动回房间/厂区，
+    // 避免停在 body.map-flow 隐藏旧版页后只剩空壳的"空白界面"
     if (sessionStorage.getItem('mapFlow') === '1') {
       const lv = window.content.levels.find(l => l.tasks.some(t => t.id === taskId));
-      if (lv && levelProgress(lv.id).completed) showLevelComplete(lv, null);
+      if (lv && levelProgress(lv.id).completed) {
+        showLevelComplete(lv, null);
+      } else {
+        setTimeout(function(){ window.goMap(); }, 900);   // 留时间看 XP 反馈，再带过渡动画返回
+      }
     }
   } catch (e) {
     console.error('completeTask error:', e);

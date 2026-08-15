@@ -53,7 +53,7 @@ registerInteraction('install_wizard', {
       const step = steps[current];
       const stage = document.getElementById('wizardStage');
       var _narr = String(step.narrative || '').replace(/^厂长[:：]\s*/, '');
-      var html = '<div class="wizard-narrative"><span class="wiz-narr-icon">\ud83d\udc68\u200d\ud83d\udcbc</span> <span class="wiz-narr-label">厂长：</span>' + _narr + '</div>';
+      var html = '<div class="wizard-narrative"><span class="wiz-narr-icon">\ud83d\udc68\u200d\ud83d\udcbc</span> <span class="wiz-narr-label">厂长：</span>' + _narr.replace(/\n/g, '<br>') + '</div>';
       html += '<div class="wizard-question">' + step.question + '</div>';
       if (step.inputType === 'number') {
         html += '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size: 15px"><input type="number" id="wizNum" placeholder="输入数字" style="width:80px;background:#0a0a10;border:1px solid var(--border);color:var(--text);padding:8px;font-size:14px" min="0" max="32"><span style="color:var(--dim)">GB</span></div>';
