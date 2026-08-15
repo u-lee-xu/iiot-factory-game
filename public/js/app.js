@@ -4,6 +4,12 @@
 // ═══════════════════════════════════════════════════════════════════════
 // BLOCK INDEX
 // ═══════════════════════════════════════════════════════════════════════
+
+import { escHtml, dstr, _fmtTime, starStr, taskKey, taskXP } from './core/utils.js';
+// 弹窗每日标记（依赖 utils 的 dstr）
+function popupShownToday(t){ try{ return localStorage.getItem('popup_day_'+t)===dstr(); }catch(e){ return false; } }
+
+
 //  547: 1. CONFIG & STATE       — API 封装、全局变量、session
 //  673: 2. SOUND SYSTEM         — AudioContext、toggleSound、playSound
 //  695: 3. ANIMATION            — typewrite 打字机效果、frame 动画
@@ -720,20 +726,11 @@ function getLevelTasks(levelId) {
   return lv ? lv.tasks : [];
 }
 
-function taskKey(taskId) {
-  return '' + taskId;
-}
 
 function isTaskDone(taskId) {
   return !!gameState.check[taskKey(taskId)];
 }
 
-function taskXP(task) {
-  if (task.hidden) return 300;
-  if (task.type === 'quiz' && task.xp <= 50) return 50;
-  if (task.xp === 0) return 0;
-  return task.xp || 100;
-}
 
 function calcTotalXP() {
   if (!content) return 0;
@@ -772,14 +769,6 @@ function areaStars(lvId) {
   return Math.round((s.self * 0.3 + s.peer * 0.3 + s.teacher * 0.4) * 10) / 10;
 }
 
-function starStr(v) {
-  if (v <= 0) return '';
-  const f = Math.floor(v);
-  let s = '';
-  for (let i = 0; i < f; i++) s += '★';
-  for (let i = f; i < 5; i++) s += '☆';
-  return s;
-}
 
 // =========================================================================
 // 6. RENDER: FACTORY VIEW
@@ -3110,11 +3099,6 @@ function updateDirectorAvatar(mood) {
 // =========================================================================
 // 9b. LEADERBOARD & ACHIEVEMENTS
 // =========================================================================
-function escHtml(str) {
-  return String(str == null ? '' : str).replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[m]));
-}
 
 const ACHIEVEMENTS = [
   { id: 'first_task', name: '第一滴汗', desc: '完成第 1 个任务', emoji: '💧', test: c => c.doneCount >= 1 },
@@ -3761,8 +3745,6 @@ function evaluateAchievements(showPopups) {
 let loginPopQueue = [];
 let loginPopActive = false;
 let pendingLevelComplete = null;
-function dstr(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
-function popupShownToday(t){ try{ return localStorage.getItem('popup_day_'+t)===dstr(); }catch(e){ return false; } }
 function markPopupToday(t){ try{ localStorage.setItem('popup_day_'+t, dstr()); }catch(e){} }
 function enqueueLoginPopup(job){ loginPopQueue.push(job); drainLoginPopups(); }
 function drainLoginPopups(){
@@ -3930,13 +3912,6 @@ function switchLbTab(tab) {
   else renderLeaderboard(document.getElementById('lbBody'));
 }
 
-function _fmtTime(iso){
-  try{
-    const d=new Date(iso); if(isNaN(d.getTime())) return String(iso||'');
-    const p=n=>String(n).padStart(2,'0');
-    return (d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
-  }catch(e){ return String(iso||''); }
-}
 function renderLeaderboard(body) {
   const d = leaderboardCache;
   if (!d || !content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
