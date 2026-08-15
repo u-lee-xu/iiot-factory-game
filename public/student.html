@@ -516,6 +516,9 @@ body {
 @keyframes soShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 @keyframes soHit { 0%{ box-shadow:0 0 0 rgba(255,85,85,0);} 50%{ box-shadow:0 0 24px rgba(255,85,85,.5);} 100%{ box-shadow:0 0 0 rgba(255,85,85,0);} }
 .so-belt.so-hit { animation: soHit .4s; }
+/* 数据分类:分类成功飘字 */
+.so-float{position:absolute;transform:translateX(-50%);color:#ffd700;font-weight:bold;font-size:17px;pointer-events:none;z-index:30;text-shadow:0 0 8px rgba(255,215,0,.8),0 1px 3px #000;animation:soFloat .7s ease-out forwards}
+@keyframes soFloat{0%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,-34px);opacity:0}}
 /* ===== Interaction: Install Wizard ===== */
 .wizard-steps { display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
 .wiz-dot { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #1a1a24; border: 2px solid var(--border); font-size: 16px; color: var(--dim); transition: all .3s; }
