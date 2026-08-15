@@ -312,6 +312,11 @@ export function openMemoryMatch(cfg, onComplete) {
     card.className = 'mm-card';
     card.dataset.idx = idx;
     card.innerHTML = '<div class="mm-inner"><div class="mm-face mm-back"><span>❔</span></div><div class="mm-face mm-front"><div class="mm-emoji">' + c.emoji + '</div><div class="mm-text">' + escHtml(c.text) + '</div></div></div>';
+    // 长文字自适应字号：让 2-3 行内显示更多内容，避免截断显示不全
+    var _len = String(c.text||'').length;
+    if (_len > 20) card.querySelector('.mm-text').style.fontSize = '8px';
+    else if (_len > 14) card.querySelector('.mm-text').style.fontSize = '9px';
+    else if (_len > 8) card.querySelector('.mm-text').style.fontSize = '10px';
     card.addEventListener('click', () => flipCard(card));
     grid.appendChild(card);
   });
