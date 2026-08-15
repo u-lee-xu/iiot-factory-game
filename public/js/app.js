@@ -6,6 +6,39 @@
 // ═══════════════════════════════════════════════════════════════════════
 
 import { escHtml, dstr, _fmtTime, starStr, taskKey, taskXP } from './core/utils.js';
+import { loadShop } from './ui/wallet.js';
+import { walletRank } from './ui/wallet.js';
+import { buildWallet } from './ui/wallet.js';
+import { openWallet } from './ui/wallet.js';
+import { closeWallet } from './ui/wallet.js';
+import { renderWallet } from './ui/wallet.js';
+import { claimSalaryNow } from './ui/wallet.js';
+import { buyItem } from './ui/wallet.js';
+import { getEquippedSkin } from './ui/wallet.js';
+import { equippedEnemySkin } from './ui/wallet.js';
+import { equipSkin } from './ui/wallet.js';
+import { refreshLeaderboard } from './ui/leaderboard.js';
+import { openGameRecords } from './ui/leaderboard.js';
+import { closeGameRecords } from './ui/leaderboard.js';
+import { renderGameRecords } from './ui/leaderboard.js';
+import { openLeaderboard } from './ui/leaderboard.js';
+import { openAchievements } from './ui/leaderboard.js';
+import { closeLb } from './ui/leaderboard.js';
+import { switchLbTab } from './ui/leaderboard.js';
+import { renderLeaderboard } from './ui/leaderboard.js';
+import { renderAchievements } from './ui/leaderboard.js';
+import { openPasswordModal } from './ui/password.js';
+import { closePasswordModal } from './ui/password.js';
+import { savePassword } from './ui/password.js';
+import { showPasswordPrompt } from './ui/password.js';
+import { getPedia } from './ui/pedia.js';
+import { savePedia } from './ui/pedia.js';
+import { getPediaCount } from './ui/pedia.js';
+import { unlockPedia } from './ui/pedia.js';
+import { pediaCount } from './ui/pedia.js';
+import { openPedia } from './ui/pedia.js';
+import { closePedia } from './ui/pedia.js';
+import { renderPedia } from './ui/pedia.js';
 import { interactions, registerInteraction, getInteraction, miniGames, registerMiniGame } from './core/interactions.js';
 import './interactions/terminal.js';
 import './interactions/quiz.js';
@@ -1256,84 +1289,6 @@ function renderHeader() {
 // 9b. 工资 & 商城（钱包）
 // =========================================================================
 let SHOP_CACHE = null;
-function loadShop() {
-  if (SHOP_CACHE) return Promise.resolve(SHOP_CACHE);
-  return api('/api/student/shop').then(r => { SHOP_CACHE = (r && r.ok) ? r.data : []; return SHOP_CACHE; }).catch(() => []);
-}
-function walletRank(xp) {
-  var R=[{min:0,t:'实习生',e:'🔰'},{min:1000,t:'学徒',e:'🔧'},{min:2500,t:'技工',e:'⚙️'},{min:4500,t:'工程师',e:'🛠️'},{min:7000,t:'专家',e:'🏆'}];
-  var r=R[0]; for (var i=0;i<R.length;i++) if (xp>=R[i].min) r=R[i];
-  return r;
-}
-function buildWallet() {
-  if (document.getElementById('walletOverlay')) return;
-  var ov=document.createElement('div');
-  ov.className='gz-overlay'; ov.id='walletOverlay';
-  ov.innerHTML='<div class="gz-box"><div class="pd-head"><div><div class="pd-title">💰 工资与商城</div><div class="pd-sub">上班打卡领工资 · 金币买道具</div></div><div class="pd-close" onclick="closeWallet()">✕</div></div><div class="pd-body" id="walletBody"></div></div>';
-  document.body.appendChild(ov);
-}
-function openWallet(){ buildWallet(); renderWallet(); document.getElementById('walletOverlay').classList.add('show'); }
-function closeWallet(){ if (_mapFlowFeature) { goMap(); return; } var o=document.getElementById('walletOverlay'); if(o) o.classList.remove('show'); }
-function renderWallet() {
-  var body=document.getElementById('walletBody'); if(!body) return;
-  var si=gameState.salaryInfo||{}, inv=gameState.inventory||{}, coins=gameState.coins||0;
-  var rank=walletRank(si.xp||0), rate=si.rate||100;
-  loadShop().then(function(items){
-    var html='';
-    html+='<div class="gz-section">📅 上班打卡</div>';
-    html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji">'+rank.e+'</span><span class="gz-name">'+rank.t+' · 日薪 <b style="color:var(--amber)">'+rate+'</b> 金币</span><span class="gz-meta">本月累计 <b style="color:var(--amber)">'+(si.monthTotal||0)+'</b></span></div>';
-    if (si.claimedToday) html+='<div class="gz-row" style="cursor:default;border-color:var(--green)"><span class="gz-emoji">✅</span><span class="gz-name">今日工资已领（'+rate+' 金币）</span></div>';
-    else html+='<div class="gz-row" onclick="claimSalaryNow()"><span class="gz-emoji">🕐</span><span class="gz-name">今日还没打卡领工资</span><span class="gz-meta"><button class="mm-btn primary" onclick="event.stopPropagation();claimSalaryNow()">打卡 +'+rate+'</button></span></div>';
-    html+='<div class="gz-section">🛒 商城 · 余额 <b style="color:var(--amber)">'+coins+'</b> 💰</div>';
-    (items||[]).forEach(function(it){
-      var afford=coins>=it.price;
-      var owned=(inv[it.id]||0)>0 && (it.type==='skin'||it.type==='title') ? '已拥有' : '';
-      html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji">'+it.emoji+'</span><span class="gz-name">'+escHtml(it.name)+' <span style="font-size:12px;color:var(--dim)">'+escHtml(it.desc)+'</span></span><span class="gz-meta">'+it.price+'💰 '+(owned?owned+' · ':'')+'</span><span><button class="mm-btn'+(afford?' primary':'')+'" data-id="'+it.id+'" '+(afford?'onclick="buyItem(this.dataset.id)"':'disabled style="opacity:.4"')+'>购买</button></span></div>';
-    });
-    var ownedList=Object.keys(inv).filter(function(k){return inv[k]>0;});
-    html+='<div class="gz-section">🎒 背包</div>';
-    if (!ownedList.length) html+='<div class="gz-row" style="cursor:default"><span class="gz-name" style="color:var(--dim)">背包空空，去商城买点道具吧</span></div>';
-    else {
-      ownedList.forEach(function(id){
-        var it=null; (items||[]).forEach(function(x){ if(x.id===id) it=x; });
-        var usable=(it && (it.type==='shooter'||it.type==='task'));
-        html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji">'+(it?it.emoji:'🎁')+'</span><span class="gz-name">'+escHtml(it?it.name:id)+' ×'+inv[id]+'</span><span class="gz-meta">'+(usable?'进游戏时可用':'永久生效')+'</span></div>';
-      });
-    }
-    // 外观
-    html+='<div class="gz-section">🎨 外观（装备皮肤，永久）</div>';
-    html+='<div class="gz-row" style="cursor:default;background:none"><span class="gz-name" style="font-size:13px;color:var(--cyan)">✈️ 飞机皮肤</span></div>';
-    Object.keys(PLANE_SKINS).forEach(function(id){
-      var sk=PLANE_SKINS[id], owned=(id==='default')||(inv[id]>0), eq=getEquippedSkin('plane')===id;
-      html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji" style="background:'+sk.col+';width:18px;height:18px;border-radius:4px;display:inline-block"></span><span class="gz-name">'+sk.name+'</span><span class="gz-meta">'+(eq?'已装备':(owned?'已拥有':'未拥有'))+'</span><span>'+(owned&&!eq?'<button class="mm-btn" data-type="plane" data-id="'+id+'" onclick="equipSkin(this.dataset.type,this.dataset.id)">装备</button>':'')+'</span></div>';
-    });
-    html+='<div class="gz-row" style="cursor:default;background:none"><span class="gz-name" style="font-size:13px;color:var(--cyan)">👾 敌人皮肤</span></div>';
-    Object.keys(ENEMY_SKIN_COLORS).forEach(function(id){
-      var sk=ENEMY_SKIN_COLORS[id], owned=(id==='default')||(inv[id]>0), eq=getEquippedSkin('enemy')===id;
-      html+='<div class="gz-row" style="cursor:default"><span class="gz-emoji" style="background:'+sk.col+';width:18px;height:18px;border-radius:4px;display:inline-block"></span><span class="gz-name">'+sk.name+'</span><span class="gz-meta">'+(eq?'已装备':(owned?'已拥有':'未拥有'))+'</span><span>'+(owned&&!eq?'<button class="mm-btn" data-type="enemy" data-id="'+id+'" onclick="equipSkin(this.dataset.type,this.dataset.id)">装备</button>':'')+'</span></div>';
-    });
-    body.innerHTML=html;
-  });
-}
-function claimSalaryNow() {
-  api('/api/student/claim-salary', { method:'POST', body:'{}' }).then(function(r){
-    if (r && r.ok) {
-      gameState.coins=r.data.coins;
-      gameState.salaryInfo=Object.assign({}, gameState.salaryInfo, { monthTotal:r.data.monthTotal, rate:r.data.rate, claimedToday:true });
-      showToast('💰 打卡成功 +'+r.data.gained+' 金币','success');
-      renderWallet(); renderHeader();
-    } else showToast((r&&r.error)||'打卡失败','error');
-  });
-}
-function buyItem(itemId) {
-  api('/api/student/buy', { method:'POST', body:JSON.stringify({itemId:itemId}) }).then(function(r){
-    if (r && r.ok) {
-      gameState.coins=r.data.coins; gameState.inventory=r.data.inventory;
-      showToast('🛒 购买成功！','success');
-      renderWallet(); renderHeader();
-    } else showToast((r&&r.error)||'购买失败','error');
-  });
-}
 // ===== 皮肤系统 =====
 const PLANE_SKINS = {
   default:      { name:'翠绿战机', col:'#00e676', ck:'#aaffcc' },
@@ -1351,16 +1306,6 @@ const ENEMY_SKIN_COLORS = {
   enemy_ice:    { name:'寒冰蓝', col:'#4fc3f7' },
   enemy_void:   { name:'紫雾', col:'#ab6cff' }
 };
-function getEquippedSkin(type){ try{ return localStorage.getItem('skin_'+type) || 'default'; }catch(e){ return 'default'; } }
-function equippedEnemySkin(){ var m=ENEMY_SKIN_COLORS[getEquippedSkin('enemy')]; return m ? m.col : null; }
-function equipSkin(type, id){
-  var inv=gameState.inventory||{};
-  if (id!=='default' && !(inv[id]>0)) { showToast('还没有这个皮肤，先去商城买', 'error'); return; }
-  try{ localStorage.setItem('skin_'+type, id); }catch(e){}
-  var nm = type==='plane' ? ((PLANE_SKINS[id]||{}).name) : ((ENEMY_SKIN_COLORS[id]||{}).name);
-  showToast('🎨 已装备：'+(nm||id), 'success');
-  renderWallet();
-}
 
 // Director mini-avatar mood sync
 let directorMood = 'neutral';
@@ -1782,193 +1727,23 @@ function renderAchBar() {
     + gotList.map(a => '<span class="ach-bar-emoji" title="' + a.name + ((gameState.teacherAwards && gameState.teacherAwards[a.id]) ? '（老师发放）' : '') + '">' + a.emoji + '</span>').join('');
 }
 
-async function refreshLeaderboard() {
-  try {
-    const res = await api('/api/game/leaderboard');
-    if (res && res.ok) leaderboardCache = res.data;
-  } catch (e) { /* 网络失败静默，打开面板时重试 */ }
-}
 
 
 // 📊 我的战绩
-function openGameRecords(){ document.getElementById('recBody').innerHTML = renderGameRecords(); document.getElementById('recOverlay').classList.add('show'); }
-function closeGameRecords(){ document.getElementById('recOverlay').classList.remove('show'); }
-function renderGameRecords(){
-  const gs = getGameStats() || {};
-  const s = (k,d)=>(k in gs ? gs[k] : d);
-  let h = '';
-  h += '<div class="rec-card"><div class="rc-name">🔫 术语防御战</div>'+
-    '<div class="rc-row">游玩 <b>'+s('typingPlays',0)+'</b> 次 · 通关 <b>'+s('typingWins',0)+'</b> 次</div>'+
-    '<div class="rc-row">最高分 <b>'+s('typingBest',0)+'</b> · 最远到第 <b>'+s('typingWaves',0)+'</b> 波</div>'+
-    '<div class="rc-row">坚持最长 <b>'+s('typingTime',0)+'</b> 秒 · 最高连击 <b>'+s('typingCombo',0)+'</b></div></div>';
-  h += '<div class="rec-card"><div class="rc-name">🃏 翻牌</div>'+
-    '<div class="rc-row">完成 <b>'+s('mmWins',0)+'</b> 次 · 最高连对 <b>'+s('mmStreak',0)+'</b></div>'+
-    '<div class="rc-row">累计配对 <b>'+s('mmMatched',0)+'</b> 对</div></div>';
-  h += '<div class="rec-card"><div class="rc-name">⚡ 快打</div>'+
-    '<div class="rc-row">完成 <b>'+s('qkWins',0)+'</b> 次 · 最高连击 <b>'+s('qkCombo',0)+'</b></div></div>';
-  h += '<div class="rec-card"><div class="rc-name">🔗 连线</div>'+
-    '<div class="rc-row">完成 <b>'+s('matchWins',0)+'</b> 次</div></div>';
-  h += '<div class="rec-card"><div class="rc-name">🛸 数据蜂群</div>'+
-    '<div class="rc-row">游玩 <b>'+s('shooterPlays',0)+'</b> 次 · 通关 <b>'+s('shooterWins',0)+'</b> 次</div>'+
-    '<div class="rc-row">🚀 最强火力 <b>'+s('shooterMaxLevel',1)+'</b> 级 · 拾取道具 <b>'+s('shooterPickups',0)+'</b> 个</div>'+
-    '<div class="rc-row">最高分 <b>'+s('shooterBest',0)+'</b> · 最远到第 <b>'+s('shooterWaves',0)+'</b> 波</div></div>';
-  h += '<div class="rec-card"><div class="rc-name">🎮 小游戏总计</div>'+
-    '<div class="rc-row">累计完成 <b>'+s('gamesWin',0)+'</b> 个小游戏</div></div>';
-  return h;
-}
 
-function openLeaderboard() {
-  document.getElementById('lbOverlay').classList.add('show');
-  if (!leaderboardCache) refreshLeaderboard();
-  switchLbTab('rank');
-}
 
-function openAchievements() {
-  document.getElementById('lbOverlay').classList.add('show');
-  switchLbTab('ach');
-}
 
-function closeLb() {
-  if (_mapFlowFeature) { goMap(); return; }
-  document.getElementById('lbOverlay').classList.remove('show');
-}
 
-function switchLbTab(tab) {
-  lbTab = tab;
-  document.getElementById('tabRank').classList.toggle('active', tab === 'rank');
-  document.getElementById('tabAch').classList.toggle('active', tab === 'ach');
-  if (tab === 'ach') renderAchievements(document.getElementById('lbBody'));
-  else renderLeaderboard(document.getElementById('lbBody'));
-}
 
-function renderLeaderboard(body) {
-  const d = leaderboardCache;
-  if (!d || !content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
-  let html = `
-    <div class="lb-summary">
-      <div>班级完成率 <b>${d.classCompletion}%</b></div>
-      <div>我的名次 <b>${d.myRank > 0 ? d.myRank : '—'}</b> / ${d.rows.length}</div>
-      <div>班级人数 <b>${d.rows.length}</b></div>
-    </div>
-    <div class="lb-list">`;
-  d.rows.forEach((r, i) => {
-    const rank = getRank(r.xp);
-    const isMe = r.name === myName;
-    const pioneerLvs = Object.keys(d.pioneers).filter(k => d.pioneers[k] === r.name);
-    html += `
-      <div class="lb-row${isMe ? ' me' : ''}">
-        <div class="lb-no">${i + 1}</div>
-        <div class="lb-name">${escHtml(r.name)}${((r.name===myName) && (gameState.inventory||{}).title_badge>0) ? '<span class="lb-pioneer" title="厂级先锋称号"> 🏅</span>' : ''}${pioneerLvs.length ? '<span class="lb-pioneer" title="先锋：第' + pioneerLvs.join('、第') + '关"> 🚩</span>' : ''}</div>
-        <div class="lb-rank">${rank.emoji} ${rank.title}</div>
-        <div class="lb-xp">${r.xp} XP</div>
-        <div class="lb-bar"><div class="lb-bar-fill" style="width:${r.completion}%"></div><span>${r.completion}%</span></div>
-      </div>`;
-  });
-  html += '</div>';
-  // ⏱ 我的通关记录（每关首通时间）
-  const _me = d.rows.find(r => r.name === myName);
-  const _mf = _me ? (_me.levelFinish || {}) : {};
-  html += '<div class="lb-pioneers"><div class="lb-pioneers-title">⏱ 我的通关记录（首通时间）</div>';
-  (content.levels || []).forEach(lv => {
-    const t = _mf[lv.id];
-    html += '<div class="lb-pioneer-line">第 ' + lv.id + ' 关 ' + escHtml(lv.areaName || '') + '：<b>' + (t ? _fmtTime(t) : '未通关') + '</b></div>';
-  });
-  html += '</div>';
-  const pioneerKeys = Object.keys(d.pioneers);
-  if (pioneerKeys.length && content.levels) {
-    html += '<div class="lb-pioneers"><div class="lb-pioneers-title">🚩 关卡先锋（班级首位完成）</div>';
-    content.levels.forEach(lv => {
-      const pp = d.pioneers[lv.id];
-      html += `<div class="lb-pioneer-line">第 ${lv.id} 关 ${escHtml(lv.areaName || '')}：<b>${pp ? escHtml(pp) : '—'}</b>${pp === myName ? ' <span style="color:var(--amber)">(我!)</span>' : ''}</div>`;
-    });
-    html += '</div>';
-  }
-  body.innerHTML = html;
-}
 
-function renderAchievements(body) {
-  const ctx = achievementContext();
-  let html = '<div class="ach-grid">';
-  ACHIEVEMENTS.forEach(a => {
-    const got = !!gameState.achievements[a.id];
-    const can = a.test(ctx);
-    html += `
-      <div class="ach-cell ${got ? 'got' : (can ? 'can' : '')}">
-        <div class="ach-emoji">${got ? a.emoji : '🔒'}</div>
-        <div class="ach-name">${a.name}</div>
-        <div class="ach-desc">${a.desc}</div>
-        ${got ? '<div class="ach-tag">已解锁</div>' : (can ? '<div class="ach-tag can">可解锁</div>' : '')}
-    ${gameState.teacherAwards && gameState.teacherAwards[a.id] ? '<div class="ach-tag" style="color:#ffd27d">🎁 老师发放</div>' : ''}
-      </div>`;
-  });
-  html += '</div>';
-  body.innerHTML = html;
-}
 
 // =========================================================================
 // 9c. PASSWORD SETTINGS
 // =========================================================================
-function openPasswordModal() {
-  const hasPw = !!gameState.hasPassword;
-  document.getElementById('pwTitle').textContent = hasPw ? '修改登录密码' : '设置登录密码';
-  document.getElementById('pwOldField').style.display = hasPw ? 'block' : 'none';
-  document.getElementById('pwOld').value = '';
-  document.getElementById('pwNew').value = '';
-  document.getElementById('pwNew2').value = '';
-  document.getElementById('pwErr').textContent = '';
-  document.getElementById('pwOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('pwNew').focus(), 50);
-}
 
-function closePasswordModal() {
-  document.getElementById('pwOverlay').classList.remove('show');
-}
 
-async function savePassword() {
-  const oldPassword = document.getElementById('pwOld').value;
-  const pw1 = document.getElementById('pwNew').value;
-  const pw2 = document.getElementById('pwNew2').value;
-  const err = document.getElementById('pwErr');
-  if (!pw1 || pw1.length < 4) { err.textContent = '新密码至少 4 位'; return; }
-  if (pw1 !== pw2) { err.textContent = '两次输入的新密码不一致'; return; }
-  const btn = document.getElementById('pwSaveBtn');
-  btn.disabled = true; btn.textContent = '保存中…';
-  const res = await api('/api/student/password', {
-    method: 'PUT',
-    body: JSON.stringify({ oldPassword, newPassword: pw1 })
-  });
-  btn.disabled = false; btn.textContent = '确认';
-  if (!res || !res.ok) {
-    err.textContent = (res && res.error) || '保存失败，请重试';
-    return;
-  }
-  gameState.hasPassword = true;
-  closePasswordModal();
-  showToast('密码已设置，下次登录需输入', 'success');
-}
 
 // 登录后未设置密码时的引导提示
-function showPasswordPrompt(done) {
-  if (!PASSWORD_ENABLED) { if (done) setTimeout(done, 50); return; }
-  if (gameState.hasPassword) { if (done) setTimeout(done, 50); return; }
-  if (document.getElementById('pwPromptOverlay')) { if (done) setTimeout(done, 50); return; }
-  const overlay = document.createElement('div');
-  overlay.id = 'pwPromptOverlay';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:10px;padding:24px 30px;max-width:430px;width:90%;box-shadow:0 0 40px rgba(255,176,0,.15)';
-  box.innerHTML = `
-    <div style="font-size:18px;color:var(--amber);font-weight:bold;margin-bottom:12px">🔑 建议修改初始密码</div>
-    <div style="font-size:14px;line-height:1.8;color:var(--text);margin-bottom:20px">你的账号还在使用初始密码 123456，任何知道你姓名的人都能用这个密码登录。设置一个自己的密码更安心。</div>
-    <div style="display:flex;gap:10px;justify-content:center">
-      <button id="pwPromptGo" style="padding:9px 24px;background:var(--amber);color:#000;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit">去设置</button>
-      <button id="pwPromptLater" style="padding:9px 24px;background:none;color:var(--dim);border:1px solid var(--border);border-radius:4px;font-size:15px;cursor:pointer;font-family:inherit">稍后再说</button>
-    </div>`;
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  box.querySelector('#pwPromptGo').onclick = () => { playAreaMusic(); overlay.remove(); if (done) setTimeout(done, 50); openPasswordModal(); };
-  box.querySelector('#pwPromptLater').onclick = () => { playAreaMusic(); overlay.remove(); if (done) setTimeout(done, 50); };
-}
 
 // =========================================================================
 // 9d. MINI GAMES — memory_match（术语翻牌热身）
@@ -2389,82 +2164,6 @@ function showShooterLoadout(cfg, onComplete) {
 
 
 // 术语图鉴（收藏）
-function getPedia() {
-  try { return JSON.parse(localStorage.getItem('term_pedia') || '{}'); } catch (e) { return {}; }
-}
-function savePedia(p) { localStorage.setItem('term_pedia', JSON.stringify(p)); }
-function getPediaCount() {
-  const p = getPedia();
-  return Object.values(p).reduce((s, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0);
-}
-function unlockPedia(levelId, ids) {
-  const p = getPedia();
-  const key = '' + levelId;
-  const cur = new Set(p[key] || []);
-  ids.forEach(id => cur.add(id));
-  p[key] = Array.from(cur);
-  savePedia(p);
-}
-function pediaCount(levelId) {
-  const tl = getTermLevel(levelId);
-  if (!tl) return { got: 0, total: 0 };
-  const all = new Set();
-  tl.warmups.forEach(w => (w.pairs || []).forEach(pr => { if (pr && pr.id) all.add(pr.id); }));
-  ((tl.bonus && tl.bonus.levels) || []).forEach(l => (l.pairs || []).forEach(pr => { if (pr && pr.id) all.add(pr.id); }));
-  const got = new Set(getPedia()['' + levelId] || []);
-  let gotCount = 0;
-  all.forEach(id => { if (got.has(id)) gotCount++; });
-  return { got: gotCount, total: all.size };
-}
-function openPedia() {
-  document.getElementById('pdOverlay').classList.add('show');
-  renderPedia();
-}
-function closePedia() {
-  if (_mapFlowFeature) { goMap(); return; }
-  document.getElementById('pdOverlay').classList.remove('show');
-}
-function renderPedia() {
-  const tl = getTermLevel(currentLevelId);
-  const body = document.getElementById('pdBody');
-  if (!tl) {
-    body.innerHTML = '<div class="lb-empty">当前关卡暂无图鉴内容</div>';
-    document.getElementById('pdProgress').textContent = '';
-    return;
-  }
-  const pediaSet = new Set(getPedia()['' + currentLevelId] || []);
-  const all = new Map();
-  tl.warmups.forEach(w => (w.pairs || []).forEach(pr => { if (pr && pr.id) all.set(pr.id, pr); }));
-  ((tl.bonus && tl.bonus.levels) || []).forEach(l => (l.pairs || []).forEach(pr => { if (pr && pr.id) all.set(pr.id, pr); }));
-  const entries = Array.from(all.values());
-  const gotCount = entries.filter(pr => pediaSet.has(pr.id)).length;
-  document.getElementById('pdProgress').textContent = (tl.emoji || '📖') + ' ' + (tl.name || ('第 ' + currentLevelId + ' 关')) + ' · 已收集 ' + gotCount + '/' + entries.length;
-  let html = '';
-  if (gotCount === entries.length) {
-    html += '<div class="pd-full">🎉 图鉴集齐！这些词汇你已经全部脸熟，后面学起来事半功倍</div>';
-  }
-  html += '<div class="pd-grid">';
-  entries.forEach(pr => {
-    const got = pediaSet.has(pr.id);
-    if (got) {
-      html += '<div class="pd-card">' +
-        '<div class="pd-emoji">' + pr.emoji + '</div>' +
-        '<div class="pd-term">' + escHtml(pr.term) + '</div>' +
-        '<div class="pd-hint">' + escHtml(pr.hint) + '</div>' +
-        (pr.cmd ? '<div class="pd-cmd">$ ' + escHtml(pr.cmd) + '</div>' : '') +
-        (pr.cat ? '<span class="pd-cat">' + escHtml(pr.cat) + '</span>' : '') +
-      '</div>';
-    } else {
-      html += '<div class="pd-card locked">' +
-        '<div class="pd-emoji">🔒</div>' +
-        '<div style="font-size:14px;color:var(--dim);margin-top:8px">？？？</div>' +
-        '<div style="font-size:12px;color:var(--dim);margin-top:6px">完成翻牌解锁</div>' +
-      '</div>';
-    }
-  });
-  html += '</div>';
-  body.innerHTML = html;
-}
 
 // =========================================================================
 // 10. LEVEL UP CHECK
