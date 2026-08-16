@@ -665,9 +665,9 @@ function rsStart(){
   function rsTryEnter(){
     const near=function(el){
       if(!el) return false;
-      const r=el.getBoundingClientRect(), sr=scene.getBoundingClientRect();
-      const cx=(r.left-sr.left)+rsCamX, cy=(r.top-sr.top)+rsCamY;
-      return Math.abs(cx-(px+6))<64 && Math.abs(cy-(py+6))<64;
+      // 用 offset(stage 坐标) 与 px 对齐，避免 .room-scene 边框/相机造成的判定错位
+      const cx=el.offsetLeft+el.offsetWidth/2, cy=el.offsetTop+el.offsetHeight/2;
+      return Math.abs(cx-(px+17))<44 && Math.abs(cy-(py+20))<44;
     };
     for(const el of scene.querySelectorAll('.rs-task')){
       if(near(el)){
@@ -766,9 +766,8 @@ function rsStart(){
     player.style.left=px+'px'; player.style.top=py+'px';
     // 走近任务设备 → 显示任务名
     scene.querySelectorAll('.rs-task').forEach(el=>{
-      const r=el.getBoundingClientRect(), sr=scene.getBoundingClientRect();
-      const cx=(r.left-sr.left)+rsCamX, cy=(r.top-sr.top)+rsCamY;
-      const near=Math.abs(cx-(px+6))<64 && Math.abs(cy-(py+6))<64;
+      const cx=el.offsetLeft+el.offsetWidth/2, cy=el.offsetTop+el.offsetHeight/2;
+      const near=Math.abs(cx-(px+17))<44 && Math.abs(cy-(py+20))<44;
       el.classList.toggle('near',near);
     });
     // 摄像机跟随：stage 平移使小人居中（x/y 双向）
@@ -1237,9 +1236,9 @@ function renderRoom(id){
     const locked=!done&&!next;
     const ri=Math.min(Math.floor(i/perRoom), nRoom-1), j=i-ri*perRoom;
     const cnt=(roomTasks[ri]||[]).length;
-    // 1个居中；2个左右分；3个三档错开
-    const cx=rooms[ri].x+ROOM_W/2 + (cnt>2 ? (j-1)*56 : cnt>1 ? (j===0?-48:48) : 0);
-    const cy=WT+ROOM_H*0.62;
+    // 1个居中；2个左右拉开(间距144)；3个三档拉开(间距118)+上下错位，避免相邻误触
+    const cx=rooms[ri].x+ROOM_W/2 + (cnt>2 ? (j-1)*118 : cnt>1 ? (j===0?-72:72) : 0);
+    const cy=WT+ROOM_H*0.58 + (cnt>2 ? (j===1 ? 34 : -16) : 0);
     return `<div class="rs-task ${locked?'locked':cls}" style="left:${cx-29}px;top:${cy-25}px" data-lv="${lv.id}" data-task="${t.id}" onclick="roomGoTask('${lv.id}','${t.id}',this)" title="${t.title||t.name||t.label||''}" ${locked?'data-locked="1"':''}>
       <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>${next?'<span class="rt-arrow">▼</span>':''}
     </div>`;
@@ -1260,7 +1259,10 @@ function renderRoom(id){
   let furnHTML='';
   rooms.forEach((rm,ri)=>{
     const fk=furnKinds[ri%furnKinds.length];
+    const fk2=furnKinds[(ri+1)%furnKinds.length];
+    // 顶部左右各一件装饰家具（设备在中部，家具不挡设备/路径）
     furnHTML+=`<div class="rs-furn ${fk[0]}" data-name="${fk[1]}" style="left:${rm.x+20}px;top:${WT+16}px" onclick="roomGoPoint(event)"></div>`;
+    furnHTML+=`<div class="rs-furn ${fk2[0]}" data-name="${fk2[1]}" style="left:${rm.x+ROOM_W-120}px;top:${WT+16}px" onclick="roomGoPoint(event)"></div>`;
   });
   // 楼梯：放最后一间房间右侧
   const stairsCls = (flrDone&&hasNext)?'open':'locked';

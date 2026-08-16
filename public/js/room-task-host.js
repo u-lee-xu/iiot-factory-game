@@ -83,13 +83,17 @@ function showTaskPreface(task, onStart) {
     '</div>';
   overlay.appendChild(box);
   document.body.appendChild(overlay);
+  overlay.id = 'roomPrefOv';   // 供 closeModal 统一清理（防止退出任务后前言残留挡住场景）
   const textEl = box.querySelector('#roomTaskPrefaceText');
   const btn = box.querySelector('#roomTaskPrefaceBtn');
   typewrite(textEl, String(teachText || '').replace(/^厂长[:：]\s*/, ''), 20, () => {
     btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '收到，开始操作'; playSound('click');
   });
+  // 兜底：即使打字动画异常卡住，5 秒后按钮也放行（保证玩家能进入任务）
+  setTimeout(function(){ if (btn.disabled) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '收到，开始操作'; } }, 5000);
   const onPrefaceKey = function(e){ if(e.key==='Enter'){ const b=box.querySelector('#roomTaskPrefaceBtn'); if(b && !b.disabled){ b.click(); } } };
   window.addEventListener('keydown', onPrefaceKey);
+  window.__roomPrefCleanup = onPrefaceKey;   // 供 closeModal 移除监听
   btn.onclick = () => {
     window.removeEventListener('keydown', onPrefaceKey);
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .3s';
@@ -129,6 +133,11 @@ function openTaskModal(lvId, taskId) {
 // —— 关闭 ——
 function closeModal() {
   try{ kbdCleanup(); }catch(e){}
+  // 清理任务前言 overlay（若玩家在"开始"前退出，避免残留遮罩挡住房间场景/点击）
+  try{
+    const _ov=document.getElementById('roomPrefOv'); if(_ov) _ov.remove();
+    if(window.__roomPrefCleanup){ window.removeEventListener('keydown', window.__roomPrefCleanup); window.__roomPrefCleanup=null; }
+  }catch(e){}
   const el = document.getElementById('modalOverlay');
   if (!el) return;
   el.classList.remove('show');

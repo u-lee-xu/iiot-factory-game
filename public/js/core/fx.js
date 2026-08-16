@@ -8,20 +8,29 @@ import { escHtml } from './utils.js';
 export function typewrite(el, text, speed, cb) {
   let idx = 0;
   el.textContent = '';
+  let _done = false;
+  function finish(){
+    if (_done) return;
+    _done = true;
+    el.textContent = text;   // 兜底时直接填满剩余文本
+    if (cb) cb();
+  }
   function frame() {
     const end = Math.min(idx + 2, text.length);
     while (idx < end) {
       el.textContent += text[idx];
-      if (text[idx] !== ' ') playSound('type');
+      if (text[idx] !== ' ') { try{ playSound('type'); }catch(e){} }   // 音频异常不中断打字
       idx++;
     }
     if (idx < text.length) {
       setTimeout(frame, speed || 30);
     } else {
-      if (cb) cb();
+      finish();
     }
   }
   frame();
+  // 强制完成兜底：即使打字动画异常卡住，6 秒后也填满文本并回调（保证按钮可用）
+  setTimeout(function(){ if (!_done) finish(); }, 6000);
 }
 
 export function generateTeach(task) {

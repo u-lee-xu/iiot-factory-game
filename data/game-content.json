@@ -1886,7 +1886,7 @@
        },
        {
         "title": "动手敲命令：禁 ping",
-        "narrative": "动手。iptables 加规则格式：iptables -A 链 -p 协议 --icmp-type 类型 -j 动作。禁 ping = 入站 INPUT 链 + ICMP 协议 + echo-request 类型 + DROP 丢弃：iptables -A INPUT -p icmp --icmp-type echo-request -j DROP。",
+        "narrative": "厂长：防火墙靠「规则」干活，一条规则就像一张指令单，从左往右念：\n① iptables——调用防火墙工具；\n② -A INPUT——往「入站链 INPUT」加一条（-A=添加；入站=别人发给你的数据）；\n③ -p icmp——针对 icmp 协议（ping 用的就是它）；\n④ --icmp-type echo-request——拦的是 ping 发来的「请求包」（echo-request）；\n⑤ -j DROP——动作是丢弃（DROP=扔掉）。\n拼起来：iptables -A INPUT -p icmp --icmp-type echo-request -j DROP\n意思是：别人从外面 ping 你的请求包，直接扔掉——ping 不通了。",
         "question": "在终端输入命令，禁止外部 ping 本机：",
         "inputType": "command",
         "correctCommand": "iptables -A INPUT -p icmp --icmp-type echo-request -j DROP",
