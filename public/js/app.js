@@ -760,10 +760,10 @@ function showTaskPreface(task, onStart) {
   
   const box = document.createElement('div');
   box.className = 'task-preface-box';
-  box.style.cssText = 'background:#12121a;border:2px solid var(--cyan);border-radius:8px;padding:0;width:90%;box-shadow:0 0 60px rgba(0,188,212,.2);overflow:hidden';
+  box.style.cssText = 'background:#12121a;border:2px solid var(--cyan);border-radius:8px;padding:0;width:min(90%,560px);box-shadow:0 0 60px rgba(0,188,212,.2);overflow:hidden;max-height:86vh;display:flex;flex-direction:column';
   
   box.innerHTML = `
-    <div class="director-box director-mood-thinking" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border);padding:16px 20px">
+    <div class="director-box director-mood-thinking" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border);padding:16px 20px;flex:1;min-height:0;overflow-y:auto">
       <div class="director-portrait">${moodEmoji}</div>
       <div class="director-bubble">
         <div class="director-name">厂长</div>

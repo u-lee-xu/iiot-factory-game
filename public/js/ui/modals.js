@@ -51,7 +51,7 @@ export function showLevelIntro(lv, onStart) {
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center';
   
   const box = document.createElement('div');
-  box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:8px;padding:0;max-width:520px;width:90%;box-shadow:0 0 60px rgba(255,176,0,.2);overflow:hidden';
+  box.style.cssText = 'background:#12121a;border:2px solid var(--amber);border-radius:8px;padding:0;max-width:520px;width:90%;box-shadow:0 0 60px rgba(255,176,0,.2);overflow:hidden;max-height:86vh;display:flex;flex-direction:column';
   
   const introText = lv.narrative.intro;
   const mood = isReturning ? 'neutral' : 'thinking';
@@ -59,7 +59,7 @@ export function showLevelIntro(lv, onStart) {
   const moodLine = window.getRandomMoodLine(mood);
   
   box.innerHTML = `
-    <div class="director-box director-mood-${mood}" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border);padding:16px 20px">
+    <div class="director-box director-mood-${mood}" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border);padding:16px 20px;flex:1;min-height:0;overflow-y:auto">
       <div class="director-portrait">${moodEmoji}</div>
       <div class="director-bubble">
         <div class="director-name">厂长</div>
