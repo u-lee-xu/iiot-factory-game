@@ -698,6 +698,8 @@ function rsStart(){
     rsSetDir(dx, dy);
   }
   function rsCollide(x,y){
+    // 外墙阻挡：四面外墙不可穿越（左/右墙宽16，上/下墙高12）——键盘移动同样生效
+    if(x < 16 || x > stageW - 16 || y < 12 || y > stageH - 12) return true;
     for(const o of rsObs){
       const cx=Math.max(o.x, Math.min(x, o.x+o.w));
       const cy=Math.max(o.y, Math.min(y, o.y+o.h));
