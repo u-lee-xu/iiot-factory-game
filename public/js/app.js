@@ -1135,6 +1135,9 @@ init().then(() => {
       if (realTask) {
         // 排进登录弹窗队列之后打开：欢迎/改密逐个关完，再进任务前言，避免弹窗轰炸
         enqueueLoginPopup(done => openTaskModal(lv.id, realTask.id, function(){ hideTransit(); done(); }));
+      } else {
+        // 只进关卡（?level=X 无具体任务）：没有任务弹窗负责收尾，直接淡出过场，避免卡在"正在进入关卡"
+        setTimeout(() => hideTransit(), 300);
       }
     }
   }
