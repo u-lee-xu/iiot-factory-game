@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { escHtml, taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('chain_quiz', {
   render(container, task) {
@@ -60,6 +61,7 @@ registerInteraction('chain_quiz', {
         };
         opts.appendChild(div);
       });
+      setupKbdNav(document.getElementById('chainOpts'), '.quiz-opt');
       document.getElementById('modalFoot').innerHTML = `<button class="btn" onclick="window.closeModal()">取消</button>`;
     }
 

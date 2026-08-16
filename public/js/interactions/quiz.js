@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('quiz', {
   render(container, task) {
@@ -22,6 +23,7 @@ registerInteraction('quiz', {
     window.addDirectorBox(container, teachText, () => {
       document.getElementById('quizQ').style.opacity = '1';
       document.getElementById('quizOpts').style.opacity = '1';
+      setupKbdNav(document.getElementById('quizOpts'), '.quiz-opt');
     }, initialMood);
     const opts = document.getElementById('quizOpts');
     cfg.options.forEach((opt, i) => {

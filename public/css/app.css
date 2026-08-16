@@ -1306,3 +1306,6 @@ body.map-flow .modal-body > * { max-width: 900px; margin-left: auto; margin-righ
   .task-preface-box #taskPrefaceBtn{font-size:17px!important;padding:12px 40px!important}
   .task-preface-box #taskAnimBtn{font-size:16px!important;padding:12px 24px!important}
 }
+
+/* PC 键盘导航：聚焦项发光外框 */
+.kbd-focus{box-shadow:0 0 0 2px #ffb340, 0 0 12px rgba(255,179,64,.6)!important;outline:none}

@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
 // ui/main.js — main 模块（拆自 app.js）
 // import core/*；其余公共函数经 window
+import { kbdCleanup } from '../core/kbd.js';
 // ═══════════════════════════════════════════════════════════════════
 import { escHtml, starStr, taskKey, taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
@@ -309,6 +310,7 @@ export function openTaskModal(lvId, taskId, onOpen) {
 }
 
 export function closeModal() {
+  try{ kbdCleanup(); }catch(e){}
   const el = document.getElementById('modalOverlay');
   if (!el) return;
   el.classList.remove('show');
