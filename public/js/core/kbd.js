@@ -1,16 +1,37 @@
 // ═══════════════════════════════════════════════════════════════════
 // core/kbd.js — PC 键盘导航（无鼠标操作）
-//   ↑/↓/←/→ 移动光标（.kbd-focus 发光外框）
-//   空格 = 选中当前聚焦项（触发其 click）
-//   回车 = 点提交按钮（#modalFoot .btn-primary/.btn-success 等）
-// 单实例：window.__kbdCleanup 记录上次监听，新任务自动清旧，避免堆积
+//   setupKbdNav：↑/↓/←/→ 移动光标（.kbd-focus 发光），空格 = 触发点击（选中/放置）
+//   回车：统一走 setupGlobalEnter —— 优先级 回厂区继续 > 知道了再试一次 > 任务主提交
+//   输入框（terminal/fill_blank）里回车不劫持，避免与命令提交冲突
 // ═══════════════════════════════════════════════════════════════════
 export function kbdCleanup(){
   try{ if(window.__kbdCleanup){ window.__kbdCleanup(); window.__kbdCleanup=null; } }catch(e){}
 }
 
+// 统一回车确认（全局只挂一次）
+export function setupGlobalEnter(){
+  if(window.__globalEnterBound) return;
+  window.__globalEnterBound = true;
+  window.addEventListener('keydown', function(e){
+    if(e.key!=='Enter') return;
+    // 输入框内回车不劫持（terminal/fill_blank 提交命令用）
+    const t=e.target;
+    if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+    // 1) 关卡结算「回厂区继续」（独立 overlay，最高优先）
+    const lc=document.getElementById('levelCompleteBtn');
+    if(lc && lc.offsetParent!==null){ e.preventDefault(); lc.click(); return; }
+    // 2) 答错提示「知道了，再试一次」
+    const retry=document.querySelector('.modal-overlay.show .director-box .btn-primary');
+    if(retry){ e.preventDefault(); retry.click(); return; }
+    // 3) 任务主提交/确认（提交/领取XP/确认分类）
+    const sb=document.querySelector('#modalFoot .btn-primary, #modalFoot .btn-success');
+    if(sb){ e.preventDefault(); sb.click(); }
+  });
+}
+
 export function setupKbdNav(scope, selector, opts){
   kbdCleanup();   // 先清旧监听（任务切换时）
+  setupGlobalEnter();   // 确保全局回车已挂
   const cfg = opts || {};
   let idx = -1;
   function items(){ return [...(scope||document).querySelectorAll(selector)]; }
@@ -19,19 +40,13 @@ export function setupKbdNav(scope, selector, opts){
     list.forEach((el,k)=>{ if(el){ el.classList.toggle('kbd-focus', k===i); } });
     if(list[i]){ try{ list[i].scrollIntoView({block:'nearest'}); }catch(e){} }
   }
-  function submit(){
-    const sb=(cfg.submitSelector && document.querySelector(cfg.submitSelector)) ||
-             document.querySelector('#modalFoot .btn-primary, #modalFoot .btn-success');
-    if(sb){ try{ sb.click(); }catch(e){} return true; }
-    return false;
-  }
   function onKey(e){
     const list=items();
     if(!list.length) return;
     if(e.key==='ArrowDown'||e.key==='ArrowRight'){ e.preventDefault(); idx=(idx+1)%list.length; focus(idx); }
     else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){ e.preventDefault(); idx=(idx-1+list.length)%list.length; focus(idx); }
     else if(e.key===' '){ if(idx>=0&&list[idx]){ e.preventDefault(); list[idx].click(); } }
-    else if(e.key==='Enter'){ e.preventDefault(); submit(); }
+    // 回车交给 setupGlobalEnter 处理（避免与 知道了再试一次/回厂区继续 冲突）
   }
   window.addEventListener('keydown', onKey);
   const list=items();

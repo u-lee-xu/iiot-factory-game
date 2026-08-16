@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('scenario_match', {
   render(container, task) {
@@ -42,7 +43,7 @@ registerInteraction('scenario_match', {
         div.className = 'match-item' + (matched.has(item.pairIdx) ? ' matched' : '') + (selectedItem === item ? ' selected' : '');
         div.textContent = item.text;
         if (!matched.has(item.pairIdx)) {
-          div.onclick = () => { selectedItem = item; renderItems(); };
+          div.onclick = () => { selectedItem = (selectedItem === item) ? null : item; renderItems(); };
         }
         leftEl.appendChild(div);
       });
@@ -78,6 +79,7 @@ registerInteraction('scenario_match', {
         }
         rightEl.appendChild(div);
       });
+      setupKbdNav(container, '.match-item');   // 键盘：↑/↓/←/→ 移动、空格选中/匹配、回车提交
     }
     renderItems();
 

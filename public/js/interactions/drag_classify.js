@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('drag_classify', {
   render(container, task) {
@@ -18,6 +19,7 @@ registerInteraction('drag_classify', {
     }
 
     const placed = {};  // itemName -> categoryName
+    let kbdPicked = null; // 键盘选中的待分类项
     let streak = 0;
     let errors = 0;
     const teachText = window.generateTeach(task);
@@ -64,6 +66,7 @@ registerInteraction('drag_classify', {
         placed[name] = catName;
         renderClassify();
       });
+      catDiv.onclick = () => { if (kbdPicked) { placed[kbdPicked] = catName; kbdPicked = null; renderClassify(); } };
       cats.appendChild(catDiv);
     });
 
@@ -79,6 +82,7 @@ registerInteraction('drag_classify', {
           e.dataTransfer.setData('text/plain', name);
           e.dataTransfer.effectAllowed = 'move';
         });
+        div.onclick = () => { kbdPicked = (kbdPicked === name) ? null : name; renderClassify(); };
         pool.appendChild(div);
       });
 
@@ -98,6 +102,7 @@ registerInteraction('drag_classify', {
               span.style.opacity = '0.4';
             });
             span.addEventListener('dragend', () => { span.style.opacity = ''; });
+            span.onclick = () => { delete placed[name]; renderClassify(); };
             catDiv.appendChild(span);
           }
         });
@@ -110,6 +115,7 @@ registerInteraction('drag_classify', {
           <button class="btn btn-primary" onclick="submitClassify()">确认分类</button>
         `;
       }
+      setupKbdNav(container, '.classify-item, .classify-cat, .placed-item');   // 键盘：空格选中/放置/取消，回车提交
     }
 
     window.submitClassify = () => {

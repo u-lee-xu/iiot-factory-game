@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { setupKbdNav, kbdCleanup } from '../core/kbd.js';
 
 registerInteraction('install_wizard', {
   render(container, task) {
@@ -52,6 +53,7 @@ registerInteraction('install_wizard', {
       }
       updateProgress();
       const step = steps[current];
+      kbdCleanup();   // 切步骤先清旧键盘监听（数字/命令步骤用自身回车）
       const stage = document.getElementById('wizardStage');
       var _narr = String(step.narrative || '').replace(/^厂长[:：]\s*/, '');
       var html = '<div class="wizard-narrative"><span class="wiz-narr-icon">\ud83d\udc68\u200d\ud83d\udcbc</span> <span class="wiz-narr-label">厂长：</span>' + _narr.replace(/\n/g, '<br>') + '</div>';
@@ -80,6 +82,7 @@ registerInteraction('install_wizard', {
           };
           optsEl.appendChild(div);
         });
+        setupKbdNav(optsEl, '.quiz-opt');   // 键盘：↑/↓ 移动、空格选中、回车确认
         document.getElementById('modalFoot').innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">取消</button>';
       } else if (step.multiSelect) {
         multiSelected = new Set();
@@ -111,6 +114,7 @@ registerInteraction('install_wizard', {
           };
           mOptsEl.appendChild(div);
         });
+        setupKbdNav(mOptsEl, '.quiz-opt');   // 键盘：↑/↓ 移动、空格勾选、回车确认
         document.getElementById('modalFoot').innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">取消</button>';
       } else if (step.inputType) {
         document.getElementById('modalFoot').innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">取消</button><button class="btn btn-primary" id="wizSubmitBtn">\u2713 确认</button>';
