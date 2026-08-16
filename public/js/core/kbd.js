@@ -2,17 +2,29 @@
 // core/kbd.js — PC 键盘导航（无鼠标操作）
 //   setupKbdNav：↑/↓/←/→ 移动光标（.kbd-focus 发光），空格 = 触发点击（选中/放置）
 //   回车：统一走 setupGlobalEnter —— 优先级 回厂区继续 > 知道了再试一次 > 任务主提交
+//   Esc：任务模态打开时 = 关闭任务（等价顶部 ✕ / 右下角「关闭」）；输入框内 & 小游戏内不劫持
 //   输入框（terminal/fill_blank）里回车不劫持，避免与命令提交冲突
 // ═══════════════════════════════════════════════════════════════════
 export function kbdCleanup(){
   try{ if(window.__kbdCleanup){ window.__kbdCleanup(); window.__kbdCleanup=null; } }catch(e){}
 }
 
-// 统一回车确认（全局只挂一次）
+// 统一键盘确认/关闭（全局只挂一次）
 export function setupGlobalEnter(){
   if(window.__globalEnterBound) return;
   window.__globalEnterBound = true;
   window.addEventListener('keydown', function(e){
+    // —— Esc：任务模态里关闭任务（等价顶部 ✕ / 右下角「关闭」）——
+    if(e.key==='Escape'){
+      // 输入框内不劫持（terminal/fill_blank），避免误关任务丢输入
+      const t=e.target;
+      if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+      // 小游戏(.mm-overlay)/游戏专区/游戏房各自有 Esc 逻辑，开着时让游戏自己关，不抢任务模态
+      if(document.querySelector('.mm-overlay') || document.querySelector('.gz-overlay.show, .gr-overlay.show')) return;
+      const m=document.getElementById('modalOverlay');
+      if(m && m.classList.contains('show')){ e.preventDefault(); window.closeTaskModal(); }
+      return;
+    }
     if(e.key!=='Enter') return;
     // 输入框内回车不劫持（terminal/fill_blank 提交命令用）
     const t=e.target;
@@ -51,7 +63,7 @@ export function setupKbdNav(scope, selector, opts){
     if(e.key==='ArrowDown'||e.key==='ArrowRight'){ e.preventDefault(); focus((idx+1)%list.length, true); }
     else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){ e.preventDefault(); focus((idx-1+list.length)%list.length, true); }
     else if(e.key===' '){ if(idx>=0&&list[idx]){ e.preventDefault(); list[idx].click(); } }
-    // 回车交给 setupGlobalEnter 处理（避免与 知道了再试一次/回厂区继续 冲突）
+    // 回车/Esc 交给 setupGlobalEnter 处理（避免与 知道了再试一次/回厂区继续/关闭任务 冲突）
   }
   // 点击/点选项 → 键盘焦点跟过去（触屏虽不显示光圈，但索引同步，键盘/回车仍一致）
   function onDocClick(e){
