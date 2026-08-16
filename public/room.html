@@ -1061,6 +1061,11 @@ function goBack(){
   setTimeout(()=>{ location.href='map_proto.html'; }, 500);
 }
 function enterLevel(id, taskId){
+  // 已通关关卡（无当前任务）：不跳转空白/旧页，留在房间提示——重刷走房间里的发光设备
+  if(!taskId){
+    if(typeof showToast==='function'){ try{ showToast('本层已全部通关 🎉 点发光设备可重刷任务拿满分'); }catch(e){} }
+    return;
+  }
   try{ if(id) sessionStorage.setItem('mapRoom', id); }catch(e){}
   const q=new URLSearchParams();
   if(taskId) q.set('task', taskId);

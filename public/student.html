@@ -13,7 +13,14 @@
 </div></div>
 <script>try{
   var _u=location.search;
-  if(/[?&](task|level|open)=/.test(_u)){
+  var _q=new URLSearchParams(_u);
+  // 旧版学生关卡页已废弃：裸 student.html(无参数) 不再渲染旧页，直接回厂区地图(新版)
+  if(!_q.get('task') && !_q.get('level') && !_q.get('open')){
+    location.replace('map_proto.html');
+  } else if(_q.get('level') && !_q.get('task')){
+    // 旧版"进入关卡"入口已废弃：?level=X → 进该关卡的新版房间，避免 map-flow 空壳/旧页
+    location.replace('room.html?room='+encodeURIComponent(_q.get('level')));
+  } else if(/[?&](task|level|open)=/.test(_u)){
     document.body.classList.add("map-flow");
     var _f=(_u.match(/[?&]open=([^&]+)/)||[])[1];
     var _t=_f==='game'?'游戏专区':_f==='pedia'?'术语图鉴':_f==='leaderboard'?'排行榜':_f==='achievements'?'成就':_f==='wallet'?'工资与商城':(/[?&]task=/.test(_u)?'任务':(/[?&]level=/.test(_u)?'关卡':''));
