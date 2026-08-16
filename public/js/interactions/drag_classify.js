@@ -75,7 +75,7 @@ registerInteraction('drag_classify', {
       shuffled.forEach(name => {
         if (placed[name]) return;
         const div = document.createElement('div');
-        div.className = 'classify-item';
+        div.className = 'classify-item' + (kbdPicked === name ? ' picked' : '');
         div.textContent = name;
         div.draggable = true;
         div.addEventListener('dragstart', e => {
