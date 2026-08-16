@@ -1886,7 +1886,7 @@
        },
        {
         "title": "动手敲命令：禁 ping",
-        "narrative": "厂长：防火墙靠「规则」干活，一条规则就像一张指令单，从左往右念：\n① iptables——调用防火墙工具；\n② -A INPUT——往「入站链 INPUT」加一条（-A=添加；入站=别人发给你的数据）；\n③ -p icmp——针对 icmp 协议（ping 用的就是它）；\n④ --icmp-type echo-request——拦的是 ping 发来的「请求包」（echo-request）；\n⑤ -j DROP——动作是丢弃（DROP=扔掉）。\n拼起来：iptables -A INPUT -p icmp --icmp-type echo-request -j DROP\n意思是：别人从外面 ping 你的请求包，直接扔掉——ping 不通了。",
+        "narrative": "厂长：这条命令由「选项+参数」组成，选项用横线开头。记住规则：单横线 - 是短选项（缩写），双横线 -- 是长选项（完整单词）。\n① iptables——工具名（防火墙）；\n② -A INPUT——-A = Append 追加（短选项），INPUT = 入站链，即「往入站链加一条」；\n③ -p icmp——-p = protocol 协议（短选项），icmp 是 ping 用的协议，即「针对 ICMP 协议」；\n④ --icmp-type echo-request——--icmp-type 是长选项（完整单词，所以双横线），指定 ICMP 包的类型；echo-request = 请求包，即「拦的是 ping 的请求」；\n⑤ -j DROP——-j = jump 跳转（短选项，指采取什么动作），DROP = 丢弃。\n拼起来：iptables -A INPUT -p icmp --icmp-type echo-request -j DROP\n= 别人从外面 ping 你，请求包在入站时直接丢掉。",
         "question": "在终端输入命令，禁止外部 ping 本机：",
         "inputType": "command",
         "correctCommand": "iptables -A INPUT -p icmp --icmp-type echo-request -j DROP",
