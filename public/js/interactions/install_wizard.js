@@ -5,7 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
-import { showWrongExplain } from '../core/fx.js';
+import { showWrongExplain, addDirectorBox } from '../core/fx.js';
 import { setupKbdNav, kbdCleanup } from '../core/kbd.js';
 
 registerInteraction('install_wizard', {
@@ -22,7 +22,8 @@ registerInteraction('install_wizard', {
         <div class="wizard-steps" id="wizardSteps"></div>
         <div class="prog-bar-bg"><div class="prog-bar-fill" id="wizardFill"></div></div>
       </div>
-      <div id="wizardStage" style="margin-top:12px"></div>
+      <div id="wizTeach" style="margin-bottom:8px"></div>
+      <div id="wizardStage" style="margin-top:4px"></div>
     `;
 
     function updateProgress() {
@@ -354,6 +355,11 @@ registerInteraction('install_wizard', {
       renderStep();
     };
 
+    // A方案：向导顶部加"综合气泡"（完整教学收起醒目、可展开查看，做题忘了可查）
+    const _teachEl = document.getElementById('wizTeach');
+    if (_teachEl && window.generateTeach) {
+      addDirectorBox(_teachEl, window.generateTeach(task), null, 'guide', { collapsed: true });
+    }
     renderStep();
   }
 });
