@@ -4825,7 +4825,7 @@
         "question": "Profibus/Modbus RTU 这类串行总线，用的连接器是？",
         "options": [
          "DB9",
-         {"text": "M12", "explain": "M12 是恶劣环境用的圆形接头，老串行总线用的是 9 针带螺丝的"},
+         {"text": "M12", "explain": "M12 是圆形、IP67 防尘防水的工业接头，主打户外/潮湿/振动等恶劣环境；本题问的老串行总线（Profibus DP / Modbus RTU）经典标配是 9 针 D 型（DB9）接头、螺丝锁固"},
          {"text": "RJ45", "explain": "RJ45 是以太网接头，串行总线不走它"},
          {"text": "光纤 SC", "explain": "光纤 SC 是光口，老串行总线用铜线 9 针"}
         ],
