@@ -82,18 +82,18 @@ registerInteraction('sort', {
     // 键盘重排：空格拿起/放下，↑/↓ 移动（无选中时移动光标）
     function setupSortKbd(area){
       kbdCleanup();
-      const isTouch = !!(matchMedia && matchMedia('(pointer:coarse)').matches);   // 触屏不显示焦点光圈
       const items=()=>[...area.querySelectorAll('.sort-item')];
       let idx=-1, picked=null;
-      function focus(i){
+      function focus(i, show){
         idx=i;
-        if(isTouch) return;
-        items().forEach((el,k)=>el.classList.toggle('kbd-focus', k===i));
+        const list=items();
+        list.forEach(el=>el.classList.remove('kbd-focus'));
+        if(show && list[i]) list[i].classList.add('kbd-focus');   // 键盘导航才显示光圈
       }
       function move(dir){
         const list=items();
         if(!list.length) return;
-        if(picked===null){ idx=(idx+dir+list.length)%list.length; focus(idx); }
+        if(picked===null){ focus((idx+dir+list.length)%list.length, true); }
         else{
           const cur=list.indexOf(picked);
           const to=cur+dir;
@@ -120,7 +120,7 @@ registerInteraction('sort', {
         // 回车交给全局回车（检查顺序）
       }
       window.addEventListener('keydown', onKey);
-      if(items().length) focus(0);
+      if(items().length) focus(0, false);   // 初始不显示光圈
       window.__kbdCleanup=function(){ window.removeEventListener('keydown', onKey); };
     }
     setupSortKbd(area);
