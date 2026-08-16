@@ -4148,16 +4148,16 @@
         "teach": "EtherNet/IP 是北美的「新厂标配」：CIP 协议（显式/隐式消息），罗克韦尔生态。记住：北美=CIP=EtherNet/IP。"
        },
        {
-        "question": "八大协议里，哪两个是「重中之重」（有实战、市场占有率高）？",
+        "question": "八大协议里，哪三个是「重中之重」（有实战、市场占有率高）？",
         "options": [
-         "Modbus 和 ProfiNet",
-         {"text": "Powerlink 和 DeviceNet", "explain": "这两类了解定位即可，不是有实战的重中之重"},
-         {"text": "EtherCAT 和 CC-Link", "explain": "EtherCAT/CC-Link 掌握特点即可，教材把它俩归为第二梯队"},
-         {"text": "EtherNet/IP 和 Profibus", "explain": "这两个是了解定位，不是教材的实战重点"}
+         "Modbus / ProfiNet / EtherCAT",
+         {"text": "Powerlink / DeviceNet / Profibus", "explain": "这三类了解定位即可，不是有实战的重中之重"},
+         {"text": "CC-Link / Profibus / Powerlink", "explain": "CC-Link 掌握特点、其余了解定位，教材不把它们列为实战重点"},
+         {"text": "EtherNet/IP / CC-Link / DeviceNet", "explain": "EtherNet/IP 了解定位、CC-Link 掌握特点、DeviceNet 了解定位——都不是实战重点"}
         ],
         "answer": 0,
-        "hint": "教材学习策略：Modbus、ProfiNet 重中之重（有实战、市场占有率高）",
-        "teach": "八大协议不用全背：Modbus 和 ProfiNet 是重中之重（有实战、市场大），EtherCAT、CC-Link 掌握特点，其余（Powerlink/DeviceNet/EtherNet/IP/Profibus）了解定位就行。"
+        "hint": "教材学习策略：Modbus、ProfiNet、EtherCAT 重中之重（有实战、市场占有率高、运动控制事实标准）",
+        "teach": "八大协议不用全背：Modbus、ProfiNet、EtherCAT 是重中之重（有实战、市场大、运动控制事实标准）；CC-Link 掌握特点；其余（Powerlink/DeviceNet/EtherNet/IP/Profibus）了解定位就行。"
        }
       ]
      },
