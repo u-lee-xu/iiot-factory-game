@@ -1200,6 +1200,12 @@ const ROOM_VIEW={workshop:'top',edge_cabinet:'top',control_room:'top',console:'t
   data_pipe:'side',big_screen:'side',cloud_platform:'top',ai_lab:'top'};
 const TASK_ICON={install_wizard:'🖥️',terminal:'⌨️',chain_quiz:'💬',quiz:'💬',fill_blank:'✍️',sort:'🔀',diagnosis_tree:'🩺',progress_bar:'📊',scenario_match:'🔗',code_review:'📝',ethics:'⚖️',drag_classify:'🗂️',boss_fight:'💥'};
 function openRoom(id){
+  // 锁定检查：前置关卡未完成 → 提示不进入（锁着的房间不能点进去）
+  const _idx=content.levels.findIndex(l=>String(l.id)===String(id));
+  if(_idx>0 && !levelProgress(content.levels[_idx-1]).completed){
+    if(typeof showToast==='function'){ showToast('🔒 先完成「'+content.levels[_idx-1].areaName+'」才能解锁'); }
+    return;
+  }
   // 房间已拆分为独立页面 room.html：地图点建筑 → 带过场进入房间
   const lv2=content&&content.levels&&content.levels.find(l=>l.id==id);
   goPage('room.html?room='+id, (lv2&&lv2.areaName)||'车间');
