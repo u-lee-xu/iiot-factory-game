@@ -345,7 +345,7 @@ body{min-height:100dvh;min-height:100vh;overflow-x:hidden}
 @media (min-width:1100px){
   .room-panel{width:min(1560px,96vw)}
   .sx-scene{height:660px;margin:0 20px 14px}
-  .room-scene{height:600px;margin:0 20px 14px}
+  .room-scene{height:calc(100dvh - 138px);min-height:480px;margin:0 20px 14px}
 }
 /* 纵版房间：竖直滚轴 */
 .vx-scene{position:relative;margin:0 18px 12px;border-radius:2px;overflow:hidden;border:10px solid #2c2a48;box-shadow:inset 0 0 0 2px #141222,0 4px 0 rgba(0,0,0,.4);background:#0a0e22;touch-action:none}
@@ -677,7 +677,13 @@ function rsStart(){
     const st=scene.querySelector('.rs-stairs.open');
     if(near(st)){ nextRoomFloor(); return; }
   }
+  // 任务模态打开时暂停房间键盘（避免吞掉任务输入框里的空格/方向键）
+  function _roomKbdOn(){
+    const _m=document.getElementById('modalOverlay');
+    return !(_m && _m.classList.contains('show'));
+  }
   function rsKd(e){
+    if(!_roomKbdOn()) return;   // 任务模态打开时不响应
     if(e.key==='ArrowUp'||e.key==='w'){ rsKeys.up=true; e.preventDefault(); }
     else if(e.key==='ArrowDown'||e.key==='s'){ rsKeys.down=true; e.preventDefault(); }
     else if(e.key==='ArrowLeft'||e.key==='a'){ rsKeys.left=true; e.preventDefault(); }
@@ -736,10 +742,18 @@ function rsStart(){
       moving=true;
       setDir(kdx,kdy);
     } else {
-      // 点设备：先寻路到设备，沿路径走，到跟前自动进任务
-      if(rsGo && !navPath){ navPath=findPath(px,py, rsGo.x, rsGo.y); }
+      // 点设备/门/楼梯：先寻路走过去，到跟前自动触发；门/楼梯不可达则取消不原地跳转
+      if(rsGo && !navPath){
+        navPath=findPath(px,py, rsGo.x, rsGo.y);
+        if(!navPath && rsGo.kind){ rsGo=null; try{ showToast('门口被挡，过不去'); }catch(e){} }
+      }
       const arrived=stepAlong();
-      if(arrived && rsGo){ const _l=rsGo.lvId, _t=rsGo.taskId; rsGo=null; navPath=null; tx=null; ty=null; enterLevel(_l,_t); /* 不return：保持帧循环续帧，关闭任务后可再次进入 */ }
+      if(arrived && rsGo){
+        const _g=rsGo; rsGo=null; navPath=null; tx=null; ty=null;
+        if(_g.kind==='exit'){ goBack(); }
+        else if(_g.kind==='stairs'){ nextRoomFloor(); }
+        else { enterLevel(_g.lvId, _g.taskId); }
+      }
       if(arrived){ tx=null; ty=null; navPath=null; }
       moving = !!(navPath && navPath.length);
       if(moving){ ldx=navPath[0].x-px; ldy=navPath[0].y-py; setDir(ldx, ldy); }
@@ -767,6 +781,24 @@ function rsStop(){
   if(rsLoop){ cancelAnimationFrame(rsLoop); rsLoop=null; }
   rsGo=null; tx=null; ty=null;
   try{ if(window.__rsKeys){ window.removeEventListener('keydown', window.__rsKeys.rsKd); window.removeEventListener('keyup', window.__rsKeys.rsKu); window.__rsKeys=null; } }catch(e){}
+}
+
+// 点门/楼梯：小人走过去，到门边才跳转（不点立即跳）
+function rsGoExit(){
+  const el=document.querySelector('.rs-exit'); if(!el) return;
+  rsGo={x:el.offsetLeft+el.offsetWidth/2, y:el.offsetTop+el.offsetHeight/2, kind:'exit'};
+}
+function rsGoStairs(){
+  const el=document.querySelector('.rs-stairs.open'); if(!el) return;
+  rsGo={x:parseFloat(el.style.left)+22, y:parseFloat(el.style.top)+22, kind:'stairs'};
+}
+function sxGoExit(){
+  const el=document.getElementById('sxDoorExit'); if(!el) return;
+  sxGo={x:parseFloat(el.style.left)+25, y:parseFloat(el.style.top)+21, kind:'exit'};
+}
+function vxGoExit(){
+  const el=document.getElementById('vxDoorExit'); if(!el) return;
+  vxGo={x:parseFloat(el.style.left)+20, y:parseFloat(el.style.top)+20};
 }
 
 function roomGoTask(lvId, taskId, el){
@@ -884,7 +916,10 @@ function sxStart(){
         // 设备在平台上且玩家还在下面 → 自动跳上去
         if(sxGo.platY && onGround && y > sxGo.platY-46){ vy=jumpV; onGround=false; }
         const dy=Math.abs((y+17)-sxGo.y);
-        if(dy<34){ const _l=sxGo.lvId, _t=sxGo.taskId; sxGo=null; moveTarget=null; enterLevel(_l,_t); /* 不return：保持帧循环续帧 */ }
+        if(dy<34){ const _g=sxGo; sxGo=null; moveTarget=null;
+          if(_g.kind==='exit'){ goBack(); }
+          else { enterLevel(_g.lvId, _g.taskId); }
+        }
       }
     }
     // 键盘方向优先，按方向键清除点击目标
@@ -904,6 +939,8 @@ function sxStart(){
       if(x+5<ob.x+ob.w && x+19>ob.x){
         // 人物脚低于障碍物顶（没跳过）→ 挡住
         if(feetY > ob.y+6){
+          // 正在走向目标(门/任务设备)：自动跳越地面障碍物
+          if(sxGo && onGround){ vy=jumpV; onGround=false; continue; }
           // 回退到障碍物边缘
           if(x+5 < ob.x+ob.w && x+19 > ob.x){
             const fromLeft = oldX <= ob.x;
@@ -962,6 +999,7 @@ function sxStart(){
     // 不在可交互物旁：不跳跃（↑/↓ 仅用于进入/出门）
   }
   function kd(e){
+    if(!_roomKbdOn()) return;   // 任务模态打开时不响应
     if(e.key==='ArrowLeft'||e.key==='a'){ keys.left=true; e.preventDefault(); }
     if(e.key==='ArrowRight'||e.key==='d'){ keys.right=true; e.preventDefault(); }
     if(e.key==='ArrowUp'||e.key==='ArrowDown'){ e.preventDefault(); tryEnterNearTaskOrExit(); return; }
@@ -1005,7 +1043,7 @@ function sxStart(){
   }
 }
 
-let vxGame=null, vxKeys=null;
+let vxGame=null, vxKeys=null, vxGo=null;
 function vxStart(){
   const scene=document.getElementById('vxScene');
   const stage=document.getElementById('vxStage');
@@ -1032,6 +1070,14 @@ function vxStart(){
   function frame(){
     if(keys.left) x-=speed;
     if(keys.right) x+=speed;
+    if(keys.left||keys.right){ vxGo=null; }   // 手动移动取消门导航
+    // 点门：自动走到门口，落地后触发返回
+    if(vxGo && !keys.left && !keys.right){
+      const vx_dx=vxGo.x-(x+12);
+      if(Math.abs(vx_dx)>6){ x+=Math.sign(vx_dx)*speed; }
+      const vx_dy=Math.abs((vxGo.y||0)-(y+17));
+      if(Math.abs(vx_dx)<=10 && vx_dy<45 && onGround){ vxGo=null; goBack(); }
+    }
     if(keys.jump&&onGround){ vy=jumpV; onGround=false; }
     vy+=g; y+=vy;
     if(y+ph>=groundTop){ y=groundTop-ph; vy=0; onGround=true; }
@@ -1070,6 +1116,7 @@ function vxStart(){
     }
   }
   function kd(e){
+    if(!_roomKbdOn()) return;   // 任务模态打开时不响应
     if(e.key==='ArrowLeft'||e.key==='a'){ keys.left=true; e.preventDefault(); }
     if(e.key==='ArrowRight'||e.key==='d'){ keys.right=true; e.preventDefault(); }
     if(e.key===' '){ keys.jump=true; e.preventDefault(); }
@@ -1160,8 +1207,19 @@ function renderRoom(id){
   const flrDone = ft.length>0 && ft.every(t=>isTaskDone(t.id));
   const hasNext = fi < flrTasks.length-1;
   // 俯视建筑：外轮廓墙 + 内部隔成 2-3 间小房间（内墙带门洞），任务设备分布各房间
-  const WT=12, WB=12, WV=16, DH=96, ROOM_W=330, ROOM_H=430;
+  const WT=12, WB=12, WV=16, DH=96;
   const nRoom = Math.max(2, Math.min(3, Math.ceil(ft.length/2)));   // 2~3 间房
+  // PC 大屏：俯视场景撑满视口、房间尺寸随之适配，避免右侧/下方留白
+  const isPCLarge = !!(window.matchMedia && window.matchMedia('(min-width:1100px)').matches);
+  const _headH = ((document.querySelector('.room-head')||{}).offsetHeight)||75;
+  const _availH = Math.max(430, window.innerHeight - _headH - 40);
+  const _availW = Math.max(760, (document.body.clientWidth||window.innerWidth) - 46);
+  let ROOM_W, ROOM_H;
+  if (isPCLarge) {
+    ROOM_W = Math.max(300, Math.round((_availW - WV*(nRoom+1)) / nRoom));
+    ROOM_H = Math.max(430, Math.round(_availH - WT - WB));
+  } else { ROOM_W = 330; ROOM_H = 430; }
+  window._rsSceneH = isPCLarge ? (ROOM_H + WT + WB + 20) : 0;   // 俯视 scene 高度（PC 含边框，JS 精确覆盖 CSS）
   const perRoom = Math.max(2, Math.ceil(ft.length / nRoom));          // 动态每间任务数，避免任务数超过容量导致越界
   const rooms=[];
   for(let ri=0;ri<nRoom;ri++) rooms.push({x:WV + ri*(ROOM_W+WV), w:ROOM_W});
@@ -1204,7 +1262,7 @@ function renderRoom(id){
   // 楼梯：放最后一间房间右侧
   const stairsCls = (flrDone&&hasNext)?'open':'locked';
   const lastRoom=rooms[nRoom-1];
-  const stairsHTML = hasNext ? `<div class="rs-stairs ${stairsCls}" style="left:${lastRoom.x+ROOM_W-70}px;top:${WT+ROOM_H-80}px" ${flrDone&&hasNext?'onclick="nextRoomFloor()"':''}>🪜</div>` : '';
+  const stairsHTML = hasNext ? `<div class="rs-stairs ${stairsCls}" style="left:${lastRoom.x+ROOM_W-70}px;top:${WT+ROOM_H-80}px" ${flrDone&&hasNext?'onclick="rsGoStairs()"':''}>🪜</div>` : '';
   window._rtRoom={stageW:stageW, stageH:stageH, rooms:rooms, nRoom:nRoom};
   const doneCnt=ft.filter(t=>isTaskDone(t.id)).length;
   const viewType = ROOM_VIEW[lv.factoryArea]||'top';
@@ -1250,7 +1308,7 @@ function renderRoom(id){
       <div class="sx-stage" id="sxStage" style="width:${stageW}px">
         <div class="sx-ground"></div>${propHTML}${platHTML}${taskElsHTML}
         <div class="sx-stairs" id="sxStairs"></div>
-        <div class="sx-door-exit" id="sxDoorExit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
+        <div class="sx-door-exit" id="sxDoorExit" onclick="sxGoExit()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
         <div class="sx-player" id="sxPlayer">
           <span class="pl hair"></span>
           <span class="pl face"></span><span class="pl eye"></span>
@@ -1287,7 +1345,7 @@ function renderRoom(id){
         <div class="sx-ground"></div>
         ${vPlats}
         ${vTasks}
-        <div class="sx-door-exit" id="vxDoorExit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
+        <div class="sx-door-exit" id="vxDoorExit" onclick="vxGoExit()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
         <div class="sx-player" id="vxPlayer">
           <span class="pl hair"></span><span class="pl face"></span><span class="pl eye"></span>
           <span class="pl body"></span><span class="pl belt"></span>
@@ -1302,7 +1360,7 @@ function renderRoom(id){
     </div>`;
   } else {
     // 俯视工坊风：墙+地板+家具+任务设备
-    sceneHTML = `<div class="room-scene" id="rsScene">
+    sceneHTML = `<div class="room-scene" id="rsScene" style="${window._rsSceneH?'height:'+window._rsSceneH+'px':''}">
       <div class="rs-stage" id="rsStage" style="width:${window._rtRoom.stageW}px;height:${window._rtRoom.stageH}px">
         <div class="rs-floor" id="rsFloor"></div>
         <div class="rs-wall t"></div><div class="rs-wall b"></div>
@@ -1313,7 +1371,7 @@ function renderRoom(id){
         ${ftHTML}
         ${stairsHTML}
         <div class="rs-npc">👷</div>
-        <div class="rs-exit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
+        <div class="rs-exit" onclick="rsGoExit()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
                 <div class="rs-player" id="rsPlayer"><canvas width="20" height="20"></canvas></div>
       </div>
     </div>`;

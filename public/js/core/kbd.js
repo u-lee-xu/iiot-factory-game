@@ -58,6 +58,10 @@ export function setupKbdNav(scope, selector, opts){
     }
   }
   function onKey(e){
+    // 输入框/下拉内不劫持（terminal/install_wizard 命令输入的空格、终端历史方向键、select 切换）：
+    // 焦点在 INPUT/TEXTAREA/SELECT/contentEditable 时，空格/方向键交给文本编辑与原生行为
+    const _t=e.target;
+    if(_t && (_t.tagName==='INPUT'||_t.tagName==='TEXTAREA'||_t.tagName==='SELECT'||_t.isContentEditable)) return;
     const list=items();
     if(!list.length) return;
     if(e.key==='ArrowDown'||e.key==='ArrowRight'){ e.preventDefault(); focus((idx+1)%list.length, true); }
