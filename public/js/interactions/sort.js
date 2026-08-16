@@ -82,11 +82,13 @@ registerInteraction('sort', {
     // 键盘重排：空格拿起/放下，↑/↓ 移动（无选中时移动光标）
     function setupSortKbd(area){
       kbdCleanup();
+      const isTouch = !!(matchMedia && matchMedia('(pointer:coarse)').matches);   // 触屏不显示焦点光圈
       const items=()=>[...area.querySelectorAll('.sort-item')];
       let idx=-1, picked=null;
       function focus(i){
-        items().forEach((el,k)=>el.classList.toggle('kbd-focus', k===i));
         idx=i;
+        if(isTouch) return;
+        items().forEach((el,k)=>el.classList.toggle('kbd-focus', k===i));
       }
       function move(dir){
         const list=items();

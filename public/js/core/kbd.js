@@ -33,9 +33,12 @@ export function setupKbdNav(scope, selector, opts){
   kbdCleanup();   // 先清旧监听（任务切换时）
   setupGlobalEnter();   // 确保全局回车已挂
   const cfg = opts || {};
+  const isTouch = !!(matchMedia && matchMedia('(pointer:coarse)').matches);   // 触屏：不显示键盘焦点光圈（避免与点击高亮叠加）
   let idx = -1;
   function items(){ return [...(scope||document).querySelectorAll(selector)]; }
   function focus(i){
+    idx = i;
+    if(isTouch) return;
     const list=items();
     list.forEach((el,k)=>{ if(el){ el.classList.toggle('kbd-focus', k===i); } });
     if(list[i]){ try{ list[i].scrollIntoView({block:'nearest'}); }catch(e){} }
@@ -43,13 +46,28 @@ export function setupKbdNav(scope, selector, opts){
   function onKey(e){
     const list=items();
     if(!list.length) return;
-    if(e.key==='ArrowDown'||e.key==='ArrowRight'){ e.preventDefault(); idx=(idx+1)%list.length; focus(idx); }
-    else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){ e.preventDefault(); idx=(idx-1+list.length)%list.length; focus(idx); }
+    if(e.key==='ArrowDown'||e.key==='ArrowRight'){ e.preventDefault(); focus((idx+1)%list.length); }
+    else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){ e.preventDefault(); focus((idx-1+list.length)%list.length); }
     else if(e.key===' '){ if(idx>=0&&list[idx]){ e.preventDefault(); list[idx].click(); } }
     // 回车交给 setupGlobalEnter 处理（避免与 知道了再试一次/回厂区继续 冲突）
   }
+  // 点击/点选项 → 键盘焦点跟过去（触屏虽不显示光圈，但索引同步，键盘/回车仍一致）
+  function onDocClick(e){
+    const t=e.target;
+    if(!t||!t.closest) return;
+    const it=t.closest(selector);
+    if(it && scope && scope.contains(it)){
+      const list=items();
+      const i=list.indexOf(it);
+      if(i>=0) focus(i);
+    }
+  }
+  document.addEventListener('click', onDocClick, true);
   window.addEventListener('keydown', onKey);
   const list=items();
-  if(list.length){ focus(0); idx=0; }
-  window.__kbdCleanup = function(){ window.removeEventListener('keydown', onKey); };
+  if(list.length){ focus(0); }
+  window.__kbdCleanup = function(){
+    window.removeEventListener('keydown', onKey);
+    document.removeEventListener('click', onDocClick, true);
+  };
 }
