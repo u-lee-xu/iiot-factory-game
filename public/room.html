@@ -347,6 +347,10 @@ body{min-height:100dvh;min-height:100vh;overflow-x:hidden}
   .sx-scene{height:660px;margin:0 20px 14px}
   .room-scene{height:600px;margin:0 20px 14px}
 }
+/* 纵版房间：竖直滚轴 */
+.vx-scene{position:relative;margin:0 18px 12px;border-radius:2px;overflow:hidden;border:10px solid #2c2a48;box-shadow:inset 0 0 0 2px #141222,0 4px 0 rgba(0,0,0,.4);background:#0a0e22;touch-action:none}
+.vx-stage{position:absolute;top:0;left:0;will-change:transform}
+.vx-plat{position:absolute;height:14px;background:#5a3a2a;border:3px solid #3a2418;border-radius:2px;box-shadow:0 3px 0 rgba(0,0,0,.4),0 0 10px rgba(255,179,64,.15)}
 </style>
 </head>
 <body>
@@ -398,7 +402,7 @@ const RS_SPRITES={ "S_0": ["....................", ".......HHhHHH.......", "....
 const RS_COLORS={'H':'#4a3524','h':'#2a1d12','B':'#3d6bd4','b':'#2a4aa0','K':'#e8c090','s':'#2f2f38','L':'#3a2a55','X':'#14141f'};
 
 const ROOM_VIEW={workshop:'top',edge_cabinet:'top',control_room:'top',console:'top',
-  data_pipe:'side',big_screen:'side',cloud_platform:'top',ai_lab:'top'};
+  data_pipe:'side',big_screen:'vert',cloud_platform:'top',ai_lab:'top'};
 
 const TASK_ICON={install_wizard:'🖥️',terminal:'⌨️',chain_quiz:'💬',quiz:'💬',fill_blank:'✍️',sort:'🔀',diagnosis_tree:'🩺',progress_bar:'📊',scenario_match:'🔗',code_review:'📝',ethics:'⚖️',drag_classify:'🗂️',boss_fight:'💥'};
 // 任务图标：按标题关键词关联具体内容，比纯类型图标更贴合
@@ -963,6 +967,100 @@ function sxStart(){
   }
 }
 
+let vxGame=null, vxKeys=null;
+function vxStart(){
+  const scene=document.getElementById('vxScene');
+  const stage=document.getElementById('vxStage');
+  const player=document.getElementById('vxPlayer');
+  if(!scene||!stage||!player) return;
+  let H=scene.clientHeight;
+  if(!H||H<180){ setTimeout(()=>{ try{ vxStop(); vxStart(); }catch(e){} }, 120); return; }
+  const groundH=58, groundTop=stage.clientHeight-groundH;
+  const ph=38, g=0.46, speed=4.6;
+  const jumpV=-Math.sqrt(2*g*360);   // 跳高约 360px，能爬上平台
+  let x=Math.round(scene.clientWidth/2-16), y=groundTop-ph, vy=0, onGround=true;
+  const keys={left:false,right:false,jump:false};
+  const taskEls=[].slice.call(scene.querySelectorAll('.vx-stage .sx-task'));
+  const plats=[]; scene.querySelectorAll('.vx-plat').forEach(p=>{
+    plats.push({x:parseFloat(p.style.left)||0, y:parseFloat(p.style.top)||0, w:parseFloat(p.style.width)||170});
+  });
+  const doorEl=document.getElementById('vxDoorExit');
+  if(doorEl){ doorEl.style.left='40px'; doorEl.style.top=(groundTop-48)+'px'; }   // 门在底部左侧，出生点在中心，互不遮挡
+  const stageH=stage.clientHeight, rw=scene.clientWidth;
+  let camY=0;
+  // 人物位置恢复
+  try{ const pp=JSON.parse(sessionStorage.getItem('roomPlayerPos')||'null');
+    if(pp&&pp.view==='vx'&&String(pp.roomId)===String(currentRoomId)&&pp.x>0&&pp.y>0){ x=pp.x; y=pp.y; } }catch(e){}
+  function frame(){
+    if(keys.left) x-=speed;
+    if(keys.right) x+=speed;
+    if(keys.jump&&onGround){ vy=jumpV; onGround=false; }
+    vy+=g; y+=vy;
+    if(y+ph>=groundTop){ y=groundTop-ph; vy=0; onGround=true; }
+    for(const p of plats){
+      if(vy>=0 && x+5<p.x+p.w && x+19>p.x && y+ph>=p.y-6 && y+ph<=p.y+22){ y=p.y-ph; vy=0; onGround=true; }
+    }
+    x=Math.max(6, Math.min(x, stage.clientWidth-30));
+    player.style.left=x+'px'; player.style.top=y+'px';
+    player.classList.toggle('walk', keys.left||keys.right);
+    // 摄像机：纵向跟随
+    const target=Math.max(0, Math.min(y-H*0.55, stageH-H));
+    camY+=(target-camY)*0.12;
+    stage.style.transform='translateY('+(-camY)+'px)';
+    taskEls.forEach(el=>{
+      const tx=parseFloat(el.style.left)+23, ty=parseFloat(el.style.top)+20;
+      const dx=Math.abs(tx-(x+12)), dy=Math.abs(ty-(y+17));
+      el.classList.toggle('near', dx<64&&dy<74);
+    });
+    vxGame=requestAnimationFrame(frame);
+  }
+  vxGame=requestAnimationFrame(frame);
+  function vxTryEnter(){
+    for(const el of taskEls){
+      const tx=parseFloat(el.style.left)+23, ty=parseFloat(el.style.top)+20;
+      const dx=Math.abs(tx-(x+12)), dy=Math.abs(ty-(y+17));
+      if(dx<64&&dy<74){
+        if(el.classList.contains('locked')){ if(typeof showToast==='function'){ try{ showToast('先完成前置任务再解锁'); }catch(e){} } return; }
+        const lvId=el.getAttribute('data-lv'), taskId=el.getAttribute('data-task');
+        if(lvId&&taskId) enterLevel(lvId, taskId);
+        return;
+      }
+    }
+    if(doorEl){
+      const ddx=parseFloat(doorEl.style.left)||0, ddy=parseFloat(doorEl.style.top)||0;
+      if(Math.abs(ddx+23-(x+12))<70 && Math.abs(ddy+23-(y+17))<70){ goBack(); return; }
+    }
+  }
+  function kd(e){
+    if(e.key==='ArrowLeft'||e.key==='a'){ keys.left=true; e.preventDefault(); }
+    if(e.key==='ArrowRight'||e.key==='d'){ keys.right=true; e.preventDefault(); }
+    if(e.key===' '){ keys.jump=true; e.preventDefault(); }
+    if(e.key==='ArrowUp'||e.key==='ArrowDown'){ e.preventDefault(); vxTryEnter(); }
+  }
+  function ku(e){
+    if(e.key==='ArrowLeft'||e.key==='a') keys.left=false;
+    if(e.key==='ArrowRight'||e.key==='d') keys.right=false;
+    if(e.key===' ') keys.jump=false;
+  }
+  window.addEventListener('keydown',kd); window.addEventListener('keyup',ku);
+  vxKeys={kd,ku};
+  scene.querySelectorAll('.sx-btn').forEach(b=>{
+    const k=b.getAttribute('data-k');
+    const dn=ev=>{ ev.preventDefault(); keys[k]=true; };
+    const up=ev=>{ ev.preventDefault(); keys[k]=false; };
+    b.addEventListener('pointerdown',dn); b.addEventListener('pointerup',up);
+    b.addEventListener('pointerleave',up); b.addEventListener('pointercancel',up);
+  });
+}
+function vxStop(){
+  if(vxGame){ cancelAnimationFrame(vxGame); vxGame=null; }
+  try{ if(vxKeys){ window.removeEventListener('keydown', vxKeys.kd); window.removeEventListener('keyup', vxKeys.ku); vxKeys=null; } }catch(e){}
+}
+function vxGoTask(lvId, taskId, el){
+  if(el.getAttribute('data-locked')==='1'){ if(typeof showToast==='function'){ try{ showToast('先完成前置任务再解锁'); }catch(e){} } return; }
+  try{ sessionStorage.setItem('roomPlayerPos', JSON.stringify({roomId:currentRoomId, floor:window._roomFlr||0, x:parseFloat(el.style.left)+20, y:parseFloat(el.style.top)+20, view:'vx'})); }catch(e){}
+  enterLevel(lvId, taskId);
+}
 function sxStop(){
   if(sxGame){ cancelAnimationFrame(sxGame); sxGame=null; }
   if(sxKeys){ window.removeEventListener('keydown',sxKeys.kd); window.removeEventListener('keyup',sxKeys.ku); sxKeys=null; }
@@ -1129,6 +1227,41 @@ function renderRoom(id){
         <button class="sx-btn" data-k="left">◀</button><button class="sx-btn" data-k="jump">▲</button><button class="sx-btn" data-k="right">▶</button></div></div>
       <div class="sx-rotate">📱 建议横屏游玩</div>
     </div>`;
+  } else if(viewType==='vert'){
+    // 纵版：竖直滚轴房间（往上跳爬塔），任务在不同高度的平台上；支持键盘+触摸
+    const vxW = Math.max(560, Math.min(780, window.innerWidth*0.5));
+    const vxH = 2600;
+    const platGap = 260;
+    const baseX = Math.round(vxW/2 - 60);
+    let vPlats='', vTasks='';
+    ft.forEach((t,i)=>{
+      const done=isTaskDone(t.id), next=(!done&&t===cur);
+      const cls=done?'done':(next?'next':'locked');
+      const platTop = vxH - 90 - (i+1)*platGap;   // 平台从下往上递增高度
+      vTasks+=`<div class="sx-task ${cls}" style="left:${baseX}px;top:${platTop-46}px" data-lv="${lv.id}" data-task="${t.id}" onclick="vxGoTask('${lv.id}','${t.id}',this)" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}" ${cls==='locked'?'data-locked="1"':''}>
+        <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>${next?'<span class="rt-arrow">▲</span>':''}
+      </div>`;
+      vPlats+=`<div class="vx-plat" style="left:${baseX-24}px;top:${platTop}px;width:170px"></div>`;
+    });
+    sceneHTML=`<div class="vx-scene" id="vxScene" style="height:${Math.max(480, Math.min(680, window.innerHeight*0.62))}px">
+      <div class="sx-bg"></div><div class="sx-sky"></div><div class="sx-ceil"></div>
+      <div class="vx-stage" id="vxStage" style="height:${vxH}px;width:${vxW}px">
+        <div class="sx-ground"></div>
+        ${vPlats}
+        ${vTasks}
+        <div class="sx-door-exit" id="vxDoorExit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
+        <div class="sx-player" id="vxPlayer">
+          <span class="pl hair"></span><span class="pl face"></span><span class="pl eye"></span>
+          <span class="pl body"></span><span class="pl belt"></span>
+          <span class="pl arm l"></span><span class="pl hand l"></span>
+          <span class="pl arm r"></span><span class="pl hand r"></span>
+          <span class="pl leg l"></span><span class="pl boot l"></span>
+          <span class="pl leg r"></span><span class="pl boot r"></span>
+        </div>
+      </div>
+      <div class="sx-hud"><div class="sx-hint">←→ 移动 · <b>空格/▲</b> 跳 · 站图标旁 <b>↑</b> 进任务</div><div class="sx-btns">
+        <button class="sx-btn" data-k="left">◀</button><button class="sx-btn" data-k="jump">▲</button><button class="sx-btn" data-k="right">▶</button></div></div>
+    </div>`;
   } else {
     // 俯视工坊风：墙+地板+家具+任务设备
     sceneHTML = `<div class="room-scene" id="rsScene">
@@ -1170,6 +1303,7 @@ function renderRoom(id){
   room.classList.add('show');
   if(viewType==='side'){ sxStop(); setTimeout(()=>sxStart(),60); }
   if(viewType==='top'){ rsStop(); setTimeout(()=>rsStart(),60); }
+  if(viewType==='vert'){ vxStop(); setTimeout(()=>vxStart(),60); }
 }
 
 function nextRoomFloor(){ if(typeof window._roomFlr==='number') window._roomFlr++; renderRoom(currentRoomId); }
