@@ -3,7 +3,7 @@
 // 拆自 app.js；import core/*，其余公共函数经 window
 // ═══════════════════════════════════════════════════════════════════
 import { registerInteraction } from '../core/interactions.js';
-import { taskXP } from '../core/utils.js';
+import { taskXP, escHtml } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
 import { setupKbdNav } from '../core/kbd.js';
@@ -16,8 +16,10 @@ registerInteraction('quiz', {
     const teachText = window.generateTeach(task);
     container.innerHTML = `
       <div class="quiz-question" id="quizQ" style="opacity:0.3;font-size:15px;color:var(--fg);padding:6px 0;font-weight:600;transition:opacity .5s"></div>
+      ${cfg.hint ? '<div id="quizHint" style="background:rgba(255,179,64,.06);border-left:3px solid var(--amber);padding:8px 12px;border-radius:4px;margin:6px 0 10px;font-size:13px;line-height:1.6;color:var(--text);opacity:0.3;transition:opacity .5s"><span style="color:var(--amber);font-weight:bold">💡 厂长提示：</span>' + escHtml(cfg.hint) + '</div>' : ''}
       <div class="quiz-options" id="quizOpts" style="opacity:0.3;margin-top:0;transition:opacity .5s"></div>
     `;
+    if (cfg.hint) { const _h=document.getElementById('quizHint'); if(_h) setTimeout(()=>{ _h.style.opacity='1'; }, 200); }
     document.getElementById("quizQ").textContent = cfg.question;
     const initialMood = window.getDirectorMood(task, { firstTime: true });
     window.addDirectorBox(container, teachText, () => {
