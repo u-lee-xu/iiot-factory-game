@@ -95,6 +95,23 @@ body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospa
 /* 出厂区出口（俯视左下角，样式同任务设备 rs-task，点击返回厂区） */
 .rs-exit{left:40px;bottom:26px;z-index:8}
 .rs-exit:hover{transform:translateY(-2px);filter:drop-shadow(0 0 12px rgba(255,179,64,.9))}
+/* 当前任务：名称常显 + 浮动箭头引导（指向该点任务的设备） */
+.rs-task.next .rt-name, .sx-task.next .rt-name{opacity:1}
+.rs-task.next .rt-arrow, .sx-task.next .rt-arrow{
+  position:absolute;top:-36px;left:50%;transform:translateX(-50%);
+  color:var(--amber);font-size:18px;line-height:1;font-weight:bold;z-index:12;pointer-events:none;
+  animation:rtArrowBob .9s ease-in-out infinite;filter:drop-shadow(0 0 6px rgba(255,179,64,.85));
+}
+@keyframes rtArrowBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+/* 出厂区门：EXIT 绿标 + 呼吸光，更醒目 */
+.sx-door-exit .exit-badge, .rs-exit .exit-badge{
+  position:absolute;top:-26px;left:50%;transform:translateX(-50%);
+  background:#19c37d;color:#04140b;font-size:9px;font-weight:bold;letter-spacing:1px;
+  padding:2px 7px;border-radius:3px;white-space:nowrap;z-index:14;pointer-events:none;
+  animation:exitSign 1.5s ease-in-out infinite;box-shadow:0 0 10px rgba(25,195,125,.75);
+}
+@keyframes exitSign{0%,100%{opacity:1}50%{opacity:.45}}
+.sx-door-exit .rt-icon, .rs-exit .rt-icon{animation:exitSign 1.8s ease-in-out infinite}
 .rs-npc{position:absolute;left:120px;top:34px;font-size:24px;z-index:6;filter:drop-shadow(0 0 6px rgba(255,179,64,.4));animation:npcBob 2.2s ease-in-out infinite}
 /* 俯视玩家小人：从头顶往下看——只看到 头顶头发/肩部/两侧手臂/脚，没有脸和眼睛 */
 /* 4 方向：dir-down(朝下·默认露双手) / dir-up(朝上·手藏身后) / dir-side(朝侧·露一侧手,左右用flip镜像) */
@@ -916,7 +933,7 @@ function renderRoom(id){
     const cx=rooms[ri].x+ROOM_W/2 + (cnt>2 ? (j-1)*56 : cnt>1 ? (j===0?-48:48) : 0);
     const cy=WT+ROOM_H*0.62;
     return `<div class="rs-task ${locked?'locked':cls}" style="left:${cx-29}px;top:${cy-25}px" onclick="roomGoTask('${lv.id}','${t.id}',this)" title="${t.title||t.name||t.label||''}" ${locked?'data-locked="1"':''}>
-      <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
+      <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>${next?'<span class="rt-arrow">▼</span>':''}
     </div>`;
   }).join('');
   // 内墙（带门洞）：相邻房间之间的隔墙分上/下两段，门洞错开上下，增强探索
@@ -956,7 +973,7 @@ function renderRoom(id){
       const cls=done?'done':(next?'next':'locked');
       const onPlat=(i%2===1);
       taskElsHTML+=`<div class="sx-task ${cls}" data-plat="${onPlat?1:0}" data-idx="${i}" onclick="sxGoTask('${lv.id}','${t.id}',this)" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}" ${cls==='locked'?'data-locked="1"':''}>
-        <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>
+        <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>${next?'<span class="rt-arrow">▼</span>':''}
       </div>`;
       if(onPlat) platHTML+=`<div class="sx-platform" data-idx="${i}"></div>`;
     });
@@ -986,7 +1003,7 @@ function renderRoom(id){
       <div class="sx-stage" id="sxStage" style="width:${stageW}px">
         <div class="sx-ground"></div>${propHTML}${platHTML}${taskElsHTML}
         <div class="sx-stairs" id="sxStairs"></div>
-        <div class="sx-door-exit" id="sxDoorExit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="rt-name">出厂区</span></div>
+        <div class="sx-door-exit" id="sxDoorExit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
         <div class="sx-player" id="sxPlayer">
           <span class="pl hair"></span>
           <span class="pl face"></span><span class="pl eye"></span>
@@ -1014,7 +1031,7 @@ function renderRoom(id){
         ${ftHTML}
         ${stairsHTML}
         <div class="rs-npc">👷</div>
-        <div class="rs-exit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="rt-name">出厂区</span></div>
+        <div class="rs-exit" onclick="goBack()" title="出厂区"><span class="rt-icon">🚪</span><span class="exit-badge">EXIT · 出厂区</span></div>
                 <div class="rs-player" id="rsPlayer"><canvas width="20" height="20"></canvas></div>
       </div>
     </div>`;
