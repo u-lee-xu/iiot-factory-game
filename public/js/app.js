@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════════════════════
 
 import { escHtml, dstr, _fmtTime, starStr, taskKey, taskXP } from './core/utils.js';
+import { setupGlobalEnter } from './core/kbd.js';
 import { renderFactory } from './ui/main.js';
 import { selectLevel } from './ui/main.js';
 import { renderMission } from './ui/main.js';
@@ -857,6 +858,7 @@ function logout() {
 // 13. INIT
 // =========================================================================
 async function init() {
+  setupGlobalEnter();   // 全局回车确认（回厂区继续/知道了再试一次/任务提交），提前绑定
   const _urlQ = new URLSearchParams(location.search);
   const _fromMap = !!( _urlQ.get('task') || _urlQ.get('level') || _urlQ.get('open') );
   if (_fromMap) { try { sessionStorage.setItem('mapFlow', '1'); } catch(e){} }
