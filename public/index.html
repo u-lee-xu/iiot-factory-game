@@ -9,7 +9,7 @@
   body {
     font-family: 'Courier New', monospace;
     background: #0b0e1a; color: #e8eaf0;
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
   }
   .card {
     background: #121830; border: 1px solid #2c3552; padding: 40px;
@@ -78,6 +78,46 @@
   .mp-song .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mp-song .t { font-size: 11px; color: #505060; }
   .mp-note { padding: 8px 13px; font-size: 11px; color: #505060; text-align: center; border-top: 1px solid #2a2a3a; }
+  /* ── 桌面双栏布局：左品牌面板 + 右登录表单（高分屏不空荡、字更大） ── */
+  .page{display:flex;align-items:center;justify-content:center;gap:64px;width:100%;min-height:100vh;padding:28px;position:relative;z-index:1}
+  .brand{display:none}
+  .card{position:relative;z-index:1}
+  #musicCtl{position:relative;z-index:2}
+  /* 背景：暗色像素网格 + 光晕，避免大面积纯黑留白 */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(60% 50% at 16% 18%, rgba(0,188,212,.10), transparent 70%),
+      radial-gradient(50% 45% at 86% 82%, rgba(255,176,64,.08), transparent 70%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 44px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 1px, transparent 1px 44px);
+  }
+  @media (min-width: 1000px){
+    .brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;flex:1;max-width:440px}
+    .brand-logo{font-size:76px;filter:drop-shadow(0 0 22px rgba(0,188,212,.55));animation:brandGlow 2.4s ease-in-out infinite}
+    .brand-title{font-size:42px;color:#fff;letter-spacing:8px;font-weight:bold;text-shadow:0 0 18px rgba(0,188,212,.35)}
+    .brand-sub{font-size:17px;color:#9aa3bd;letter-spacing:4px}
+    .brand-sky{font-size:26px;letter-spacing:12px;margin-top:6px;opacity:.92}
+    .brand-feats{margin-top:16px;display:flex;flex-direction:column;gap:9px;font-size:16px;color:#c8c8d0}
+    .brand-feats div{background:rgba(255,255,255,.03);border:1px solid #2a3852;border-radius:8px;padding:8px 18px}
+    .brand-foot{margin-top:20px;font-size:12px;color:#505060;letter-spacing:2px}
+    @keyframes brandGlow{0%,100%{filter:drop-shadow(0 0 16px rgba(0,188,212,.4))}50%{filter:drop-shadow(0 0 34px rgba(0,188,212,.85))}}
+    @media (min-width:1800px){
+      .brand{max-width:520px}
+      .card{width:480px}
+      .page{gap:88px}
+    }
+    /* 登录卡片桌面放大 */
+    .card{width:440px;max-width:92vw;padding:48px 46px}
+    .card .logo{display:none}
+    .card h1{font-size:29px}
+    .card .subtitle{font-size:15px}
+    .card .field label{font-size:16px}
+    .card .field input{font-size:22px;padding:12px 14px}
+    .card .btn{font-size:22px;padding:13px}
+    .card .btn-link{font-size:17px;padding:12px}
+    .card .sep{font-size:15px}
+    .card .error{font-size:15px}
+  }
   @media (max-width: 480px) {
     #musicBtn .lbl { display: none; }
     #musicPop { width: 300px; }
@@ -101,8 +141,22 @@
     <div class="mp-note">点击即播放（循环）· ZzFXM 纯合成 · 名曲均为公有领域民歌/古典</div>
   </div>
 </div>
-<div class="card">
-  <div class="logo">⚙</div>
+<div class="page">
+  <div class="brand">
+    <div class="brand-logo">⚙</div>
+    <div class="brand-title">锐智工厂</div>
+    <div class="brand-sub">工业互联网实训基地</div>
+    <div class="brand-sky">🏭⚙️🏢🔧🛰️</div>
+    <div class="brand-feats">
+      <div>🎮 闯关式剧情 · 8 幕</div>
+      <div>🃏 翻牌 · 快打 · 小蜜蜂 · 贪吃蛇</div>
+      <div>🏆 排行榜 · 成就 · 工资商城</div>
+      <div>🎵 8-bit 场景配乐</div>
+    </div>
+    <div class="brand-foot">局域网教学 · 锐智工厂</div>
+  </div>
+  <div class="card">
+    <div class="logo">⚙</div>
   <h1>锐智工厂 · 工业互联网实训</h1>
   <div class="subtitle">工业互联网技能实训</div>
   <div class="field">
@@ -121,6 +175,7 @@
   <div class="sep">——</div>
   <button id="teacherBtn" class="btn-link" onclick="showTeacherLogin()">我是教师</button>
   <div class="error" id="errorMsg"></div>
+  </div>
 </div>
 
 <script>
