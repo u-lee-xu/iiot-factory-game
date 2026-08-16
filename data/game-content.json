@@ -177,7 +177,7 @@
          "以上两种都可以，本地终端和远程 SSH 是运维的基本方式"
         ],
         "answer": 3,
-        "hint": "服务器没有 GUI，但不限操作方式——可以在本地敲键盘，也可以用手机/电脑远程 SSH 上去，两种都行",
+        "hint": "一台没有显示器的服务器，想操作它有哪些方式？想想看",
         "teach": "Ubuntu Server 没有图形桌面，没法像 Windows 那样点点点。"
        },
        {
@@ -198,7 +198,7 @@
          "bash（Bourne Again Shell）"
         ],
         "answer": 3,
-        "hint": "Ubuntu 预装的默认 Shell 是 bash，大多数 Linux 发行版的标配",
+        "hint": "这个输入命令的黑底白字窗口叫 Shell——Ubuntu 预装的那款，几乎所有 Linux 都在用，名字是个缩写",
         "teach": "你输入了第一行命令。记住，这个黑底白字的窗口叫 Shell，你后面所有的操作都通过它完成。"
        },
        {
@@ -222,7 +222,7 @@
          }
         ],
         "answer": 3,
-        "hint": "Ubuntu 是 Debian 家族，包管理用 apt。yum 是 RHEL/CentOS 的，pacman 是 Arch 的，brew 是 macOS 的",
+        "hint": "Ubuntu 属于 Debian 家族——Debian 系 Linux 的包管理命令，和 RHEL 的 yum、macOS 的 brew 不是一回事",
         "teach": "递给你一张纸条：装软件、打补丁、卸包，都得靠包管理。"
        },
        {
@@ -246,7 +246,7 @@
          }
         ],
         "answer": 2,
-        "hint": "安装包用 apt install <包名>。OpenSSH 服务器的包名是 openssh-server",
+        "hint": "装软件的命令格式是「包管理命令 + install + 包名」——要装的是 SSH 的服务端",
         "teach": "最后问：你要往这台 Ubuntu Server 上装 OpenSSH 服务。"
        }
       ]

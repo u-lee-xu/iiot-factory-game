@@ -214,7 +214,8 @@ export function addDirectorBox(container, text, cb, mood, opts) {
     nameEl.style.display = hidden ? 'none' : '';
     if (moodLineEl) moodLineEl.style.display = hidden ? 'none' : '';
     toggle.style.display = 'block';
-    toggle.textContent = hidden ? '▽ 展开教学' : '△ 收起教学';
+    toggle.textContent = hidden ? '📖 厂长教学 ▾（忘了点开）' : '△ 收起教学';
+    toggle.style.color = hidden ? 'var(--amber)' : 'var(--dim)';
     toggle.style.marginTop = hidden ? '6px' : '0';
   }
   function finish(){
@@ -260,7 +261,8 @@ function collapseTeachingBox(box) {
   textEl.style.display = 'none';
   nameEl.style.display = 'none';
   if (moodLineEl) moodLineEl.style.display = 'none';
-  toggle.textContent = '▽ 展开教学';
+  toggle.textContent = '📖 厂长教学 ▾（忘了点开）';
+  toggle.style.color = 'var(--amber)';
   toggle.style.marginTop = '0';
 }
 

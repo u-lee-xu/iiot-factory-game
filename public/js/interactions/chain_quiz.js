@@ -38,13 +38,26 @@ registerInteraction('chain_quiz', {
       if (old) old.remove();
       const area = document.createElement('div');
       area.id = 'chainArea';
-      area.innerHTML = `
-        ${q.teach ? '<div style="background:rgba(0,188,212,.08);border-left:3px solid var(--cyan);padding:10px 12px;border-radius:4px;margin:8px 0 10px;font-size:14px;line-height:1.7;color:var(--text)"><span style="color:var(--cyan);font-weight:bold">🤔 厂长：</span>' + escHtml(q.teach) + '</div>' : ''}
+      // 每题：轻提示(hint)默认显示，完整讲解(teach)默认收起可展开（忘了可查看，符合A方案）
+      const hintHtml = q.hint ? '<div style="background:rgba(255,179,64,.06);border-left:3px solid var(--amber);padding:8px 12px;border-radius:4px;margin:8px 0 10px;font-size:13px;line-height:1.6;color:var(--text)"><span style="color:var(--amber);font-weight:bold">💡 厂长提示：</span>' + escHtml(q.hint) + '</div>' : '';
+      const teachHtml = q.teach ? '<div class="chain-teach-wrap" style="margin:6px 0"><div class="chain-teach-toggle" style="cursor:pointer;color:var(--dim);font-size:12px;user-select:none">📖 厂长讲解 ▾（忘了点开）</div><div class="chain-teach-body" style="display:none;background:rgba(0,188,212,.08);border-left:3px solid var(--cyan);padding:8px 12px;border-radius:4px;margin-top:6px;font-size:13px;line-height:1.7;color:var(--text)"><span style="color:var(--cyan);font-weight:bold">🤔 厂长：</span>' + escHtml(q.teach) + '</div></div>' : '';
+      area.innerHTML = hintHtml + teachHtml + `
         <div style="font-size:15px;font-weight:bold;color:var(--text);margin:6px 0 4px">第 ${currentQ + 1}/${questions.length} 题</div>
         <div style="font-size:14px;color:var(--text);margin:0 0 10px;line-height:1.7">${escHtml(q.question)}</div>
         <div class="quiz-options" id="chainOpts" style="opacity:0.3;transition:opacity .5s"></div>
       `;
       container.appendChild(area);
+      // 绑定"厂长讲解"展开/收起
+      const _tg = area.querySelector('.chain-teach-toggle');
+      if (_tg) {
+        const _tb = area.querySelector('.chain-teach-body');
+        _tg.onclick = function(){
+          const hidden = _tb.style.display === 'none';
+          _tb.style.display = hidden ? '' : 'none';
+          _tg.textContent = hidden ? '📖 厂长讲解 ▴（收起）' : '📖 厂长讲解 ▾（忘了点开）';
+          _tg.style.color = hidden ? 'var(--cyan)' : 'var(--dim)';
+        };
+      }
       setTimeout(() => { document.getElementById('chainOpts').style.opacity = '1'; }, 100);
       const opts = document.getElementById('chainOpts');
       q.options.forEach((opt, i) => {
