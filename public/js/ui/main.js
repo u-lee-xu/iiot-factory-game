@@ -309,18 +309,21 @@ export function openTaskModal(lvId, taskId, onOpen) {
   });
 }
 
-export function closeModal() {
+// 统一关闭任务：mapFlow 下默认回厂区/房间（goMap），
+// 盖过渡防"关闭后露出旧版壳子空白页"。调用方传 { back:false } 可自行接管流转（如 finishTaskFlow 通关庆祝）。
+export function closeModal(opts) {
   try{ kbdCleanup(); }catch(e){}
   const el = document.getElementById('modalOverlay');
   if (!el) return;
   el.classList.remove('show');
   window.currentTaskId = null;
   window.playAreaMusic();
+  if (opts && opts.back === false) return;
+  if (sessionStorage.getItem('mapFlow') === '1') { window.goMap(); }
 }
 
 export function closeTaskModal(){
-  closeModal();
-  if (sessionStorage.getItem('mapFlow') === '1') { window.goMap(); }
+  closeModal();   // 已含 mapFlow 回厂区/房间逻辑，不再重复 goMap
 }
 
 export function findTaskAnswer(task) {
@@ -414,7 +417,7 @@ function refreshMainUI() {
 // 统一"任务完成后的界面流转"出口：关弹窗 → 刷新 → XP 反馈 → 按进入模式返回。
 // 不管从哪进任务（旧版关卡页 / 厂区地图房间），完成任务后都走这里，杜绝"漏返回 → 空白"。
 export function finishTaskFlow(taskId, xp) {
-  closeModal();
+  closeModal({ back: false });   // 返回流转由本函数接管（通关庆祝 / 延迟 goMap），不让 closeModal 抢跑
   refreshMainUI();
   window.showToast('+' + xp + 'XP', 'success');
   window.checkLevelUp();
