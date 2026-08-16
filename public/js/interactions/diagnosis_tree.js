@@ -118,7 +118,11 @@ registerInteraction('diagnosis_tree', {
                 out.appendChild(okD);
               }
               out.scrollTop = out.scrollHeight;
-              setTimeout(() => { stepIdx++; renderStep(); }, 1300);
+              // 不自动跳转：让玩家看清厂长解读后，按回车（或点「继续」）进入下一步
+              document.getElementById('modalFoot').innerHTML =
+                '<button class="btn" onclick="window.closeModal()">取消</button>' +
+                '<button class="btn btn-primary" id="diagNextBtn">▶ 按回车继续</button>';
+              document.getElementById('diagNextBtn').onclick = function(){ stepIdx++; renderStep(); };
             }
           }
           next();
