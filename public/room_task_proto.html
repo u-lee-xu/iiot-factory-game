@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>原型 · 房间作任务底板（锐智工厂）</title>
+<style>
+:root{
+  --bg:#0b0e1a; --floor:#141a2e; --road:#1b2339; --roadline:#3a4568;
+  --text:#e8eaf0; --dim:#9aa3bd; --amber:#ffb340; --green:#00e676; --red:#ff5252;
+  --cyan:#00bcd4; --border:#2c3552; --panel:#12121a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospace,Menlo,Consolas,monospace;min-height:100dvh;overflow-x:hidden}
+/* ============ 页头 ============ */
+.room-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);background:#0d1222}
+.room-head .t{display:flex;align-items:center;gap:8px}
+.room-head .t b{color:var(--amber);font-size:16px;letter-spacing:2px}
+.room-head .t span{font-size:12px;color:var(--dim)}
+.room-head .actions{display:flex;gap:6px}
+.mm-btn{padding:5px 12px;background:var(--amber);color:#1a1206;border:none;border-radius:3px;font-family:inherit;font-size:12px;cursor:pointer;font-weight:bold}
+.mm-btn.ghost{background:none;color:var(--dim);border:1px solid var(--border)}
+.mm-btn.ghost:hover{border-color:var(--amber);color:var(--amber)}
+.mode-switch{font-size:11px;color:var(--dim)}
+.mode-switch label{cursor:pointer;margin:0 4px}
+
+/* ============ 房间场景（俯视工坊风，复刻 room.html 风格） ============ */
+.room-scene{position:relative;height:calc(100vh - 52px);margin:12px 16px 0;border-radius:2px;overflow:hidden;
+  border:10px solid #2a3352;box-shadow:inset 0 0 0 2px #0a0d18, 0 4px 0 rgba(0,0,0,.35);background:#141a30}
+.rs-stage{position:absolute;inset:0}
+.rs-floor{position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,#1c2340 0 16px,#19203a 16px 32px),
+  repeating-linear-gradient(0deg,#1b223d 0 16px,#182039 16px 32px)}
+.rs-floor::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(120% 90% at 50% 0%, rgba(255,179,64,.05), transparent 55%)}
+.rs-wall{position:absolute;background:repeating-linear-gradient(90deg,#3a4568 0 12px,#313c5c 12px 24px);z-index:3}
+.rs-wall.t{top:0;left:0;right:0;height:12px}
+.rs-wall.b{bottom:0;left:0;right:0;height:12px}
+.rs-wall.l{left:0;top:0;bottom:0;width:16px}
+.rs-wall.r{right:0;top:0;bottom:0;width:16px}
+.rs-door{position:absolute;top:-2px;left:40px;width:56px;height:16px;background:#2a3852;border:2px solid #0a0d18;z-index:6}
+.rs-door::after{content:"🚪";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:12px}
+.rs-label{position:absolute;top:16px;left:8px;font-size:11px;color:var(--amber);background:rgba(11,14,26,.85);border:1px solid var(--amber);padding:2px 9px;border-radius:2px;z-index:8;letter-spacing:1px}
+/* 家具 */
+.rs-furn{position:absolute;z-index:2;background:#151b33;border:2px solid #0a0d18;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.rs-bench{left:60px;bottom:50px;width:150px;height:44px;border-radius:2px;background:repeating-linear-gradient(90deg,#3a2f1e 0 10px,#33291a 10px 20px)}
+.rs-bench::before{content:"🛠️🔧";position:absolute;left:50%;top:5px;transform:translateX(-50%);font-size:15px;letter-spacing:6px}
+.rs-bench::after{content:"工作台";position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:9px;color:#cbb98a;letter-spacing:3px}
+.rs-furnace{right:70px;bottom:50px;width:64px;height:56px;border-radius:2px;background:linear-gradient(180deg,#2a1a14,#1a100c);box-shadow:0 0 18px rgba(255,110,30,.35)}
+.rs-furnace::before{content:"🔥";position:absolute;left:50%;top:8px;transform:translateX(-50%);font-size:20px;animation:furnFire 1.4s ease-in-out infinite}
+.rs-furnace::after{content:"熔炉";position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:9px;color:#e8b88a;letter-spacing:2px}
+@keyframes furnFire{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.15)}}
+/* 任务设备 */
+.rs-task{position:absolute;width:46px;height:40px;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:none;border:none;transition:transform .15s, filter .15s}
+.rs-task:hover{transform:translateY(-2px);filter:drop-shadow(0 0 10px rgba(255,179,64,.9))}
+.rs-task .rt-icon{font-size:22px;line-height:1;filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
+.rs-task .rt-name{position:absolute;top:-24px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:var(--text);background:rgba(11,14,26,.9);border:1px solid var(--border);padding:1px 7px;border-radius:2px;letter-spacing:1px}
+.rs-task.next{animation:stNext 1.6s ease-in-out infinite}
+.rs-task.next .rt-icon{animation:stPulse 1.6s ease-in-out infinite}
+.rs-task.next .rt-name{color:var(--amber);border-color:var(--amber);font-weight:bold}
+@keyframes stNext{0%,100%{filter:drop-shadow(0 0 0 rgba(255,179,64,0))}50%{filter:drop-shadow(0 0 10px rgba(255,179,64,.8))}}
+@keyframes stPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+/* 小人（静态，示意） */
+.rs-player{position:absolute;z-index:9;width:34px;height:40px}
+.rs-player .pl{position:absolute;image-rendering:pixelated}
+.rs-player .hair{left:7px;top:0;width:20px;height:9px;background:#3a2a20;border-radius:50% 50% 0 0}
+.rs-player .face{left:9px;top:8px;width:16px;height:13px;background:#f0c89a}
+.rs-player .eye{left:12px;top:12px;width:3px;height:3px;background:#2a2130;box-shadow:6px 0 0 #2a2130}
+.rs-player .body{left:6px;top:21px;width:22px;height:13px;background:#3d6df2}
+.rs-player .belt{left:6px;top:26px;width:22px;height:3px;background:#1d2f6e}
+.rs-player .arm.l{left:0;top:21px;width:7px;height:11px;background:#3d6df2;border-radius:3px}
+.rs-player .arm.r{right:0;top:21px;width:7px;height:11px;background:#2f57cf;border-radius:3px}
+.rs-player .leg.l{left:9px;top:34px;width:8px;height:8px;background:#2a3852}
+.rs-player .leg.r{left:19px;top:34px;width:8px;height:8px;background:#22304a}
+/* 房间底部任务提示条 */
+.room-footer{margin:10px 16px 12px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--dim)}
+.room-footer b{color:var(--amber)}
+.tip{font-size:11px;color:#5a6280}
+
+/* ============ 任务模态（房间作底板：backdrop-filter 让房间透出） ============ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;
+  background:rgba(5,8,16,.52);
+  -webkit-backdrop-filter:blur(5px) brightness(.5);
+  backdrop-filter:blur(5px) brightness(.5);
+}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--border);width:min(600px,92vw);max-height:84vh;display:flex;flex-direction:column;border-radius:4px;box-shadow:0 14px 50px rgba(0,0,0,.6)}
+.modal-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:15px;color:var(--amber);letter-spacing:1px}
+.modal-sub{font-size:12px;color:var(--dim)}
+.modal-close{background:none;border:none;color:var(--dim);font-size:19px;cursor:pointer;font-family:inherit}
+.modal-close:hover{color:var(--red)}
+.modal-body{padding:16px;overflow-y:auto;flex:1}
+.modal-foot{padding:10px 16px;border-top:1px solid var(--border);text-align:right;display:flex;gap:8px;justify-content:flex-end}
+.btn{padding:6px 16px;border:1px solid var(--border);background:#1a1a24;color:var(--text);font-family:inherit;font-size:16px;cursor:pointer;transition:all .2s}
+.btn:hover{background:#2a2a3a}
+.btn-primary{background:var(--amber);color:#000;border-color:var(--amber);font-weight:bold}
+.btn-success{background:var(--green);color:#000;border-color:var(--green);font-weight:bold}
+/* 厂长教学气泡 */
+.director-box{display:flex;gap:12px;padding:12px;background:#0e0e16;border:1px solid var(--border);margin-bottom:14px;align-items:flex-start}
+.director-portrait{font-size:36px;line-height:1;flex-shrink:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#1a1a24;border-radius:4px}
+.director-bubble{flex:1;min-width:0}
+.director-name{font-size:16px;color:var(--amber);margin-bottom:2px}
+.director-text{font-size:15px;line-height:1.7;color:var(--text);white-space:pre-wrap}
+.director-mood-thinking .director-portrait{animation:thinkBounce 1.5s infinite}
+@keyframes thinkBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+/* 题目 */
+.quiz-question{font-size:16px;font-weight:600;color:var(--text);padding:4px 0 10px;line-height:1.6}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 12px;border:1px solid var(--border);cursor:pointer;font-size:15px;transition:all .2s;word-break:break-word;line-height:1.5;background:#151a2c}
+.quiz-opt:hover{border-color:var(--cyan)}
+.quiz-opt.selected{border-color:var(--amber);background:rgba(255,176,0,.12)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(0,230,118,.12)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(255,85,85,.12)}
+/* 场景截图提示条（仅原型用，标出"这里是房间底板"） */
+.debug-tag{position:absolute;right:10px;bottom:10px;z-index:20;font-size:10px;color:#5a6280;background:rgba(11,14,26,.7);padding:2px 8px;border-radius:2px}
+/* 侧边形态（对比用） */
+body.side-mode .modal-overlay{justify-content:flex-end;background:rgba(5,8,16,.2)}
+body.side-mode .modal-box{width:min(46vw,560px);height:calc(100vh - 60px);margin-right:14px}
+@media (max-width:760px){
+  body.side-mode .modal-overlay{justify-content:center;background:rgba(5,8,16,.55)}
+  body.side-mode .modal-box{width:min(600px,94vw);height:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="room-head">
+  <div class="t"><b>中控室</b><span>你的第一间数字工位 · 房间作任务底板原型</span></div>
+  <div class="actions">
+    <span class="mode-switch">形态：
+      <label><input type="radio" name="mode" value="full" checked> 全屏·房间底板</label>
+      <label><input type="radio" name="mode" value="side"> 侧边面板</label>
+    </span>
+    <button class="mm-btn ghost" onclick="location.href='map_proto.html'">🗺️ 返回厂区</button>
+  </div>
+</div>
+
+<!-- 房间场景：任务底板 -->
+<div class="room-scene" id="rsScene">
+  <div class="rs-stage">
+    <div class="rs-floor"></div>
+    <div class="rs-wall t"></div><div class="rs-wall b"></div>
+    <div class="rs-wall l"></div><div class="rs-wall r"></div>
+    <div class="rs-door"></div>
+    <div class="rs-label">L1 · 中控室</div>
+    <div class="rs-furn rs-bench"></div>
+    <div class="rs-furn rs-furnace"></div>
+    <!-- 任务设备（点开任务模态） -->
+    <button class="rs-task next" style="left:150px;bottom:120px" data-task="t1">
+      <span class="rt-icon">💻</span><span class="rt-name">安装虚拟机</span>
+    </button>
+    <button class="rs-task" style="left:250px;bottom:160px" data-task="t2">
+      <span class="rt-icon">🌐</span><span class="rt-name">网络连通性</span>
+    </button>
+    <button class="rs-task" style="left:360px;bottom:120px" data-task="t3">
+      <span class="rt-icon">🔌</span><span class="rt-name">端口与协议</span>
+    </button>
+    <button class="rs-task" style="left:480px;bottom:180px" data-task="t4">
+      <span class="rt-icon">🛡️</span><span class="rt-name">安全加固</span>
+    </button>
+    <!-- 静态小人示意 -->
+    <div class="rs-player" style="left:300px;bottom:40px">
+      <div class="pl hair"></div><div class="pl face"></div>
+      <div class="pl eye"></div><div class="pl body"></div>
+      <div class="pl belt"></div><div class="pl arm l"></div>
+      <div class="pl arm r"></div><div class="pl leg l"></div><div class="pl leg r"></div>
+    </div>
+    <div class="debug-tag">底板 = 房间场景（打开任务后它会被压暗模糊，关闭后恢复）</div>
+  </div>
+</div>
+
+<div class="room-footer">
+  <div><b>L1 中控室</b> · 进度 0/4</div>
+  <div class="tip">点任务设备 → 任务在房间里打开（背景=房间）→ 关闭后回到房间</div>
+</div>
+
+<!-- 任务模态 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h3 id="modalTitle">任务</h3>
+        <div class="modal-sub" id="modalSub">中控室 · 房间底板原型</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<script>
+/* ===== 假任务数据（原型用） ===== */
+const FAKE_TASKS = {
+  t1: {
+    title:'安装虚拟机', area:'中控室',
+    teach:'厂长：这屋子的第一件事——把 Ubuntu Server 装起来。装之前先想清楚：为什么要用虚拟机？因为不想动你现在的 Windows，虚拟机能在一台电脑里再跑一个系统，互不干扰。',
+    question:'装系统前，最应该先确认什么？',
+    options:['虚拟机软件已经装好','U盘空间是否够','电脑是不是新买的','网速快不快'],
+    answer:0,
+    explain:'虚拟机里装系统用的是虚拟硬盘镜像，不占 U 盘；新不新、网速快不快都和"能不能装"没关系。先把装虚拟机的软件准备好才是第一步。'
+  },
+  t2: {
+    title:'网络连通性', area:'中控室',
+    teach:'厂长：装好系统就该通网了。判断网络通不通，最常用的命令是 ping——往目标地址发探测包，有回包就是通。记住：ping 后面跟的是目标 IP。',
+    question:'要测试本机能不能上网，ping 哪个地址最合适？',
+    options:['ping 127.0.0.1','ping 8.8.8.8','ping 自己的名字','ping 0.0.0.0'],
+    answer:1,
+    explain:'127.0.0.1 是本机回环，只测本机网卡；0.0.0.0 是无效地址。要测能不能上外网，得 ping 一个公网 IP，比如 8.8.8.8。'
+  },
+  t3: {
+    title:'端口与协议', area:'中控室',
+    teach:'厂长：网络通了，还要知道"服务开在哪个口"。端口就是服务的门牌号，协议是服务说话的方式。比如 SSH 远程登录，默认走 22 端口、SSH 协议。',
+    question:'SSH 远程登录默认使用哪个端口？',
+    options:['21','22','80','443'],
+    answer:1,
+    explain:'21 是 FTP 传文件的，80/443 是网页 HTTP/HTTPS，SSH 远程登录默认是 22。'
+  },
+  t4: {
+    title:'安全加固', area:'中控室',
+    teach:'厂长：系统对外暴露前，先做最基础的加固——改掉默认端口、关掉用不到的端口，别让大门敞着。',
+    question:'下面哪条是"加固"的思路？',
+    options:['所有端口全开，方便访问','默认密码不改，省事','关掉不需要的服务和端口','防火墙全部关闭'],
+    answer:2,
+    explain:'加固 = 最小暴露：只开必须的端口、改掉默认口令、关掉多余服务。全开、不改密、关防火墙都是把大门敞给攻击者。'
+  }
+};
+
+/* ===== 模态逻辑（复刻真实交互的关键路径） ===== */
+let curTask = null, curSelected = null;
+
+function openTask(id){
+  const t = FAKE_TASKS[id];
+  if(!t) return;
+  curTask = t; curSelected = null;
+  document.getElementById('modalTitle').textContent = t.title;
+  document.getElementById('modalSub').textContent = t.area + ' · 房间底板原型';
+  const body = document.getElementById('modalBody');
+  body.innerHTML =
+    '<div class="director-box director-mood-thinking">' +
+      '<div class="director-portrait">👨‍💼</div>' +
+      '<div class="director-bubble"><div class="director-name">厂长</div>' +
+      '<div class="director-text">' + t.teach + '</div></div>' +
+    '</div>' +
+    '<div class="quiz-question">' + t.question + '</div>' +
+    '<div class="quiz-options">' +
+      t.options.map((o,i)=>'<div class="quiz-opt" data-i="'+i+'">' + String.fromCharCode(65+i) + '. ' + o + '</div>').join('') +
+    '</div>';
+  document.getElementById('modalFoot').innerHTML =
+    '<button class="btn" onclick="closeModal()">取消</button>' +
+    '<button class="btn btn-primary" onclick="submitQuiz()" disabled>提交</button>';
+  body.querySelectorAll('.quiz-opt').forEach(el=>{
+    el.onclick = ()=>{
+      body.querySelectorAll('.quiz-opt').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected'); curSelected = parseInt(el.dataset.i);
+      document.querySelector('#modalFoot .btn-primary').disabled = false;
+    };
+  });
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function submitQuiz(){
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((el,i)=>{
+    el.style.pointerEvents='none';
+    if(i===curTask.answer) el.classList.add('correct');
+    if(i===curSelected && i!==curTask.answer) el.classList.add('wrong');
+  });
+  const foot = document.getElementById('modalFoot');
+  if(curSelected===curTask.answer){
+    foot.innerHTML = '<button class="btn btn-success" onclick="doneTask()">✓ 领取 XP</button>';
+  } else {
+    foot.innerHTML = '<button class="btn" onclick="closeModal()">关闭</button>';
+    // 厂长错误提示气泡（答错留在本题重选）
+    const box = document.createElement('div');
+    box.className='director-box director-mood-thinking';
+    box.innerHTML = '<div class="director-portrait">🤔</div><div class="director-bubble">' +
+      '<div class="director-name">厂长</div><div class="director-text">' + curTask.explain + '</div>' +
+      '<div style="margin-top:8px;text-align:right"><button class="btn btn-primary">知道了，再试一次</button></div></div>';
+    box.querySelector('button').onclick = ()=>{
+      box.remove();
+      opts.forEach(el=>{ el.classList.remove('wrong','correct','selected'); el.style.pointerEvents=''; });
+      curSelected=null;
+      document.getElementById('modalFoot').innerHTML =
+        '<button class="btn" onclick="closeModal()">取消</button>' +
+        '<button class="btn btn-primary" onclick="submitQuiz()" disabled>提交</button>';
+    };
+    document.getElementById('modalBody').prepend(box);
+  }
+}
+
+function doneTask(){
+  document.getElementById('modalBody').innerHTML = '<div style="text-align:center;padding:28px"><div style="font-size:34px">🎉</div><div style="margin-top:8px;color:var(--green);font-weight:bold">任务完成 +100 XP</div><div style="font-size:13px;color:var(--dim);margin-top:6px">关闭后回到房间</div></div>';
+  document.getElementById('modalFoot').innerHTML = '<button class="btn btn-primary" onclick="closeModal()">返回房间</button>';
+}
+
+/* 关闭：核心验证点——关闭后直接露出房间，无空白 */
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+  curTask=null; curSelected=null;
+}
+
+/* 形态切换 */
+document.querySelectorAll('input[name=mode]').forEach(r=>{
+  r.addEventListener('change',()=>{
+    document.body.classList.toggle('side-mode', document.querySelector('input[name=mode]:checked').value==='side');
+  });
+});
+
+/* Esc 关闭（与真实 kbd 一致：输入框内不劫持；这里无输入框，直接关） */
+window.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && document.getElementById('modalOverlay').classList.contains('show')){
+    closeModal();
+  }
+});
+
+/* 点任务设备打开任务 */
+document.querySelectorAll('.rs-task').forEach(el=>{
+  el.addEventListener('click', ()=> openTask(el.dataset.task));
+});
+</script>
+</body>
+</html>

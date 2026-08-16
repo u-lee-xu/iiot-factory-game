@@ -351,7 +351,26 @@ body{min-height:100dvh;min-height:100vh;overflow-x:hidden}
 .vx-scene{position:relative;margin:0 18px 12px;border-radius:2px;overflow:hidden;border:10px solid #2c2a48;box-shadow:inset 0 0 0 2px #141222,0 4px 0 rgba(0,0,0,.4);background:#0a0e22;touch-action:none}
 .vx-stage{position:absolute;top:0;left:0;will-change:transform}
 .vx-plat{position:absolute;height:14px;background:#5a3a2a;border:3px solid #3a2418;border-radius:2px;box-shadow:0 3px 0 rgba(0,0,0,.4),0 0 10px rgba(255,179,64,.15)}
+
+/* ===== 任务模态（房间作底板：backdrop-filter 让房间透出） ===== */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:9990;align-items:center;justify-content:center;
+  background:rgba(5,8,16,.52);
+  -webkit-backdrop-filter:blur(5px) brightness(.5);
+  backdrop-filter:blur(5px) brightness(.5);
+}
+.modal-overlay.show{display:flex}
+.modal-box{background:#12121a;border:1px solid var(--border,#2c3552);width:min(620px,94vw);max-height:86vh;display:flex;flex-direction:column;border-radius:4px;box-shadow:0 14px 50px rgba(0,0,0,.6)}
+.modal-head{padding:12px 16px;border-bottom:1px solid var(--border,#2c3552);display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:16px;color:var(--amber,#ffb340);letter-spacing:1px;margin:0}
+.modal-sub{font-size:12px;color:var(--dim,#9aa3bd)}
+.modal-close{background:none;border:none;color:var(--dim,#9aa3bd);font-size:20px;cursor:pointer;font-family:inherit;line-height:1}
+.modal-close:hover{color:#ff5252}
+.modal-body{padding:16px;overflow-y:auto;flex:1}
+.modal-foot{padding:10px 16px;border-top:1px solid var(--border,#2c3552);text-align:right;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.room-modal-hint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9995;font-size:11px;color:#9aa3bd;background:rgba(11,14,26,.85);padding:3px 12px;border-radius:12px;pointer-events:none;opacity:.8}
 </style>
+<link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <div id="transit" class="transit"><div class="tr-inner">
@@ -365,6 +384,23 @@ body{min-height:100dvh;min-height:100vh;overflow-x:hidden}
   <div class="lt-sub">把手机转回竖屏<br>横版暂不支持，转过来继续闯关～</div>
 </div>
 <div id="room"></div>
+
+<!-- 任务模态（房间作底板） -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h3 id="modalTitle">任务</h3>
+        <div class="modal-sub" id="modalSub"></div>
+      </div>
+      <button class="modal-close" id="roomModalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+<div class="room-modal-hint" id="roomModalHint" style="display:none">Esc / ✕ 关闭 · 房间作任务底板</div>
+
 <script>
 (function(){
   var t=document.getElementById('transit');
@@ -1324,6 +1360,8 @@ function enterLevel(id, taskId){
     if(typeof showToast==='function'){ try{ showToast('本层已全部通关 🎉 点发光设备可重刷任务拿满分'); }catch(e){} }
     return;
   }
+  // 房间作任务底板：优先在房间内直接打开任务模态（不跳转 student.html）
+  if(typeof window.__openRoomTask==='function'){ try{ window.__openRoomTask(id, taskId); }catch(e){} return; }
   try{ if(id) sessionStorage.setItem('mapRoom', id); }catch(e){}
   const q=new URLSearchParams();
   if(taskId) q.set('task', taskId);
@@ -1367,6 +1405,14 @@ async function init(){
     if(!lv){ location.href='map_proto.html'; return; }
     renderRoom(lv.id);
     try{ musStart(); }catch(e){}
+    // —— 任务宿主：暴露房间数据，等 room-task-host.js 就绪后挂载（房间内打开任务）——
+    try{
+      window.__roomData = { content, me, token, API, refresh: ()=>renderRoom(currentRoomId) };
+      let _n=0;
+      while(!window.__roomTaskHost && _n<60){ await new Promise(r=>setTimeout(r,50)); _n++; }
+      if(window.__roomTaskHost){ window.__roomTaskHost.setup(window.__roomData); }
+      else console.warn('任务宿主未就绪，任务将回退跳转 student.html');
+    }catch(e){ console.error('任务宿主 setup fail:', e); }
     hideTransit();
   }catch(e){ console.error('room init fail:', e); location.href='map_proto.html'; }
 }
@@ -1374,5 +1420,6 @@ init();
 
 </script>
 <script src="/data/music.js"></script>
+<script type="module" src="/js/room-task-host.js"></script>
 </body>
 </html>
