@@ -38,11 +38,11 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .back{font-size:12px;color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:5px 9px;border-radius:3px}
 .back:hover{color:var(--amber);border-color:var(--amber)}
 /* ===== 厂区 ===== */
-#map{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding:14px 12px 36px}
+#map{position:relative;z-index:1;max-width:min(1760px,96vw);margin:0 auto;padding:14px 12px 36px}
 .compound{position:relative;border:2px solid #223050;border-radius:10px;overflow:hidden;
   background:
-    radial-gradient(120% 90% at 50% 0%, rgba(30,50,95,.18), transparent 60%),
-    linear-gradient(180deg,#0d1226,#0a0e1c)}
+    radial-gradient(120% 90% at 50% 0%, rgba(70,105,170,.20), transparent 60%),
+    linear-gradient(180deg,#1a2440,#141c32)}
 /* 厂区入口 */
 .entrance{position:relative;display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 14px 12px;background:linear-gradient(180deg,rgba(255,179,64,.06),transparent)}
 
@@ -76,7 +76,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .zone-tag b{color:var(--amber)}
 .row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 8px}
 /* 中心广场 */
-.plaza{display:flex;align-items:flex-end;justify-content:center;gap:22px;margin:4px 0 8px;padding:12px 0;background:linear-gradient(180deg,transparent,rgba(0,229,118,.04),transparent);border-radius:8px}
+.plaza{display:flex;align-items:flex-end;justify-content:center;gap:22px;margin:4px 0 8px;padding:12px 0;background:linear-gradient(180deg,transparent,rgba(0,229,118,.09),transparent);border-radius:8px}
 .flag{font-size:24px;animation:flagWave 2.4s ease-in-out infinite}
 @keyframes flagWave{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
 /* 配套设施区（像素风设施楼） */
@@ -89,7 +89,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .b-awning{position:absolute;left:-2px;right:-2px;top:2px;height:6px;z-index:2;background:repeating-linear-gradient(90deg,#ff5252 0 6px,#f2f2f2 6px 12px);border:1px solid #04060c;border-bottom:none;box-shadow:0 0 6px rgba(255,82,82,.4)}
 /* 休息区 · 凉亭 */
 .pavilion{position:relative;width:88px;height:54px;margin:0 auto}
-.pv-roof{position:absolute;left:8px;right:8px;top:0;height:12px;background:linear-gradient(180deg,#2b3454,#181e36);border:2px solid #04060c;clip-path:polygon(2% 0,98% 0,86% 100%,14% 100%)}
+.pv-roof{position:absolute;left:8px;right:8px;top:0;height:12px;background:linear-gradient(180deg,#3d4d7c,#263458);border:2px solid #04060c;clip-path:polygon(2% 0,98% 0,86% 100%,14% 100%)}
 .pv-roof::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:#00e676;box-shadow:0 0 6px rgba(0,230,118,.5)}
 .pv-post{position:absolute;top:10px;bottom:8px;width:3px;background:#3a4560;border:1px solid #04060c}
 .pv-post.p1{left:16px}
@@ -124,7 +124,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .wt-legs{position:absolute;left:4px;right:4px;bottom:0;height:16px;background:repeating-linear-gradient(90deg,#2a3040 0 4px,transparent 4px 6px)}
 .wt-tank{position:absolute;left:6px;right:6px;top:10px;height:20px;background:linear-gradient(180deg,#465170,#2a3248);border:2px solid #04060c;border-radius:6px 6px 2px 2px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.05)}
 .wt-tank::after{content:"";position:absolute;left:2px;right:2px;top:8px;height:2px;background:#ff9800;opacity:.55}
-.wt-roof{position:absolute;left:4px;right:4px;top:0;height:12px;background:linear-gradient(180deg,#2b3454,#181e36);border:2px solid #04060c;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.wt-roof{position:absolute;left:4px;right:4px;top:0;height:12px;background:linear-gradient(180deg,#3d4d7c,#263458);border:2px solid #04060c;clip-path:polygon(50% 0,100% 100%,0 100%)}
 /* 储罐 */
 .tanks{display:inline-flex;gap:6px;align-items:flex-end}
 .tk{position:relative;width:16px;height:24px;background:linear-gradient(180deg,#3a4560,#1c2438);border:2px solid #04060c;border-radius:8px 8px 2px 2px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.05)}
@@ -142,7 +142,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .flowerbed::before{content:"";position:absolute;left:3px;top:-4px;width:4px;height:4px;background:#ff6d9c;border-radius:50%}
 .flowerbed::after{content:"";position:absolute;right:4px;top:-3px;width:3px;height:3px;background:#ffd400;border-radius:50%}
 /* 动力站区 */
-.utility-zone{display:flex;align-items:center;justify-content:center;gap:20px;margin:10px 0 4px;padding:10px 14px;background:rgba(10,14,28,.35);border:1px dashed #2a3852;border-radius:8px}
+.utility-zone{display:flex;align-items:center;justify-content:center;gap:20px;margin:10px 0 4px;padding:10px 14px;background:rgba(34,48,84,.5);border:1px dashed #3a4d80;border-radius:8px}
 .utility-zone .ut-label{font-size:10px;color:var(--dim);letter-spacing:3px}
 /* 设施 Logo */
 .lg-ctrl .lgc-body{position:absolute;left:1px;top:2px;width:18px;height:4px;background:var(--c);border-radius:2px;box-shadow:0 0 6px var(--cg)}
@@ -226,13 +226,13 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
   background:
     linear-gradient(90deg, rgba(0,0,0,.5), transparent 15%, transparent 85%, rgba(0,0,0,.5)),
     repeating-linear-gradient(180deg, rgba(255,255,255,.045) 0 2px, transparent 2px 5px),
-    linear-gradient(180deg,#242d4d 0%,#161c34 60%,#0b1020 100%);
+    linear-gradient(180deg,#3d4d7c 0%,#29375f 60%,#1b2745 100%);
   box-shadow:inset 0 0 0 2px #04060c, inset 0 0 0 1px rgba(255,255,255,.07), inset 0 -4px 0 rgba(0,0,0,.35), 0 0 12px var(--cg)}
 .b-wall{position:absolute;inset:0}
 .b-wall::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0 2px, transparent 2px 9px);opacity:.45}
 .b-ribs{position:absolute;inset:0;background:repeating-linear-gradient(90deg, transparent 0 15px, rgba(0,0,0,.4) 15px 17px)}
-.b-base{position:absolute;left:0;right:0;bottom:0;height:calc(var(--bh) - 46px);background:repeating-linear-gradient(90deg, rgba(0,0,0,.35) 0 10px, transparent 10px 12px),linear-gradient(180deg,#12182e,#0a0e1c);border-top:2px solid #04060c}
-.b-side{position:absolute;right:-4px;top:2px;bottom:2px;width:4px;background:linear-gradient(180deg,#1c2440,#0a0e1c);border:1px solid #04060c;z-index:1}
+.b-base{position:absolute;left:0;right:0;bottom:0;height:calc(var(--bh) - 46px);background:repeating-linear-gradient(90deg, rgba(0,0,0,.3) 0 10px, transparent 10px 12px),linear-gradient(180deg,#22305a,#182240);border-top:2px solid #04060c}
+.b-side{position:absolute;right:-4px;top:2px;bottom:2px;width:4px;background:linear-gradient(180deg,#2c3a66,#1c2848);border:1px solid #04060c;z-index:1}
 .b-pipe{position:absolute;left:1px;top:calc(var(--sh) - var(--bh) - 8px);bottom:0;width:6px;z-index:2;background:repeating-linear-gradient(180deg,#4a5570 0 5px,#222a40 5px 7px);border:1px solid #04060c}
 .b-pipe::before{content:"";position:absolute;left:-2px;top:10px;width:9px;height:3px;background:#3a4560;border:1px solid #04060c}
 .b-pipe::after{content:"";position:absolute;left:-2px;top:26px;width:9px;height:3px;background:#3a4560;border:1px solid #04060c}
@@ -255,7 +255,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 @keyframes flick{0%,100%{opacity:1}50%{opacity:.12}}
 @keyframes breath{0%,100%{opacity:1}50%{opacity:.4}}
 .b-door{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:14px;height:9px;z-index:2;background:#04060c;border:1px solid var(--c);box-shadow:0 0 6px var(--cg)}
-.b-roof{position:absolute;left:3px;right:3px;background:linear-gradient(180deg,#2b3454,#181e36);border:2px solid #04060c}
+.b-roof{position:absolute;left:3px;right:3px;background:linear-gradient(180deg,#3d4d7c,#263458);border:2px solid #04060c}
 .b-roof::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:var(--c);box-shadow:0 0 8px var(--cg);animation:neonPulse 2.6s ease-in-out infinite}
 .roof-flat{top:calc(var(--sh) - var(--bh) - 8px);height:8px}
 .roof-peak{top:calc(var(--sh) - var(--bh) - 20px);height:20px;clip-path:polygon(50% 0,100% 100%,0 100%);border-bottom:none}
@@ -376,14 +376,14 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .pop-tip{font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
 .foot{text-align:center;font-size:11px;color:var(--dim);padding:14px 0 20px;letter-spacing:1px}
 /* ===== ISA-95 数据流转层次 ===== */
-.isa-layer{position:relative;background:rgba(10,14,28,.45);border:1px solid #223050;border-radius:8px;padding:18px 10px 12px;margin:0 0 4px}
+.isa-layer{position:relative;background:rgba(32,46,80,.55);border:1px solid #33436c;border-radius:8px;padding:10px 10px 8px;margin:0 0 2px}
 .isa-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:7px;background:#0b0e1a;border:1px solid var(--border);padding:2px 12px;border-radius:12px;white-space:nowrap;z-index:2}
 .isa-tag .ilv{font-size:11px;font-weight:bold;color:#1a1206;background:var(--amber);padding:1px 7px;border-radius:8px}
 .isa-tag b{font-size:12px;color:var(--text)}
 .isa-tag em{font-size:9px;color:var(--dim);font-style:normal;letter-spacing:1px}
 .isa-layer .row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 8px}
 /* 层间数据流（自下而上） */
-.dataflow{display:flex;align-items:center;justify-content:center;gap:6px;height:28px;margin:6px 0 12px;position:relative}
+.dataflow{display:flex;align-items:center;justify-content:center;gap:6px;height:22px;margin:4px 0 8px;position:relative}
 .dataflow .df-label{font-size:9px;color:#4fd6ff;letter-spacing:2px;opacity:.75}
 .df-pack{width:5px;height:5px;border-radius:50%;background:#4fd6ff;box-shadow:0 0 6px #4fd6ff;opacity:0;animation:dfUp 2.6s ease-in infinite}
 .df-pack.p2{animation-delay:.9s}
@@ -706,6 +706,48 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
   .fac-row{grid-template-columns:repeat(2,1fr)}
   .npc .bubble{max-width:160px}
 }
+/* 信息面板（玩家档案 / 数据流导览） */
+.map-panel{background:rgba(32,46,80,.55);border:1px solid #3a4d80;border-radius:8px;padding:12px 14px;color:var(--text)}
+.map-panel .mp-title{font-size:15px;color:var(--amber);font-weight:bold;margin-bottom:8px;letter-spacing:1px}
+.map-panel .mp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed #2a3a5c;font-size:15px}
+.map-panel .mp-row:last-child{border-bottom:none}
+.map-panel .mp-row b{color:var(--amber)}
+.map-panel .mp-desc{font-size:12px;color:var(--dim);line-height:1.6;margin-top:6px}
+.map-panel .mp-flow{font-size:13px;color:#cfe6ff;line-height:1.7;font-weight:bold}
+/* 闯关进度卡 */
+.pp-bar{height:9px;background:#0a0e1c;border:1px solid #2a3852;border-radius:4px;overflow:hidden;margin-top:2px}
+.pp-fill{height:100%;background:linear-gradient(90deg,#00bcd4,#ffb340);transition:width .3s}
+.pp-marks{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.pp-mark{width:24px;height:24px;border-radius:4px;background:#141a2e;border:1px solid #2a3852;color:#7c8ca6;font-size:11px;display:flex;align-items:center;justify-content:center}
+.pp-mark.done{background:#00e676;color:#04140b;border-color:#00e676}
+.player-card .mp-title{font-size:16px}
+.map-col{display:flex;flex-direction:column;gap:12px}
+/* 桌面三栏：左(玩家档案/厂长/灯塔/路线/导览) · 中(ISA四层完整数据流) · 右(游戏/商城等设施) */
+/* 数据流导览：竖向流程小图，撑满左栏剩余高度 */
+.cl-left .flow-tip{flex:1;display:flex;flex-direction:column}
+.flow-v{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0;flex:1;justify-content:space-around}
+.fv-item{background:#141a2e;border:1px solid #3a4d80;border-radius:6px;padding:13px 14px;font-size:15px;color:var(--text);width:84%;text-align:center;letter-spacing:1px}
+.fv-arrow{color:#00bcd4;font-size:13px;line-height:1;text-shadow:0 0 6px rgba(0,188,212,.6)}
+@media (min-width:1100px){
+  .compound{display:flex;gap:18px;align-items:stretch}
+  .map-col.cl-left{flex:1;justify-content:flex-start}
+  .map-col.cl-mid{flex:2}
+  .map-col.cl-right{flex:1}
+  .cl-right .fac-row{display:grid;grid-template-columns:1fr;gap:12px}
+  #isaArea{padding-top:16px}   /* 顶部留白：修复 L4 层标题被 compound overflow 裁切 */
+  .brand{font-size:23px}
+  .brand small{font-size:13px}
+  .back{font-size:14px}
+  .foot{font-size:14px}
+  .building .b-sprite{zoom:1.5}
+  .b-label{font-size:16px}
+  .b-label .icon{font-size:20px}
+  .isa-tag .ilv{font-size:13px}
+  .isa-tag b{font-size:16px}
+  .isa-tag em{font-size:12px}
+  .fac-sub{font-size:13px}
+  .fac-cell .fac-sub{font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -731,18 +773,23 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 
 <div id="mapApp">
   <header>
-    <div class="brand">🏭 锐智工厂<small>工业互联网实训 · 厂区地图</small></div><button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
-    <div class="player">
-      <span class="pill">👤 <b id="pName">-</b></span>
-      <span class="pill">🏅 <b id="pRank">-</b></span>
-      <span class="pill">XP <b id="pXp">0</b></span>
-      <span class="pill">💰 <b id="pCoins">0</b></span>
+    <div class="brand">🏭 锐智工厂<small>工业互联网实训 · 厂区地图</small></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
       <button class="back" onclick="doLogout()" title="退出登录">🚪 退出</button>
     </div>
   </header>
 
   <div id="map">
     <div class="compound">
+      <div class="player-card map-panel" id="playerCard">
+        <div class="mp-title">👤 我的档案</div>
+        <div class="mp-row"><span>👤 姓名</span><b id="pName">-</b></div>
+        <div class="mp-row"><span>🏅 段位</span><b id="pRank">-</b></div>
+        <div class="mp-row"><span>⚡ XP</span><b id="pXp">0</b></div>
+        <div class="mp-row"><span>💼 月薪</span><b id="pSalary">-</b></div>
+        <div class="mp-row"><span>💰 存款</span><b id="pCoins">0</b></div>
+      </div>
       <div class="sky-bird">〰</div><div class="sky-bird b2">〰</div>
       <div class="drone"><i class="dr-rotor"></i><i class="dr-body"></i><i class="dr-rotor r2"></i><i class="dr-light"></i></div>
       <div class="drone-path"></div>
@@ -999,6 +1046,54 @@ function facilityHTML(kind){
   </div>`;
 }
 
+function buildProgressPanel(){
+  const d=document.createElement('div');
+  d.className='map-panel progress-panel';
+  let done=0,total=0; const marks=[];
+  (content.levels||[]).forEach(lv=>{
+    const p=levelProgress(lv); total+=p.total; done+=p.done;
+    marks.push('<span class="pp-mark '+(p.completed?'done':'')+'" title="'+lv.areaName+'">'+(p.completed?'✓':lv.id)+'</span>');
+  });
+  const pct=total?Math.round(done/total*100):0;
+  d.innerHTML='<div class="mp-title">🗺️ 闯关进度</div>'+
+    '<div style="font-size:13px;color:var(--dim)">已完成 '+done+'/'+total+' 任务 · '+pct+'%</div>'+
+    '<div class="pp-bar"><div class="pp-fill" style="width:'+pct+'%"></div></div>'+
+    '<div class="pp-marks">'+marks.join('')+'</div>';
+  return d;
+}
+function buildFlowTip(){
+  const d=document.createElement('div');
+  d.className='map-panel flow-tip';
+  d.innerHTML='<div class="mp-title">🧭 数据怎么流动</div>'+
+    '<div class="flow-v">'+
+    '<div class="fv-item">L4 · 云与智能</div><div class="fv-arrow">▲</div>'+
+    '<div class="fv-item">L3 · 数据贯通</div><div class="fv-arrow">▲</div>'+
+    '<div class="fv-item">L2 · 控制操作</div><div class="fv-arrow">▲</div>'+
+    '<div class="fv-item">L1 · 现场接入</div>'+
+    '</div>'+
+    '<div class="mp-desc">数据从车间一路往上汇——中栏四层就是这条路。点建筑进任务。</div>';
+  return d;
+}
+function layoutColumns(){
+  try{
+    const c=document.querySelector('.compound');
+    if(!c || c.querySelector('.map-col')) return;
+    if(innerWidth<1100) return;   // 移动端保持单列
+    const mk=cls=>{const d=document.createElement('div'); d.className='map-col '+cls; return d;};
+    const colL=mk('cl-left'), colM=mk('cl-mid'), colR=mk('cl-right');
+    // 左栏：玩家档案 + 厂长/灯塔/路线/主干道 + 数据流导览 + 动力站
+    const pc=c.querySelector('#playerCard'); if(pc) colL.appendChild(pc);
+    colL.appendChild(buildProgressPanel());
+    ['.entrance','.gate','.route-bar','.road.road-a'].forEach(sel=>{const el=c.querySelector(sel); if(el) colL.appendChild(el);});
+    colL.appendChild(buildFlowTip());
+    const ut=c.querySelector('.utility-zone'); if(ut) colL.appendChild(ut);
+    // 中栏：ISA 四层 + 主干道B + 中心广场（完整数据流）
+    ['#isaArea','.road.road-b','.plaza'].forEach(sel=>{const el=c.querySelector(sel); if(el) colM.appendChild(el);});
+    // 右栏：设施
+    const fr=c.querySelector('.fac-row'); if(fr) colR.appendChild(fr);
+    c.appendChild(colL); c.appendChild(colM); c.appendChild(colR);
+  }catch(e){}
+}
 function render(){
   const xp=me.salaryInfo?me.salaryInfo.xp:0;
   let rank=RANKS[0];
@@ -1007,6 +1102,10 @@ function render(){
   $('pRank').textContent=rank.e+' '+rank.t;
   $('pXp').textContent=xp;
   $('pCoins').textContent=me.coins||0;
+  // 月薪：按段位(XP)查档（与 db.js SALARY_TABLE 一致）
+  const salTable=[[0,100],[1000,200],[2500,350],[4500,500],[7000,800]];
+  let _rate=100; for(const _r of salTable) if(xp>=_r[0]) _rate=_r[1];
+  if($('pSalary')) $('pSalary').textContent=_rate;
 
   $('isaArea').innerHTML = ISA_LAYERS.map((L,i)=>{
     const body=L.areas.map(a=>{ const lv=content.levels.find(l=>l.factoryArea===a); return lv?buildingHTML(lv):''; }).join('');
@@ -1014,6 +1113,7 @@ function render(){
     return `<div class="isa-layer"><div class="isa-tag"><span class="ilv">${L.level}</span><b>${L.name}</b><em>${L.sub}</em></div><div class="row">${body}</div></div>${flow}`;
   }).join('');
   $('facRow').innerHTML=facilityHTML('game')+facilityHTML('research')+facilityHTML('shop')+facilityHTML('rest');
+  layoutColumns();
 
   // 闯关路线条
   const nums=['①','②','③','④','⑤','⑥','⑦','⑧'];
