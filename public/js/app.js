@@ -711,6 +711,41 @@ function calculateLevelXP(levelId) {
 }
 
 // =========================================================================
+// 概念动画「📺 看动画」：教材侧出 HTML 精简版(anim/*.html)，游戏侧播放器接入
+// =========================================================================
+const ANIM_MAP = {
+  '2-6b': { file:'anim/closed_loop_lite.html', title:'数据闭环' }
+  // '1-5b': { file:'anim/tcp_handshake_lite.html', title:'TCP 三次握手' },   // 教材侧精简版待批
+  // '7-0':  { file:'anim/mqtt_pubsub_lite.html',  title:'MQTT 发布-订阅' },   // 教材侧精简版待批
+};
+function openTaskAnim(taskId){
+  const a=ANIM_MAP[taskId];
+  if(!a) return;
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.86);z-index:10010;display:flex;align-items:center;justify-content:center';
+  const box=document.createElement('div');
+  box.style.cssText='width:min(920px,92vw);background:#12121a;border:2px solid var(--amber);border-radius:10px;overflow:hidden;box-shadow:0 0 60px rgba(255,176,64,.25)';
+  box.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(8,11,20,.92)">
+      <div style="color:var(--amber);font-weight:bold;font-size:15px;letter-spacing:1px">📺 概念动画 · ${a.title}</div>
+      <div style="display:flex;gap:8px">
+        <button id="animReplay" style="background:#22222e;border:1px solid var(--border);color:#c8c8d0;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:13px">↻ 重播</button>
+        <button id="animClose" style="background:#3a2230;border:1px solid #6a3a4a;color:#ff9aa0;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:13px">✕ 关闭</button>
+      </div>
+    </div>
+    <div style="position:relative;width:100%;aspect-ratio:16/9;background:#0b0e1a">
+      <iframe id="animFrame" src="${a.file}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allowfullscreen></iframe>
+    </div>`;
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+  ov.addEventListener('click', function(e){ if(e.target===ov) ov.remove(); });
+  box.querySelector('#animClose').onclick=function(){ ov.remove(); };
+  box.querySelector('#animReplay').onclick=function(){ const f=box.querySelector('#animFrame'); f.src=f.src; };
+  // 加载兜底：iframe 加载失败提示
+  const fr=box.querySelector('#animFrame');
+  fr.onerror=function(){ box.querySelector('.anim-holder').innerHTML='<div style="color:var(--dim);padding:40px;text-align:center">⚠️ 动画加载失败，请稍后重试</div>'; };
+}
+// =========================================================================
 // P2 NARRATIVE SYSTEM: Task Preface Dialogue
 // =========================================================================
 function showTaskPreface(task, onStart) {
@@ -735,9 +770,12 @@ function showTaskPreface(task, onStart) {
       </div>
     </div>
     <div style="padding:16px 20px;text-align:center;border-top:1px solid var(--border);background:rgba(0,0,0,.2)">
-      <button id="taskPrefaceBtn" style="display:block;margin:0 auto;padding:10px 32px;background:var(--cyan);color:#000;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;opacity:0.5" disabled>
-        正在讲解...
-      </button>
+      <div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap">
+        ${ANIM_MAP[task.id] ? '<button id="taskAnimBtn" style="padding:10px 20px;background:var(--amber);color:#1a1206;border:none;border-radius:4px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit">📺 看动画</button>' : ''}
+        <button id="taskPrefaceBtn" style="padding:10px 32px;background:var(--cyan);color:#000;border:none;border-radius:4px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;opacity:0.5" disabled>
+          正在讲解...
+        </button>
+      </div>
     </div>
   `;
   
@@ -746,6 +784,8 @@ function showTaskPreface(task, onStart) {
   
   const textEl = box.querySelector('#taskPrefaceText');
   const btn = box.querySelector('#taskPrefaceBtn');
+  const animBtn = box.querySelector('#taskAnimBtn');
+  if(animBtn) animBtn.onclick = function(){ openTaskAnim(task.id); };
   
   typewrite(textEl, teachText, 20, () => {
     btn.disabled = false;
@@ -1000,6 +1040,7 @@ Object.assign(window, {
   openStormDefense,
   openTank,
   openTaskModal,
+  openTaskAnim,
   openTile2048,
   openTowerDefense,
   openTycoon,

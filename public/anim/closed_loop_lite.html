@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!-- 精简嵌入版（供游戏「📺看动画」iframe 使用）：去掉终端窗/成就弹窗，保留像素车间+工位+动效+进度条+副题讲解。
+     源：closed_loop_game2.html（完整版）。与教材图2-2 同构（5框+虚线反馈=六环节）。2026-08-16 -->
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#0b0e1a; }
+  body { font-family:'Courier New','Noto Sans Mono CJK SC',monospace; display:flex; }
+  svg { display:block; width:100%; height:100%; }
+  .station-pad { transition: stroke .18s ease, filter .18s ease; }
+  .station-tag { transition: fill .18s ease; }
+  .st-emoji { transition: font-size .18s ease; }
+  .active .station-pad { filter: drop-shadow(0 0 14px var(--sc)); }
+  .active .st-emoji { }
+  .pathline { stroke:#4a5570; stroke-width:4; stroke-dasharray:8 8; fill:none; stroke-linecap:square; transition: stroke .2s ease; }
+  .pathhead { fill:#4a5570; transition: fill .2s ease; }
+  #pkt { transition:none; }
+  .label-tag { font-size:20px; font-weight:700; letter-spacing:3px; }
+</style>
+</head>
+<body>
+<svg id="scene" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="pixel" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#19203a"/>
+      <rect width="12" height="12" fill="#1c2340"/>
+      <rect x="12" y="12" width="12" height="12" fill="#1c2340"/>
+    </pattern>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="pktGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="roomGlow" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0%" stop-color="#1a2340" stop-opacity=".7"/><stop offset="100%" stop-color="#0d1120" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ===== 顶部：标题 + 当前环节副题（嵌入版，无终端窗） ===== -->
+  <text id="title" x="640" y="72" font-size="40" font-weight="700" text-anchor="middle" fill="#ffb340" letter-spacing="3" opacity="0">数据闭环 · 让数据在工厂里转起来</text>
+  <text id="subline" x="640" y="122" font-size="24" text-anchor="middle" fill="#cdd8ea" opacity="0"></text>
+
+  <!-- ===== 车间地图（主场景） ===== -->
+  <rect x="40" y="158" width="1200" height="478" fill="url(#pixel)"/>
+  <rect x="40" y="158" width="1200" height="478" fill="url(#roomGlow)"/>
+  <rect x="40" y="158" width="1200" height="478" fill="none" stroke="#2a3352" stroke-width="10"/>
+  <rect x="48" y="166" width="1184" height="462" fill="none" stroke="#0a0d18" stroke-width="2"/>
+  <rect x="56" y="171" width="330" height="36" rx="4" fill="rgba(11,14,26,.92)" stroke="#ffb340" stroke-width="1.5"/>
+  <text class="label-tag" x="221" y="195" text-anchor="middle" fill="#ffb340">【 车间地图 · 数据闭环 】</text>
+
+  <!-- 路径 -->
+  <path id="loopPath" d="M 200 400 L 420 400 L 640 400 L 860 400 L 1080 400 L 1080 560 L 200 560 L 200 400" fill="none" stroke="none"/>
+  <path id="ln0" class="pathline" d="M 270 400 L 350 400"/>
+  <path id="ln1" class="pathline" d="M 490 400 L 570 400"/>
+  <path id="ln2" class="pathline" d="M 710 400 L 790 400"/>
+  <path id="ln3" class="pathline" d="M 930 400 L 1010 400"/>
+  <path id="fback" class="pathline" d="M 1080 470 L 1080 560 L 200 560 L 200 470" stroke="#3a4560" stroke-dasharray="8 8"/>
+  <polygon id="ah0" class="pathhead" points="350,392 372,400 350,408"/>
+  <polygon id="ah1" class="pathhead" points="570,392 592,400 570,408"/>
+  <polygon id="ah2" class="pathhead" points="790,392 812,400 790,408"/>
+  <polygon id="ah3" class="pathhead" points="1010,392 1032,400 1010,408"/>
+  <polygon id="ahf" class="pathhead" fill="#4a5570" points="192,492 208,492 200,468" opacity="0"/>
+  <text x="640" y="590" font-size="20" font-weight="700" fill="#7c8ca6" text-anchor="middle">🔁 反馈 · 状态回传</text>
+
+  <!-- 5 个工位 -->
+  <g id="n0" class="station"><rect class="station-pad" x="130" y="330" width="140" height="130" rx="4" fill="#121830" stroke="#2c3552" stroke-width="2" style="--sc:#00bcd4"/>
+    <text class="st-emoji" x="200" y="392" font-size="44" text-anchor="middle">📡</text>
+    <text class="station-tag" x="200" y="434" font-size="22" font-weight="700" text-anchor="middle" fill="#ffb340">感知</text>
+    <text class="station-tag" x="200" y="452" font-size="13" text-anchor="middle" fill="#7c8ca6">传感器采集</text></g>
+  <g id="n1" class="station"><rect class="station-pad" x="350" y="330" width="140" height="130" rx="4" fill="#121830" stroke="#2c3552" stroke-width="2" style="--sc:#00e676"/>
+    <text class="st-emoji" x="420" y="392" font-size="44" text-anchor="middle">🌐</text>
+    <text class="station-tag" x="420" y="434" font-size="22" font-weight="700" text-anchor="middle" fill="#ffb340">传输</text>
+    <text class="station-tag" x="420" y="452" font-size="13" text-anchor="middle" fill="#7c8ca6">网络上传</text></g>
+  <g id="n2" class="station"><rect class="station-pad" x="570" y="330" width="140" height="130" rx="4" fill="#121830" stroke="#2c3552" stroke-width="2" style="--sc:#ffb340"/>
+    <text class="st-emoji" x="640" y="392" font-size="44" text-anchor="middle">🖥️</text>
+    <text class="station-tag" x="640" y="434" font-size="22" font-weight="700" text-anchor="middle" fill="#ffb340">分析</text>
+    <text class="station-tag" x="640" y="452" font-size="13" text-anchor="middle" fill="#7c8ca6">平台计算</text></g>
+  <g id="n3" class="station"><rect class="station-pad" x="790" y="330" width="140" height="130" rx="4" fill="#121830" stroke="#2c3552" stroke-width="2" style="--sc:#ff5555"/>
+    <text class="st-emoji" x="860" y="392" font-size="44" text-anchor="middle">🧠</text>
+    <text class="station-tag" x="860" y="434" font-size="22" font-weight="700" text-anchor="middle" fill="#ffb340">决策</text>
+    <text class="station-tag" x="860" y="452" font-size="13" text-anchor="middle" fill="#7c8ca6">算法指令</text></g>
+  <g id="n4" class="station"><rect class="station-pad" x="1010" y="330" width="140" height="130" rx="4" fill="#121830" stroke="#2c3552" stroke-width="2" style="--sc:#e040fb"/>
+    <text class="st-emoji" x="1080" y="392" font-size="44" text-anchor="middle">🦾</text>
+    <text class="station-tag" x="1080" y="434" font-size="22" font-weight="700" text-anchor="middle" fill="#ffb340">执行</text>
+    <text class="station-tag" x="1080" y="452" font-size="13" text-anchor="middle" fill="#7c8ca6">设备动作</text></g>
+
+  <!-- 数据包（8bit 发光方块） -->
+  <g id="pktWrap" filter="url(#pktGlow)">
+    <rect id="pkt" x="0" y="0" width="16" height="16" fill="#fff9c4" stroke="#ffb340" stroke-width="2"/>
+  </g>
+
+  <!-- ===== 底部进度条 ===== -->
+  <g id="prog">
+    <rect x="60" y="660" width="1160" height="22" rx="3" fill="#0d1120" stroke="#2c3552" stroke-width="1"/>
+    <rect id="progFill" x="62" y="662" width="0" height="18" rx="2" fill="#ffb340" opacity="0.9"/>
+    <text id="progTxt" x="640" y="653" font-size="15" text-anchor="middle" fill="#cdd8ea" font-weight="700">1 / 6</text>
+  </g>
+
+
+</svg>
+
+<script>
+const $=id=>document.getElementById(id);
+const STAGES=[
+ {name:'感知', color:'#00bcd4', desc:'传感器采集温度 / 振动 / 产量等数据', start:1500, end:4000},
+ {name:'传输', color:'#00e676', desc:'数据经工业网络上传至边缘 / 平台', start:4000, end:6500},
+ {name:'分析', color:'#ffb340', desc:'平台对数据清洗、计算、建模', start:6500, end:9000},
+ {name:'决策', color:'#ff5555', desc:'算法根据模型生成控制指令', start:9000, end:11500},
+ {name:'执行', color:'#e040fb', desc:'设备执行动作：调阀、启停、变速', start:11500, end:14000},
+ {name:'反馈', color:'#9aa3bd', desc:'状态数据回传，闭环转入下一圈', start:14000, end:16500},
+];
+const TOTAL=18000;
+const path=$('loopPath');
+const L=path.getTotalLength();
+const SEG=[0,220,440,660,880,L];
+const pads=[0,1,2,3,4].map(i=>$('n'+i).querySelector('.station-pad'));
+const stations=['n0','n1','n2','n3','n4'].map(id=>$(id));
+const linkLines=['ln0','ln1','ln2','ln3'].map(id=>$(id));
+const linkHeads=['ah0','ah1','ah2','ah3'].map(id=>$(id));
+const LINKCOL=['#00bcd4','#00e676','#ffb340','#ff5555','#e040fb'];
+
+const t0=performance.now();
+function draw(now){
+  const t=now-t0;
+  let cur=-1;
+  STAGES.forEach((s,i)=>{ if(t>=s.start && t<s.end) cur=i; });
+  if(t>=16500) cur=6;
+  const boxActive = (cur>=0&&cur<=4)? cur : -1;
+  const arcActive = (cur===5||cur===6);
+
+  // 工位高亮
+  for(let i=0;i<5;i++){
+    const on = i===boxActive || cur===6;
+    pads[i].setAttribute('stroke', on? LINKCOL[i] : '#2c3552');
+    pads[i].setAttribute('stroke-width', on? '3':'2');
+    stations[i].setAttribute('class', 'station' + (on? ' active':''));
+  }
+  // 路径高亮
+  for(let i=0;i<4;i++){
+    const on = cur===6 || cur-1===i;
+    linkLines[i].setAttribute('stroke', on? LINKCOL[i] : '#4a5570');
+    linkHeads[i].setAttribute('fill', on? LINKCOL[i] : '#4a5570');
+  }
+  const fb=$('fback');
+  fb.setAttribute('stroke', arcActive? '#00bcd4' : '#3a4560');
+  fb.setAttribute('stroke-width', arcActive? '6':'4');
+  $('ahf').setAttribute('opacity', arcActive? '1':'0');
+  $('ahf').setAttribute('fill', arcActive? '#00bcd4' : '#4a5570');
+
+  // 数据包位置
+  let frac;
+  if(cur<=0 && t<4000){ frac=0; }
+  else if(cur>=1 && cur<=5){
+    const s=STAGES[cur]; const f=Math.min(1,(t-s.start)/(s.end-s.start));
+    frac = SEG[cur-1] + (SEG[cur]-SEG[cur-1])*f;
+  }else if(cur===6){ frac = (t-16500)/1500 * L; }
+  else { frac=0; }
+  const p=path.getPointAtLength(Math.min(frac, L));
+  $('pkt').setAttribute('x', p.x-8); $('pkt').setAttribute('y', p.y-8);
+
+  // 标题淡入 + 副题更新（嵌入版无终端，副题承担讲解）
+  if(t>=1000) $('title').setAttribute('opacity', Math.min(1,(t-1000)/400));
+  const sl=$('subline');
+  if(cur>=0 && cur<=5){ sl.setAttribute('opacity','1'); sl.textContent=(cur+1)+' / 6 · '+STAGES[cur].desc; }
+  else if(cur===6){ sl.setAttribute('opacity','1'); sl.textContent='★ 闭环形成 · 数据循环往复，持续优化生产'; }
+  else { sl.setAttribute('opacity','0'); }
+
+  // 底部进度条
+  const curNo = cur===6? 6 : (cur+1);
+  $('progFill').setAttribute('width', Math.max(0,(curNo)/6)*1156);
+  $('progTxt').textContent = (cur===6? '6' : (cur+1)) + ' / 6';
+
+
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
