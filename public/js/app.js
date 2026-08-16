@@ -1136,7 +1136,17 @@ init().then(() => {
         // 排进登录弹窗队列之后打开：欢迎/改密逐个关完，再进任务前言，避免弹窗轰炸
         enqueueLoginPopup(done => openTaskModal(lv.id, realTask.id, function(){ hideTransit(); done(); }));
       } else {
-        // 只进关卡（?level=X 无具体任务）：没有任务弹窗负责收尾，直接淡出过场，避免卡在"正在进入关卡"
+        // 已通关关卡入口（?level=X 无当前任务）：幕intro 结束后恢复关卡任务列表，
+        // 避免 map-flow 模式下无任务可开、只剩空壳白屏；列表可点任务重刷拿满分
+        enqueueLoginPopup(done => {
+          document.body.classList.remove('map-flow');
+          renderFactory();
+          renderMission();
+          renderHeader();
+          hideTransit();
+          done();
+        });
+        // 先行淡出过场，避免 intro 弹出前长时间停在"正在进入关卡"
         setTimeout(() => hideTransit(), 300);
       }
     }
