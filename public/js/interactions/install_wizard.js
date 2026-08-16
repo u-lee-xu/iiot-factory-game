@@ -166,7 +166,7 @@ registerInteraction('install_wizard', {
       // → 立即验证命令，不正确的直接报错，不跑动画
       var normalized = cmd.toLowerCase().replace(/\s+/g, ' ');
       var commands = [step.correctCommand.toLowerCase()].concat((step.aliases || []).map(function(a) { return a.toLowerCase(); }));
-      var ok = commands.some(function(c) { return normalized === c || normalized.startsWith(c); });
+      var ok = commands.some(function(c) { return normalized === c; });   // 严格匹配：错误命令(如 ss -tln -)真实报错，不靠前缀放行
       
       var stage = document.getElementById('wizardStage');
       var termRoot = stage.querySelector('.term-root');
@@ -248,7 +248,7 @@ registerInteraction('install_wizard', {
           setTimeout(function() {
             var normalized = cmd.toLowerCase().replace(/\s+/g, ' ');
             var commands = [step.correctCommand.toLowerCase()].concat((step.aliases || []).map(function(a) { return a.toLowerCase(); }));
-            var ok = commands.some(function(c) { return normalized === c || normalized.startsWith(c); });
+            var ok = commands.some(function(c) { return normalized === c; });   // 严格匹配：错误命令(如 ss -tln -)真实报错，不靠前缀放行
             if (ok) {
               var okDiv = document.createElement('div');
               okDiv.textContent = step.successText || '\u2705 系统更新完成，所有软件包已是最新版本！';
