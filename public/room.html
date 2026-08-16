@@ -343,9 +343,9 @@ body{min-height:100dvh;min-height:100vh;overflow-x:hidden}
 
 /* 桌面高分屏：房间面板放宽铺满，横版/俯视场景加高，不再居中成手机窄条 */
 @media (min-width:1100px){
-  .room-panel{width:min(1560px,96vw)}
+  .room-panel{width:min(1560px,96vw);max-height:none;overflow:hidden}
   .sx-scene{height:660px;margin:0 20px 14px}
-  .room-scene{height:min(680px, calc(100dvh - 190px));min-height:460px;margin:0 20px 14px}
+  .room-scene{height:min(660px, calc(100dvh - 330px));min-height:430px;margin:0 20px 14px}
 }
 /* 纵版房间：竖直滚轴 */
 .vx-scene{position:relative;margin:0 18px 12px;border-radius:2px;overflow:hidden;border:10px solid #2c2a48;box-shadow:inset 0 0 0 2px #141222,0 4px 0 rgba(0,0,0,.4);background:#0a0e22;touch-action:none}
@@ -1213,7 +1213,7 @@ function renderRoom(id){
   const isPCLarge = !!(window.matchMedia && window.matchMedia('(min-width:1100px)').matches);
   const _availW = Math.max(760, (document.body.clientWidth||window.innerWidth) - 46);
   // PC：俯视 scene 高度适中（上限680px、下限460px，不撑满视口，保证 head+场景+footer 无页面滚动条）
-  const _sceneH = isPCLarge ? Math.max(460, Math.min(680, window.innerHeight - 190)) : 0;
+  const _sceneH = isPCLarge ? Math.max(430, Math.min(660, window.innerHeight - 330)) : 0;
   let ROOM_W, ROOM_H;
   if (isPCLarge) {
     ROOM_W = Math.max(300, Math.round((_availW - WV*(nRoom+1)) / nRoom));
