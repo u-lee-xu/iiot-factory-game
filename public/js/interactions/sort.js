@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { escHtml, taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { kbdCleanup } from '../core/kbd.js';
 
 registerInteraction('sort', {
   render(container, task) {
@@ -77,6 +78,50 @@ registerInteraction('sort', {
 
       area.appendChild(div);
     });
+
+    // 键盘重排：空格拿起/放下，↑/↓ 移动（无选中时移动光标）
+    function setupSortKbd(area){
+      kbdCleanup();
+      const items=()=>[...area.querySelectorAll('.sort-item')];
+      let idx=-1, picked=null;
+      function focus(i){
+        items().forEach((el,k)=>el.classList.toggle('kbd-focus', k===i));
+        idx=i;
+      }
+      function move(dir){
+        const list=items();
+        if(!list.length) return;
+        if(picked===null){ idx=(idx+dir+list.length)%list.length; focus(idx); }
+        else{
+          const cur=list.indexOf(picked);
+          const to=cur+dir;
+          if(to>=0&&to<list.length){
+            const ref=list[to];
+            if(to<cur) area.insertBefore(picked, ref);
+            else area.insertBefore(picked, ref.nextSibling);
+            focus(list.indexOf(picked));
+          }
+        }
+      }
+      function togglePick(){
+        const list=items();
+        if(idx<0||!list[idx]) return;
+        if(picked===list[idx]){ picked=null; list[idx].classList.remove('picked'); }
+        else{ picked=list[idx]; list.forEach(el=>el.classList.remove('picked')); list[idx].classList.add('picked'); }
+      }
+      function onKey(e){
+        const list=items();
+        if(!list.length) return;
+        if(e.key==='ArrowDown'||e.key==='ArrowRight'){ e.preventDefault(); move(1); }
+        else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){ e.preventDefault(); move(-1); }
+        else if(e.key===' '){ e.preventDefault(); togglePick(); }
+        // 回车交给全局回车（检查顺序）
+      }
+      window.addEventListener('keydown', onKey);
+      if(items().length) focus(0);
+      window.__kbdCleanup=function(){ window.removeEventListener('keydown', onKey); };
+    }
+    setupSortKbd(area);
 
     document.getElementById('modalFoot').innerHTML = `
       <button class="btn" onclick="window.closeModal()">取消</button>

@@ -1309,3 +1309,6 @@ body.map-flow .modal-body > * { max-width: 900px; margin-left: auto; margin-righ
 
 /* PC 键盘导航：聚焦项发光外框 */
 .kbd-focus{box-shadow:0 0 0 2px #ffb340, 0 0 12px rgba(255,179,64,.6)!important;outline:none}
+
+/* 排序任务：拿起项高亮 */
+.sort-item.picked{background:rgba(255,179,64,.15);border-color:var(--amber)!important}

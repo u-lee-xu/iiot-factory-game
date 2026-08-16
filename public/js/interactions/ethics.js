@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('ethics', {
   render(container, task) {
@@ -29,6 +30,7 @@ registerInteraction('ethics', {
       };
       choices.appendChild(div);
     });
+    setupKbdNav(choices, '.ethics-choice');
     window.submitEthics = (choice) => {
       const allChoices = choices.querySelectorAll('.ethics-choice');
       allChoices.forEach((el, i) => {

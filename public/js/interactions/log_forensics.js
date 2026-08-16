@@ -5,6 +5,7 @@
 import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('log_forensics', {
   render(container, task) {
@@ -59,6 +60,7 @@ registerInteraction('log_forensics', {
       };
       optContainer.appendChild(el);
     });
+    setupKbdNav(optContainer, '.forensics-opt');
 
     function renderOptions() {
       document.querySelectorAll('.forensics-opt').forEach((el, i) => {

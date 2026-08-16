@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('diagnosis_tree', {
   render(container, task) {
@@ -57,6 +58,7 @@ registerInteraction('diagnosis_tree', {
         };
         opts.appendChild(div);
       });
+      setupKbdNav(opts, '.diag-opt');
       document.getElementById('modalFoot').innerHTML = `<button class="btn" onclick="window.closeModal()">取消</button>`;
     }
     renderStep();

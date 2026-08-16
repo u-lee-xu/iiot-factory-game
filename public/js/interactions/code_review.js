@@ -6,6 +6,7 @@ import { registerInteraction } from '../core/interactions.js';
 import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
+import { setupKbdNav } from '../core/kbd.js';
 
 registerInteraction('code_review', {
   render(container, task) {
@@ -36,6 +37,7 @@ registerInteraction('code_review', {
       };
       opts.appendChild(div);
     });
+    setupKbdNav(opts, '.quiz-opt');
     window.submitCodeReview = (choice, answer) => {
       const els = document.getElementById('codeOpts').querySelectorAll('.quiz-opt');
       els.forEach((el, i) => {
