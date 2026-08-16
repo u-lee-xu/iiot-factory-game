@@ -73,7 +73,7 @@ function showTaskPreface(task, onStart) {
   const box = document.createElement('div');
   box.style.cssText = 'background:#12121a;border:2px solid var(--cyan,#00bcd4);border-radius:8px;padding:0;width:min(92vw,560px);box-shadow:0 0 60px rgba(0,188,212,.2);overflow:hidden;max-height:86vh;display:flex;flex-direction:column';
   box.innerHTML =
-    '<div class="director-box director-mood-thinking" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border,#2c3552);padding:16px 20px;display:flex;gap:12px;align-items:flex-start">' +
+    '<div class="director-box director-mood-thinking" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border,#2c3552);padding:16px 20px;display:flex;gap:12px;align-items:flex-start;flex:1;min-height:0;overflow-y:auto">' +
       '<div class="director-portrait" style="font-size:36px;line-height:1;flex-shrink:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#1a1a24;border-radius:4px">👨‍💼</div>' +
       '<div class="director-bubble" style="flex:1;min-width:0"><div class="director-name" style="font-size:16px;color:var(--amber,#ffb340);margin-bottom:2px">厂长</div>' +
       '<div class="director-text" id="roomTaskPrefaceText" style="font-size:15px;line-height:1.7;color:var(--text,#e8eaf0);white-space:pre-wrap"></div></div>' +
