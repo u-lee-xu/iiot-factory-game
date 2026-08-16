@@ -37,7 +37,7 @@ registerInteraction('drag_classify', {
     const initialMood = window.getDirectorMood(task, { firstTime: true });
     window.addDirectorBox(container, teachText, () => {
       document.getElementById('dragClassifyArea').style.opacity = '1';
-    }, initialMood);
+    }, initialMood, { collapsed: true });
 
     const pool = document.getElementById('classifyPool');
     const cats = document.getElementById('classifyCats');

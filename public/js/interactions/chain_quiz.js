@@ -19,7 +19,7 @@ registerInteraction('chain_quiz', {
 
     container.innerHTML = '';
     const initialMood = window.getDirectorMood(task, { firstTime: true });
-    window.addDirectorBox(container, teachText, () => showQ(), initialMood);
+    window.addDirectorBox(container, teachText, () => showQ(), initialMood, { collapsed: true });
 
     function showQ() {
       if (currentQ >= questions.length) {

@@ -26,7 +26,7 @@ registerInteraction('fill_blank', {
     const initialMood = window.getDirectorMood(task, { firstTime: true });
     window.addDirectorBox(container, teachText, () => {
       document.getElementById('fillBlankArea').style.opacity = '1';
-    }, initialMood);
+    }, initialMood, { collapsed: true });
     document.getElementById('fillBlankArea').style.opacity = '0.3';
     document.getElementById('fillBlankArea').style.transition = 'opacity .5s';
 

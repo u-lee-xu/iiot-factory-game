@@ -177,8 +177,9 @@ export function getDirectorMood(task, context) {
   return 'neutral';
 }
 
-export function addDirectorBox(container, text, cb, mood) {
+export function addDirectorBox(container, text, cb, mood, opts) {
   const m = mood || 'neutral';
+  const collapsed = !!(opts && opts.collapsed);   // 默认收起：引导已在前言讲过，可点开再看
   const moodLine = getRandomMoodLine(m);
   const moodEmoji = { proud: '😎', stern: '😤', awkward: '😅', thinking: '🤔', guide: '👨‍💼', neutral: '👨‍💼' }[m];
   
@@ -195,24 +196,32 @@ export function addDirectorBox(container, text, cb, mood) {
   `;
   container.prepend(box);
   const textEl = box.querySelector('.director-text');
-  typewrite(textEl, String(text || '').replace(/^厂长[:：]\s*/, ''), 25, () => {
-    const toggle = box.querySelector('.teach-toggle');
-    if (toggle) {
-      toggle.style.display = 'block';
-      toggle.onclick = () => {
-        const textEl2 = box.querySelector('.director-text');
-        const nameEl = box.querySelector('.director-name');
-        const moodLineEl = box.querySelector('.director-mood-line');
-        const isHidden = textEl2.style.display === 'none';
-        textEl2.style.display = isHidden ? '' : 'none';
-        nameEl.style.display = isHidden ? '' : 'none';
-        if (moodLineEl) moodLineEl.style.display = isHidden ? '' : 'none';
-        toggle.textContent = isHidden ? '△ 收起教学' : '▽ 展开教学';
-        toggle.style.marginTop = isHidden ? '6px' : '0';
-      };
-    }
+  const nameEl = box.querySelector('.director-name');
+  const moodLineEl = box.querySelector('.director-mood-line');
+  const toggle = box.querySelector('.teach-toggle');
+
+  function setCollapsed(hidden){
+    textEl.style.display = hidden ? 'none' : '';
+    nameEl.style.display = hidden ? 'none' : '';
+    if (moodLineEl) moodLineEl.style.display = hidden ? 'none' : '';
+    toggle.style.display = 'block';
+    toggle.textContent = hidden ? '▽ 展开教学' : '△ 收起教学';
+    toggle.style.marginTop = hidden ? '6px' : '0';
+  }
+  function finish(){
+    toggle.style.display = 'block';
+    if (collapsed) setCollapsed(true);
+    toggle.onclick = () => { setCollapsed(textEl.style.display === 'none' ? false : true); };
     if (cb) cb();
-  });
+  }
+
+  const _text = String(text || '').replace(/^厂长[:：]\s*/, '');
+  if (collapsed) {
+    textEl.textContent = _text;   // 收起：直接填充文本但不展开，立即就绪
+    finish();
+  } else {
+    typewrite(textEl, _text, 25, finish);
+  }
   return box;
 }
 

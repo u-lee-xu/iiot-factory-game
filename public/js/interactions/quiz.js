@@ -24,7 +24,7 @@ registerInteraction('quiz', {
       document.getElementById('quizQ').style.opacity = '1';
       document.getElementById('quizOpts').style.opacity = '1';
       setupKbdNav(document.getElementById('quizOpts'), '.quiz-opt');
-    }, initialMood);
+    }, initialMood, { collapsed: true });
     const opts = document.getElementById('quizOpts');
     cfg.options.forEach((opt, i) => {
       const div = document.createElement('div');

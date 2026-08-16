@@ -516,7 +516,7 @@ export function renderTypeTerminal(container, task, cfg) {
   `;
   // 初始 mood：首次进关卡 -> thinking
   const initialMood = window.getDirectorMood(task, { firstTime: true });
-  window.addDirectorBox(teachArea, teachText, () => startBoot(), initialMood);
+  window.addDirectorBox(teachArea, teachText, () => startBoot(), initialMood, { collapsed: true });
 
   function startBoot() {
   document.getElementById('termRoot').style.display = 'block';
