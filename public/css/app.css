@@ -1295,3 +1295,14 @@ body.map-flow .modal-body > * { max-width: 900px; margin-left: auto; margin-righ
   .gr-cab-screen { width: 50px; height: 42px; font-size: 22px; }
   .gr-cab-name { font-size: 12px; }
 }
+
+/* 厂长任务前言：PC 放大 */
+.task-preface-box{max-width:500px}
+.task-pref-text{font-size:15px}
+@media (min-width:1100px){
+  .task-preface-box{max-width:800px}
+  .task-pref-text{font-size:18px}
+  .task-preface-box .director-mood-line{font-size:15px!important}
+  .task-preface-box #taskPrefaceBtn{font-size:17px!important;padding:12px 40px!important}
+  .task-preface-box #taskAnimBtn{font-size:16px!important;padding:12px 24px!important}
+}

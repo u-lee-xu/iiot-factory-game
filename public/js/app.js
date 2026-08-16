@@ -758,7 +758,8 @@ function showTaskPreface(task, onStart) {
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:10001;display:flex;align-items:center;justify-content:center';
   
   const box = document.createElement('div');
-  box.style.cssText = 'background:#12121a;border:2px solid var(--cyan);border-radius:8px;padding:0;max-width:500px;width:90%;box-shadow:0 0 60px rgba(0,188,212,.2);overflow:hidden';
+  box.className = 'task-preface-box';
+  box.style.cssText = 'background:#12121a;border:2px solid var(--cyan);border-radius:8px;padding:0;width:90%;box-shadow:0 0 60px rgba(0,188,212,.2);overflow:hidden';
   
   box.innerHTML = `
     <div class="director-box director-mood-thinking" style="margin:0;border-radius:0;border:none;border-bottom:1px solid var(--border);padding:16px 20px">
@@ -766,7 +767,7 @@ function showTaskPreface(task, onStart) {
       <div class="director-bubble">
         <div class="director-name">厂长</div>
         <div class="director-mood-line" style="font-size:13px;color:var(--cyan);margin-bottom:4px;font-style:italic">${moodLine}</div>
-        <div class="director-text" id="taskPrefaceText" style="font-size:15px;line-height:1.7;color:var(--text)"></div>
+        <div class="director-text task-pref-text" id="taskPrefaceText" style="line-height:1.7;color:var(--text)"></div>
       </div>
     </div>
     <div style="padding:16px 20px;text-align:center;border-top:1px solid var(--border);background:rgba(0,0,0,.2)">
@@ -786,6 +787,9 @@ function showTaskPreface(task, onStart) {
   const btn = box.querySelector('#taskPrefaceBtn');
   const animBtn = box.querySelector('#taskAnimBtn');
   if(animBtn) animBtn.onclick = function(){ openTaskAnim(task.id); };
+  // 回车 = 点「收到，开始操作」（文字播完、按钮可用后才生效）
+  const onPrefaceKey = function(e){ if(e.key==='Enter'){ const b=box.querySelector('#taskPrefaceBtn'); if(b && !b.disabled){ b.click(); } } };
+  window.addEventListener('keydown', onPrefaceKey);
   
   typewrite(textEl, teachText, 20, () => {
     btn.disabled = false;
@@ -795,6 +799,7 @@ function showTaskPreface(task, onStart) {
   });
   
   btn.onclick = () => {
+    window.removeEventListener('keydown', onPrefaceKey);
     overlay.style.opacity = '0';
     overlay.style.transition = 'opacity .3s';
     setTimeout(() => overlay.remove(), 300);
