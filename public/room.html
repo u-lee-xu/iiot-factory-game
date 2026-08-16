@@ -737,7 +737,7 @@ function rsStart(){
       // 点设备：先寻路到设备，沿路径走，到跟前自动进任务
       if(rsGo && !navPath){ navPath=findPath(px,py, rsGo.x, rsGo.y); }
       const arrived=stepAlong();
-      if(arrived && rsGo){ enterLevel(rsGo.lvId, rsGo.taskId); rsGo=null; navPath=null; tx=null; ty=null; return; }
+      if(arrived && rsGo){ const _l=rsGo.lvId, _t=rsGo.taskId; rsGo=null; navPath=null; tx=null; ty=null; enterLevel(_l,_t); /* 不return：保持帧循环续帧，关闭任务后可再次进入 */ }
       if(arrived){ tx=null; ty=null; navPath=null; }
       moving = !!(navPath && navPath.length);
       if(moving){ ldx=navPath[0].x-px; ldy=navPath[0].y-py; setDir(ldx, ldy); }
@@ -882,7 +882,7 @@ function sxStart(){
         // 设备在平台上且玩家还在下面 → 自动跳上去
         if(sxGo.platY && onGround && y > sxGo.platY-46){ vy=jumpV; onGround=false; }
         const dy=Math.abs((y+17)-sxGo.y);
-        if(dy<34){ enterLevel(sxGo.lvId,sxGo.taskId); sxGo=null; moveTarget=null; return; }
+        if(dy<34){ const _l=sxGo.lvId, _t=sxGo.taskId; sxGo=null; moveTarget=null; enterLevel(_l,_t); /* 不return：保持帧循环续帧 */ }
       }
     }
     // 键盘方向优先，按方向键清除点击目标
