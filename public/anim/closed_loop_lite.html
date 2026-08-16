@@ -123,9 +123,10 @@ const linkLines=['ln0','ln1','ln2','ln3'].map(id=>$(id));
 const linkHeads=['ah0','ah1','ah2','ah3'].map(id=>$(id));
 const LINKCOL=['#00bcd4','#00e676','#ffb340','#ff5555','#e040fb'];
 
-const t0=performance.now();
+let t0=performance.now();
 function draw(now){
-  const t=now-t0;
+  let t=now-t0;
+  if(t>=TOTAL){ t0=performance.now(); t=0; }   // 循环播放：播完一圈从头再来
   let cur=-1;
   STAGES.forEach((s,i)=>{ if(t>=s.start && t<s.end) cur=i; });
   if(t>=16500) cur=6;
@@ -178,6 +179,18 @@ function draw(now){
   requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
+
+// 字体适配：不同客户端宽度下缩放文字，小屏放大保证可读（PC 不变，手机/平板按比例放大）
+function fitFonts(){
+  const cw=document.body.clientWidth||window.innerWidth;
+  const f=Math.max(1, Math.min(2.6, 820/cw));
+  document.querySelectorAll('text').forEach(function(t){
+    if(t.__ofs===undefined){ t.__ofs=parseFloat(t.getAttribute('font-size'))||20; }
+    t.setAttribute('font-size', (t.__ofs*f).toFixed(1));
+  });
+}
+fitFonts();
+window.addEventListener('resize', fitFonts);
 </script>
 </body>
 </html>
