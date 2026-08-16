@@ -1029,7 +1029,6 @@ function renderRoom(id){
     <div class="room-head">
       <div class="room-logo">${logoHTML(lv.factoryArea,color)}</div>
       <div class="room-title"><div class="rt-name">${lv.areaName} ${prog.completed?'<span class="room-cleared">🎉 全通关</span>':''}</div><div class="rt-sub">${lv.name} · ${layer?layer.level+' '+layer.name:'厂区'}</div></div>
-      <button class="room-close" onclick="goBack()">✕</button>
     </div>
     <div class="room-progress"><div class="rp-bar"><div class="rp-fill" style="width:${prog.pct}%"></div></div><div class="rp-txt">已完成 ${prog.done}/${prog.total}（${prog.pct}%） · ⚡ ${earnedXP}/${totalXP} XP · 🏆 ${starStr(Math.max(st.self||0,st.teacher||0))}</div></div>
     <div class="room-narr"><div class="rt-who">👷 厂长</div>${narr||'加油，把这一层的任务打通！'}</div>
@@ -1038,10 +1037,7 @@ function renderRoom(id){
       <div class="rt-sec">🎮 关联小游戏</div>
       <div class="games">${games.length?games.map(g=>`<span class="game-chip">${g}</span>`).join(''):'<span class="game-chip">-</span>'}</div>
     </div>
-    <div class="room-foot">
-      <button class="room-back" onclick="goBack()">← 返回厂区</button>
-      <button class="room-go ${locked?'locked':''}" onclick="enterLevel('${lv.id}','${cur?cur.id:''}')">${locked?'🔒 未解锁':(cur?'▶ 进入「'+cur.title+'」':'✅ 已通关')}</button>
-    </div>
+    <!-- 出口统一走场景里的 🚪 门：不再放 返回厂区/已通关 按钮，减少操作点 -->
   </div>`;
   room.classList.add('show');
   if(viewType==='side'){ sxStop(); setTimeout(()=>sxStart(),60); }
