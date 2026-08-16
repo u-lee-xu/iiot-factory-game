@@ -38,7 +38,18 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .back{font-size:12px;color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:5px 9px;border-radius:3px}
 .back:hover{color:var(--amber);border-color:var(--amber)}
 /* ===== 厂区 ===== */
-#map{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding:14px 12px 36px}
+#map{position:relative;z-index:1;max-width:min(1700px,96vw);margin:0 auto;padding:14px 12px 36px}
+/* 桌面高分屏：左 2/3 主厂区（ISA 四层纵向，数据自下而上，体现 4 层逻辑）+ 右 1/3 设施（游戏房/研发/商城/凉亭），一页放得下、字更大 */
+@media (min-width:1100px){
+  .compound{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);grid-auto-rows:min-content;gap:16px 20px;align-items:start}
+  .entrance,.gate,.route-bar,.road,#isaArea,.plaza,.utility-zone{grid-column:1}
+  .fac-row{grid-column:2;grid-row:1/-1;align-self:start;display:grid;grid-template-columns:1fr;gap:12px}
+  .brand{font-size:23px}
+  .brand small{font-size:13px}
+  .player{font-size:16px}
+  .back{font-size:14px}
+  .foot{font-size:14px}
+}
 .compound{position:relative;border:2px solid #223050;border-radius:10px;overflow:hidden;
   background:
     radial-gradient(120% 90% at 50% 0%, rgba(30,50,95,.18), transparent 60%),
@@ -877,6 +888,7 @@ async function loadAll(){
   content=cr.data||cr; me=mr.data;
   if(!content||!content.levels){ throw new Error('内容加载失败'); }
   render();
+  scheduleFit();
 }
 
 function isTaskDone(tid){ return !!(me.check && me.check[''+tid]); }
@@ -999,6 +1011,29 @@ function facilityHTML(kind){
   </div>`;
 }
 
+function fitFactory(){
+  try{
+    const c=document.querySelector('.compound');
+    const app=document.getElementById('mapApp');
+    if(!c) return;
+    if(app && getComputedStyle(app).display==='none') return; // 页面还没显示，等下次再算
+    if(innerWidth<1100){ c.style.zoom=''; c.style.margin=''; return; }
+    // 先清 zoom 量自然尺寸
+    c.style.zoom=''; c.style.margin='';
+    const r=c.getBoundingClientRect();
+    if(!r.width || r.width<50) return;
+    const m=document.getElementById('map');
+    const availW=Math.min(m?m.clientWidth:innerWidth, innerWidth)-40;
+    const availH=innerHeight-200;   // 预留顶部品牌栏+底部 footer，保证一页放下
+    const scale=Math.max(0.4, Math.min(1.6, Math.min(availW/r.width, availH/r.height)));
+    // zoom：布局与渲染等比缩放，无双重缩放；布局盒自动变小→一页放下
+    c.style.zoom=scale;
+    c.style.margin='0 auto';
+  }catch(e){}
+}
+function scheduleFit(){
+  [80, 400, 1200, 2500].forEach(d=>setTimeout(()=>{ try{ fitFactory(); }catch(e){} }, d));
+}
 function render(){
   const xp=me.salaryInfo?me.salaryInfo.xp:0;
   let rank=RANKS[0];
@@ -1537,6 +1572,7 @@ async function autoLogin(){
     if(!content||!content.levels){ $('loginBox').classList.remove('hide'); return false; }
     render();
     $('mapApp').classList.add('show');
+    scheduleFit();
     try{ musStart(); }catch(e){}
     // 从任务叉掉/完成跳回：自动重新打开对应房间（房间=该幕任务清单）
     try{
