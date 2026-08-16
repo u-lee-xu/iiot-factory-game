@@ -581,17 +581,20 @@ function rsStart(){
   const rt=window._rtRoom||{};
   // 俯视障碍物：家具 + 内墙段（门洞不阻挡），人物需绕过
   const rsObs=[];
+  // 用 offsetLeft/offsetTop（相对 stage 的布局坐标）而非 getBoundingClientRect：
+  // 避免 .room-scene 的 10px 边框/transform 造成"视觉位置 vs 逻辑碰撞"错位
   scene.querySelectorAll('.rs-furn').forEach(el=>{
-    const r=el.getBoundingClientRect(), sr=scene.getBoundingClientRect();
-    rsObs.push({x:(r.left-sr.left)+rsCamX, y:(r.top-sr.top)+rsCamY, w:r.width, h:r.height});
+    rsObs.push({x:el.offsetLeft, y:el.offsetTop, w:el.offsetWidth, h:el.offsetHeight});
   });
   scene.querySelectorAll('.rs-part').forEach(part=>{
-    const pr=part.getBoundingClientRect(), sr=scene.getBoundingClientRect();
-    const px0=(pr.left-sr.left)+rsCamX, py0=(pr.top-sr.top)+rsCamY;
+    const px0=part.offsetLeft, py0=part.offsetTop;
     part.querySelectorAll('.rs-inwall').forEach(w=>{
-      const wr=w.getBoundingClientRect();
-      rsObs.push({x:px0, y:(wr.top-sr.top)+rsCamY, w:pr.width, h:wr.height});
+      rsObs.push({x:px0, y:py0 + w.offsetTop, w:part.offsetWidth, h:w.offsetHeight});
     });
+  });
+  // 厂长（NPC）也是障碍：小人不能穿过厂长
+  scene.querySelectorAll('.rs-npc').forEach(el=>{
+    rsObs.push({x:el.offsetLeft, y:el.offsetTop, w:el.offsetWidth, h:el.offsetHeight});
   });
   // ===== 障碍网格（A* 寻路用）：家具+内墙覆盖格标记不可通行，门洞区自然可通行 =====
   const CELL=16;
