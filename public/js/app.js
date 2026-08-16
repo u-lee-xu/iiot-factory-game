@@ -88,6 +88,11 @@ import { gzAfter } from './ui/gamezone.js';
 import { buildGameZone } from './ui/gamezone.js';
 import { openGameZone } from './ui/gamezone.js';
 import { closeGameZone } from './ui/gamezone.js';
+import { openGameRoom } from './ui/gamezone.js';
+import { closeGameRoom } from './ui/gamezone.js';
+import { gzOpenType } from './ui/gamezone.js';
+import { renderGameRoom } from './ui/gamezone.js';
+import { buildGameRoom } from './ui/gamezone.js';
 import { loadShop } from './ui/wallet.js';
 import { walletRank } from './ui/wallet.js';
 import { buildWallet } from './ui/wallet.js';
@@ -897,6 +902,11 @@ Object.assign(window, {
   closeBugReport,
   closeGameRecords,
   closeGameZone,
+  closeGameRoom,
+  buildGameRoom,
+  openGameRoom,
+  renderGameRoom,
+  gzOpenType,
   closeLb,
   closeModal,
   closePasswordModal,
@@ -1105,7 +1115,7 @@ init().then(() => {
   // 地图流程（task/level/open）：隐藏旧版关卡页，跳转不闪旧界面
   if (taskId || levelId || openFeat) document.body.classList.add('map-flow');
   if (openFeat) {
-    const featMap = { game: openGameZone, pedia: openPedia, leaderboard: openLeaderboard, achievements: openAchievements, wallet: openWallet };
+    const featMap = { game: openGameZone, gameroom: openGameRoom, pedia: openPedia, leaderboard: openLeaderboard, achievements: openAchievements, wallet: openWallet };
     const fn = featMap[openFeat];
     if (openFeat) _mapFlowFeature = openFeat;
     if (fn) setTimeout(() => { try { fn(); } catch(e){} }, 600);
@@ -1119,7 +1129,7 @@ init().then(() => {
       const _t = taskId ? (_lv && _lv.tasks.find(t => String(t.id) === taskId)) : null;
       crumb = '🗺️ 厂区地图 › ' + (_lv ? _lv.areaName : '') + (_t ? ' · ' + _t.title : '');
     } else {
-      const _names = { game: '游戏专区', pedia: '术语图鉴', leaderboard: '排行榜', achievements: '成就', wallet: '工资与商城' };
+      const _names = { game: '游戏专区', gameroom: '游戏房', pedia: '术语图鉴', leaderboard: '排行榜', achievements: '成就', wallet: '工资与商城' };
       crumb = '🗺️ 厂区地图 › ' + (_names[openFeat] || '');
     }
     const _bc = document.getElementById('mapCrumb');

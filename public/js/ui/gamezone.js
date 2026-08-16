@@ -102,11 +102,7 @@ export function gzName(w) {
   return special ? escHtml(w.name) : '翻牌 · ' + escHtml(w.name);
 }
 
-export function renderGameZone(body) {
-  if (!window.TERM_CARDS || !window.content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
-  window.gzList = [];
-  // 按游戏类型分组排序：同一类型排一起，方便按类型测试、不重不漏
-  const TYPE_ORDER = [
+const GZ_TYPE_ORDER = [
     ['memory','🧠','翻牌配对'],
     ['quick','⚡','快打'],
     ['typing','🔫','术语防御战'],
@@ -133,9 +129,12 @@ export function renderGameZone(body) {
     ['breakout','🧱','AI打砖块'],
     ['m3','🍬','消消乐'],
     ['boss','💥','厂长Boss战']
-  ];
-  // 先收集: 类型 -> [游戏]
+
+];
+
+function collectByType() {
   const byType = {};
+  if (!window.content) return byType;
   window.content.levels.forEach(lv => {
     const tl = getTermLevel(lv.id);
     if (!tl) return;
@@ -150,12 +149,21 @@ export function renderGameZone(body) {
       byType['__bonus'].push({ lvId: lv.id, bonus: true });
     }
   });
+  return byType;
+}
+
+export function renderGameZone(body, typeFilter) {
+  if (!window.TERM_CARDS || !window.content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
+  window.gzList = [];
+  const TYPE_ORDER = GZ_TYPE_ORDER;
+  const byType = collectByType();
   let html = '';
   // 遍历固定类型顺序（未列出的类型放最后）
   const ordered = TYPE_ORDER.map(x=>x[0]).filter(t=>byType[t]);
   const rest = Object.keys(byType).filter(t=>t!=='__bonus' && !ordered.includes(t)).sort();
   const allTypes = ordered.concat(rest);
   allTypes.forEach(t => {
+    if (typeFilter && t !== typeFilter) return;
     const items = byType[t] || [];
     const label = (TYPE_ORDER.find(x=>x[0]===t) || [t, gzEmoji(byType[t]&&byType[t][0]?byType[t][0].w:{}), t])[2];
     const emoji = (TYPE_ORDER.find(x=>x[0]===t) || [t,'🎮',t])[1];
@@ -272,9 +280,9 @@ export function buildGameZone() {
   ov.innerHTML = `
     <div class="gz-box">
       <div class="pd-head">
-        <div><div class="pd-title">🎮 游戏专区</div><div class="pd-sub">解锁后直接来玩，通关的也能反复刷分</div></div>
+        <div><div class="pd-title" id="gzTitle">🎮 游戏专区</div><div class="pd-sub" id="gzSub">解锁后直接来玩，通关的也能反复刷分</div></div>
         <div style="display:flex;align-items:center;gap:8px">
-          <button class="mm-btn" onclick="closeGameZone()" style="font-size:12px;padding:6px 12px">🗺️ 返回厂区地图</button>
+          <button class="mm-btn" id="gzBackBtn" onclick="closeGameZone()" style="font-size:12px;padding:6px 12px">🗺️ 返回厂区地图</button>
           <div class="pd-close" onclick="closeGameZone()">✕</div>
         </div>
       </div>
@@ -283,15 +291,103 @@ export function buildGameZone() {
   document.body.appendChild(ov);
 }
 
-export function openGameZone() {
+export function openGameZone(type) {
   buildGameZone();
-  renderGameZone(document.getElementById('gzBody'));
+  const body = document.getElementById('gzBody');
+  renderGameZone(body, type);
+  const tEl = document.getElementById('gzTitle');
+  const sEl = document.getElementById('gzSub');
+  const bEl = document.getElementById('gzBackBtn');
+  if (type) {
+    window._grType = type;
+    const meta = GZ_TYPE_ORDER.find(x=>x[0]===type) || [type, gzEmoji({type:type}), type];
+    if (tEl) tEl.textContent = '🎮 ' + meta[2];
+    if (sEl) sEl.textContent = '「' + meta[2] + '」玩法 · 挑一个开玩';
+    if (bEl) { bEl.textContent = '🎮 返回游戏房'; bEl.onclick = () => { closeGameZone(); setTimeout(()=>openGameRoom(), 60); }; }
+  } else {
+    window._grType = null;
+    if (tEl) tEl.textContent = '🎮 游戏专区';
+    if (sEl) sEl.textContent = '解锁后直接来玩，通关的也能反复刷分';
+    if (bEl) { bEl.textContent = '🗺️ 返回厂区地图'; bEl.onclick = () => closeGameZone(); }
+  }
   document.getElementById('gzOverlay').classList.add('show');
 }
 
 export function closeGameZone() {
+  // 从游戏房进来（类型视图）：关闭回游戏房
+  if (window._grType) {
+    window._grType = null;
+    const ov = document.getElementById('gzOverlay');
+    if (ov) ov.classList.remove('show');
+    setTimeout(()=>openGameRoom(), 60);
+    return;
+  }
   // 地图流程：关闭=回厂区地图，避免露出旧版页面
   if (window._mapFlowFeature) { window.goMap(); return; }
   const ov = document.getElementById('gzOverlay');
   if (ov) ov.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 游戏房：进入后呈现为"机台房间"，每种游戏一个机台，点机台进该类型
+// ═══════════════════════════════════════════════════════════════════
+export function buildGameRoom() {
+  if (document.getElementById('grOverlay')) return;
+  const ov = document.createElement('div');
+  ov.className = 'gr-overlay';
+  ov.id = 'grOverlay';
+  ov.innerHTML = `
+    <div class="gr-box">
+      <div class="gr-head">
+        <div><div class="gr-title">🎮 游戏房</div><div class="gr-sub">一台机台 = 一种玩法 · 点机台挑游戏</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="mm-btn" onclick="closeGameRoom()" style="font-size:12px;padding:6px 12px">🗺️ 返回厂区地图</button>
+          <div class="pd-close" onclick="closeGameRoom()">✕</div>
+        </div>
+      </div>
+      <div class="gr-body" id="grBody"></div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+export function openGameRoom() {
+  buildGameRoom();
+  renderGameRoom(document.getElementById('grBody'));
+  document.getElementById('grOverlay').classList.add('show');
+}
+
+export function renderGameRoom(body) {
+  if (!window.TERM_CARDS || !window.content) { body.innerHTML = '<div class="lb-empty">加载中…</div>'; return; }
+  const byType = collectByType();
+  const ordered = GZ_TYPE_ORDER.map(x=>x[0]).filter(t=>byType[t]);
+  const rest = Object.keys(byType).filter(t=>t!=='__bonus' && !ordered.includes(t)).sort();
+  const allTypes = ordered.concat(rest);
+  let html = '';
+  allTypes.forEach(t => {
+    const items = byType[t] || [];
+    if (!items.length) return;
+    const meta = GZ_TYPE_ORDER.find(x=>x[0]===t) || [t, gzEmoji(items[0]&&items[0].w||{}), t];
+    const emoji = meta[1], label = meta[2];
+    const unlocked = items.filter(it => it.bonus ? window.levelProgress(it.lvId).completed : isUnlocked(it.w)).length;
+    const cls = unlocked ? '' : 'locked';
+    const metaTxt = unlocked + '/' + items.length + ' 个' + (unlocked ? ' · 可玩' : ' · 未解锁');
+    html += `<div class="gr-cab ${cls}" data-type="${t}" onclick="gzOpenType('${t}')">` +
+      `<div class="gr-cab-screen">${emoji}</div>` +
+      `<div class="gr-cab-name">${escHtml(label)}</div>` +
+      `<div class="gr-cab-meta">${metaTxt}</div>` +
+      `</div>`;
+  });
+  body.innerHTML = html || '<div class="lb-empty">还没有可玩的小游戏，先去闯关吧！</div>';
+}
+
+export function gzOpenType(type) {
+  openGameZone(type);
+}
+
+export function closeGameRoom() {
+  window._grType = null;
+  const ov = document.getElementById('grOverlay');
+  if (ov) ov.classList.remove('show');
+  // 从厂区地图进入：关闭回厂区地图
+  if (window._mapFlowFeature) { window.goMap(); return; }
 }

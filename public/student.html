@@ -23,7 +23,7 @@
   } else if(/[?&](task|level|open)=/.test(_u)){
     document.body.classList.add("map-flow");
     var _f=(_u.match(/[?&]open=([^&]+)/)||[])[1];
-    var _t=_f==='game'?'游戏专区':_f==='pedia'?'术语图鉴':_f==='leaderboard'?'排行榜':_f==='achievements'?'成就':_f==='wallet'?'工资与商城':(/[?&]task=/.test(_u)?'任务':(/[?&]level=/.test(_u)?'关卡':''));
+    var _t=_f==='game'?'游戏专区':_f==='gameroom'?'游戏房':_f==='pedia'?'术语图鉴':_f==='leaderboard'?'排行榜':_f==='achievements'?'成就':_f==='wallet'?'工资与商城':(/[?&]task=/.test(_u)?'任务':(/[?&]level=/.test(_u)?'关卡':''));
     var _tr=document.getElementById('trText');
     if(_tr&&_t)_tr.innerHTML='正在进入 <b>'+_t+'</b>…';
     var _tv=document.getElementById('transit');

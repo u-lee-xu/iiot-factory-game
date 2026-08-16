@@ -1269,3 +1269,29 @@ body.map-flow .modal-sub { font-size: 11px; color: var(--dim); letter-spacing: .
 /* 答题区：居中限宽，面板化 */
 body.map-flow .modal-body { padding: 24px 28px; }
 body.map-flow .modal-body > * { max-width: 900px; margin-left: auto; margin-right: auto; }
+
+/* ===== 游戏房：机台房间（进入后呈现为房间，每种游戏一个机台） ===== */
+.gr-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(4,6,14,.82); z-index: 9150; display: none; align-items: center; justify-content: center; }
+.gr-overlay.show { display: flex; }
+.gr-box { background: #10142a; border: 2px solid var(--border); border-radius: 12px; width: min(960px, 94vw); max-height: 86vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 70px rgba(255,138,194,.18); }
+.gr-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); background: rgba(8,11,20,.92); }
+.gr-title { font-size: 21px; color: var(--text); letter-spacing: 1px; }
+.gr-sub { font-size: 12px; color: var(--dim); margin-top: 2px; }
+.gr-body { padding: 20px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 14px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 26px),
+    #0c1020; }
+.gr-cab { position: relative; background: linear-gradient(180deg, #222b45, #12182c); border: 2px solid #2a3852; border-radius: 9px; padding: 13px 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; transition: all .2s; }
+.gr-cab::before { content:""; position:absolute; inset:0; border-radius:7px; background: radial-gradient(65% 42% at 50% 14%, rgba(0,188,212,.14), transparent 70%); pointer-events:none; }
+.gr-cab:hover { border-color: var(--cyan); transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,188,212,.22); }
+.gr-cab.locked { opacity: .42; cursor: not-allowed; }
+.gr-cab.locked:hover { transform:none; border-color:#2a3852; box-shadow:none; }
+.gr-cab-screen { width: 62px; height: 50px; background: #0a0e1c; border: 2px solid #31405f; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: inset 0 0 14px rgba(0,188,212,.28); }
+.gr-cab-name { font-size: 13px; color: var(--text); font-weight: bold; letter-spacing: 1px; text-align: center; }
+.gr-cab-meta { font-size: 11px; color: var(--dim); }
+@media (max-width: 560px) {
+  .gr-body { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; padding: 14px; }
+  .gr-cab-screen { width: 50px; height: 42px; font-size: 22px; }
+  .gr-cab-name { font-size: 12px; }
+}
