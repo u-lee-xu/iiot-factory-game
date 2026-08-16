@@ -818,10 +818,24 @@ function sxStart(){
     });
     sxGame=requestAnimationFrame(frame);
   }
+  function tryEnterNearTask(){
+    for(const el of taskEls){
+      const tx=parseFloat(el.style.left)+25, ty=parseFloat(el.style.top)+21;
+      const dx=Math.abs(tx-(x+12)), dy=Math.abs(ty-(y+17));
+      if(dx<64&&dy<74){
+        if(el.classList.contains('locked')){ if(typeof showToast==='function'){ try{ showToast('先完成前置任务再解锁'); }catch(e){} } return; }
+        const lvId=el.getAttribute('data-lv'), taskId=el.getAttribute('data-task');
+        if(lvId&&taskId) enterLevel(lvId, taskId);
+        return;
+      }
+    }
+    keys.jump=true;   // 不在图标旁：↑ 当作跳跃
+  }
   function kd(e){
     if(e.key==='ArrowLeft'||e.key==='a'){ keys.left=true; e.preventDefault(); }
     if(e.key==='ArrowRight'||e.key==='d'){ keys.right=true; e.preventDefault(); }
-    if(e.key==='ArrowUp'||e.key===' '||e.key==='w'){ keys.jump=true; e.preventDefault(); }
+    if(e.key==='ArrowUp'){ e.preventDefault(); tryEnterNearTask(); return; }
+    if(e.key===' '||e.key==='w'){ keys.jump=true; e.preventDefault(); }
   }
   function ku(e){
     if(e.key==='ArrowLeft'||e.key==='a') keys.left=false;
@@ -981,7 +995,7 @@ function renderRoom(id){
       const done=isTaskDone(t.id), next=(!done&&t===cur);
       const cls=done?'done':(next?'next':'locked');
       const onPlat=(i%2===1);
-      taskElsHTML+=`<div class="sx-task ${cls}" data-plat="${onPlat?1:0}" data-idx="${i}" onclick="sxGoTask('${lv.id}','${t.id}',this)" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}" ${cls==='locked'?'data-locked="1"':''}>
+      taskElsHTML+=`<div class="sx-task ${cls}" data-plat="${onPlat?1:0}" data-idx="${i}" data-lv="${lv.id}" data-task="${t.id}" onclick="sxGoTask('${lv.id}','${t.id}',this)" title="${(t.title||t.name||t.label||'').replace(/"/g,'&quot;')}" ${cls==='locked'?'data-locked="1"':''}>
         <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>${next?'<span class="rt-arrow">▼</span>':''}
       </div>`;
       if(onPlat) platHTML+=`<div class="sx-platform" data-idx="${i}"></div>`;
