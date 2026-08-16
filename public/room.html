@@ -695,13 +695,13 @@ function sxStart(){
   const groundH=58, groundTop=H-52-groundH;
   const platTop=Math.max(112, groundTop-100);
   const g=0.46, speed=4.6, ph=38;
-  const gap=250, baseX=140;
+  const gap=250, baseX=220;
   // 动态跳跃：最大跳跃高度 = min(上平台所需高度的2.2倍, 地面到场景顶可用高度的78%)
   // 保证跳最高时人物不超出场景顶部被裁切，同时足够跳上高处横杠
   const needJump = Math.max(30, groundTop - platTop);
   const maxJump = Math.min(needJump * 2.0, Math.max(50, (groundTop - ph) * 0.60));
   const jumpV = -Math.sqrt(2 * g * maxJump);
-  let x=72, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
+  let x=150, y=groundTop-ph, vy=0, onGround=true, moveTarget=null;
   try{ const _pp=JSON.parse(sessionStorage.getItem('roomPlayerPos')||'null');
     if(_pp&&_pp.view==='sx'&&String(_pp.roomId)===String(currentRoomId)&&(_pp.floor||0)===(window._roomFlr||0)&&_pp.x>0){ x=_pp.x; } }catch(e){}
   const keys={left:false,right:false,jump:false};
@@ -735,12 +735,19 @@ function sxStart(){
   const stairsEl=document.getElementById('sxStairs');
   if(stairsEl){
     const sx=window._sxRoom||{};
+    const sxPos=(baseX+taskEls.length*gap+70);
     if(!sx.hasNext){
-      stairsEl.style.display='none';   // 顶层：上面没有层了，不显示楼梯
+      // 顶层：放一架「出厂梯子」，离开房间返回厂区（替换隐藏逻辑）
+      stairsEl.className='sx-stairs open exit';
+      stairsEl.style.left=sxPos+'px';
+      stairsEl.style.top=(groundTop-48)+'px';
+      stairsEl.onclick=function(){ goBack(); };
+      const tip=document.createElement('div'); tip.className='sx-door-tip'; tip.textContent='🪜 出厂 · 返回厂区';
+      stairsEl.appendChild(tip);
     } else {
       const sCls=sx.flrDone?'open':'locked';
       stairsEl.className='sx-stairs '+sCls;
-      stairsEl.style.left=(baseX+taskEls.length*gap+70)+'px';
+      stairsEl.style.left=sxPos+'px';
       stairsEl.style.top=(groundTop-48)+'px';
       if(sx.flrDone){
         stairsEl.onclick=function(){ nextRoomFloor(); };
@@ -749,9 +756,9 @@ function sxStart(){
       }
     }
   }
-  // 出厂区门：场景左端（小人出生点旁），点击返回厂区
+  // 出厂区门：场景左端、距边界留白(文字不截断)、距出生点远(不被小人遮住)
   const doorEl=document.getElementById('sxDoorExit');
-  if(doorEl){ doorEl.style.left='4px'; doorEl.style.top=(groundTop-48)+'px'; }
+  if(doorEl){ doorEl.style.left='60px'; doorEl.style.top=(groundTop-48)+'px'; }
   const rw=scene.clientWidth, stageW=stage.clientWidth;
   // 点哪儿走哪儿：点击场景（非设备/楼梯/按钮）→ 小人走到该水平位置
   scene.addEventListener('pointerdown', function(e){
@@ -824,7 +831,7 @@ function sxStart(){
     });
     sxGame=requestAnimationFrame(frame);
   }
-  function tryEnterNearTask(){
+  function tryEnterNearTaskOrExit(){
     for(const el of taskEls){
       const tx=parseFloat(el.style.left)+25, ty=parseFloat(el.style.top)+21;
       const dx=Math.abs(tx-(x+12)), dy=Math.abs(ty-(y+17));
@@ -835,12 +842,22 @@ function sxStart(){
         return;
       }
     }
-    keys.jump=true;   // 不在图标旁：↑ 当作跳跃
+    const doorEl=document.getElementById('sxDoorExit');
+    if(doorEl){
+      const ddx=parseFloat(doorEl.style.left)||0;
+      if(Math.abs(ddx+23-(x+12))<70){ goBack(); return; }
+    }
+    const stEl=document.getElementById('sxStairs');
+    if(stEl && stEl.style.display!=='none'){
+      const sxp=parseFloat(stEl.style.left);
+      if(!isNaN(sxp) && Math.abs(sxp+23-(x+12))<70){ if(stEl.onclick) stEl.onclick(); else nextRoomFloor(); return; }
+    }
+    // 不在可交互物旁：不跳跃（↑/↓ 仅用于进入/出门）
   }
   function kd(e){
     if(e.key==='ArrowLeft'||e.key==='a'){ keys.left=true; e.preventDefault(); }
     if(e.key==='ArrowRight'||e.key==='d'){ keys.right=true; e.preventDefault(); }
-    if(e.key==='ArrowUp'){ e.preventDefault(); tryEnterNearTask(); return; }
+    if(e.key==='ArrowUp'||e.key==='ArrowDown'){ e.preventDefault(); tryEnterNearTaskOrExit(); return; }
     if(e.key===' '||e.key==='w'){ keys.jump=true; e.preventDefault(); }
   }
   function ku(e){
@@ -995,7 +1012,7 @@ function renderRoom(id){
     // 横版过关：室内房间剖面，任务设备分散在长廊各处，小人左右移动
     // 坐标在 sxStart 里根据场景实际高度动态计算（groundTop/平台/设备）
     const gap=250, baseX=140;
-    const stageW=Math.max(900, ft.length*gap+260);
+    const stageW=Math.max(900, ft.length*gap+380);
     let platHTML='', taskElsHTML='';
     ft.forEach((t,i)=>{
       const done=isTaskDone(t.id), next=(!done&&t===cur);
@@ -1019,7 +1036,7 @@ function renderRoom(id){
     let propHTML='';
     const obCnt=Math.min(4, Math.max(2, Math.round(ft.length/2)));
     for(let k=0;k<obCnt;k++){
-      const px=Math.round(90+k*210);
+      const px=Math.round(330+k*250);
       const kind=(k%2===0)?'crate':'barrel';
       propHTML+=`<div class="sx-prop ${kind}" style="left:${px}px"></div>`;
     }
