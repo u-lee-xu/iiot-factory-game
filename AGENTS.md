@@ -73,6 +73,13 @@ npm start            # 生产模式
   - [ ] 修改 `game-content.json` 后确认 mtime 更新、无需重启即生效
   - [ ] 新增任务类型已在 `student.html` 调用 `registerInteraction(type, handler)`
   - [ ] 涉及数据库写操作均复用 `db.js` 封装函数（自动 `save()`），未手写 SQL
+- **推送（网络不稳时的标准做法）**：直接 `git push` 常因 GitHub 直连超时挂起。**一律改用后台定时推送脚本**（带单实例锁、失败自动重试、推完自动退出）：
+  ```bash
+  /home/lee/bin/git-push-bg.sh                                   # 默认当前目录 origin main
+  /home/lee/bin/git-push-bg.sh /home/lee/闯关游戏 origin main     # 指定仓库/远程/分支
+  ```
+  - 可选环境变量：`PUSH_INTERVAL`（重试间隔秒，默认 3600）、`PUSH_TIMEOUT`（单次超时秒，默认 120）
+  - 日志：`/tmp/git-push-bg-<仓库名>.log`；已用 `flock` 单实例锁防重复运行，重复启动会打印提示并直接退出
 
 ### 常用数据库操作（db.js 导出函数）
 ```js
