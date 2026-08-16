@@ -341,6 +341,12 @@ body{min-height:100dvh;min-height:100vh;overflow-x:hidden}
 .room-mus:hover{opacity:1;border-color:var(--amber)}
 @media (max-width:700px){ .room-mus{font-size:13px;padding:5px 8px} }
 
+/* 桌面高分屏：房间面板放宽铺满，横版/俯视场景加高，不再居中成手机窄条 */
+@media (min-width:1100px){
+  .room-panel{width:min(1560px,96vw)}
+  .sx-scene{height:660px;margin:0 20px 14px}
+  .room-scene{height:600px;margin:0 20px 14px}
+}
 </style>
 </head>
 <body>
