@@ -490,8 +490,18 @@ function rsDraw(dir, frame){
   if(!cv){ cv=document.createElement('canvas'); cv.width=20; cv.height=20; p.appendChild(cv); }
   const ctx=cv.getContext('2d');
   ctx.clearRect(0,0,20,20);
-  const key=dir+'_'+(frame||0);
-  const rows=RS_SPRITES[key]||RS_SPRITES[dir+'_0']||RS_SPRITES.S_0;
+  let rows;
+  if(dir==='E'||dir==='W'){
+    // 左右朝向：以 S(朝下) 精灵为底，画布旋转 90°（面朝左/右）
+    rows = RS_SPRITES['S_'+(frame||0)] || RS_SPRITES.S_0;
+    ctx.save();
+    ctx.translate(10,10);
+    ctx.rotate(dir==='E' ? Math.PI/2 : -Math.PI/2);
+    ctx.translate(-10,-10);
+  } else {
+    const key=dir+'_'+(frame||0);
+    rows = RS_SPRITES[key]||RS_SPRITES[dir+'_0']||RS_SPRITES.S_0;
+  }
   for(let y=0;y<20;y++){
     const row=rows[y];
     for(let x=0;x<20;x++){
@@ -499,13 +509,16 @@ function rsDraw(dir, frame){
       if(ch!=='.'){ ctx.fillStyle=RS_COLORS[ch]||'#fff'; ctx.fillRect(x,y,1,1); }
     }
   }
+  if(dir==='E'||dir==='W') ctx.restore();
 }
 
 function rsSetDir(dx,dy){
-  // 只做上下两个方向：dy 决定朝上(N)/朝下(S)，左右保持当前朝向
+  // 四方向：上下由 dy 决定，左右由 dx 决定（人物面朝移动方向）
   if(dx===0&&dy===0) return;
   if(Math.abs(dy)>=Math.abs(dx)){
     rsDir = dy<0 ? 'N' : 'S';
+  } else {
+    rsDir = dx>0 ? 'E' : 'W';
   }
   rsDraw(rsDir, rsFrame);
 }
@@ -604,6 +617,42 @@ function rsStart(){
     rsGo=null;
     navPath=findPath(px,py, tx,ty) || [{x:px,y:py}];   // 可达则寻路，不可达原地不动
   }, true);
+  // —— 俯视图键盘移动 + 空格进入任务/门/梯子 ——
+  const rsKeys={up:false,down:false,left:false,right:false};
+  function rsTryEnter(){
+    const near=function(el){
+      if(!el) return false;
+      const r=el.getBoundingClientRect(), sr=scene.getBoundingClientRect();
+      const cx=(r.left-sr.left)+rsCamX, cy=(r.top-sr.top)+rsCamY;
+      return Math.abs(cx-(px+6))<64 && Math.abs(cy-(py+6))<64;
+    };
+    for(const el of scene.querySelectorAll('.rs-task')){
+      if(near(el)){
+        const lvId=el.getAttribute('data-lv'), taskId=el.getAttribute('data-task');
+        if(lvId&&taskId){ enterLevel(lvId, taskId); return; }
+      }
+    }
+    const door=scene.querySelector('.rs-exit');
+    if(near(door)){ goBack(); return; }
+    const st=scene.querySelector('.rs-stairs.open');
+    if(near(st)){ nextRoomFloor(); return; }
+  }
+  function rsKd(e){
+    if(e.key==='ArrowUp'||e.key==='w'){ rsKeys.up=true; e.preventDefault(); }
+    else if(e.key==='ArrowDown'||e.key==='s'){ rsKeys.down=true; e.preventDefault(); }
+    else if(e.key==='ArrowLeft'||e.key==='a'){ rsKeys.left=true; e.preventDefault(); }
+    else if(e.key==='ArrowRight'||e.key==='d'){ rsKeys.right=true; e.preventDefault(); }
+    else if(e.key===' '){ e.preventDefault(); rsTryEnter(); }
+  }
+  function rsKu(e){
+    if(e.key==='ArrowUp'||e.key==='w') rsKeys.up=false;
+    else if(e.key==='ArrowDown'||e.key==='s') rsKeys.down=false;
+    else if(e.key==='ArrowLeft'||e.key==='a') rsKeys.left=false;
+    else if(e.key==='ArrowRight'||e.key==='d') rsKeys.right=false;
+  }
+  window.addEventListener('keydown', rsKd);
+  window.addEventListener('keyup', rsKu);
+  window.__rsKeys={rsKd:rsKd, rsKu:rsKu};
   function setDir(dx, dy){
     if(Math.abs(dx)<0.5&&Math.abs(dy)<0.5) return;
     rsSetDir(dx, dy);
@@ -631,13 +680,28 @@ function rsStart(){
   }
   function frame(){
     let moving=false, ldx=0, ldy=0;
-    // 点设备：先寻路到设备，沿路径走，到跟前自动进任务
-    if(rsGo && !navPath){ navPath=findPath(px,py, rsGo.x, rsGo.y); }
-    const arrived=stepAlong();
-    if(arrived && rsGo){ enterLevel(rsGo.lvId, rsGo.taskId); rsGo=null; navPath=null; tx=null; ty=null; return; }
-    if(arrived){ tx=null; ty=null; navPath=null; }
-    moving = !!(navPath && navPath.length);
-    if(moving){ ldx=navPath[0].x-px; ldy=navPath[0].y-py; setDir(ldx, ldy); }
+    // 键盘移动优先（四方向 + 碰撞）
+    let kdx=0, kdy=0;
+    if(rsKeys.left) kdx-=1; if(rsKeys.right) kdx+=1;
+    if(rsKeys.up) kdy-=1; if(rsKeys.down) kdy+=1;
+    const keyboard = !!(kdx||kdy);
+    if(keyboard){
+      navPath=null; tx=null; ty=null; rsGo=null;
+      const len=Math.hypot(kdx,kdy)||1;
+      const nx=px+kdx/len*speed, ny=py+kdy/len*speed;
+      if(!rsCollide(nx,py)) px=nx;
+      if(!rsCollide(px,ny)) py=ny;
+      moving=true;
+      setDir(kdx,kdy);
+    } else {
+      // 点设备：先寻路到设备，沿路径走，到跟前自动进任务
+      if(rsGo && !navPath){ navPath=findPath(px,py, rsGo.x, rsGo.y); }
+      const arrived=stepAlong();
+      if(arrived && rsGo){ enterLevel(rsGo.lvId, rsGo.taskId); rsGo=null; navPath=null; tx=null; ty=null; return; }
+      if(arrived){ tx=null; ty=null; navPath=null; }
+      moving = !!(navPath && navPath.length);
+      if(moving){ ldx=navPath[0].x-px; ldy=navPath[0].y-py; setDir(ldx, ldy); }
+    }
     player.classList.toggle('walk', moving);
     if(moving){ rsFrame=(rsFrame+1)%2; rsDraw(rsDir, rsFrame); }
     player.style.left=px+'px'; player.style.top=py+'px';
@@ -660,6 +724,7 @@ function rsStart(){
 function rsStop(){
   if(rsLoop){ cancelAnimationFrame(rsLoop); rsLoop=null; }
   rsGo=null; tx=null; ty=null;
+  try{ if(window.__rsKeys){ window.removeEventListener('keydown', window.__rsKeys.rsKd); window.removeEventListener('keyup', window.__rsKeys.rsKu); window.__rsKeys=null; } }catch(e){}
 }
 
 function roomGoTask(lvId, taskId, el){
@@ -978,7 +1043,7 @@ function renderRoom(id){
     // 1个居中；2个左右分；3个三档错开
     const cx=rooms[ri].x+ROOM_W/2 + (cnt>2 ? (j-1)*56 : cnt>1 ? (j===0?-48:48) : 0);
     const cy=WT+ROOM_H*0.62;
-    return `<div class="rs-task ${locked?'locked':cls}" style="left:${cx-29}px;top:${cy-25}px" onclick="roomGoTask('${lv.id}','${t.id}',this)" title="${t.title||t.name||t.label||''}" ${locked?'data-locked="1"':''}>
+    return `<div class="rs-task ${locked?'locked':cls}" style="left:${cx-29}px;top:${cy-25}px" data-lv="${lv.id}" data-task="${t.id}" onclick="roomGoTask('${lv.id}','${t.id}',this)" title="${t.title||t.name||t.label||''}" ${locked?'data-locked="1"':''}>
       <span class="rt-icon">${taskIconOf(t)}</span><span class="rt-name">${(t.title||t.name||t.label||'').slice(0,6)}</span>${next?'<span class="rt-arrow">▼</span>':''}
     </div>`;
   }).join('');
