@@ -37,19 +37,26 @@
       "1-3b",
       "1-4"
      ],
-     "subtitle": "厂长：ip addr 敲过了吧？这些数字和名字都得认住。",
-     "tip": "都是 ip 命令里能看到的东西，认个脸熟。",
-     "size": 5,
-     "timed": false,
+     "subtitle": "厂长：看清你的网卡——吃掉网卡相关词条变长，别撞断网/防火墙！",
      "xp": 70,
-     "rounds": [
-      2,
-      3,
-      4
-     ],
      "pairsFrom": {
       "unit": "l1_b"
-     }
+     },
+     "type": "snake",
+     "food": [
+      "网卡",
+      "IP 地址",
+      "MAC 地址",
+      "子网掩码",
+      "CIDR 前缀"
+     ],
+     "wall": [
+      "断网",
+      "防火墙",
+      "广播地址"
+     ],
+     "win": 5,
+     "lives": 3
     },
     {
      "id": "l1_c",
@@ -127,20 +134,16 @@
       "1-10",
       "1-11"
      ],
-     "subtitle": "厂长：数据怎么走、网址怎么变 IP，这条链路你得门儿清。",
-     "tip": "traceroute 看路、nslookup 查号，都是刚练过的。",
-     "size": 6,
-     "timed": true,
-     "timeLimit": 70,
+     "subtitle": "厂长：上网寻路的词成群冲过来了，看解释打对应的名词！",
      "xp": 90,
-     "rounds": [
-      2,
-      3,
-      4
-     ],
      "pairsFrom": {
       "unit": "l1_d"
-     }
+     },
+     "type": "shooter",
+     "lives": 5,
+     "waves": 3,
+     "cols": 6,
+     "rows": 4
     },
     {
      "id": "l1_e",
@@ -1067,21 +1070,26 @@
       "2-2",
       "2-3"
      ],
-     "type": "quick",
-     "subtitle": "厂长：ls、cat、curl 这些家伙认熟了，手速也要跟上。",
-     "tip": "看提示点对的命令，第一幕也学过。",
-     "size": 5,
+     "type": "snake",
+     "subtitle": "厂长：ls、cat、curl 这些命令认熟了，吃掉它们变长，别撞危险命令！",
      "xp": 70,
-     "timeLimit": 50,
-     "distractors": [
-      "vim",
-      "mkdir",
-      "rm",
-      "nano"
-     ],
      "pairsFrom": {
       "unit": "l2_b"
-     }
+     },
+     "food": [
+      "ls",
+      "cat",
+      "curl",
+      "pwd",
+      "hostname"
+     ],
+     "wall": [
+      "rm -rf",
+      "reboot",
+      "shutdown"
+     ],
+     "win": 5,
+     "lives": 3
     },
     {
      "id": "l2_c",
@@ -1116,21 +1124,16 @@
       "2-7",
       "2-8"
      ],
-     "type": "quick",
-     "subtitle": "厂长：免密登录的密钥一套，认熟它。",
-     "tip": "密钥对、白名单文件，都在这两关。",
-     "size": 4,
+     "type": "shooter",
+     "subtitle": "厂长：SSH 密钥相关的词成群冲过来了，看飞机上的解释打对应的名词！",
      "xp": 70,
-     "timeLimit": 45,
-     "distractors": [
-      "ssh-add",
-      "id_rsa.pub",
-      "/etc/passwd",
-      "hostname"
-     ],
      "pairsFrom": {
       "unit": "l2_d"
-     }
+     },
+     "lives": 5,
+     "waves": 3,
+     "cols": 6,
+     "rows": 4
     },
     {
      "id": "l2_e",
@@ -1189,21 +1192,17 @@
       "2-2",
       "2-3"
      ],
-     "type": "quick",
-     "subtitle": "厂长：常用命令再打一轮，这轮加了「搜内容」的 grep。",
-     "tip": "看提示点对的命令。",
-     "size": 6,
+     "subtitle": "厂长：命令进阶，把命令和它的用途配对。",
+     "size": 4,
      "xp": 80,
-     "timeLimit": 60,
-     "distractors": [
-      "rm",
-      "cd",
-      "mkdir",
-      "top"
-     ],
      "pairsFrom": {
       "unit": "l2_b2"
-     }
+     },
+     "rounds": [
+      3,
+      4,
+      5
+     ]
     },
     {
      "id": "l2_c2",
@@ -1238,21 +1237,16 @@
       "2-7",
       "2-8"
      ],
-     "type": "quick",
-     "subtitle": "厂长：密钥这一套再打一遍，公钥私钥别搞混。",
-     "tip": "看提示点对的词。",
-     "size": 5,
+     "type": "shooter",
+     "subtitle": "厂长：SSH 密钥蜂群·进阶，火力全开！",
      "xp": 70,
-     "timeLimit": 50,
-     "distractors": [
-      "密码",
-      "验证码",
-      "指纹",
-      "口令"
-     ],
      "pairsFrom": {
       "unit": "l2_d2"
-     }
+     },
+     "lives": 5,
+     "waves": 3,
+     "cols": 6,
+     "rows": 4
     },
     {
      "id": "l2_e2",
