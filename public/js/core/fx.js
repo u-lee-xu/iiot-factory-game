@@ -37,7 +37,7 @@ export function generateTeach(task) {
   const cfg = task.config;
   const cmd = cfg.command ? (Array.isArray(cfg.command) ? cfg.command[0] : cfg.command) : '';
   const explains = {
-    '1-0': '先讲清楚装虚拟机这条路：VMware 是给 Ubuntu 开一个独立的房间（虚拟机），和 Windows 隔离但共享硬件。下载一律走官网（vmware.com / ubuntu.com/download/server），别碰破解版——产线不能引入来历不明的软件。装的时候：内存分 2~4GB、网络模式选桥接（让 Ubuntu 在车间交换机上拥有独立身份）、系统只装 Server 版不装图形界面。按步骤来，一步一步别跳。',
+    '1-0': '先讲清楚装虚拟机这条路：VMware 是给 Ubuntu 开一个独立的房间（虚拟机），和 Windows 隔离但共享硬件。下载一律走官网（vmware.com / ubuntu.com/download/server），别碰破解版——产线不能引入来历不明的软件。装的时候：内存分 2~4GB、网络模式选桥接（让 Ubuntu 在车间交换机上拥有独立身份）、系统只装 Server 版不装图形界面。按步骤来，一步一步别跳。\n附一张「命令动词中英对照」（Linux 命令是英文，记住这几个词就能看懂大部分命令）：update=更新（拉取列表）、upgrade=升级、install=安装、remove=卸载、status=查看状态、start=启动、stop=停止、enable=设为开机自启、list=列出、show=显示、add=添加、ping=测连通、help=帮助。后面敲命令忘了就翻这条。',
     '1-1': 'Ubuntu Server 不装图形界面，这不代表操作受限——你可以坐在服务器前接显示器键盘敲命令，也可以在另一台电脑甚至手机上用 SSH 远程登录。工控工程师经常晚上躺床上拿手机查服务器日志——跟你在王者峡谷操作英雄没什么区别，只不过这次你的英雄是一台 Linux。记住 Shell 是 bash，装软件用 apt install，这些都是你后面每天都要用的基本操作。',
     '1-2': '输入 uname -a 查看系统完整信息。先记住 Linux 命令的通用格式：命令名 [选项] [参数]，各部分用空格隔开。比如 uname -a：uname 是命令名，-a 是选项（显示全部信息）。选项以 - 开头，可以有好几个、还能合并写（-la = -l -a）；长选项用两个短横（如 --help）。记住这个套路，后面所有命令都是它。',
     '1-3': '想搞清楚"我这台电脑在网络里是什么身份"，就用 ip addr。先补个基础：计算机里最小的信息单位叫"比特（bit）"，一个比特只能是 0 或 1。ip addr 的输出里你会看到三样东西：网卡（设备上网的接口，比如 ens33）、IP 地址（这台设备的门牌号，比如 192.168.1.100）、MAC 地址（出厂就烧录好的"身份证"，一个网卡一个号）。记住这三个，后面翻牌、排障都靠它们。',

@@ -139,7 +139,7 @@
        },
        {
         "title": "首次更新系统",
-        "narrative": "系统装好了，重启登录，黑底白字的终端等着你。厂长说：第一件事不是开工——先把系统软件包升到最新版。两条命令连在一起用，先拉最新软件包列表、再统一升级。照着我下面写的敲，敲完按回车：apt update && apt upgrade",
+        "narrative": "系统装好了，重启登录，黑底白字的终端等着你。厂长说：第一件事不是开工——先把系统软件包升到最新版。看这条命令，拆开讲：`apt` = Ubuntu 的包管理工具（装/卸/升级软件全靠它）；`update` = 英文「更新」，这里是把本机的软件包列表拉成最新（注意：update 更新的是「列表」，不是软件本身）；`upgrade` = 英文「升级」，把已装的软件包升到最新版；`&&` = 「而且/接着」的意思，前面成功才执行后面。所以整条 = 先更新包列表，再升级软件包。照着我下面写的敲，敲完按回车：apt update && apt upgrade",
         "question": "在终端中照着输入命令，然后按回车：",
         "inputType": "command",
         "correctCommand": "apt update && apt upgrade",
@@ -148,7 +148,80 @@
          "sudo apt update && sudo apt upgrade",
          "sudo apt-get update && sudo apt-get upgrade"
         ],
-        "errorHint": "用 apt 更新软件包列表并升级（先 update 再 upgrade）"
+        "errorHint": "用 apt 更新软件包列表并升级（先 update 再 upgrade）",
+        "outputLines": [
+         {
+          "text": "Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease",
+          "color": "",
+          "delay": 250
+         },
+         {
+          "text": "Get:2 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]",
+          "color": "",
+          "delay": 250
+         },
+         {
+          "text": "Reading package lists... Done",
+          "color": "green",
+          "delay": 400
+         },
+         {
+          "text": "厂长：update 执行完——Reading=正在读取、Done=完成；Get/Hit 都是「获取」。现在软件包列表已是最新。",
+          "color": "amber",
+          "delay": 400
+         },
+         {
+          "text": "$ apt upgrade",
+          "color": "cyan",
+          "delay": 200
+         },
+         {
+          "text": "Reading package lists... Done",
+          "color": "green",
+          "delay": 300
+         },
+         {
+          "text": "Building dependency tree... Done",
+          "color": "green",
+          "delay": 300
+         },
+         {
+          "text": "The following packages will be upgraded:",
+          "color": "",
+          "delay": 250
+         },
+         {
+          "text": "  openssh-server libc6 systemd base-files",
+          "color": "",
+          "delay": 250
+         },
+         {
+          "text": "Need to get 12.3 MB of archives.",
+          "color": "",
+          "delay": 250
+         },
+         {
+          "text": "Get:1 openssh-server [380 kB]",
+          "color": "",
+          "delay": 250
+         },
+         {
+          "text": "Fetched 12.3 MB in 5s (2.46 MB/s)",
+          "color": "",
+          "delay": 300
+         },
+         {
+          "text": "Setting up openssh-server ... Done",
+          "color": "green",
+          "delay": 250
+         },
+         {
+          "text": "厂长：upgrade 执行完——upgraded=被升级、Fetched=已下载、Setting up=正在配置、Done=完成。这些软件包（openssh-server 等）都已升到最新版。",
+          "color": "amber",
+          "delay": 400
+         }
+        ],
+        "successText": "✅ 系统软件包已全部更新并升级到最新版！"
        }
       ]
      }
