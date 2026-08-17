@@ -4,6 +4,7 @@
 import { kbdCleanup } from '../core/kbd.js';
 // ═══════════════════════════════════════════════════════════════════
 import { escHtml, starStr, taskKey, taskXP } from '../core/utils.js';
+import { cmdAnnotateBox } from '../core/cmd-annotate.js';
 import { playSound } from '../core/sound.js';
 
 export function renderFactory() {
@@ -497,6 +498,7 @@ export function renderTypeTerminal(container, task, cfg) {
         <span id="termStatus">就绪</span>
       </div>
       <div class="term-task-title" id="termTaskTitle">${escHtml(cfg.prompt || '输入命令完成任务')}</div>
+      ${cmdAnnotateBox(Array.isArray(cfg.command) ? cfg.command[0] : cfg.command)}
       <div class="term-body" id="termBody">
         <div class="term-line term-info" id="bootMsgs"></div>
         <div id="termHistory"></div>

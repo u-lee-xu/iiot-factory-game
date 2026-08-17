@@ -7,6 +7,7 @@ import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain } from '../core/fx.js';
 import { setupKbdNav } from '../core/kbd.js';
+import { cmdAnnotateBox } from '../core/cmd-annotate.js';
 
 registerInteraction('diagnosis_tree', {
   render(container, task) {
@@ -71,6 +72,7 @@ registerInteraction('diagnosis_tree', {
         <div style="margin-bottom:6px;font-size: 14px;color:var(--dim)">场景：${cfg.scenario}</div>
         <div class="diag-progress">步骤 ${stepIdx + 1} / ${steps.length}</div>
         <div class="diag-question">${s.question}</div>
+        ${cmdAnnotateBox(s.command)}
         <div class="term-root" style="margin-top:8px">
           <div class="term-header"><span class="term-dots"><span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span></span><span>锐智终端 · 排障</span></div>
           <div class="term-body" id="diagTermOut" style="padding:8px;font-size:14px;color:var(--dim);max-height:190px;overflow-y:auto;min-height:64px;background:#0a0a10">

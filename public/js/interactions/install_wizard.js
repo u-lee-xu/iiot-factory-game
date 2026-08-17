@@ -7,30 +7,23 @@ import { taskXP } from '../core/utils.js';
 import { playSound } from '../core/sound.js';
 import { showWrongExplain, addDirectorBox } from '../core/fx.js';
 import { setupKbdNav, kbdCleanup } from '../core/kbd.js';
+import { cmdAnnotateBox } from '../core/cmd-annotate.js';
 
-// 命令词词典：install_wizard 命令步骤自动标注中文含义（学生不认识的英文命令词）
-const COMMAND_ZH = {
-  'apt':'包管理工具','update':'更新(拉包列表)','upgrade':'升级','install':'安装','remove':'卸载','&&':'前面成功才执行后面',
-  'ip':'网络配置命令','addr':'address·查看地址','ss':'查看端口/连接','-t':'只看TCP','-l':'只看监听','-n':'数字显示(不解析)',
-  'grep':'过滤·挑出','|':'管道:前输出给后','traceroute':'追踪路由每跳','iptables':'防火墙','-A':'追加规则','-j':'动作',
-  'icmp':'ping用的协议','--icmp-type':'ICMP包类型','echo-request':'请求包','DROP':'丢弃','ACCEPT':'放行',
-  'systemctl':'服务管理','status':'查看状态','start':'启动','stop':'停止','restart':'重启','enable':'启用(systemctl=开机自启)',
-  'ssh':'远程登录','ls':'列出文件','-la':'-l长格式 -a隐藏文件','curl':'命令行网页工具','modpoll':'Modbus测试工具',
-  '-m':'协议(如tcp)','-r':'起始地址','-1':'只读一次','node-red':'Node-RED启动','sudo':'管理员权限','ping':'测连通',
-  'pwd':'当前目录','route':'路由表','add':'添加','default':'默认','via':'经由(网关)','show':'显示','list':'列出',
-  'rm':'删除','mkdir':'创建目录','cd':'切换目录','cat':'查看文件','echo':'输出文本','bash':'执行脚本','chmod':'改权限',
-  'nslookup':'查域名IP','restart':'重启','-a':'显示全部/隐藏文件','-p':'参数(随命令:协议/端口/进程)','--help':'帮助','-h':'帮助'
-};
-function cmdAnnotate(cmd){
-  var tokens = String(cmd).split(/\s+/).filter(Boolean);
-  return tokens.map(function(t){
-    var zh = COMMAND_ZH[t] || COMMAND_ZH[t.toLowerCase()];
-    var esc = String(t).replace(/</g,'&lt;');
-    var chip = '<span style="display:inline-flex;flex-direction:column;align-items:center;margin:2px 5px 2px 0;padding:3px 8px;background:#0a0e1c;border:1px solid var(--border);border-radius:4px"><b style="color:var(--green);font-size:14px;font-family:inherit">'+esc+'</b>';
-    if (zh) chip += '<i style="font-size:11px;color:var(--amber);font-style:normal;margin-top:1px">'+zh+'</i>';
-    return chip + '</span>';
-  }).join('');
+// 公网 IPv4 校验：排除回环/内网/保留/组播段（真实 IP 无法验证，只校验格式与网段）
+function isPublicIPv4(ip){
+  var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(String(ip||'').trim());
+  if (!m) return false;
+  var a=+m[1],b=+m[2];
+  if (a>255||(+m[2])>255||(+m[3])>255||(+m[4])>255) return false;
+  if (a===127) return false;
+  if (a===10) return false;
+  if (a===172 && b>=16 && b<=31) return false;
+  if (a===192 && b===168) return false;
+  if (a===0 || a===255 || a>=224) return false;
+  if (a===100 && b>=64 && b<=127) return false;
+  return true;
 }
+
 
 registerInteraction('install_wizard', {
   render(container, task) {
@@ -87,10 +80,11 @@ registerInteraction('install_wizard', {
         html += '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size: 15px"><input type="number" id="wizNum" placeholder="输入数字" style="width:80px;background:#0a0a10;border:1px solid var(--border);color:var(--text);padding:8px;font-size:14px" min="0" max="32"><span style="color:var(--dim)">GB</span></div>';
       } else if (step.inputType === 'command') {
         // 命令拆解卡片：每个命令词自动标注中文含义（学生不认识的英文命令词）
-        if (step.correctCommand) {
-          html += '<div style="display:flex;flex-wrap:wrap;gap:2px;margin:10px 0 4px;background:rgba(0,188,212,.04);border:1px dashed rgba(0,188,212,.3);border-radius:6px;padding:8px 10px"><span style="font-size:12px;color:var(--dim);margin-right:8px;align-self:center">📖 命令拆解：</span>' + cmdAnnotate(step.correctCommand) + '</div>';
-        }
+        html += cmdAnnotateBox(step.correctCommand);
         html += '<div class="term-root" style="margin-top:8px"><div class="term-header"><span class="term-dots"><span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span></span><span>终端</span></div><div class="term-body"><input type="text" id="wizCmd" placeholder="输入命令…" spellcheck="false" autocomplete="off" style="width:94%;background:transparent;border:none;color:var(--green);font:inherit;font-size: 15px;outline:none;padding:8px"></div></div>';
+      } else if (step.inputType === 'ip') {
+        // 真实获取公网 IP：学生用自己电脑终端查，把结果填进来
+        html += '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:15px"><input type="text" id="wizIp" placeholder="如 223.5.5.5" spellcheck="false" autocomplete="off" style="width:190px;background:#0a0a10;border:1px solid var(--border);color:var(--green);padding:8px;font-size:14px"></div>';
       } else if (step.multiSelect) {
         html += '<div id="wizMultiOpts" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>';
       } else if (step.options) {
@@ -158,6 +152,12 @@ registerInteraction('install_wizard', {
             var val = inp.value.trim();
             if (!val) { window.showToast('终端还等着你的命令', 'error'); return; }
             submitWizard(val);
+          } else if (step.inputType === 'ip') {
+            var inp = document.getElementById('wizIp');
+            if (!inp) return;
+            var val = inp.value.trim();
+            if (!isPublicIPv4(val)) { window.showToast('填一个公网 IP（如 223.5.5.5，不能是 192.168/10.x 内网）', 'error'); return; }
+            submitWizard(val);
           }
         };
         // Enter key binding
@@ -167,6 +167,9 @@ registerInteraction('install_wizard', {
             if (el) el.onkeydown = function(e) { if (e.key === 'Enter') document.getElementById('wizSubmitBtn').click(); };
           } else if (step.inputType === 'command') {
             var el = document.getElementById('wizCmd');
+            if (el) { el.onkeydown = function(e) { if (e.key === 'Enter') document.getElementById('wizSubmitBtn').click(); }; el.focus(); }
+          } else if (step.inputType === 'ip') {
+            var el = document.getElementById('wizIp');
             if (el) { el.onkeydown = function(e) { if (e.key === 'Enter') document.getElementById('wizSubmitBtn').click(); }; el.focus(); }
           }
         }, 100);
@@ -182,6 +185,8 @@ registerInteraction('install_wizard', {
       var correct = false;
       if (step.inputType === 'number') {
         correct = step.correctNumber.includes(answer);
+      } else if (step.inputType === 'ip') {
+        correct = true;   // 格式已在校验时通过（真实 IP 服务器无法验证，只校验格式）
       } else {
       window.errors++;
       window.streak = 0;
