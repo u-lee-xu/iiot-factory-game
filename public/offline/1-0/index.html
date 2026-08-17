@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1-0 安装VMware + Ubuntu Server · 离线试玩</title>
+<style>
+
+:root{--bg:#0b0e1a;--panel:#12121a;--text:#e8eaf0;--dim:#9aa3bd;--amber:#ffb340;--green:#00e676;--red:#ff5252;--cyan:#00bcd4;--border:#2c3552;--fg:#e8eaf0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"Courier New",ui-monospace,monospace;min-height:100vh}
+.topbar{position:sticky;top:0;background:#10162a;border-bottom:1px solid var(--border);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.topbar b{color:var(--amber)}
+.topbar span{font-size:12px;color:var(--dim)}
+#app{max-width:720px;margin:0 auto;padding:14px 16px}
+.modal-foot{padding:10px 16px;border-top:1px solid var(--border);text-align:right;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;background:#10162a;border-radius:0 0 4px 4px}
+.modal-foot{background:transparent}
+#modalFoot{margin:6px auto 30px;max-width:720px;padding:0 16px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+#app input[type=number]{width:80px;background:#0a0a10;border:1px solid var(--border);color:var(--text);padding:8px;font-size:14px}
+#app input[type=text]{background:#0a0a10;border:1px solid var(--border);color:var(--green);padding:8px;font-size:14px;width:190px}
+#app .term-body input[type=text]{width:94%;border:none;color:var(--green)}
+.teach-toggle{cursor:pointer;color:var(--amber);font-size:12px;margin-top:4px;user-select:none}
+
+/* ===== Director Dialogue ===== */
+.director-box{
+  display: flex; gap: 12px; padding: 12px; background: #0e0e16;
+  border: 1px solid var(--border); margin-bottom: 14px;
+  align-items: flex-start;
+}
+/* ===== Director Mood System ===== */
+.director-box{ transition: transform .2s, box-shadow .2s; }
+.director-portrait{
+  font-size: 36px; line-height: 1; flex-shrink: 0;
+  width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+  background: #1a1a24; border-radius: 4px;
+}
+.director-mood-proud .director-portrait{ transform: scale(1.1); filter: drop-shadow(0 0 8px #0f0); }
+.director-mood-stern .director-portrait{ transform: scale(1.05); filter: drop-shadow(0 0 8px #f40); animation: stern-shake 0.5s ease; }
+.director-mood-awkward .director-portrait{ filter: grayscale(0.3) sepia(0.2); opacity: 0.9; }
+.director-mood-thinking .director-portrait{ animation: thinking-bounce 1.5s infinite; }
+.director-bubble{ flex: 1; min-width: 0; }
+.director-name{ font-size: 16px; color: var(--amber); margin-bottom: 2px; }
+.director-text{ font-size: 15px; line-height: 1.6; color: var(--text); }
+.director-text .cursor-blink{
+  display: inline-block; width: 4px; height: 14px;
+  background: var(--amber); animation: blink 1s step-end infinite;
+  vertical-align: text-bottom; margin-left: 1px;
+}
+.wizard-narrative{ background: rgba(255,176,0,.06); border-left: 3px solid var(--amber); padding: 10px 14px; margin-bottom: 12px; font-size: 15px; line-height: 1.6; color: var(--text); border-radius: 0 6px 6px 0; }
+.wiz-narr-icon{ font-size: 16px; }
+.wiz-narr-label{ color: var(--amber); font-weight: bold; margin-right: 4px; }
+.wizard-question{ font-size: 16px; color: var(--text); margin-bottom: 6px; font-weight: 600; }
+/* ===== Interaction: Install Wizard ===== */
+.wizard-steps{ display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
+.wiz-dot{ position: relative; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #1a1a24; border: 2px solid var(--border); font-size: 16px; color: var(--dim); transition: all .3s; }
+.wiz-dot.done{ background: var(--green); border-color: var(--green); color: #000; }
+.wiz-dot.active{ border-color: var(--amber); color: var(--amber); box-shadow: 0 0 8px rgba(255,176,0,.3); }
+.wiz-dot.active::after{ content: ''; position: absolute; top: 50%; left: 50%; width: 32px; height: 32px; margin: -16px 0 0 -16px; border-radius: 50%; border: 2px solid var(--amber); animation: wiz-pulse 1.2s infinite; }
+.prog-bar-bg{ height: 4px; background: #1a1a24; margin: 12px 0; overflow: hidden; }
+.prog-bar-fill{ height: 100%; background: var(--green); width: 0; transition: width .3s; }
+.quiz-opt{
+  padding: 8px 12px; border: 1px solid var(--border); cursor: pointer;
+  font-size: 15px; transition: all .2s; word-break: break-word; line-height: 1.5;
+}
+.quiz-opt:hover{ border-color: var(--cyan); }
+.quiz-opt.selected{ border-color: var(--amber); background: rgba(255,176,0,.1); }
+.quiz-opt.correct{ border-color: var(--green); background: rgba(0,230,118,.1); }
+.quiz-opt.wrong{ border-color: var(--red); background: rgba(255,85,85,.1); }
+/* ===== Enhanced Terminal ===== */
+.term-root{ background: #050508; border: 1px solid #1a1a24; font-family: 'Courier New', monospace; }
+.term-root .term-header{
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 10px; background: #0a0a10; border-bottom: 1px solid #1a1a24;
+  font-size: 16px; color: #505060;
+}
+.term-root .term-dots{ display: flex; gap: 4px; }
+.term-root .term-dot{ width: 8px; height: 8px; border-radius: 50%; }
+.term-root .term-dot.red{ background: #ff5555; }
+.term-root .term-dot.yellow{ background: #ffb000; }
+.term-root .term-dot.green{ background: #00e676; }
+.term-root .term-body{
+  padding: 12px; min-height: 100px; max-height: 260px; overflow-y: auto;
+  background: #050508;
+}
+.term-root .term-line{ white-space: pre-wrap; word-break: break-all; line-height: 1.5; font-size: 16px; }
+.term-root .term-prompt{ color: var(--green); }
+.term-root .term-cmd{ color: #d0d0d8; }
+.term-root .term-out{ color: #808088; }
+.term-root .term-success{ color: var(--green); }
+.term-root .term-error{ color: var(--red); }
+.term-root .term-info{ color: var(--cyan); }
+.term-root .term-warn{ color: var(--amber); }
+.term-root .term-cursor-blink{
+  display: inline-block; width: 6px; height: 14px;
+  background: var(--green); animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+.term-root .term-input-row{
+  display: flex; align-items: center; gap: 6px; padding: 8px 12px;
+  background: #08080c; border-top: 1px solid #1a1a24;
+}
+.term-root .term-input-row .prompt{ color: var(--green); font-size: 16px; flex-shrink: 0; }
+.term-root .term-input-row input{
+  flex: 1; background: transparent; border: none; color: var(--text);
+  font-family: inherit; font-size: 16px; padding: 4px 0; outline: none;
+  caret-color: var(--green);
+}
+.term-root .term-input-row input:focus{ outline: none; }
+.term-root .term-header{
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 10px; background: #0a0a10; border-bottom: 1px solid #1a1a24;
+  font-size: 16px; color: #505060;
+}
+.term-root .term-dots{ display: flex; gap: 4px; }
+.term-root .term-dot{ width: 8px; height: 8px; border-radius: 50%; }
+.term-root .term-dot.red{ background: #ff5555; }
+.term-root .term-dot.yellow{ background: #ffb000; }
+.term-root .term-dot.green{ background: #00e676; }
+.term-root .term-body{
+  padding: 12px; min-height: 100px; max-height: 260px; overflow-y: auto;
+  background: #050508;
+}
+.term-root .term-input-row{
+  display: flex; align-items: center; gap: 6px; padding: 8px 12px;
+  background: #08080c; border-top: 1px solid #1a1a24;
+}
+.term-root .term-input-row .prompt{ color: var(--green); font-size: 16px; flex-shrink: 0; }
+.term-root .term-input-row input{
+  flex: 1; background: transparent; border: none; color: var(--text);
+  font-family: inherit; font-size: 16px; padding: 4px 0; outline: none;
+  caret-color: var(--green);
+}
+.term-root .term-input-row input:focus{ outline: none; }
+.term-prompt{ color: var(--green); }
+.term-root .term-prompt{ color: var(--green); }
+.term-task-title{
+  padding: 8px 12px; background: rgba(255,176,0,.08);
+  border-bottom: 1px solid var(--border);
+  color: var(--amber); font-size: 14px; line-height: 1.5;
+}
+.btn-logout{ background: none; border: 1px solid var(--border); color: var(--dim); padding: 3px 8px; font-family: inherit; font-size: 16px; cursor: pointer; }
+.btn-logout:hover{ border-color: var(--red); color: var(--red); }
+.btn{ padding: 6px 16px; border: 1px solid var(--border); background: #1a1a24; color: var(--text); font-family: inherit; font-size: 16px; cursor: pointer; transition: all .2s; }
+.btn:hover{ background: #2a2a3a; }
+.btn-primary{ background: var(--amber); color: #000; border-color: var(--amber); font-weight: bold; }
+.btn-primary:hover{ background: #ffc030; }
+.btn-primary:disabled{ opacity: .4; cursor: not-allowed; }
+.btn-success{ background: var(--green); color: #000; border-color: var(--green); font-weight: bold; }
+.btn-success:disabled{ opacity: .4; cursor: not-allowed; }
+/* ===== Leaderboard / Achievements ===== */
+.btn-icon{ background: none; border: 1px solid var(--border); color: var(--dim); padding: 3px 8px; font-family: inherit; font-size: 16px; cursor: pointer; }
+.btn-icon:hover{ border-color: var(--amber); color: var(--amber); }
+body.map-flow .header .xp-wrap,
+body.map-flow .header .rank-badge,
+body.map-flow .header .btn-icon:not(#backMapBtn),
+body.map-flow .header .btn-logout,
+body.map-flow .header .director-avatar{ display: none !important; }
+.btn-primary{ background: var(--amber); color: #000; border-color: var(--amber); font-weight: bold; }
+.btn-primary:hover{ background: #ffc030; }
+.btn-primary:disabled{ opacity: .4; cursor: not-allowed; }
+.btn-success{ background: var(--green); color: #000; border-color: var(--green); font-weight: bold; }
+.btn-success:disabled{ opacity: .4; cursor: not-allowed; }
+.modal-foot{ padding: 10px 16px; border-top: 1px solid var(--border); text-align: right; display: flex; gap: 8px; justify-content: flex-end; }
+body.map-flow .modal-foot{ padding: 12px 24px calc(12px + env(safe-area-inset-bottom, 0px)); }
+</style></head><body>
+<div class="topbar"><b>🔧 1-0 安装VMware + Ubuntu Server</b><span>离线试玩 · 进度存本机浏览器</span></div>
+<div id="app"></div>
+<div id="modalFoot"></div>
+<script>
+(() => {
+  // public/js/core/interactions.js
+  var interactions = {};
+  function registerInteraction(type, handler) {
+    interactions[type] = handler;
+  }
+  function getInteraction(type) {
+    return interactions[type] || interactions["default"];
+  }
+
+  // public/js/core/sound.js
+  var soundEnabled = true;
+  var audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
+  function playSound(type, opt) {
+    if (!soundEnabled) return;
+    try {
+      const ctx = getAudioCtx();
+      if (ctx.state === "suspended") ctx.resume();
+      const now = ctx.currentTime;
+      switch (type) {
+        case "success": {
+          [523, 659, 784].forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = "sine";
+            o.frequency.setValueAtTime(freq, now + i * 0.08);
+            g.gain.setValueAtTime(0.2, now + i * 0.08);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.2);
+            o.start(now + i * 0.08);
+            o.stop(now + i * 0.08 + 0.2);
+          });
+          break;
+        }
+        case "error": {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "sawtooth";
+          o.frequency.setValueAtTime(180, now);
+          o.frequency.linearRampToValueAtTime(80, now + 0.25);
+          g.gain.setValueAtTime(0.15, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          o.start(now);
+          o.stop(now + 0.3);
+          break;
+        }
+        case "click": {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "sine";
+          o.frequency.setValueAtTime(900, now);
+          g.gain.setValueAtTime(0.08, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+          o.start(now);
+          o.stop(now + 0.04);
+          break;
+        }
+        case "type": {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "sine";
+          o.frequency.setValueAtTime(400 + Math.random() * 300, now);
+          g.gain.setValueAtTime(0.03, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+          o.start(now);
+          o.stop(now + 0.03);
+          break;
+        }
+        case "levelup": {
+          [523, 659, 784, 1047].forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = "sine";
+            o.frequency.setValueAtTime(freq, now + i * 0.12);
+            g.gain.setValueAtTime(0.25, now + i * 0.12);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.4);
+            o.start(now + i * 0.12);
+            o.stop(now + i * 0.12 + 0.4);
+          });
+          break;
+        }
+        case "boot": {
+          for (let i = 0; i < 8; i++) {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = "square";
+            o.frequency.setValueAtTime(100 + i * 30, now + i * 0.05);
+            g.gain.setValueAtTime(0.02, now + i * 0.05);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.05 + 0.04);
+            o.start(now + i * 0.05);
+            o.stop(now + i * 0.05 + 0.04);
+          }
+          break;
+        }
+        case "fanfare": {
+          [523, 659, 784, 1047, 1319].forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = "triangle";
+            o.frequency.setValueAtTime(freq, now + i * 0.1);
+            g.gain.setValueAtTime(0.22, now + i * 0.1);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.35);
+            o.start(now + i * 0.1);
+            o.stop(now + i * 0.1 + 0.35);
+          });
+          break;
+        }
+        case "fail": {
+          [392, 330, 262, 196].forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = "sine";
+            o.frequency.setValueAtTime(freq, now + i * 0.15);
+            g.gain.setValueAtTime(0.18, now + i * 0.15);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.3);
+            o.start(now + i * 0.15);
+            o.stop(now + i * 0.15 + 0.3);
+          });
+          break;
+        }
+        case "alarm": {
+          for (let i = 0; i < 6; i++) {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = "square";
+            o.frequency.setValueAtTime(i % 2 === 0 ? 660 : 550, now + i * 0.12);
+            g.gain.setValueAtTime(0.07, now + i * 0.12);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.1);
+            o.start(now + i * 0.12);
+            o.stop(now + i * 0.12 + 0.11);
+          }
+          break;
+        }
+        case "tick": {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "square";
+          o.frequency.setValueAtTime(1200, now);
+          g.gain.setValueAtTime(0.06, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          o.start(now);
+          o.stop(now + 0.05);
+          break;
+        }
+        case "combo": {
+          const lv = Math.min(Math.max(parseInt(opt) || 1, 1), 20);
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "triangle";
+          o.frequency.setValueAtTime(500 + lv * 40, now);
+          g.gain.setValueAtTime(0.12, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          o.start(now);
+          o.stop(now + 0.12);
+          break;
+        }
+        case "shoot": {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "square";
+          o.frequency.setValueAtTime(340, now);
+          o.frequency.linearRampToValueAtTime(220, now + 0.05);
+          g.gain.setValueAtTime(0.04, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+          o.start(now);
+          o.stop(now + 0.07);
+          break;
+        }
+        case "hit": {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "triangle";
+          o.frequency.setValueAtTime(260, now);
+          o.frequency.linearRampToValueAtTime(180, now + 0.08);
+          g.gain.setValueAtTime(0.08, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+          o.start(now);
+          o.stop(now + 0.1);
+          break;
+        }
+        case "pickup": {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.type = "sine";
+          o.frequency.setValueAtTime(880, now);
+          o.frequency.linearRampToValueAtTime(1320, now + 0.1);
+          g.gain.setValueAtTime(0.12, now);
+          g.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+          o.start(now);
+          o.stop(now + 0.18);
+          break;
+        }
+        case "toggle": {
+          [440, 660].forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = "sine";
+            o.frequency.setValueAtTime(freq, now + i * 0.05);
+            g.gain.setValueAtTime(0.1, now + i * 0.05);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.05 + 0.08);
+            o.start(now + i * 0.05);
+            o.stop(now + i * 0.05 + 0.08);
+          });
+          break;
+        }
+      }
+    } catch (e) {
+    }
+  }
+
+  // public/js/core/utils.js
+  function escHtml(str) {
+    return String(str == null ? "" : str).replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[m]);
+  }
+  function taskXP(task) {
+    if (task.hidden) return 300;
+    if (task.type === "quiz" && task.xp <= 50) return 50;
+    if (task.xp === 0) return 0;
+    return task.xp || 100;
+  }
+
+  // public/js/core/fx.js
+  function typewrite(el, text, speed, cb) {
+    let idx = 0;
+    el.textContent = "";
+    let _done = false;
+    function finish() {
+      if (_done) return;
+      _done = true;
+      el.textContent = text;
+      if (cb) cb();
+    }
+    function frame() {
+      const end = Math.min(idx + 2, text.length);
+      while (idx < end) {
+        el.textContent += text[idx];
+        if (text[idx] !== " ") {
+          try {
+            playSound("type");
+          } catch (e) {
+          }
+        }
+        idx++;
+      }
+      if (idx < text.length) {
+        setTimeout(frame, speed || 30);
+      } else {
+        finish();
+      }
+    }
+    frame();
+    setTimeout(function() {
+      if (!_done) finish();
+    }, 6e3);
+  }
+  function generateTeach(task) {
+    const cfg = task.config;
+    const cmd = cfg.command ? Array.isArray(cfg.command) ? cfg.command[0] : cfg.command : "";
+    const explains = {
+      "1-0": "\u5148\u8BB2\u6E05\u695A\u88C5\u865A\u62DF\u673A\u8FD9\u6761\u8DEF\uFF1AVMware \u662F\u7ED9 Ubuntu \u5F00\u4E00\u4E2A\u72EC\u7ACB\u7684\u623F\u95F4\uFF08\u865A\u62DF\u673A\uFF09\uFF0C\u548C Windows \u9694\u79BB\u4F46\u5171\u4EAB\u786C\u4EF6\u3002\u4E0B\u8F7D\u4E00\u5F8B\u8D70\u5B98\u7F51\uFF08vmware.com / ubuntu.com/download/server\uFF09\uFF0C\u522B\u78B0\u7834\u89E3\u7248\u2014\u2014\u4EA7\u7EBF\u4E0D\u80FD\u5F15\u5165\u6765\u5386\u4E0D\u660E\u7684\u8F6F\u4EF6\u3002\u88C5\u7684\u65F6\u5019\uFF1A\u5185\u5B58\u5206 2~4GB\u3001\u7F51\u7EDC\u6A21\u5F0F\u9009\u6865\u63A5\uFF08\u8BA9 Ubuntu \u5728\u8F66\u95F4\u4EA4\u6362\u673A\u4E0A\u62E5\u6709\u72EC\u7ACB\u8EAB\u4EFD\uFF09\u3001\u7CFB\u7EDF\u53EA\u88C5 Server \u7248\u4E0D\u88C5\u56FE\u5F62\u754C\u9762\u3002\u6309\u6B65\u9AA4\u6765\uFF0C\u4E00\u6B65\u4E00\u6B65\u522B\u8DF3\u3002\n\u9644\u4E00\u5F20\u300C\u547D\u4EE4\u52A8\u8BCD\u4E2D\u82F1\u5BF9\u7167\u300D\uFF08Linux \u547D\u4EE4\u662F\u82F1\u6587\uFF0C\u8BB0\u4F4F\u8FD9\u51E0\u4E2A\u8BCD\u5C31\u80FD\u770B\u61C2\u5927\u90E8\u5206\u547D\u4EE4\uFF09\uFF1Aupdate=\u66F4\u65B0\uFF08\u62C9\u53D6\u5217\u8868\uFF09\u3001upgrade=\u5347\u7EA7\u3001install=\u5B89\u88C5\u3001remove=\u5378\u8F7D\u3001status=\u67E5\u770B\u72B6\u6001\u3001start=\u542F\u52A8\u3001stop=\u505C\u6B62\u3001enable=\u542F\u7528/\u4F7F\u80FD\uFF08systemctl enable \u573A\u666F\u624D=\u8BBE\u4E3A\u5F00\u673A\u81EA\u542F\uFF09\u3001list=\u5217\u51FA\u3001show=\u663E\u793A\u3001add=\u6DFB\u52A0\u3001ping=\u6D4B\u8FDE\u901A\u3001help=\u5E2E\u52A9\u3002\u540E\u9762\u6572\u547D\u4EE4\u5FD8\u4E86\u5C31\u7FFB\u8FD9\u6761\u3002",
+      "1-1": "Ubuntu Server \u4E0D\u88C5\u56FE\u5F62\u754C\u9762\uFF0C\u8FD9\u4E0D\u4EE3\u8868\u64CD\u4F5C\u53D7\u9650\u2014\u2014\u4F60\u53EF\u4EE5\u5750\u5728\u670D\u52A1\u5668\u524D\u63A5\u663E\u793A\u5668\u952E\u76D8\u6572\u547D\u4EE4\uFF0C\u4E5F\u53EF\u4EE5\u5728\u53E6\u4E00\u53F0\u7535\u8111\u751A\u81F3\u624B\u673A\u4E0A\u7528 SSH \u8FDC\u7A0B\u767B\u5F55\u3002\u5DE5\u63A7\u5DE5\u7A0B\u5E08\u7ECF\u5E38\u665A\u4E0A\u8EBA\u5E8A\u4E0A\u62FF\u624B\u673A\u67E5\u670D\u52A1\u5668\u65E5\u5FD7\u2014\u2014\u8DDF\u4F60\u5728\u738B\u8005\u5CE1\u8C37\u64CD\u4F5C\u82F1\u96C4\u6CA1\u4EC0\u4E48\u533A\u522B\uFF0C\u53EA\u4E0D\u8FC7\u8FD9\u6B21\u4F60\u7684\u82F1\u96C4\u662F\u4E00\u53F0 Linux\u3002\u8BB0\u4F4F Shell \u662F bash\uFF0C\u88C5\u8F6F\u4EF6\u7528 apt install\uFF0C\u8FD9\u4E9B\u90FD\u662F\u4F60\u540E\u9762\u6BCF\u5929\u90FD\u8981\u7528\u7684\u57FA\u672C\u64CD\u4F5C\u3002",
+      "1-2": "\u8F93\u5165 uname -a \u67E5\u770B\u7CFB\u7EDF\u5B8C\u6574\u4FE1\u606F\u3002\u5148\u8BB0\u4F4F Linux \u547D\u4EE4\u7684\u901A\u7528\u683C\u5F0F\uFF1A\u547D\u4EE4\u540D [\u9009\u9879] [\u53C2\u6570]\uFF0C\u5404\u90E8\u5206\u7528\u7A7A\u683C\u9694\u5F00\u3002\u6BD4\u5982 uname -a\uFF1Auname \u662F\u547D\u4EE4\u540D\uFF0C-a \u662F\u9009\u9879\uFF08\u663E\u793A\u5168\u90E8\u4FE1\u606F\uFF09\u3002\u9009\u9879\u4EE5 - \u5F00\u5934\uFF0C\u53EF\u4EE5\u6709\u597D\u51E0\u4E2A\u3001\u8FD8\u80FD\u5408\u5E76\u5199\uFF08-la = -l -a\uFF09\uFF1B\u957F\u9009\u9879\u7528\u4E24\u4E2A\u77ED\u6A2A\uFF08\u5982 --help\uFF09\u3002\u8BB0\u4F4F\u8FD9\u4E2A\u5957\u8DEF\uFF0C\u540E\u9762\u6240\u6709\u547D\u4EE4\u90FD\u662F\u5B83\u3002",
+      "1-3": '\u60F3\u641E\u6E05\u695A"\u6211\u8FD9\u53F0\u7535\u8111\u5728\u7F51\u7EDC\u91CC\u662F\u4EC0\u4E48\u8EAB\u4EFD"\uFF0C\u5C31\u7528 ip addr\u3002\u5148\u8865\u4E2A\u57FA\u7840\uFF1A\u8BA1\u7B97\u673A\u91CC\u6700\u5C0F\u7684\u4FE1\u606F\u5355\u4F4D\u53EB"\u6BD4\u7279\uFF08bit\uFF09"\uFF0C\u4E00\u4E2A\u6BD4\u7279\u53EA\u80FD\u662F 0 \u6216 1\u3002ip addr \u7684\u8F93\u51FA\u91CC\u4F60\u4F1A\u770B\u5230\u4E09\u6837\u4E1C\u897F\uFF1A\u7F51\u5361\uFF08\u8BBE\u5907\u4E0A\u7F51\u7684\u63A5\u53E3\uFF0C\u6BD4\u5982 ens33\uFF09\u3001IP \u5730\u5740\uFF08\u8FD9\u53F0\u8BBE\u5907\u7684\u95E8\u724C\u53F7\uFF0C\u6BD4\u5982 192.168.1.100\uFF09\u3001MAC \u5730\u5740\uFF08\u51FA\u5382\u5C31\u70E7\u5F55\u597D\u7684"\u8EAB\u4EFD\u8BC1"\uFF0C\u4E00\u4E2A\u7F51\u5361\u4E00\u4E2A\u53F7\uFF09\u3002\u8BB0\u4F4F\u8FD9\u4E09\u4E2A\uFF0C\u540E\u9762\u7FFB\u724C\u3001\u6392\u969C\u90FD\u9760\u5B83\u4EEC\u3002',
+      "1-3b": "\u5148\u628A IP \u8FD9\u4EF6\u4E8B\u8BF4\u900F\uFF1AIP \u5C31\u662F\u7F51\u7EDC\u4E16\u754C\u7684\u300C\u6536\u8D27\u5730\u5740\u300D\uFF0C\u6570\u636E\u5305\u9760\u5B83\u627E\u5230\u4F60\u7684\u8BBE\u5907\u3002\u8BB0\u4F4F\u4F60\u5176\u5B9E\u6709\u597D\u51E0\u4E2A IP\u2014\u2014\u624B\u673A\u8FDE\u5BB6\u91CC WiFi \u62FF\u5230\u7684 192.168.x.x \u662F\u300C\u5185\u7F51 IP\u300D\uFF0C\u7531\u8DEF\u7531\u5668\u81EA\u52A8\u5206\u914D\uFF0C\u53EA\u5728\u81EA\u5BB6\u7F51\u7EDC\u91CC\u6709\u6548\uFF0C\u50CF\u5C0F\u533A\u95E8\u536B\u53D1\u7684\u7F16\u53F7\uFF1B\u771F\u6B63\u4E0A\u7F51\u65F6\uFF0C\u8FD0\u8425\u5546\uFF08\u5BBD\u5E26\u6216\u624B\u673A\u6D41\u91CF\uFF09\u8FD8\u4F1A\u7ED9\u4F60\u4E00\u4E2A\u300C\u516C\u7F51 IP\u300D\uFF0C\u8FD9\u624D\u662F\u4E92\u8054\u7F51\u4E0A\u5168\u4E16\u754C\u552F\u4E00\u7684\u5BF9\u5916\u95E8\u724C\u53F7\u3002\u800C\u4E14\u8FD9\u4E24\u4E2A IP \u90FD\u662F\u52A8\u6001\u7684\uFF1A\u91CD\u542F\u5149\u732B/\u8DEF\u7531\u5668\u3001\u624B\u673A\u6362\u4E2A\u57FA\u7AD9\u6216\u8005\u5F00\u4E00\u4E0B\u98DE\u884C\u6A21\u5F0F\uFF0CIP \u5E38\u5E38\u5C31\u53D8\u4E86\u3002\u4E00\u53E5\u8BDD\u8BB0\u4F4F\uFF1A\u5185\u7F51 IP \u7BA1\u300C\u5C0F\u533A\u5185\u300D\uFF0C\u516C\u7F51 IP \u7BA1\u300C\u5168\u4E16\u754C\u300D\uFF0C\u800C\u4E14\u90FD\u4E0D\u662F\u56FA\u5B9A\u7684\u3002",
+      "1-4": 'IP \u5730\u5740\u548C\u5B50\u7F51\u63A9\u7801\u662F\u6210\u5BF9\u51FA\u73B0\u7684\u3002\u5148\u8BF4\u6700\u57FA\u7840\u7684\u6982\u5FF5\uFF1A\u4FE1\u606F\u7684\u6700\u5C0F\u5355\u4F4D\u53EB"\u6BD4\u7279"\uFF08bit\uFF09\uFF0C\u4E00\u4E2A\u6BD4\u7279\u53EA\u80FD\u662F 0 \u6216 1\uFF0C8 \u4E2A\u6BD4\u7279 = 1 \u5B57\u8282\u3002\u4E00\u4E2A IPv4 \u5730\u5740\uFF08\u5982 192.168.1.100\uFF09\u4E00\u5171 32 \u4E2A\u6BD4\u7279\uFF0C\u5206\u6210 4 \u7EC4\u6570\u5B57\u3002\u90A3\u600E\u4E48\u533A\u5206"\u54EA\u4E9B\u4F4D\u662F\u7F51\u7EDC\u53F7\u3001\u54EA\u4E9B\u4F4D\u662F\u4E3B\u673A\u53F7"\uFF1F\u9760\u5B50\u7F51\u63A9\u7801\u2014\u2014\u5B83\u7528 32 \u4E2A\u6BD4\u7279\u91CC\u524D\u9762\u8FDE\u7EED\u7684 1 \u5212\u51FA\u7F51\u7EDC\u53F7\uFF08\u4E00\u4E2A\u7F51\u6BB5\u5171\u6709\u7684\u90E8\u5206\uFF09\uFF0C\u540E\u9762 0 \u5212\u51FA\u4E3B\u673A\u53F7\uFF08\u533A\u5206\u7F51\u6BB5\u5185\u6BCF\u53F0\u8BBE\u5907\uFF09\u3002255.255.255.0 \u5C31\u662F 24 \u4E2A 1 \u63A5 8 \u4E2A 0\uFF0C\u7B80\u5199\u4E3A /24\uFF08\u8FD9\u53EB CIDR \u8BB0\u6CD5\uFF09\u3002\u4E00\u4E2A /24 \u5B50\u7F51\u6709 256 \u4E2A\u5730\u5740\uFF0C\u53BB\u6389\u7F51\u7EDC\u5730\u5740\u548C\u5E7F\u64AD\u5730\u5740\uFF0C\u5B9E\u9645\u53EF\u7528 254 \u53F0\u3002\u518D\u8BB0\u4E24\u4E2A\u8BCD\uFF1AIPv4 \u603B\u5171\u53EA\u6709\u7EA6 43 \u4EBF\u4E2A\u5730\u5740\uFF0C\u65E9\u5C31\u5206\u5B8C\uFF0C\u6240\u4EE5\u6709\u4E86\u66F4\u957F\u7684 IPv6\uFF1BNAT \u5219\u662F\u8BA9\u5382\u91CC\u5F88\u591A\u8BBE\u5907\u5171\u7528\u4E00\u4E2A\u516C\u7F51 IP \u4E0A\u7F51\u7684\u7FFB\u8BD1\u5B98\u3002',
+      "1-5": "OSI \u4E03\u5C42\u6A21\u578B\u4ECE\u4E0B\u5230\u4E0A\uFF1A\u7269\u7406\u5C42\uFF08\u7F51\u7EBF\uFF09\u3001\u6570\u636E\u94FE\u8DEF\u5C42\uFF08MAC/\u4EA4\u6362\u673A\uFF09\u3001\u7F51\u7EDC\u5C42\uFF08IP/\u8DEF\u7531\uFF09\u3001\u4F20\u8F93\u5C42\uFF08TCP \u53EF\u9760/UDP \u5FEB\u901F\uFF09\u3001\u4F1A\u8BDD\u5C42\u3001\u8868\u793A\u5C42\u3001\u5E94\u7528\u5C42\uFF08HTTP\uFF09\u3002\u4F20\u8F93\u5C42\u4E24\u4E2A\u534F\u8BAE\u8BB0\u6E05\u695A\uFF1ATCP \u5148\u63E1\u624B\u518D\u4F20\u3001\u4E0D\u4E22\u5305\uFF0C\u9002\u5408\u6587\u4EF6\u4F20\u8F93\uFF1BUDP \u53D1\u51FA\u53BB\u5C31\u4E0D\u7BA1\u3001\u5FEB\u4F46\u6709\u98CE\u9669\uFF0C\u89C6\u9891\u901A\u8BDD\u548C\u4F20\u611F\u5668\u9AD8\u9891\u6570\u636E\u5E38\u7528\u5B83\u3002\u7406\u89E3\u4E86\u4E03\u5C42\uFF0C\u4F60\u5C31\u80FD\u51C6\u786E\u5B9A\u4F4D\u7F51\u7EDC\u95EE\u9898\u51FA\u5728\u54EA\u4E00\u5C42\u3002",
+      "1-5b": "\u5237\u89C6\u9891\u5361\u6210 PPT\u3001\u56E2\u6218\u7A81\u7136 460ms \u5EF6\u8FDF\u2014\u2014\u4F60\u558A\u7684\u300C\u7F51\u574F\u4E86\u300D\uFF0C\u5F80\u5F80\u662F TCP/IP \u67D0\u4E00\u5C42\u51FA\u4E86\u95EE\u9898\u3002\u8BB0\u5B9E\u9645\u5E72\u6D3B\u7528\u7684\u7CBE\u7B80\u7248\u2014\u2014TCP/IP \u56DB\u5C42\uFF1A\u5E94\u7528\u5C42(\u9762\u5BF9\u7528\u6237\uFF0CHTTP/DNS)\u3001\u4F20\u8F93\u5C42(\u53EF\u9760\u4F20\u8F93\uFF0CTCP/UDP)\u3001\u7F51\u7EDC\u5C42(\u627E\u8DEF\uFF0CIP/\u8DEF\u7531\u5668)\u3001\u7F51\u7EDC\u63A5\u53E3\u5C42(\u6536\u53D1\u5B57\u8282\uFF0C\u7F51\u5361/\u4EA4\u6362\u673A)\u3002\u8BB0\u6210\u5FEB\u9012\uFF1A\u4E1A\u52A1\u5458\u2192\u5E72\u7EBF\u2192\u5206\u62E3\u2192\u914D\u9001\u3002",
+      "1-6": "0.0.0.0 \u662F\u8BBE\u5907\u51FA\u5382\u72B6\u6001\u2014\u2014\u7F51\u5361\u8FD8\u6CA1\u6709\u88AB\u5206\u914D\u6709\u6548\u7684 IP \u5730\u5740\u3002\u8FD9\u5C31\u597D\u6BD4\u65B0\u5458\u5DE5\u8FD8\u6CA1\u9886\u5DE5\u724C\uFF0C\u522B\u4EBA\u4E0D\u77E5\u9053\u4F60\u53EB\u5565\u53F7\u3002\u62FF\u5230\u6709\u6548 IP \u4E4B\u524D\uFF0C\u8BBE\u5907\u5BF9\u5916\u901A\u4FE1\u5168\u662F\u8FD9\u4E2A\u5360\u4F4D\u72B6\u6001\u3002",
+      "1-7": "\u8F93\u5165 ping -c 4 192.168.1.1\u2014\u2014ping \u53D1\u5305\u6D4B\u8FDE\u901A\u6027\uFF0C-c 4 \u63A7\u5236\u53EA\u53D1 4 \u4E2A\u3002\u770B\u56DE\u590D\u7387\uFF1A0% \u4E22\u5305\u7EBF\u8DEF\u5065\u5EB7\uFF0C\u6709\u4E22\u5305\u5C31\u5F97\u6392\u67E5\u3002",
+      "1-8": 'ping \u4E0D\u901A\u7F51\u5173\uFF0C\u6309\u6D41\u7A0B\u6765\uFF1A\u5148\u67E5\u7F51\u7EBF\uFF08ip link\uFF09\uFF0C\u518D\u67E5\u672C\u5730\u534F\u8BAE\u6808\u2014\u2014ping 127.0.0.1\uFF0C\u8FD9\u4E2A 127.0.0.1 \u53EB"\u56DE\u73AF\u5730\u5740"\uFF0C\u6C38\u8FDC\u4EE3\u8868\u8BBE\u5907\u81EA\u5DF1\uFF0C\u5B83\u901A\u4E86\u8BF4\u660E\u672C\u673A\u7F51\u7EDC\u534F\u8BAE\u6808\u6CA1\u95EE\u9898\uFF1B\u7136\u540E\u518D\u67E5\u8DEF\u7531\u8868\uFF08ip route\uFF09\uFF0C\u8DEF\u7531\u8868\u5C31\u662F\u8BBE\u5907\u91CC"\u53BB\u54EA\u4E2A\u7F51\u7EDC\u8D70\u54EA\u6761\u8DEF"\u7684\u8BF4\u660E\u4E66\uFF0C\u770B\u770B\u6709\u6CA1\u6709\u901A\u5F80\u7F51\u5173\u7684\u9ED8\u8BA4\u8DEF\u7531\u3002\u4E00\u6B65\u6B65\u6392\u9664\uFF0C\u627E\u5230\u6839\u56E0\u3002',
+      "1-9": "traceroute \u7A7A\u683C \u7F51\u5740\uFF08Windows \u7CFB\u7EDF\u91CC\u8FD9\u4E2A\u547D\u4EE4\u53EB tracert\uFF0C\u5176\u5B9E\u4E24\u8005\u662F\u540C\u4E00\u4E2A\u4E1C\u897F\uFF0C\u53EA\u662F\u5E73\u53F0\u53EB\u6CD5\u4E0D\u540C\uFF09\uFF0C\u5B83\u4F1A\u5217\u51FA\u6570\u636E\u4ECE\u4F60\u7535\u8111\u5230\u76EE\u6807\u4E4B\u95F4\u7ECF\u8FC7\u7684\u6BCF\u4E00\u4E2A\u8DEF\u7531\u5668\uFF08\u8DF3\uFF09\u3002\u6BCF\u8DF3\u7684\u5EF6\u8FDF\u80FD\u5B9A\u4F4D\u74F6\u9888\u2014\u20145 \u8DF3\u6B63\u5E38\uFF0C\u8D85\u8FC7 15 \u8DF3\u8BF4\u660E\u8DEF\u7531\u7ED5\u8DEF\u4E86\u3002",
+      "1-10": "\u8F93\u5165 nslookup \u57DF\u540D\uFF0C\u67E5\u57DF\u540D\u5BF9\u5E94\u7684 IP \u5730\u5740\u2014\u2014\u7C7B\u4F3C\u6570\u5B57\u7535\u8BDD\u672C\u3002nslookup www.baidu.com \u8FD4\u56DE\u767E\u5EA6\u670D\u52A1\u5668 IP\u3002\u53CD\u8FC7\u6765\u4ECE IP \u67E5\u57DF\u540D\u53EB\u53CD\u5411\u89E3\u6790\u3002",
+      "1-11": 'DNS \u5C31\u662F\u4E92\u8054\u7F51\u7535\u8BDD\u672C\u2014\u2014\u4F60\u628A www.baidu.com \u6572\u8FDB\u53BB\uFF0CDNS \u670D\u52A1\u5668\u8FD4\u56DE\u4E00\u4E2A IP \u5730\u5740\u3002\u57DF\u540D\u53D8 IP \u7684\u8FC7\u7A0B\u53EB"\u6B63\u5411\u89E3\u6790"\uFF08\u4E5F\u5C31\u662F\u65E5\u5E38\u8BF4\u7684\u57DF\u540D\u89E3\u6790\uFF09\uFF1B\u53CD\u8FC7\u6765\u4ECE IP \u5730\u5740\u67E5\u5B83\u5BF9\u5E94\u4EC0\u4E48\u57DF\u540D\uFF0C\u53EB"\u53CD\u5411\u89E3\u6790"\u3002\u4E24\u4E2A\u65B9\u5411\u522B\u641E\u6DF7\u3002',
+      "1-12": "iptables \u662F Linux \u9632\u706B\u5899\uFF0C\u901A\u8FC7\u89C4\u5219\u63A7\u5236\u6570\u636E\u8FDB\u51FA\u3002\u5165\u7AD9=\u5916\u90E8\u5230\u672C\u673A\uFF0C\u51FA\u7AD9=\u672C\u673A\u5230\u5916\u90E8\u3002\u7981\u6B62 ping \u5C31\u662F\u52A0\u4E00\u6761\u5165\u7AD9\u89C4\u5219\u4E22\u5F03 ICMP \u8BF7\u6C42\u3002",
+      "1-13": '\u6BCF\u53F0\u673A\u5668\u4E0A\u540C\u65F6\u8DD1\u7740\u591A\u79CD\u670D\u52A1\uFF0C\u5168\u9760\u7AEF\u53E3\u53F7\u533A\u5206\uFF0C\u5C31\u50CF\u4E00\u680B\u5927\u697C\u91CC\u6BCF\u4E2A\u516C\u53F8\u6709\u81EA\u5DF1\u95E8\u724C\u53F7\u3002\u8BB0\u4F4F\u8FD9\u51E0\u4E2A\u5E38\u7528\u7AEF\u53E3\uFF1ASSH \u8FDC\u7A0B\u7BA1\u7406\u7528 22\uFF0C\u7F51\u9875\u670D\u52A1 HTTP \u7528 80\u3001HTTPS \u7528 443\uFF0CDNS \u57DF\u540D\u89E3\u6790\u7528 53\u3002\u770B\u5230\u7AEF\u53E3\u5C31\u77E5\u9053\u662F\u54EA\u4E2A\u670D\u52A1\u5728\u5E72\u6D3B\uFF0C\u6392\u6545\u969C\u65F6\u7B2C\u4E00\u4E2A\u5FF5\u5934\u5C31\u662F"\u8FD9\u4E2A\u670D\u52A1\u7684\u7AEF\u53E3\u901A\u4E0D\u901A\uFF1F"\u3002',
+      "1-13b": "\u9632\u706B\u5899\u914D\u597D\u4E86\uFF0C\u600E\u4E48\u786E\u8BA4\u670D\u52A1\u771F\u7684\u5728\u76D1\u542C\uFF1F\u7528 ss \u547D\u4EE4\uFF1Ass -tln \u5217\u51FA TCP \u76D1\u542C\u7AEF\u53E3\uFF0C\u8F93\u51FA\u91CC\u8FD8\u4F1A\u770B\u5230 127.0.0.1\uFF08\u672C\u673A\uFF09\u548C 0.0.0.0\uFF08\u6240\u6709\u7F51\u5361\uFF09\u3002\u60F3\u53EA\u770B\u67D0\u4E2A\u7AEF\u53E3\uFF0C\u5C31\u5957\u4E0A\u7BA1\u9053\uFF1Ass -tln | grep \u7AEF\u53E3\u53F7\u2014\u2014| \u662F\u7BA1\u9053\uFF0C\u628A\u524D\u4E00\u4E2A\u547D\u4EE4\u7684\u8F93\u51FA\u9001\u7ED9\u540E\u4E00\u4E2A\u547D\u4EE4\u8FC7\u6EE4\u3002\u8DDF\u7740\u6572\uFF0C\u62A5\u9519\u4E5F\u6CA1\u5173\u7CFB\uFF0C\u770B\u6E05\u7EC8\u7AEF\u53CD\u9988\u3002",
+      "1-14": "\u4E09\u79CD\u5E38\u89C1\u653B\u51FB\uFF1ADDoS \u7528\u6D77\u91CF\u8BF7\u6C42\u585E\u6EE1\u5E26\u5BBD\uFF0CARP \u6B3A\u9A97\u4F2A\u9020 MAC \u622A\u83B7\u901A\u4FE1\uFF0C\u7AEF\u53E3\u626B\u63CF\u9010\u4E2A\u8BD5\u63A2\u627E\u7A81\u7834\u53E3\u3002\u77E5\u5DF1\u77E5\u5F7C\u624D\u80FD\u9632\u4F4F\u3002",
+      "1-hidden-0": "traceroute \u8DDF IP \u5730\u5740\u80FD\u770B\u8DEF\u7531\u8DEF\u5F84\u6BCF\u4E00\u8DF3\u2014\u2014\u52A0 -n \u53C2\u6570\u8DF3\u8FC7\u57DF\u540D\u89E3\u6790\u66F4\u5FEB\u3002\u7528\u6BCF\u4E00\u8DF3\u7684 IP \u8FD8\u80FD\u53CD\u67E5\u5730\u7406\u4F4D\u7F6E\uFF0C\u77E5\u9053\u6570\u636E\u90FD\u7ECF\u8FC7\u4E86\u54EA\u4E9B\u57CE\u5E02\u7684\u8282\u70B9\u3002",
+      "1-hidden-1": "iptables \u89C4\u5219\u4ECE\u4E0A\u5230\u4E0B\u9010\u6761\u5339\u914D\u3002\u5148\u770B -A \u52A0\u5728\u54EA\u4E2A\u94FE\uFF1AINPUT=\u5165\u7AD9\uFF08\u4ECE\u5916\u9762\u8FDB\u6765\u7684\u6570\u636E\uFF09\u3001OUTPUT=\u51FA\u7AD9\uFF08\u672C\u673A\u53D1\u51FA\u53BB\u7684\u6570\u636E\uFF09\u3001FORWARD=\u8F6C\u53D1\u3002\u518D\u770B -p \u534F\u8BAE\u3001--dport \u76EE\u6807\u7AEF\u53E3\uFF0C\u6700\u540E -j \u52A8\u4F5C\uFF08ACCEPT \u653E\u884C / DROP \u4E22\u5F03\uFF09\u3002\u8FD9\u4E09\u6761\u662F\uFF1A\u2460 \u4E22\u5F03\u8FDB\u6765\u7684 ping\uFF08\u7981 ping\uFF09\u2192 \u2461 \u653E\u884C\u8FDB\u6765\u7684 22 \u7AEF\u53E3\uFF08\u5F00 SSH\uFF09\u2192 \u2462 \u5176\u4F59\u8FDB\u6765\u7684\u5168\u4E22\u5F03\u3002\u8BFB\u89C4\u5219\u5C31\u6309\u8FD9\u4E2A\u903B\u8F91\u4E00\u884C\u884C\u4E32\u3002",
+      "2-0": "\u8F93\u5165 sudo apt install openssh-server \u5B89\u88C5 SSH \u670D\u52A1\u3002\u88C5\u597D\u540E\u8981\u914D\u7F6E\u597D\u7CFB\u7EDF\u670D\u52A1\u2014\u2014\u63A7\u5236\u670D\u52A1\u7528 systemctl\uFF1Asudo systemctl status ssh \u770B\u72B6\u6001\u3001sudo systemctl start ssh \u542F\u52A8\u3001sudo systemctl enable ssh \u8BBE\u4E3A\u5F00\u673A\u81EA\u542F\uFF08\u91CD\u542F\u540E\u81EA\u52A8\u8FD0\u884C\uFF09\u3002\u518D\u8BB0\u4E00\u4E2A\u6570\uFF1ASSH \u9ED8\u8BA4\u8D70 22 \u7AEF\u53E3\uFF0C\u540E\u9762\u8FDC\u7A0B\u8FDE\u63A5\u3001\u5B89\u5168\u7EC4\u653E\u884C\u90FD\u9760\u5B83\u3002\u88C5\u597D\u914D\u7F6E\u597D\uFF0C\u5C31\u80FD\u4ECE\u4EFB\u4F55\u8BBE\u5907\u8FDC\u7A0B\u767B\u5F55\u8FD9\u53F0\u673A\u5668\u4E86\u2014\u2014\u8FDC\u7A0B\u8FD0\u7EF4\u7684\u57FA\u7840\u3002 \u4F46\u9ED8\u8BA4 22 \u7AEF\u53E3\u6700\u5BB9\u6613\u88AB\u626B\u63CF\u7206\u7834\uFF0C\u751F\u4EA7\u73AF\u5883\u5EFA\u8BAE\u6539\u6210\u4E0D\u5E38\u89C1\u7684\u7AEF\u53E3\uFF08\u6BD4\u5982 26200\uFF09\uFF0C\u518D\u914D\u5408\u5BC6\u94A5\u767B\u5F55\u66F4\u5B89\u5FC3\u3002",
+      "2-1": "SSH \u767B\u5F55\u683C\u5F0F\u662F ssh \u7528\u6237\u540D@IP\u5730\u5740\u3002\u6BD4\u5982 ssh root@192.168.1.100\u3002\u7B2C\u4E00\u6B21\u8FDE\u63A5\u4F1A\u63D0\u793A\u786E\u8BA4\u4E3B\u673A\u6307\u7EB9\uFF0C\u8F93\u5165 yes \u7EE7\u7EED\uFF0C\u7136\u540E\u8F93\u5165\u5BC6\u7801\u5C31\u767B\u4E0A\u4E86\u3002\u8FDC\u7A0B\u7BA1\u7406\u5168\u9760\u8FD9\u6761\u547D\u4EE4\u3002",
+      "2-2": "\u8F93\u5165 ls -la /home \u67E5\u770B\u76EE\u5F55\u6240\u6709\u6587\u4EF6\u3002\u5957\u7528\u547D\u4EE4\u683C\u5F0F \u547D\u4EE4\u540D [\u9009\u9879] [\u53C2\u6570]\uFF1Als \u662F\u547D\u4EE4\u540D\uFF0C-la \u662F\u9009\u9879\u3001/home \u662F\u76EE\u6807\u53C2\u6570\u3002\u9009\u9879 -l \u663E\u793A\u6743\u9650\u548C\u5927\u5C0F\uFF08\u957F\u683C\u5F0F\uFF09\u3001-a \u663E\u793A\u9690\u85CF\u6587\u4EF6\uFF0C\u4E24\u4E2A\u77ED\u9009\u9879\u5408\u5E76\u5199\u6210 -la\uFF08\u7B49\u4E8E -l -a\uFF09\u3002\u6743\u9650\u5982 drwxr-xr-x\uFF1Ad=\u76EE\u5F55\uFF0Cr=\u8BFB\uFF0Cw=\u5199\uFF0Cx=\u8FD0\u884C\u3002 \u60F3\u968F\u65F6\u786E\u8BA4\u81EA\u5DF1\u5F53\u524D\u5728\u54EA\u4E2A\u76EE\u5F55\uFF0C\u5C31\u7528 pwd\uFF08\u6253\u5370\u5DE5\u4F5C\u76EE\u5F55\uFF09\uFF0C\u5B83\u4F1A\u76F4\u63A5\u8F93\u51FA\u5F53\u524D\u8DEF\u5F84\u3002",
+      "2-3": "curl \u662F\u547D\u4EE4\u884C\u91CC\u7684 HTTP \u5DE5\u5177\uFF0C\u76F8\u5F53\u4E8E\u6587\u5B57\u7248\u6D4F\u89C8\u5668\u2014\u2014\u540E\u9762\u8DDF\u7F51\u7AD9\u540D\u5C31\u80FD\u8BBF\u95EE\u5B83\u3002ip.sb \u662F\u4E00\u4E2A\u300C\u516C\u7F51 IP \u67E5\u8BE2\u7F51\u7AD9\u300D\uFF08\u56FD\u5185\u53EF\u76F4\u63A5\u8BBF\u95EE\uFF09\uFF0C\u6536\u5230\u8BF7\u6C42\u5C31\u628A\u4F60\u7684\u516C\u7F51 IP \u8FD4\u56DE\u6765\uFF1Bmyip.ipip.net \u8FD8\u80FD\u663E\u793A\u5F52\u5C5E\u5730\u3002\u56FD\u5916\u540C\u7C7B\u6709 ifconfig.me\u3001ifconfig.co \u7B49\uFF0C\u4F46\u56FD\u5185\u8BBF\u95EE\u53EF\u80FD\u6162\u6216\u4E0D\u901A\uFF0C\u6559\u5B66\u4F18\u5148\u7528\u56FD\u5185\u7684\u3002\u547D\u4EE4\u91CC http:// \u548C www \u5199\u4E0D\u5199\u90FD\u884C\uFF08curl \u4F1A\u81EA\u52A8\u8865\u5168\uFF09\u3002\u5982\u679C\u6CA1\u8FD4\u56DE\uFF0C\u8BF4\u660E\u8FD9\u53F0\u673A\u5668\u6CA1\u6709\u516C\u7F51\u51FA\u53E3\u2014\u2014\u5185\u7F51\u8BBE\u5907\u8FD9\u6837\u5F88\u6B63\u5E38\u3002",
+      "2-4": "\u4E91\u670D\u52A1\u5668\u662F\u5DE5\u63A7\u7CFB\u7EDF\u7684\u8FDC\u7A0B\u5927\u8111\u3002\u6CE8\u518C\u4E91\u670D\u52A1\u5546\u8D26\u53F7\u540E\uFF0C\u9700\u8981\u9009\u62E9\u914D\u7F6E\uFF08CPU/\u5185\u5B58/\u5E26\u5BBD\uFF09\u3001\u8BBE\u7F6E\u5BC6\u7801\u3001\u542F\u52A8\u5B9E\u4F8B\u3002\u6709\u4E86\u4E91\u670D\u52A1\u5668\uFF0C\u4F60\u7684\u6570\u636E\u5C31\u80FD\u5728\u4EFB\u4F55\u5730\u65B9\u8BBF\u95EE\u4E86\u3002",
+      "2-5": "\u5B89\u5168\u7EC4\u662F\u4E91\u670D\u52A1\u5668\u7684\u9632\u706B\u5899\uFF0C\u63A7\u5236\u54EA\u4E9B\u7AEF\u53E3\u5BF9\u5916\u90E8\u5F00\u653E\u3002SSH \u4F7F\u7528 22 \u7AEF\u53E3\uFF0C\u6240\u4EE5\u8981\u5728\u5B89\u5168\u7EC4\u4E2D\u6DFB\u52A0\u5165\u7AD9\u89C4\u5219\u653E\u884C TCP 22\uFF0C\u624D\u80FD\u4ECE\u5916\u90E8 SSH \u767B\u5F55\u5230\u670D\u52A1\u5668\u3002",
+      "2-6": "\u5DE5\u4E1A\u4E92\u8054\u7F51\u7684\u65F6\u5EF6\u8981\u6C42\u662F\u6BEB\u79D2\uFF0C\u6D88\u8D39\u4E92\u8054\u7F51\u79D2\u7EA7\u5DF2\u7ECF\u591F\u4E86\u3002\u66F4\u5173\u952E\u7684\u662F\uFF0C\u5DE5\u4E1A\u7F51\u7EDC\u8FDE\u7684\u662F\u786C\u4EF6\u8BBE\u5907\uFF0C\u8981\u8003\u8651\u9AD8\u6E29\u9707\u52A8\u7535\u78C1\u5E72\u6270\uFF1B\u6D88\u8D39\u7F51\u7EDC\u8FDE\u7684\u662F\u4EBA\u62FF\u624B\u673A\u4E0A\u7F51\u3002\u5F52\u6839\u7ED3\u5E95\u662F\u8FDE\u63A5\u7684\u4E1C\u897F\u4E0D\u540C\uFF0C\u8981\u6C42\u4E5F\u5B8C\u5168\u4E0D\u540C\u3002",
+      "2-hidden": "SSH \u514D\u5BC6\u767B\u5F55\u901A\u8FC7\u5BC6\u94A5\u5BF9\u5B9E\u73B0\uFF1A\u4F60\u5728\u672C\u5730\u751F\u6210\u4E00\u5BF9\u5BC6\u94A5\uFF08\u516C\u94A5+\u79C1\u94A5\uFF09\uFF0C\u628A\u516C\u94A5\u590D\u5236\u5230\u670D\u52A1\u5668 ~/.ssh/authorized_keys \u91CC\uFF0C\u4E4B\u540E SSH \u767B\u5F55\u5C31\u7528\u5BC6\u94A5\u8BA4\u8BC1\u66FF\u4EE3\u5BC6\u7801\u4E86\u3002",
+      "4-0": "\u8FB9\u7F18\u8BA1\u7B97\u5C31\u662F\u300C\u6570\u636E\u5728\u54EA\u4EA7\u751F\uFF0C\u5C31\u5728\u54EA\u5148\u5904\u7406\u300D\u2014\u2014\u522B\u5565\u90FD\u5F80\u4E91\u7AEF\u4F20\uFF0C\u6210\u672C\u9AD8\u3001\u65F6\u5EF6\u5927\u3001\u8FD8\u6015\u65AD\u7F51\u3002\u5148\u7B97\u4E00\u7B14\u8D26\uFF1A\u4F20\u611F\u5668\u6BCF\u79D2\u91C7\u4E00\u6B21\uFF0C\u4E00\u5929\u5C31\u662F 8 \u4E07\u591A\u6761\uFF0C\u5168\u4F20\u4E0A\u53BB\u5E26\u5BBD\u548C\u5B58\u50A8\u625B\u4E0D\u4F4F\u3002\u6240\u4EE5\u5728\u8FB9\u7F18\u5148\u5904\u7406\uFF0C\u6709\u7528\u7684\u624D\u4E0A\u4F20\u3002\u8FD9\u6BB5 Function \u4EE3\u7801\u5C31\u662F\u6A21\u62DF\u4F20\u611F\u5668\u4EA7\u751F\u6570\u636E\uFF1A\u6E29\u5EA6 25-85\u2103 \u968F\u673A\u3001\u632F\u52A8 0-1.5 \u968F\u673A\u3002",
+      "4-1": "Node-RED \u4E2D\u505A\u6761\u4EF6\u5224\u65AD\u7528 Switch \u8282\u70B9\u3002\u548C\u7F16\u7A0B\u8BED\u8A00\u7684 switch/case \u7C7B\u4F3C\uFF0C\u4F60\u53EF\u4EE5\u914D\u7F6E\u591A\u6761\u89C4\u5219\uFF1A\u6E29\u5EA6 > 80 \u8D70\u62A5\u8B66\u5206\u652F\uFF0C<= 80 \u8D70\u6B63\u5E38\u5206\u652F\u3002",
+      "4-2": "\u4F20\u611F\u5668\u62A5\u6570\u4F1A\u6296\u2014\u2014\u6BD4\u5982\u6E29\u5EA6 25\u300126\u300127\u300180\u300126\u2026\uFF0C\u90A3\u4E2A 80 \u662F\u5F02\u5E38\u6BDB\u523A\u3002\u6ED1\u52A8\u5747\u503C\u5C31\u662F\u300C\u53EA\u770B\u6700\u8FD1 10 \u4E2A\u6570\uFF0C\u7B97\u4E2A\u5E73\u5747\u300D\uFF1A\u5148\u6709\u7F13\u5B58 \u2192 \u65B0\u6570\u636E\u6765\u4E86\u585E\u8FDB\u53BB \u2192 \u8D85\u8FC7 10 \u4E2A\u5C31\u628A\u6700\u65E7\u90A3\u4E2A\u6324\u6389\uFF08\u4FDD\u6301\u201C\u6700\u8FD1 10 \u4E2A\u201D\uFF0C\u8FD9\u5C31\u662F\u201C\u6ED1\u52A8\u201D\uFF09\u2192 \u6512\u6EE1 10 \u4E2A\u5C31\u7B97\u5E73\u5747 \u2192 \u8F93\u51FA\u5E73\u5747\u503C\u3002\u8FD9\u6837\u8F93\u51FA\u5E73\u6ED1\u3001\u8FD8\u7701\u6D41\u91CF\u3002",
+      "4-3": "\u8FB9\u7F18\u8BA1\u7B97\u56DB\u5927\u9A71\u52A8\u529B\uFF1A\u7701\u5E26\u5BBD\uFF08\u6570\u636E\u672C\u5730\u5904\u7406\u51CF\u5C11\u4E0A\u4F20\uFF09\u3001\u5FEB\u54CD\u5E94\uFF08\u6BEB\u79D2\u7EA7\u672C\u5730\u51B3\u7B56\uFF09\u3001\u7A33\u8FD0\u884C\uFF08\u65AD\u7F51\u4E0D\u5F71\u54CD\u672C\u5730\u63A7\u5236\uFF09\u3001\u5BC6\u9632\u62A4\uFF08\u654F\u611F\u6570\u636E\u4E0D\u51FA\u5382\u533A\uFF09\u3002",
+      "4-4": "\u6ED1\u52A8\u5747\u503C\u6EE4\u6CE2\u540E\u6570\u636E\u91CF\u5927\u5E45\u51CF\u5C11\uFF1A\u539F\u59CB\u6BCF\u79D2 1 \u4E2A\u91C7\u6837\uFF0C10 \u4E2A\u53D6\u5747\u503C\u540E\u6BCF\u79D2\u53EA\u4F20 0.1 \u4E2A\u2014\u2014\u6570\u636E\u91CF\u53EA\u5269\u539F\u6765\u7684 1/10\uFF0C\u51CF\u5C11\u7EA6 90%\u3002\u7F51\u7EDC\u538B\u529B\u5C0F\u591A\u4E86\uFF0C\u5382\u957F\u5F88\u6EE1\u610F\u3002",
+      "4-5": "OpenPLC \u662F\u4E00\u4E2A\u5F00\u6E90\u8F6F PLC\uFF0C\u53EF\u4EE5\u5728\u666E\u901A\u7535\u8111\u4E0A\u8FD0\u884C PLC \u7A0B\u5E8F\u3002\u548C\u786C PLC \u76F8\u6BD4\uFF0C\u5B83\u6210\u672C\u4F4E\u3001\u7075\u6D3B\u9AD8\uFF0C\u9002\u5408\u5B66\u4E60\u548C\u539F\u578B\u9A8C\u8BC1\u3002\u7F16\u8BD1\u5B89\u88C5\u540E\u901A\u8FC7\u6D4F\u89C8\u5668\u8BBF\u95EE Web \u754C\u9762\u8FDB\u884C\u7F16\u7A0B\u3002",
+      "4-6": "\u8F6FPLC\u7528\u8F6F\u4EF6\u6A21\u62DF\u6240\u6709PLC\u529F\u80FD\uFF0C\u6210\u672C\u4F4E\u53EF\u5B9A\u5236\uFF0C\u6BD4\u786CPLC\u7075\u6D3B\u592A\u591A\u3002\u4F46\u786CPLC\u6709\u72EC\u7ACB\u7535\u8DEF\u548C\u786C\u5B9E\u65F6OS\uFF0C\u5E26\u6709\u4E25\u683C\u5B89\u5168\u8BA4\u8BC1\u2014\u2014\u51FA\u4E86\u6545\u969C\u4E0D\u4F1A\u56E0\u4E3A\u8F6F\u4EF6\u5D29\u6389\u53CD\u5E94\u4E0D\u8FC7\u6765\u3002\u5728\u751F\u547D\u5B89\u5168\u7684\u573A\u666F\u4E0B\u5FC5\u987B\u9760\u54EA\u4E2A\uFF1F",
+      "4-hidden": "\u5168\u91CF\u6570\u636E\u6BCF\u5206\u949F\u7EA6 60 \u6761\uFF0C\u7B5B\u9009\u540E\u6BCF\u5206\u949F\u7EA6 9 \u6761\u3002\u8FD0\u884C 2 \u5206\u949F\uFF0C\u5168\u91CF\u7EA6 120 \u6761\uFF0C\u7B5B\u9009\u540E\u7EA6 18 \u6761\u3002\u8FD9\u5C31\u662F\u8FB9\u7F18\u8BA1\u7B97\u7684\u5A01\u529B\u2014\u2014\u5C11\u4F20\u6570\u636E\uFF0C\u4E0D\u4E22\u4FE1\u606F\u3002",
+      "5-0": "Docker \u5C31\u50CF\u6807\u51C6\u96C6\u88C5\u7BB1\u2014\u2014\u4E0D\u7BA1\u91CC\u9762\u88C5\u7684\u662F\u5565\uFF08\u5E94\u7528+\u73AF\u5883\uFF09\uFF0C\u7BB1\u5B50\u5C3A\u5BF8\u7EDF\u4E00\uFF0C\u540A\u5230\u54EA\u8258\u8239\uFF08\u54EA\u53F0\u670D\u52A1\u5668\uFF09\u90FD\u80FD\u653E\u3002\u4EE5\u524D\u88C5\u8F6F\u4EF6\u6015\u73AF\u5883\u51B2\u7A81\uFF0C\u73B0\u5728 Docker \u628A\u5E94\u7528\u548C\u73AF\u5883\u6253\u5305\u6210\u955C\u50CF\uFF0C\u4E00\u6761\u547D\u4EE4\u8DD1\u8D77\u6765\u3001\u79D2\u7EA7\u542F\u505C\u3002\u8FD9\u6B63\u662F\u5DE5\u4E1A\u8FB9\u7F18\u90E8\u7F72\u6700\u5E38\u7528\u7684\u65B9\u5F0F\u3002\u88C5 Docker \u5F88\u7B80\u5355\uFF0C\u5B98\u65B9\u63D0\u4F9B\u4E00\u952E\u5B89\u88C5\u811A\u672C\u3002",
+      "5-1": "docker run hello-world \u662F Docker \u7684\u5165\u95E8\u547D\u4EE4\u3002\u5B83\u4F1A\u4ECE Docker Hub \u4E0B\u8F7D hello-world \u955C\u50CF\uFF0C\u521B\u5EFA\u5BB9\u5668\u5E76\u8FD0\u884C\u3002\u770B\u5230 Hello from Docker \u7684\u6B22\u8FCE\u4FE1\u606F\uFF0C\u5C31\u8BF4\u660E Docker \u5B89\u88C5\u6210\u529F\u4E86\u3002",
+      "5-2": "docker run -d --name mynginx -p 8080:80 nginx \u547D\u4EE4\u7528 Nginx \u955C\u50CF\u542F\u52A8\u4E00\u4E2A Web \u670D\u52A1\u5668\u3002-d \u540E\u53F0\u8FD0\u884C\uFF0C--name \u6307\u5B9A\u5BB9\u5668\u540D\uFF0C-p 8080:80 \u628A\u4E3B\u673A\u7684 8080 \u7AEF\u53E3\u6620\u5C04\u5230\u5BB9\u5668\u7684 80 \u7AEF\u53E3\u3002",
+      "5-3": "Docker \u5E38\u7528\u547D\u4EE4\u4E0D\u591A\uFF1Adocker ps \u770B\u8FD0\u884C\u4E2D\u7684\u5BB9\u5668\uFF0Cdocker stop \u505C\u6389\u5BB9\u5668\uFF0Cdocker rm \u5220\u9664\u5BB9\u5668\uFF0Cdocker pull \u4E0B\u8F7D\u955C\u50CF\u3002\u8BB0\u4F4F\u8FD9\u56DB\u4E2A\u5C31\u80FD\u4E0A\u624B\u4E86\u3002",
+      "5-4": "\u7528 Docker \u8FD0\u884C Node-RED \u53EF\u4EE5\u907F\u514D\u4E0E\u539F\u751F\u7248\u672C\u7684\u7AEF\u53E3\u51B2\u7A81\u3002Docker \u7248\u7684 Node-RED \u4F7F\u7528 1881 \u7AEF\u53E3\uFF08\u533A\u522B\u4E8E\u539F\u751F\u7684 1880\uFF09\uFF0C\u8FD9\u6837\u4E24\u4E2A\u7248\u672C\u53EF\u4EE5\u540C\u65F6\u8FD0\u884C\u5BF9\u6BD4\u3002",
+      "5-5": "Docker \u548C\u865A\u62DF\u673A\u7684\u6838\u5FC3\u533A\u522B\uFF1ADocker \u5171\u4EAB\u5BBF\u4E3B\u673A\u5185\u6838\uFF08\u8F7B\u91CF\uFF09\uFF0C\u865A\u62DF\u673A\u6709\u72EC\u7ACB\u5185\u6838\uFF08\u91CD\u91CF\uFF09\u3002\u6240\u4EE5 Docker \u542F\u52A8\u79D2\u7EA7\u3001\u78C1\u76D8 MB \u7EA7\uFF1B\u865A\u62DF\u673A\u542F\u52A8\u5206\u949F\u7EA7\u3001\u78C1\u76D8 GB \u7EA7\u3002",
+      "5-6": "Docker \u5BB9\u5668\u5220\u4E86\u5C31\u5168\u6CA1\u4E86\u2014\u2014\u8FD9\u662F\u8BBE\u8BA1\u54F2\u5B66\u4E0D\u662Fbug\u3002\u60F3\u8BA9\u6570\u636E\u6D3B\u8FC7\u5BB9\u5668\u751F\u547D\u5468\u671F\uFF0C\u5F97\u7528Docker\u63D0\u4F9B\u7684\u6570\u636E\u5377\u6302\u8F7D\u2014\u2014\u5BBF\u4E3B\u673A\u4E0A\u7559\u4E00\u5757\u72EC\u7ACB\u533A\u57DF\uFF0C\u5BB9\u5668\u91CD\u542F\u6570\u636E\u8FD8\u5728\u3002",
+      "5-hidden": "\u540C\u65F6\u8FD0\u884C\u539F\u751F Node-RED \u548C Docker \u7248 Node-RED\uFF0C\u5BF9\u6BD4\u5B83\u4EEC\u7684\u5B89\u88C5\u65B9\u5F0F\u3001\u9694\u79BB\u6027\u3001\u6570\u636E\u6301\u4E45\u5316\u3002\u8FD9\u662F\u7406\u89E3 Docker \u4EF7\u503C\u7684\u6700\u4F73\u5B9E\u8DF5\u3002",
+      "6-0": "\u6570\u636E\u91C7\u4E0A\u6765\u4E86\uFF0C\u5F97\u8BA9\u64CD\u4F5C\u5458\u4E00\u773C\u770B\u61C2\u2014\u2014\u8FD9\u5C31\u662F Dashboard\uFF08\u4EEA\u8868\u76D8\uFF09\uFF0C\u50CF\u7ED9\u5DE5\u5382\u88C5\u4E00\u5757\u300C\u9A7E\u9A76\u8231\u5927\u5C4F\u300D\uFF1AGauge \u662F\u4EEA\u8868\uFF08\u50CF\u6C7D\u8F66\u6CB9\u8868\uFF09\u3001Chart \u662F\u8D8B\u52BF\u56FE\u3001Notification \u662F\u62A5\u8B66\u706F\u3002\u5148\u88C5\u63D2\u4EF6\uFF08Node-RED \u8282\u70B9\u7BA1\u7406\u9762\u677F\u641C\u7D22\u5B89\u88C5\uFF09\uFF0C\u88C5\u597D\u5DE6\u4FA7\u51FA\u73B0 ui \u5F00\u5934\u7684\u8282\u70B9\uFF0C\u62D6\u5230\u753B\u5E03\u62FC\u4E00\u62FC\u5C31\u662F\u4E00\u5757\u770B\u677F\u3002",
+      "6-1": "\u5DE5\u63A7\u5927\u5C4F\u7684\u4E09\u6761\u9EC4\u91D1\u539F\u5219\uFF1A\u4E00\u76EE\u4E86\u7136\uFF08\u64CD\u4F5C\u5458 3 \u79D2\u8BFB\u61C2\u5F53\u524D\u72B6\u6001\uFF09\u3001\u91CD\u70B9\u7A81\u51FA\uFF08\u53EA\u663E\u793A\u5173\u952E\u6307\u6807\uFF0C\u4E0D\u5806\u780C\u6570\u636E\uFF09\u3001\u53EF\u64CD\u4F5C\uFF08\u53D1\u73B0\u62A5\u8B66\u540E\u80FD\u76F4\u63A5\u64CD\u4F5C\uFF0C\u4E0D\u662F\u53EA\u80FD\u770B\uFF09\u3002",
+      "6-2": "Dashboard \u7684\u5C42\u7EA7\u7ED3\u6784\uFF1ATab\uFF08\u9875\u9762\u6807\u7B7E\uFF09\u2192 Group\uFF08\u5361\u7247\u7EC4\uFF09\u2192 Widget\uFF08\u4EEA\u8868\u76D8\u7EC4\u4EF6\uFF09\u3002\u4E00\u4E2A Tab \u53EF\u4EE5\u5305\u542B\u591A\u4E2A Group\uFF0C\u4E00\u4E2A Group \u53EF\u4EE5\u5305\u542B\u591A\u4E2A Widget\u3002",
+      "6-3": "Gauge \u4EEA\u8868\u76D8\u7684\u989C\u8272\u5206\u6BB5\u7528\u6765\u8868\u793A\u72B6\u6001\uFF1A\u7EFF\u8272=\u6B63\u5E38\uFF0C\u9EC4\u8272=\u9884\u8B66\uFF0C\u7EA2\u8272=\u62A5\u8B66\u3002\u914D\u7F6E\u9608\u503C\u540E\uFF0C\u6307\u9488\u6307\u5230\u4E0D\u540C\u533A\u57DF\u4F1A\u81EA\u52A8\u53D8\u8272\uFF0C\u64CD\u4F5C\u5458\u4E00\u773C\u5C31\u80FD\u770B\u51FA\u8BBE\u5907\u72B6\u6001\u3002",
+      "6-4": 'Chart \u8D8B\u52BF\u56FE\u53EF\u4EE5\u663E\u793A\u591A\u6761\u66F2\u7EBF\u3002\u7528 topic \u5B57\u6BB5\u6765\u533A\u5206\u4E0D\u540C\u7684\u6570\u636E\u6E90\u2014\u2014\u6E29\u5EA6\u6570\u636E\u8BBE\u7F6E topic \u4E3A "\u6E29\u5EA6"\uFF0C\u632F\u52A8\u6570\u636E\u8BBE\u7F6E topic \u4E3A "\u632F\u52A8"\uFF0C\u56FE\u8868\u4F1A\u81EA\u52A8\u7528\u4E0D\u540C\u989C\u8272\u7ED8\u5236\u4E24\u6761\u66F2\u7EBF\u3002',
+      "6-5": "Notification \u4E0D\u5F39\u7A97\uFF1F\u5148\u67E5 Switch \u9608\u503C\u6709\u6CA1\u6709\u89E6\u53D1\u2014\u2014\u6570\u636E\u503C 85\u2103 \u8D85\u8FC7\u9608\u503C 80\u2103\uFF0C\u5E94\u8BE5\u89E6\u53D1\u3002\u89E6\u53D1\u4E86\u8FD8\u6CA1\u5F39\u7A97\uFF1F\u67E5 Notification \u8282\u70B9\u7684 level \u7EA7\u522B\uFF0C\u53EF\u80FD\u7EA7\u522B\u592A\u4F4E\u88AB\u5FFD\u7565\u4E86\u3002",
+      "6-6": "\u5DE5\u63A7\u770B\u677F\u8BBE\u8BA1\u6709\u4E09\u4E2A\u539F\u5219\uFF1A\u770B\u4E00\u773C\u5C31\u77E5\u9053\u60C5\u51B5\u3001\u53EA\u5C55\u793A\u91CD\u8981\u4FE1\u606F\u3001\u70B9\u4E00\u4E0B\u80FD\u505A\u52A8\u4F5C\u3002\u8FD9\u4E09\u6761\u76F8\u8F85\u76F8\u6210\uFF0C\u6CA1\u6709\u54EA\u4E2A\u6B21\u8981\u2014\u2014\u7F3A\u5C11\u4EFB\u610F\u4E00\u6761\u770B\u677F\u5C31\u4E0D\u597D\u7528\u4E86\u3002",
+      "6-hidden": "\u4E09\u5C4F\u8054\u52A8\u662F\u6307\u628A\u6E29\u5EA6\u3001\u632F\u52A8\u3001\u62A5\u8B66\u4E09\u4E2A\u7EF4\u5EA6\u7684\u6570\u636E\u663E\u793A\u5728\u540C\u4E00\u4E2A Dashboard \u4E0A\u3002\u5F53\u6E29\u5EA6\u5F02\u5E38\u65F6\u632F\u52A8\u5F80\u5F80\u4E5F\u4F1A\u53D8\u5316\uFF0C\u4E09\u5C4F\u540C\u65F6\u5C55\u793A\u80FD\u8BA9\u64CD\u4F5C\u5458\u770B\u5230\u6570\u636E\u7684\u5173\u8054\u6027\u3002",
+      "7-0": "\u524D\u9762\u516D\u7AE0\u50CF\u76D6\u697C\uFF1A\u7F51\u7EDC\u3001\u534F\u8BAE\u3001\u8FB9\u7F18\u3001\u5E73\u53F0\u3001APP \u4E00\u5C42\u5C42\u642D\u8D77\u6765\u4E86\u3002\u73B0\u5728\u8981\u300C\u901A\u6C34\u901A\u7535\u300D\u2014\u2014\u8BA9\u6570\u636E\u5728\u6574\u4E2A\u7CFB\u7EDF\u91CC\u6D41\u52A8\u8D77\u6765\uFF0C\u8FD9\u680B\u697C\u624D\u7B97\u771F\u6B63\u80FD\u7528\u3002\u5382\u91CC\u51E0\u5341\u53F0\u8BBE\u5907\u90FD\u8981\u9001\u6570\u636E\uFF0C\u7528 Modbus \u4E00\u95EE\u4E00\u7B54\u4F1A\u7D2F\u6B7B\u4E3B\u7AD9\u2014\u2014\u5C31\u50CF\u6328\u4E2A\u70B9\u540D\u3002MQTT \u6362\u4E2A\u601D\u8DEF\uFF1A\u8BBE\u5907\u628A\u6D88\u606F\u300C\u53D1\u5E03\u300D\u5230 Broker\uFF08\u76F8\u5F53\u4E8E\u5728\u7FA4\u91CC\u53D1\u6D88\u606F\uFF09\uFF0C\u8981\u6570\u636E\u7684\u4EBA\u300C\u8BA2\u9605\u300D\u8FD9\u4E2A\u4E3B\u9898\uFF08\u76F8\u5F53\u4E8E\u5173\u6CE8\u7FA4\uFF09\uFF0CBroker \u81EA\u52A8\u8F6C\u53D1\u3002\u4E00\u5BF9\u591A\u3001\u89E3\u8026\u3001\u7701\u8D44\u6E90\u3002Mosquitto \u5C31\u662F\u8FD9\u6837\u4E00\u4E2A Broker\uFF0Capt install \u5C31\u80FD\u88C5\u3002",
+      "7-1": "mosquitto_sub \u662F MQTT \u7684\u8BA2\u9605\u547D\u4EE4\u3002mosquitto_sub -h localhost -t factory/temp \u8BA2\u9605\u672C\u5730 Broker \u4E0A factory/temp \u4E3B\u9898\u7684\u6D88\u606F\u3002\u6709\u8BBE\u5907\u53D1\u5E03\u6D88\u606F\u5230\u8FD9\u4E2A\u4E3B\u9898\uFF0C\u4F60\u8FD9\u91CC\u5C31\u4F1A\u6536\u5230\u3002",
+      "7-2": "MQTT \u4E3B\u9898\u652F\u6301\u901A\u914D\u7B26\uFF1A+ \u5339\u914D\u4E00\u7EA7\uFF08factory/+/temp \u5339\u914D\u4EFB\u610F\u8F66\u95F4\u6E29\u5EA6\uFF09\uFF0C# \u5339\u914D\u591A\u5C42\uFF08factory/# \u5339\u914D factory \u4E0B\u6240\u6709\u4E3B\u9898\uFF09\u3002\u7CBE\u786E\u4E3B\u9898\u5982 factory/workshop1/temp \u53EA\u5339\u914D\u7279\u5B9A\u8BBE\u5907\u3002",
+      "7-3": "\u5DE5\u4E1A\u5927\u6570\u636E\u6709 4V \u7279\u5F81\uFF1AVelocity\uFF08\u901F\u5EA6\u5FEB\u2014\u2014\u6BCF\u79D2\u4E0A\u5343\u91C7\u6837\uFF09\u3001Volume\uFF08\u6570\u636E\u91CF\u5927\u2014\u2014\u6BCF\u5929 500GB\uFF09\u3001Variety\uFF08\u7C7B\u578B\u591A\u2014\u2014\u6CE2\u5F62/\u9891\u8C31/\u56FE\u50CF\u6DF7\u5408\uFF09\u3001Value\uFF08\u4EF7\u503C\u5BC6\u5EA6\u4F4E\u2014\u2014\u5927\u91CF\u6570\u636E\u4E2D\u53EA\u6709\u5C11\u91CF\u6709\u4EF7\u503C\u4FE1\u53F7\uFF09\u3002",
+      "7-4": "\u5B8C\u6574 MQTT \u94FE\u8DEF\uFF1A\u4F20\u611F\u5668\u6A21\u62DF(Inject+Function) \u4EA7\u751F\u6570\u636E \u2192 MQTT \u53D1\u5E03\u8282\u70B9 \u53D1\u5230 Broker \u2192 Mosquitto Broker \u4E2D\u8F6C \u2192 MQTT \u8BA2\u9605\u8282\u70B9 \u63A5\u6536 \u2192 Dashboard \u663E\u793A\u3002\u6570\u636E\u4ECE\u8BBE\u5907\u5230\u5C4F\u5E55\u7684\u5B8C\u6574\u65C5\u7A0B\u3002",
+      "7-5": "MQTT \u8BA2\u9605\u8005\u79BB\u7EBF\u671F\u95F4 Broker \u4E0D\u4F1A\u6512\u6570\u636E\u7B49\u5B83\u56DE\u6765\u2014\u2014\u4E2D\u95F4\u8FD9\u6BB5\u4E22\u4E86\u5C31\u4E22\u4E86\uFF0C\u8FD9\u662F\u53D1\u5E03\u8BA2\u9605\u6A21\u5F0F\u5929\u751F\u7279\u6027\u3002\u9664\u975E\u628A Broker \u914D\u7F6E\u4E3A\u6301\u4E45\u4F1A\u8BDD\u3002",
+      "7-6": "Modbus \u662F\u4E3B\u7AD9\u53D1\u95EE\u4ECE\u7AD9\u56DE\u7B54\uFF0C\u4E00\u95EE\u4E00\u7B54\u4E0D\u80FD\u4E71\uFF1BMQTT \u662F\u53D1\u5E03\u8005-\u8BA2\u9605\u8005\u6A21\u5F0F\uFF0C\u8BBE\u5907\u6570\u636E\u53D1\u5230Broker\u6240\u6709\u8BA2\u9605\u8005\u540C\u65F6\u6536\u3002\u5DE5\u63A7\u51E0\u5341\u53F0\u8BBE\u5907\u8F6E\u8BE2 vs \u5DE5\u4E1A\u7EA7\u4E0A\u5343\u53F0\u8BBE\u5907\u7EC4\u7F51\uFF0C\u9009\u54EA\u4E2A\uFF1F",
+      "7-hidden": "LWT\uFF08Last Will Testament\uFF0C\u9057\u5631\u6D88\u606F\uFF09\u662F MQTT \u7684\u7279\u6027\u3002\u8BBE\u5907\u79BB\u7EBF\u65F6 Broker \u4EE3\u5B83\u53D1\u4E00\u6761\u6D88\u606F\u901A\u77E5\u5176\u4ED6\u8BBE\u5907\u300C\u6211\u79BB\u7EBF\u4E86\u300D\u3002\u5728\u5DE5\u4E1A\u573A\u666F\u4E2D\uFF0C\u53CA\u65F6\u53D1\u73B0\u8BBE\u5907\u6389\u7EBF\u81F3\u5173\u91CD\u8981\u3002",
+      "8-0": "AI \u7F16\u7A0B\u4E0D\u662F\u53D6\u4EE3\u4F60\uFF0C\u662F\u7ED9\u4F60\u914D\u4E2A\u300C\u968F\u53EB\u968F\u5230\u7684\u8001\u5E08\u5085\u300D\u2014\u2014\u4F60\u63CF\u8FF0\u9700\u6C42\uFF0C\u5B83\u751F\u6210\u4EE3\u7801\u3001\u89E3\u91CA\u62A5\u9519\u3001\u4F18\u5316\u7B97\u6CD5\u3002\u5C31\u50CF\u524D\u9762\u8BF4\u7684\uFF0CAI \u662F\u8F85\u52A9\u4EBA\u51B3\u7B56\u7684\u5DE5\u5177\uFF0C\u4E0D\u662F\u66FF\u4EE3\u4EBA\u3002\u9009\u4E00\u4E2A\u5DE5\u5177\uFF08GitHub Copilot \u6216\u901A\u4E49\u7075\u7801\uFF09\uFF0C\u5148\u5B66\u4F1A\u7528\u81EA\u7136\u8BED\u8A00\u628A\u9700\u6C42\u8BF4\u6E05\u695A\u3002",
+      "8-1": "5G \u7684\u4E09\u5927\u5DE5\u4E1A\u573A\u666F\uFF1AeMBB\uFF08\u589E\u5F3A\u79FB\u52A8\u5BBD\u5E26\u2014\u2014\u9002\u5408\u9AD8\u6E05\u89C6\u9891\u8D28\u68C0\uFF09\u3001uRLLC\uFF08\u8D85\u4F4E\u65F6\u5EF6\u9AD8\u53EF\u9760\u2014\u2014\u9002\u5408\u8FDC\u7A0B\u63A7\u5236\u8D77\u91CD\u673A\uFF09\u3001mMTC\uFF08\u6D77\u91CF\u673A\u5668\u901A\u4FE1\u2014\u2014\u9002\u5408\u4E0A\u5343\u4E2A\u4F20\u611F\u5668\u540C\u65F6\u4E0A\u62A5\uFF09\u3002",
+      "8-1b": "5G \u4E0D\u6B62\u4E09\u5927\u6A21\u5F0F\uFF0C\u8FD8\u6709\u4E24\u4E2A\u8865\u5145\u88C5\u5907\uFF1ARedCap\uFF08\u8F7B\u91CF\u5316 5G\uFF0C5G \u7684\u300C\u7ECF\u6D4E\u8231\u300D\uFF0C\u7ED9\u4E2D\u7B49\u9700\u6C42\u7684\u4F20\u611F\u5668\u964D\u672C\uFF09\u548C 5G \u4E13\u7F51\uFF08\u5DE5\u5382\u80FD\u62E5\u6709\u81EA\u5DF1\u7684 5G\uFF0C\u4E09\u79CD\u90E8\u7F72\uFF1A\u865A\u62DF/\u6DF7\u5408/\u72EC\u7ACB\uFF0C\u72EC\u7ACB\u4E13\u7F51\u6027\u80FD\u6700\u9AD8\u6700\u8D35\uFF09\u3002",
+      "8-2": "\u5DE5\u4E1A AI \u7684\u4E09\u79CD\u5F62\u6001\uFF1A\u89C6\u89C9\u68C0\u6D4B\uFF08\u7528\u6444\u50CF\u5934\u8BC6\u522B\u4EA7\u54C1\u7F3A\u9677\uFF09\u3001\u9884\u6D4B\u6027\u7EF4\u62A4\uFF08\u4ECE\u632F\u52A8\u6570\u636E\u9884\u6D4B\u8F74\u627F\u5269\u4F59\u5BFF\u547D\uFF09\u3001\u8FC7\u7A0B\u4F18\u5316\uFF08\u901A\u8FC7\u6570\u636E\u5206\u6790\u627E\u5230\u6700\u4F18\u5DE5\u827A\u53C2\u6570\uFF09\u3002",
+      "8-3": "\u6570\u5B57\u5B6A\u751F\u4E09\u7EA7\u8FDB\u5316\uFF1A\u4EE5\u865A\u6620\u5B9E\uFF08\u955C\u50CF\u6620\u5C04\u2014\u2014\u5B9E\u65F6\u540C\u6B65\u8BBE\u5907\u6570\u636E\uFF09\u3001\u4EE5\u865A\u63A7\u5B9E\uFF08\u8FDC\u7A0B\u63A7\u5236\u2014\u2014\u5728\u6570\u5B57\u4E16\u754C\u64CD\u7EB5\u7269\u7406\u8BBE\u5907\uFF09\u3001\u4EE5\u865A\u4F18\u5B9E\uFF08\u4F18\u5316\u4EFF\u771F\u2014\u2014\u7528 AI \u6A21\u62DF\u627E\u51FA\u6700\u4F18\u65B9\u6848\uFF09\u3002",
+      "8-4": "MQTT \u4EE3\u7801\u5E38\u89C1\u9519\u8BEF\uFF1Aconnect \u6210\u529F\u540E\u8981\u5904\u7406 error \u4E8B\u4EF6\u548C close \u4E8B\u4EF6\uFF0C\u5426\u5219\u8FDE\u63A5\u5F02\u5E38\u65AD\u5F00\u65F6\u7A0B\u5E8F\u4F1A\u5D29\u6E83\u3002\u4EE3\u7801\u91CC\u53EA\u76D1\u542C\u4E86 connect \u4E8B\u4EF6\uFF0C\u6CA1\u6709\u9519\u8BEF\u5904\u7406\uFF0C\u8FD9\u662F\u751F\u4EA7\u73AF\u5883\u7684\u5927\u5FCC\u3002",
+      "8-5": "AI \u9884\u6D4B\u7F6E\u4FE1\u5EA6 65%\u2014\u2014\u4E0D\u7B97\u9AD8\u4F46\u4E5F\u4E0D\u7B97\u4F4E\u3002\u7ACB\u5373\u505C\u673A\u635F\u5931 50 \u4E07\uFF0C\u8D4C\u9519\u4E86\u662F\u8BEF\u5224\uFF1B\u4E0D\u505C\u673A\u53EF\u80FD\u635F\u5931 500 \u4E07\uFF0C\u8D4C\u5BF9\u4E86\u7701\u4E00\u7B14\u3002\u964D\u8D1F\u8377\u8FD0\u884C 24 \u5C0F\u65F6\u518D\u89C2\u5BDF\u662F\u6298\u4E2D\u7684\u5408\u7406\u9009\u62E9\u3002",
+      "8-6": "AI \u5728\u5DE5\u5382\u91CC\u80FD\u505A\u5206\u6790\u9884\u8B66\u5EFA\u8BAE\uFF0C\u4F46\u6700\u7EC8\u62CD\u677F\u73AF\u8282\u5FC5\u987B\u6709\u4EBA\u3002\u4E0D\u53EA\u662F\u5B89\u5168\uFF0C\u8FD8\u6709\u5408\u89C4\u2014\u2014\u5DE5\u5382\u51FA\u4E8B\u6545\u7B2C\u4E00\u8D23\u4EFB\u4EBA\u662F\u5DE5\u7A0B\u5E08\u3002AI \u7ED9\u4F60\u5EFA\u8BAE\u4F60\u6765\u505A\u51B3\u5B9A\uFF0C\u8FD9\u624D\u662F\u5DE5\u4E1A AI \u7684\u6B63\u786E\u6253\u5F00\u65B9\u5F0F\u3002",
+      "8-hidden": "\u540C\u5B66\u6284\u4E86\u4F60\u7684\u4EE3\u7801\uFF0C\u4F60\u600E\u4E48\u5904\u7406\uFF1F\u76F4\u63A5\u4E3E\u62A5\u4F24\u5BB3\u5173\u7CFB\uFF0C\u9ED8\u4E0D\u4F5C\u58F0\u7EB5\u5BB9\u9519\u8BEF\uFF0C\u8BF4\u662F\u4E00\u8D77\u5408\u4F5C\u4E0D\u8BDA\u5B9E\u3002\u79C1\u4E0B\u8DDF\u540C\u5B66\u8BF4\u8FD9\u6837\u4E0D\u5BF9\uFF0C\u65E2\u575A\u6301\u4E86\u539F\u5219\u53C8\u7ED9\u5BF9\u65B9\u7559\u4E86\u6539\u8FC7\u7684\u673A\u4F1A\u3002",
+      "2-6b": "\u8FD8\u8BB0\u5F97\u6559\u6750\u91CC\u7684\u9ED1\u706F\u5DE5\u5382\u5417\uFF1F\u5173\u7740\u706F\u4E5F\u80FD\u5E72\u6D3B\uFF0C\u9760\u7684\u662F\u6570\u636E\u4E0D\u505C\u8F6C\u5708\u2014\u2014\u5C31\u50CF\u8840\u6DB2\u5FAA\u73AF\uFF0C\u5DE5\u5382\u624D\u771F\u6B63\u300C\u6D3B\u300D\u8D77\u6765\u3002\u8FD9\u5957\u5FAA\u73AF\u5C31\u662F\u6570\u636E\u95ED\u73AF\uFF1A\u611F\u77E5\u2192\u4F20\u8F93\u2192\u5206\u6790\u2192\u51B3\u7B56\u2192\u6267\u884C\u2192\u518D\u611F\u77E5\uFF08\u53CD\u9988\u56DE\u6765\u7EE7\u7EED\u8F6C\uFF09\u3002\u518D\u770B\u4E24\u5F20\u6A21\u578B\uFF1A\u529F\u80FD\u89C6\u89D2 IIRA \u56DB\u5C42\uFF08\u8FB9\u7F18/\u5E73\u53F0/\u5E94\u7528/\u4E1A\u52A1\uFF09\u3001\u90E8\u7F72\u89C6\u89D2 ISA-95 \u4E94\u5C42\uFF08L0\u73B0\u573A/L1\u63A7\u5236/L2\u76D1\u63A7/L3\u8FD0\u8425/L4\u4E1A\u52A1\uFF09\u2014\u2014\u8FD9\u662F\u5168\u4E66\u7684\u300C\u5730\u56FE\u300D\uFF0C\u540E\u9762\u88C5\u7CFB\u7EDF\u3001\u8C03\u534F\u8BAE\u3001\u4E0A\u4E91\u3001\u770B\u677F\u90FD\u4E0D\u8FF7\u8DEF\u3002",
+      "2-7": "\u8F93\u5165 ssh student@192.168.1.100\u3002\u683C\u5F0F\uFF1Assh \u7528\u6237\u540D@IP\u3002\u7B2C\u4E00\u6B21\u8FDE\u63A5\u4F1A\u63D0\u793A\u786E\u8BA4\u6307\u7EB9\u2014\u2014\u8F93\u5165 yes\uFF0C\u7136\u540E\u56DE\u8F66\u7EE7\u7EED\u3002\u8FDC\u7A0B\u767B\u5F55\u7684\u5177\u4F53\u64CD\u4F5C\u3002",
+      "2-8": "SSH \u514D\u5BC6\u767B\u5F55\u7528\u975E\u5BF9\u79F0\u52A0\u5BC6\u2014\u2014\u79C1\u94A5\u5B58\u5BA2\u6237\u7AEF\uFF0C\u516C\u94A5\u5B58\u670D\u52A1\u5668\u3002\u5BA2\u6237\u7AEF\u7684\u516C\u94A5\u5C31\u653E\u5728\u670D\u52A1\u5668\u7684 ~/.ssh/authorized_keys \u8FD9\u4E2A\u6587\u4EF6\u91CC\uFF08\u4E00\u884C\u4E00\u4E2A\u516C\u94A5\uFF09\u3002\u8FDE\u63A5\u65F6\u670D\u52A1\u5668\u8BFB\u51FA authorized_keys \u9A8C\u8BC1\u4F60\u7684\u8EAB\u4EFD\uFF0C\u4E24\u8FB9\u5339\u914D\u5C31\u76F4\u63A5\u653E\u884C\u3002\u8981\u8BA9\u67D0\u53F0\u673A\u5668\u514D\u5BC6\u767B\u8FDB\u6765\uFF0C\u5C31\u628A\u90A3\u53F0\u673A\u5668\u7684\u516C\u94A5\u8FFD\u52A0\u8FDB\u8FD9\u4E2A\u6587\u4EF6\u3002",
+      "3-6c": "\u534F\u8BAE\u4F1A\u8BF4\u8BDD\u4E86\uFF0C\u8FD8\u5F97\u77E5\u9053\u5B83\u4EEC\u8D70\u4EC0\u4E48\u300C\u8DEF\u300D\uFF08\u4F20\u8F93\u4ECB\u8D28\uFF09\u3001\u600E\u4E48\u51FA\u8F66\u95F4\u3002\u8BB0\u4F4F\u9009\u7EBF\u53E3\u8BC0\uFF1A\u7D2B\u7EBF Profibus\u3001\u7EFF\u7EBF ProfiNet\u3001\u5C4F\u853D\u53CC\u7EDE\u7EBF\u901A\u7528\u3001\u6237\u5916\u6F6E\u6E7F\u4E0A M12\u3002\u6570\u636E\u8D70\u51FA\u8F66\u95F4\u9760\u4E13\u7EBF/VPN \u52A0\u5BC6\u96A7\u9053\uFF0C\u4E0D\u80FD\u88F8\u5954\u3002",
+      "3-7": "Modbus TCP \u8BFB\u53D6\u6570\u636E\u7528 modbus read \u547D\u4EE4\uFF0C\u53C2\u6570\u4F9D\u6B21\u662F IP \u5730\u5740\u3001\u7AEF\u53E3\u53F7\u3001\u5BC4\u5B58\u5668\u5730\u5740\u3002Holding Register \u662F\u6700\u5E38\u7528\u7684\u5BC4\u5B58\u5668\u7C7B\u578B\uFF0C\u5B58\u50A8\u4F20\u611F\u5668\u5F53\u524D\u503C\u3002",
+      "3-8": "ISA-95 \u6807\u51C6\u7684 L3 \u6267\u884C\u5C42\uFF08MES\uFF09\u8D1F\u8D23\u751F\u4EA7\u8C03\u5EA6\u4E0E\u6267\u884C\u2014\u2014\u5B89\u6392\u751F\u4EA7\u8BA1\u5212\u3001\u8DDF\u8E2A\u5DE5\u5355\u8FDB\u5EA6\u3001\u7BA1\u7406\u7269\u6599\u3002L2 \u76D1\u63A7\u5C42\uFF08SCADA\uFF09\u8D1F\u8D23\u5B9E\u65F6\u76D1\u63A7\uFF0CL4 \u7BA1\u7406\u5C42\uFF08ERP\uFF09\u8D1F\u8D23\u4F01\u4E1A\u8D44\u6E90\u89C4\u5212\u3002",
+      "4-7": "systemctl \u662F Linux \u7BA1\u7406\u670D\u52A1\u7684\u547D\u4EE4\u3002systemctl status edge-service \u67E5\u770B\u8FB9\u7F18\u670D\u52A1\u7684\u8FD0\u884C\u72B6\u6001\u2014\u2014\u662F\u5426 active\u3001\u8FD0\u884C\u4E86\u591A\u4E45\u3001\u5360\u591A\u5C11\u5185\u5B58\u3002\u6392\u67E5\u670D\u52A1\u95EE\u9898\u65F6\u7B2C\u4E00\u4E2A\u5C31\u7528\u5B83\u3002",
+      "4-8": "\u6570\u636E\u5728\u8BBE\u5907\u65C1\u8FB9\u76F4\u63A5\u7B97\u53EB\u8FB9\u7F18\u8BA1\u7B97\uFF0C\u51E0\u767E\u516C\u91CC\u5916\u7B97\u53EB\u4E91\u8BA1\u7B97\u3002\u524D\u8005\u5EF6\u8FDF\u4F4E\u54CD\u5E94\u5FEB\uFF0C\u540E\u8005\u7B97\u529B\u5F3A\u5B58\u91CF\u5927\u3002\u54EA\u4E9B\u4EFB\u52A1\u7B49\u4E0D\u8D77\u51E0\u6BEB\u79D2\u5EF6\u8FDF\uFF0C\u5FC5\u987B\u5C31\u5730\u5904\u7406\uFF1F \u5DE5\u4E1A\u4E92\u8054\u7F51\u5E38\u7528\u300E\u4E91-\u8FB9-\u7AEF\u300F\u4E09\u5C42\u67B6\u6784\uFF1A\u4E91\u7AEF\u96C6\u4E2D\u5B58\u50A8\u548C\u5927\u6570\u636E\u5206\u6790\uFF0C\u7EC8\u7AEF\uFF08\u4F20\u611F\u5668/PLC\uFF09\u8D1F\u8D23\u91C7\u96C6\uFF0C\u8FB9\u7F18\u5C31\u5728\u8BBE\u5907\u65C1\u8FB9\u5C31\u8FD1\u8BA1\u7B97\u3001\u6BEB\u79D2\u7EA7\u54CD\u5E94\u3002\u8FB9\u7F18\u8BA1\u7B97\u8BF4\u7684\u5C31\u662F\u4E2D\u95F4\u8FD9\u5C42\u2014\u2014\u6570\u636E\u5C31\u5730\u5904\u7406\uFF0C\u4E0D\u8FC7\u5EA6\u4F9D\u8D56\u4E91\u7AEF\u3002",
+      "5-6b": "\u521A\u624D Docker \u628A\u5E94\u7528\u6253\u5305\u8DD1\u8D77\u6765\u4E86\uFF0C\u5148\u522B\u6025\u7740\u5199\u4EE3\u7801\u2014\u2014\u5148\u770B\u61C2\u300C\u5E73\u53F0\u300D\u662F\u5E72\u561B\u7684\u3002\u4E00\u53E5\u8BDD\uFF1A\u5B83\u662F\u300C\u5411\u4E0B\u8FDE\u8BBE\u5907\u3001\u5411\u4E0A\u627F\u8F7D\u5E94\u7528\u300D\u7684\u4E2D\u95F4\u5C42\uFF0C\u5C31\u50CF\u5FEB\u9012\u8C03\u5EA6\u4E2D\u5FC3\u2014\u2014\u5411\u4E0B\u300C\u63A5\u5355\u300D\uFF08\u628A\u8F66\u95F4\u8BBE\u5907\u7684\u65B9\u8A00\u7FFB\u8BD1\u6210\u666E\u901A\u8BDD\uFF09\uFF0C\u5411\u4E0A\u300C\u6D3E\u9001\u300D\uFF08\u628A\u5DE5\u4E1AAPP\u8DD1\u8D77\u6765\u7ED9\u5DE5\u4EBA\u7528\uFF09\uFF0C\u4E2D\u95F4\u518D\u5B58\u6570\u636E\u3001\u7B97\u6570\u636E\u3001\u5582AI\u3002\u56FD\u5185 240+ \u5BB6\u5E73\u53F0\u770B\u7740\u773C\u82B1\uFF0C\u5176\u5B9E\u53EA\u6709\u4E24\u79CD\u51FA\u8EAB\uFF1A\u4E92\u8054\u7F51\u516C\u53F8\u5F80\u4E0B\u6C89\uFF08\u62FF\u4E91\u7B97\u529B+AI \u505A\u8F93\u51FA\uFF0C\u5982\u963F\u91CC\u4E91IoT\uFF09\uFF0C\u5236\u9020\u4F01\u4E1A\u5F80\u4E0A\u957F\uFF08\u4ECE\u81EA\u5BB6\u5DE5\u5382\u957F\u51FA\u6765\uFF0C\u5982\u6811\u6839\u4E92\u8054\u3001\u5361\u5965\u65AF\uFF09\u3002\u5176\u4F59\u8BB0\u4E0D\u4F4F\u6CA1\u5173\u7CFB\uFF0C\u8BB0\u4F4F\u8FD9\u53E5\u53E3\u8BC0\uFF1A\u8FDE\u8BBE\u5907\u3001\u627F\u8F7D\u5E94\u7528\u3002",
+      "5-7": "docker ps \u67E5\u770B\u6B63\u5728\u8FD0\u884C\u7684\u5BB9\u5668\u5217\u8868\u3002\u663E\u793A\u5BB9\u5668 ID\u3001\u4F7F\u7528\u7684\u955C\u50CF\u3001\u542F\u52A8\u547D\u4EE4\u3001\u521B\u5EFA\u65F6\u95F4\u3001\u72B6\u6001\u3001\u7AEF\u53E3\u6620\u5C04\u3001\u5BB9\u5668\u540D\u3002docker ps -a \u8FD8\u80FD\u770B\u5230\u5DF2\u7ECF\u505C\u6B62\u7684\u5BB9\u5668\u3002",
+      "5-8": "Docker \u7F51\u7EDC\u6A21\u5F0F\u6709\u51E0\u79CD\uFF1Anone \u65E0\u7F51\uFF0Chost \u5171\u7528\u5BBF\u4E3B\u5171\u4EABIP\uFF0Cbridge \u6BCF\u4E2A\u5BB9\u5668\u901A\u8FC7\u865A\u62DF\u7F51\u6865\u72EC\u7ACB\u901A\u4FE1\u3002\u4E0D\u5E26\u4EFB\u4F55\u53C2\u6570\u8DD1\u8D77\u6765\uFF0C\u9ED8\u8BA4\u5C31\u662F\u5176\u4E2D\u4E00\u79CD\u2014\u2014\u9694\u79BB\u6027\u521A\u521A\u597D\u7684\u90A3\u79CD\u3002",
+      "6-6b": "\u8FD9\u4E00\u5E55\u73A9 Dashboard \u4E4B\u524D\uFF0C\u5148\u641E\u6E05\u695A\u5DE5\u4E1AAPP \u662F\u4EC0\u4E48\uFF1A\u5C0F\u800C\u7CBE\u3001\u805A\u7126\u5355\u4E00\u573A\u666F\uFF0C\u8FED\u4EE3\u5FEB\u3001\u5E73\u53F0\u6258\u7BA1\u3001\u8BA2\u9605\u5236\uFF0C\u9886\u57DF\u5DE5\u7A0B\u5E08\uFF08\u516C\u6C11\u5F00\u53D1\u8005\uFF09\u4E5F\u80FD\u7528\u4F4E\u4EE3\u7801\u642D\u3002\u8BB0\u4F4F\u4E94\u4E2A\u8BCD\uFF1A\u5C0F\u800C\u7CBE\u3001\u5FEB\u3001\u53EF\u5F00\u53D1\u3001\u6258\u7BA1\u3001\u8BA2\u9605\u3002",
+      "6-7": "curl \u53EF\u4EE5\u83B7\u53D6\u7F51\u9875\u6E90\u7801\u3002curl -s http://localhost:1880/ui/dashboard \u83B7\u53D6 Dashboard \u9875\u9762\u7684 HTML\uFF0C\u901A\u8FC7\u7BA1\u9053 | head -20 \u53EA\u663E\u793A\u524D 20 \u884C\uFF0C\u5FEB\u901F\u786E\u8BA4\u670D\u52A1\u662F\u5426\u5728\u8FD0\u884C\u3002",
+      "6-8": "\u5E38\u89C4\u7684\u4EEA\u8868\u76D8\u6BCF\u9694\u51E0\u79D2\u5237\u65B0\u4E00\u6B21\u9875\u9762\uFF0C\u8FC7\u7A0B\u4E2D\u6570\u636E\u7A7A\u6D1E\u3002Node-RED \u7528 WebSocket \u6280\u672F\uFF0C\u670D\u52A1\u7AEF\u4E00\u6709\u53D8\u5316\u7ACB\u523B\u4E3B\u52A8\u63A8\u9001\u5230\u6D4F\u89C8\u5668\uFF0C\u6570\u636E\u662F\u8FDE\u7EED\u6D41\u52A8\u7684\u3002",
+      "7-6b": "MQTT \u628A\u6570\u636E\u91C7\u4E0A\u6765\u4E86\uFF0C\u4F46\u8981\u5148\u4F1A\u300C\u770B\u6570\u636E\u300D\u3002\u6570\u636E\u5206\u6790\u6709\u56DB\u5C42\uFF1A\u63CF\u8FF0\u6027(\u53D1\u751F\u4E86\u4EC0\u4E48)\u2192\u8BCA\u65AD\u6027(\u4E3A\u4EC0\u4E48)\u2192\u9884\u6D4B\u6027(\u5C06\u8981\u53D1\u751F\u4EC0\u4E48)\u2192\u6307\u5BFC\u6027(\u600E\u4E48\u505A)\u3002\u591A\u6570\u5DE5\u5382\u8FD8\u5728\u7B2C\u4E00\u5C42\uFF0C\u522B\u6025\uFF0C\u4E00\u5C42\u5C42\u6765\u3002",
+      "7-7": "mosquitto_pub \u662F MQTT \u53D1\u5E03\u547D\u4EE4\u3002mosquitto_pub -h localhost -t factory/temp -m 75.3 \u5411\u672C\u5730 Broker \u7684 factory/temp \u4E3B\u9898\u53D1\u5E03\u6E29\u5EA6 75.3\u3002\u8BA2\u9605\u4E86\u8FD9\u4E2A\u4E3B\u9898\u7684\u5BA2\u6237\u7AEF\u4F1A\u7ACB\u5373\u6536\u5230\u3002",
+      "7-8": "MQTT \u6709 3 \u7EA7\u670D\u52A1\u8D28\u91CF\uFF1AQoS 0 \u53D1\u4E00\u6B21\u62C9\u5012\uFF08\u53EF\u80FD\u4E22\uFF09\uFF0CQoS 1 \u81F3\u5C11\u53D1\u4E00\u6B21\uFF08\u53EF\u80FD\u91CD\u590D\uFF09\uFF0CQoS 2 \u4FDD\u8BC1\u5230\u8FBE\u4E14\u53EA\u5230\u8FBE\u4E00\u6B21\u3002\u6838\u5FC3\u533A\u522B\u5728\u4E8E\u5BF9\u5F85\u4E22\u5305\u548C\u91CD\u590D\u7684\u5904\u7406\u7B56\u7565\u3002",
+      "8-6c": "\u6700\u540E\u7684\u5C55\u671B\u548C\u5B89\u5168\uFF1A\u533A\u5757\u94FE\u89E3\u51B3\u591A\u65B9\u4E92\u4FE1\uFF08\u8054\u76DF\u94FE\uFF0C\u50CF\u4E0D\u53EF\u7BE1\u6539\u7684\u7269\u6D41\u8BB0\u5F55\u518C\uFF09\uFF0C\u4F46\u65F6\u5EF6\u662F\u786C\u4F24\u3001\u8FD8\u5728\u65E9\u671F\u3002\u5DE5\u4E1A\u5B89\u5168\u9760\u7EB5\u6DF1\u9632\u5FA1\u4E94\u5C42\uFF1A\u7269\u7406\u2192\u7F51\u7EDC\u5206\u79BB\u2192\u6743\u9650\u2192\u52A0\u5BC6\u2192\u5BA1\u8BA1\uFF0C\u8BB0\u4F4F\u300C\u56F4\u5899\u2192\u5206\u533A\u2192\u95E8\u9501\u2192\u4FDD\u9669\u67DC\u2192\u76D1\u63A7\u6444\u50CF\u5934\u300D\uFF0C\u5176\u4E2D IT/OT \u5206\u79BB\u662F\u81F4\u547D\u95F8\u70B9\u3002",
+      "8-7": "AI \u6A21\u578B\u901A\u8FC7 REST API \u63D0\u4F9B\u63A8\u7406\u670D\u52A1\u3002\u7528 curl \u53D1\u9001 POST \u8BF7\u6C42\uFF0C\u628A\u4F20\u611F\u5668\u6570\u636E\uFF08\u632F\u52A8\u3001\u6E29\u5EA6\uFF09\u4EE5 JSON \u683C\u5F0F\u53D1\u7ED9\u6A21\u578B\uFF0C\u8FD4\u56DE\u9884\u6D4B\u7ED3\u679C\uFF08\u5269\u4F59\u5BFF\u547D\u3001\u7F6E\u4FE1\u5EA6\uFF09\u3002\u8FD9\u662F\u5DE5\u4E1A AI \u7684\u5178\u578B\u8C03\u7528\u65B9\u5F0F\u3002",
+      "8-8": "\u6570\u5B57\u5B6A\u751F\u4E09\u7EA7\u5F62\u6001\uFF1A\u4EE5\u865A\u6620\u5B9E\uFF08\u6570\u636E\u955C\u50CF\u540C\u6B65\uFF09\u3001\u4EE5\u865A\u63A7\u5B9E\uFF08\u8FDC\u7A0B\u64CD\u4F5C\u8BBE\u5907\uFF09\u3001\u4EE5\u865A\u4F18\u5B9E\uFF08AI \u4EFF\u771F\u4F18\u5316\uFF09\u3002\u6700\u9AD8\u7EA7\u5F62\u6001\u662F\u4EE5\u865A\u4F18\u5B9E\u2014\u2014\u5728\u6570\u5B57\u4E16\u754C\u4E2D\u6A21\u62DF\u4F18\u5316\uFF0C\u7136\u540E\u628A\u6700\u4F18\u65B9\u6848\u5E94\u7528\u5230\u7269\u7406\u4E16\u754C\u3002",
+      "2-9": "SSH \u8FDE\u63A5\u8D85\u65F6\u7684\u6392\u969C\u601D\u8DEF\uFF1A\u5148 ping \u770B IP \u901A\u4E0D\u901A\uFF0C\u901A\u7684\u8BDD\u68C0\u67E5 22 \u7AEF\u53E3\u662F\u5426\u5F00\u653E\uFF0C\u4E0D\u5F00\u7684\u8BDD\u68C0\u67E5 SSH \u670D\u52A1\u72B6\u6001\uFF0C\u6CA1\u8FD0\u884C\u5C31\u542F\u52A8\u5B83\u3002\u7AEF\u53E3\u6539\u4E86\u5C31\u7528 -p \u53C2\u6570\u3002",
+      "2-10": "SSH \u7AEF\u53E3\u8F6C\u53D1\u662F\u9AD8\u7EA7\u529F\u80FD\uFF1A-L \u672C\u5730\u8F6C\u53D1\uFF08\u628A\u672C\u5730\u7AEF\u53E3\u6620\u5C04\u5230\u8FDC\u7A0B\uFF09\u3001-R \u8FDC\u7A0B\u8F6C\u53D1\uFF08\u628A\u8FDC\u7A0B\u7AEF\u53E3\u6620\u5C04\u5230\u672C\u5730\uFF09\u3001-D \u52A8\u6001\u8F6C\u53D1\uFF08SOCKS \u4EE3\u7406\uFF09\u3002",
+      "2-11": "SSH \u5B89\u5168\u52A0\u56FA\u6709\u4E09\u677F\u65A7\uFF1A\u4E0D\u8981\u7528\u9ED8\u8BA4\u7AEF\u53E3\u3001\u4E0D\u8981\u7528 root \u767B\u3001\u4E0D\u8981\u53EA\u7528\u5BC6\u7801\u3002\u5176\u4E2D\u6709\u4E00\u9879\u76F4\u63A5\u628A\u5B89\u5168\u98CE\u9669\u6700\u5927\u7684\u8D26\u53F7\u5173\u4E86\uFF0C\u6700\u7ACB\u7AFF\u89C1\u5F71\u3002",
+      "2-hidden-2": "SSH \u5165\u4FB5\u53D6\u8BC1\u4E09\u6B65\u8D70\uFF1A\u67E5 /var/log/auth.log \u770B\u767B\u5F55\u8BB0\u5F55\u3001\u67E5 authorized_keys \u6709\u6CA1\u6709\u964C\u751F\u516C\u94A5\u3001\u67E5 last \u770B\u5F02\u5E38\u767B\u5F55\u65F6\u95F4\u3002",
+      "3-0": '\u5148\u8BB2\u4E2A\u6545\u4E8B\uFF1A\u8FDC\u53E4\u65F6\u4EBA\u7C7B\u8BED\u8A00\u7EDF\u4E00\uFF0C\u60F3\u5408\u529B\u5EFA\u4E00\u5EA7\u901A\u5929\u5854\uFF0C\u4E0A\u5E1D\u53D8\u4E71\u4E86\u4ED6\u4EEC\u7684\u8BED\u8A00\uFF0C\u5DE5\u4EBA\u5404\u8BF4\u5404\u8BDD\u3001\u5EFA\u4E0D\u6210\u5854\u2014\u2014\u8FD9\u5C31\u662F\u300C\u5DF4\u522B\u5854\u300D\uFF0C\u4ECE\u6B64\u6210\u4E86"\u8BED\u8A00\u4E0D\u901A\u3001\u6C9F\u901A\u6DF7\u4E71"\u7684\u4EE3\u540D\u8BCD\u3002\u54B1\u4EEC\u8F66\u95F4\u4E5F\u4E00\u6837\uFF1A\u4E03\u79CD\u8BBE\u5907\u81F3\u5C11\u7528\u7740\u56DB\u79CD\u534F\u8BAE\uFF08FANUC \u79C1\u6709\u3001\u897F\u95E8\u5B50 ProfiNet\u3001ABB\u3001\u500D\u798F EtherCAT\u3001Modbus\uFF09\uFF0C\u5404\u8BF4\u5404\u8BDD\u3002\u8981\u89E3\u51B3\u8BBE\u5907"\u8BED\u8A00\u4E0D\u901A"\uFF0C\u5F97\u9760\u534F\u8BAE\u8F6C\u6362\u7F51\u5173\uFF08\u914D\u7FFB\u8BD1\uFF09\u6216\u901A\u7528\u4E2D\u95F4\u5C42\uFF08OPC UA\uFF09\u3002\u7406\u89E3\u4E86\u8FD9\u4E2A\uFF0C\u518D\u770B ISA-95 \u4E94\u5C42\u5730\u56FE\u5C31\u66F4\u6E05\u695A\u4E86\u3002',
+      "3-1": "ISA-95 \u4E94\u5C42\u4ECE\u4E0B\u5230\u4E0A\uFF1AL0 \u73B0\u573A\u8BBE\u5907\u5C42\uFF08\u4F20\u611F\u5668/\u6267\u884C\u5668\uFF0C\u91C7\u96C6\u6570\u636E\uFF09\u3001L1 \u63A7\u5236\u5C42\uFF08PLC \u505A\u903B\u8F91\u63A7\u5236\uFF09\u3001L2 \u76D1\u63A7\u5C42\uFF08SCADA \u770B\u6574\u6761\u4EA7\u7EBF\uFF09\u3001L3 \u5236\u9020\u8FD0\u8425\u5C42\uFF08MES \u7BA1\u8BA2\u5355\u8FDB\u5EA6\uFF09\u3001L4 \u4E1A\u52A1\u5C42\uFF08ERP \u7BA1\u8D22\u52A1\u91C7\u8D2D\uFF09\u3002\u4E00\u53E5\u8BDD\uFF1A\u8BBE\u5907\u91C7\u96C6\u2192\u63A7\u5236\u6307\u6325\u2192\u76D1\u63A7\u5168\u5C40\u2192\u8FD0\u8425\u8BA2\u5355\u2192\u4E1A\u52A1\u516C\u53F8\u3002",
+      "3-2": "Node-RED \u662F\u4F4E\u4EE3\u7801\u300C\u7FFB\u8BD1\u53F0\u300D\u2014\u2014\u628A\u8BBE\u5907\u6570\u636E\u7528\u62D6\u62FD\u8282\u70B9\u8FDE\u6210\u6570\u636E\u6D41\u3002\u88C5\u5B83\u7528\u5B98\u65B9\u4E00\u952E\u811A\u672C\uFF08\u6765\u6E90\u8981\u6B63\uFF09\uFF0CWeb \u754C\u9762\u8DD1\u5728 1880 \u7AEF\u53E3\uFF0C\u8981\u8FDE Modbus \u8BBE\u5907\u5C31\u88C5 node-red-contrib-modbus \u8282\u70B9\u5305\u3002",
+      "3-3": "ProfiNet \u662F\u897F\u95E8\u5B50\u7684\u5DE5\u4E1A\u4EE5\u592A\u7F51\u534F\u8BAE\uFF0C\u6BEB\u79D2\u7EA7\u5B9E\u65F6\u3002\u8BB0\u5F97\u90A3\u53E5\uFF1A\u7D2B\u8272\u7EBF Profibus \u662F\u8001\u6B3E\u3001\u7EFF\u8272\u5DE5\u4E1A\u7F51\u7EBF ProfiNet \u662F\u65B0\u6B3E\uFF0C\u90FD\u662F\u897F\u95E8\u5B50\u5BB6\u7684\u3002",
+      "3-3b": "\u524D\u9762\u8BA4\u4E86\u56DB\u4F4D\u9AD8\u624B\uFF08ProfiNet/EtherCAT/CC-Link/Modbus\uFF09\uFF0C\u8FD8\u6709\u56DB\u4F4D\u522B\u5FFD\u7565\uFF1AProfibus\uFF08\u7D2B\u8272\u7EBF\u8001\u6B3E\u603B\u7EBF\uFF09\u3001Powerlink\uFF08\u5F00\u6E90\u5B9E\u65F6\u4EE5\u592A\u7F51\uFF09\u3001DeviceNet\uFF08CAN \u5317\u7F8E\u65E7\u6B3E\uFF09\u3001EtherNet/IP\uFF08CIP \u5317\u7F8E\u65B0\u5382\uFF09\u3002\u5B66\u4E60\u7B56\u7565\uFF1AModbus \u548C ProfiNet \u662F\u91CD\u4E2D\u4E4B\u91CD\uFF0C\u5176\u4F59\u4E86\u89E3\u5B9A\u4F4D\u5C31\u884C\uFF0C\u522B\u5168\u80CC\u3002",
+      "3-4": "\u534F\u8BAE\u5404\u6709\u4E2A\u6027\uFF1AProfiNet=\u897F\u95E8\u5B50\u6BEB\u79D2\u5B9E\u65F6\uFF0CEtherCAT=\u500D\u798F\u5FEB\u5230\u6781\u81F4\uFF08\u98DE\u8BFB\u98DE\u5199\uFF09\uFF0CCC-Link IE=\u4E09\u83F1\u73AF\u5F62\u5197\u4F59\u65AD\u7EBF\u4E0D\u65AD\uFF0CModbus=\u6700\u8001\u6700\u5F00\u653E\u53D8\u9891\u4EEA\u8868\u90FD\u652F\u6301\uFF0CPowerlink=\u8D1D\u52A0\u83B1\u6807\u51C6\u786C\u4EF6\uFF0CEtherNet/IP=\u7F57\u514B\u97E6\u5C14\u57FA\u4E8E\u4EE5\u592A\u7F51\u3002 DNP3=\u7535\u529B\u884C\u4E1A\u8FDC\u52A8\u534F\u8BAE\uFF0C\u7535\u7F51/\u914D\u7535\u7AD9\u8FDC\u7A0B\u76D1\u63A7\u90FD\u5728\u7528\u3002",
+      "3-5": "Modbus \u7528\u5BC4\u5B58\u5668\u7EC4\u7EC7\u6570\u636E\uFF0C\u56DB\u79CD\uFF1A\u7EBF\u5708\uFF081 \u4F4D\u53EF\u8BFB\u5199\uFF0C\u5F00\u5173\u72B6\u6001\uFF09\u3001\u79BB\u6563\u8F93\u5165\uFF081 \u4F4D\u53EA\u8BFB\uFF0C\u9650\u4F4D\u5F00\u5173\uFF09\u3001\u4FDD\u6301\u5BC4\u5B58\u5668\uFF0816 \u4F4D\u53EF\u8BFB\u5199\uFF0C\u8BBE\u5B9A\u503C\uFF09\u3001\u8F93\u5165\u5BC4\u5B58\u5668\uFF0816 \u4F4D\u53EA\u8BFB\uFF0C\u6D4B\u91CF\u503C\uFF09\u3002\u53E3\u8BC0\uFF1A\u4FDD\u6301=\u8BBE\u5B9A\u503C\u3001\u8F93\u5165=\u6D4B\u91CF\u503C\u3001\u7EBF\u5708=\u5F00\u5173\u53EF\u5199\u3001\u79BB\u6563=\u5F00\u5173\u53EA\u8BFB\u3002",
+      "3-6": "Modbus \u901A\u4FE1\u6545\u969C\u6392\u67E5\u6309\u987A\u5E8F\u6765\uFF1A\u7F51\u7EBF\uFF08ip link\uFF09\u2192 ping \u4ECE\u7AD9 IP \u2192 \u7AEF\u53E3\uFF08ss -tln\uFF0C\u5982 502\uFF09\u2192 \u4ECE\u7AD9 ID / \u5BC4\u5B58\u5668\u5730\u5740 \u2192 \u9632\u706B\u5899\u3002\u4E00\u6B65\u6B65\u6392\u9664\uFF0C\u522B\u8DF3\u6B65\u9AA4\u3002",
+      "3-6b": "Modbus \u4ECE\u7AD9\u8FDE\u4E0D\u4E0A\u4E86\uFF0C\u522B\u614C\uFF0C\u6309\u300C\u7F51\u5361 \u2192 \u7F51\u7EDC \u2192 \u7AEF\u53E3 \u2192 \u4ECE\u7AD9\u300D\u7684\u987A\u5E8F\u6392\u67E5\u3002\u5148\u770B\u672C\u673A\u7F51\u5361\uFF08ip link\uFF09\u3001\u8DEF\u7531\uFF08route -n\uFF09\uFF0C\u518D\u786E\u8BA4\u7AEF\u53E3\u901A\u4E0D\u901A\uFF08ss -tln\uFF09\uFF0C\u6700\u540E\u624D\u6000\u7591\u4ECE\u7AD9\u3002\u7528 modpoll \u8FD9\u7C7B\u5DE5\u5177\u5B9E\u6D4B\u8BFB\u5199\uFF0C\u4E00\u6B65\u6B65\u7F29\u5C0F\u8303\u56F4\u3002",
+      "3-hidden": "QModMaster \u662F\u5916\u90E8\u8C03\u8BD5\u5DE5\u5177\uFF0C\u76F4\u8FDE Modbus \u4ECE\u7AD9\u9A8C\u8BC1\u8BFB\u5199\u3002\u8FDE\u63A5\u65F6\u586B\u4ECE\u7AD9\u7684 IP \u5730\u5740\u548C\u7AEF\u53E3\uFF0C\u80FD\u8BFB\u5230\u6570\u636E\u5C31\u8BF4\u660E\u4ECE\u7AD9\u548C\u914D\u7F6E\u90FD\u5BF9\u3002",
+      "3-9": "Modbus \u901A\u4FE1\u4E2D\u65AD\u7684\u6392\u969C\u6D41\u7A0B\uFF1A\u5148\u786E\u8BA4 Server \u8FD0\u884C\uFF0C\u518D\u68C0\u67E5\u7AEF\u53E3\u53F7\u662F\u5426\u5339\u914D\uFF0C\u6700\u540E\u67E5\u9632\u706B\u5899\u6709\u6CA1\u6709\u963B\u6321\u3002\u4E00\u6B65\u4E00\u6B65\u6765\uFF0C\u522B\u8DF3\u6B65\u9AA4\u3002",
+      "3-10": "\u5DE5\u4E1A\u534F\u8BAE\u5404\u6709\u5343\u79CB\uFF1AModbusTCP \u7B80\u5355\u901A\u7528\u9002\u5408\u5927\u591A\u6570\u573A\u666F\uFF0CProfiNet \u5B9E\u65F6\u6027\u9AD8\u9002\u5408\u897F\u95E8\u5B50\u751F\u6001\uFF0CEtherCAT \u7EB3\u79D2\u7EA7\u540C\u6B65\u9002\u5408\u8FD0\u52A8\u63A7\u5236\u3002",
+      "3-11": "PLC \u68AF\u5F62\u56FE\u4E2D\uFF0C\u4E24\u4E2A\u89E6\u70B9\u4E32\u8054\u4EE3\u8868\u4E0E\u903B\u8F91\uFF08AND\uFF09\uFF0C\u4E24\u4E2A\u89E6\u70B9\u5E76\u8054\u4EE3\u8868\u6216\u903B\u8F91\uFF08OR\uFF09\u3002\u4E32\u8054\u7684\u89E6\u70B9\u5FC5\u987B\u5168\u90E8\u63A5\u901A\u624D\u6709\u8F93\u51FA\u3002",
+      "4-9": "\u7F51\u7EDC\u6D41\u91CF\u7A81\u7136\u98D9\u5347\u901A\u5E38\u662F\u67D0\u4E2A\u8BBE\u5907\u5F02\u5E38\u5BFC\u81F4\u3002\u5148\u5B9A\u4F4D\u54EA\u4E2A\u8BBE\u5907\u7684\u6570\u636E\u91CF\u5F02\u5E38\uFF0C\u7136\u540E\u5206\u6790\u539F\u56E0\u2014\u2014\u53EF\u80FD\u662F\u91C7\u6837\u9891\u7387\u914D\u7F6E\u9519\u8BEF\uFF0C\u4E5F\u53EF\u80FD\u662F\u8BBE\u5907\u6545\u969C\u4EA7\u751F\u566A\u97F3\u6570\u636E\u3002 \u538B\u4F4F\u5F02\u5E38\u5C16\u5CF0\u3001\u7ED9\u6D41\u91CF\u7626\u8EAB\u6709\u4E09\u62DB\uFF1A\u964D\u91C7\u6837\uFF08\u53EA\u4FDD\u7559\u4E00\u90E8\u5206\u91C7\u6837\uFF0C\u6D41\u91CF\u51CF\u534A\u4F46\u53EF\u80FD\u6F0F\u5173\u952E\uFF09\u3001\u4E22\u5F03\u5F02\u5E38\uFF08\u76F4\u63A5\u6254\u5F02\u5E38\u6570\u636E\uFF0C\u6700\u7701\u6D41\u91CF\u4F46\u53EF\u80FD\u8BEF\u4F24\u5173\u952E\uFF09\u3001\u9608\u503C\u622A\u65AD\uFF08\u8D85\u9650\u5C31\u622A\u65AD/\u62A5\u8B66\uFF0C\u538B\u4F4F\u6BDB\u523A\uFF09\u3002",
+      "4-10": "\u8FB9\u7F18\u8BA1\u7B97\u7684\u4E09\u5C42\u67B6\u6784\uFF1A\u611F\u77E5\u5C42\u8D1F\u8D23\u6570\u636E\u91C7\u96C6\uFF0C\u8BA1\u7B97\u5C42\u8D1F\u8D23\u672C\u5730\u5904\u7406\uFF0C\u7F51\u7EDC\u5C42\u8D1F\u8D23\u4E0A\u4F20\u7ED3\u679C\u5230\u4E91\u7AEF\u3002\u6BCF\u5C42\u5404\u53F8\u5176\u804C\u3001\u534F\u540C\u5DE5\u4F5C\u3002",
+      "4-11": "\u62A5\u8B66\u9608\u503C\u8BBE\u7F6E\u7684\u539F\u5219\uFF1A\u6B63\u5E38\u8303\u56F4\u4E0B\u9650\u5230 80% \u5DE6\u53F3\u8BBE\u9884\u8B66\uFF0C\u8D85\u8FC7\u4E0A\u9650\u8BBE\u62A5\u8B66\u3002\u6E29\u5EA6\u8303\u56F4 0-80\u2103\uFF0C65\u2103 \u9884\u8B66\u63D0\u793A\u5173\u6CE8\uFF0C80\u2103 \u62A5\u8B66\u7ACB\u5373\u5904\u7F6E\u3002",
+      "5-9": "Docker \u5BB9\u5668\u96C6\u4F53\u5B95\u673A\u7684\u5904\u7406\u6D41\u7A0B\uFF1A\u5148\u67E5 Docker \u5B88\u62A4\u8FDB\u7A0B\uFF0C\u518D\u67E5\u8D44\u6E90\u5360\u7528\uFF0C\u6E05\u7406\u4E0D\u7528\u7684\u5BB9\u5668\u548C\u955C\u50CF\u91CA\u653E\u7A7A\u95F4\u3002docker system prune \u4E00\u952E\u6E05\u7406\u3002",
+      "5-10": "Docker Compose \u7528 YAML \u6587\u4EF6\u5B9A\u4E49\u591A\u4E2A\u5BB9\u5668\u7684\u542F\u52A8\u914D\u7F6E\uFF0C\u9ED8\u8BA4\u6587\u4EF6\u540D\u4E3A docker-compose.yml\u3002\u4E00\u6761 docker-compose up \u5C31\u80FD\u542F\u52A8\u6574\u4E2A\u670D\u52A1\u6808\u3002",
+      "5-11": "\u51CF\u5C0F\u955C\u50CF\u4F53\u79EF\u6700\u5E38\u89C4\u7684\u529E\u6CD5\u2014\u2014\u628A\u57FA\u7840\u5C42\u6362\u6210 Alpine\u3002Alpine \u53EA\u67095MB\uFF0C\u6781\u81F4\u7CBE\u7B80\u3002\u53E6\u5916\u7F16\u8BD1\u9636\u6BB5\u53EA\u4FDD\u7559\u6700\u7EC8\u4EA7\u7269\uFF0C\u4FD7\u79F0\u591A\u9636\u6BB5\u6784\u5EFA\u3002",
+      "6-9": "\u76D1\u63A7\u5927\u5C4F\u9ED1\u5C4F\u7684\u6392\u67E5\u6B65\u9AA4\uFF1A\u5148\u67E5 Node-RED \u662F\u5426\u8FD0\u884C\uFF0C\u518D\u770B Flow \u662F\u5426\u5DF2\u90E8\u7F72\uFF0C\u7136\u540E\u786E\u8BA4 WebSocket \u8FDE\u63A5\u6709\u6CA1\u6709\u65AD\u5F00\u3002\u52A0\u770B\u95E8\u72D7\u786E\u4FDD\u957F\u671F\u7A33\u5B9A\u3002",
+      "6-10": "\u76D1\u63A7\u5927\u5C4F\u7684\u989C\u8272\u5FC3\u7406\u5B66\uFF1A\u7EA2\u8272=\u5371\u9669/\u62A5\u8B66\uFF08\u7D27\u6025\u5904\u7F6E\uFF09\uFF0C\u9EC4\u8272=\u9884\u8B66/\u6CE8\u610F\uFF08\u63D0\u524D\u5E72\u9884\uFF09\uFF0C\u7EFF\u8272=\u6B63\u5E38/\u5B89\u5168\uFF08\u65E0\u9700\u64CD\u4F5C\uFF09\u3002\u4E00\u76EE\u4E86\u7136\u3002",
+      "6-11": "\u591A\u5C4F\u8054\u52A8\u7684\u67B6\u6784\u8BBE\u8BA1\uFF1A\u8F66\u95F4\u5C4F\u5B9E\u65F6\u8BBE\u5907\u6570\u636E\uFF08\u79D2\u7EA7\uFF09\uFF0C\u4E2D\u63A7\u5BA4\u5C4F\u7EFC\u5408\u6982\u89C8\uFF08\u5206\u949F\u7EA7\uFF09\uFF0C\u5382\u957F\u5C4F KPI \u62A5\u8868\uFF08\u5C0F\u65F6/\u5929\u7EA7\uFF09\u3002\u4FE1\u606F\u5206\u5C42\u5448\u73B0\u3002",
+      "7-9": "MQTT \u6D88\u606F\u94FE\u8DEF\u7684\u6545\u969C\u6392\u67E5\uFF1A\u5148\u68C0\u67E5 Broker \u662F\u5426\u8FD0\u884C\uFF0C\u518D\u68C0\u67E5\u53D1\u5E03\u7AEF\u662F\u5426\u6B63\u5E38\uFF0C\u6700\u540E\u7528\u5FC3\u8DF3\u4E3B\u9898\u76D1\u63A7\u94FE\u8DEF\u5065\u5EB7\u3002\u9632\u6B62\u6D88\u606F\u9ED1\u6D1E\u3002",
+      "7-10": "MQTT \u4E3B\u9898\u547D\u540D\u5EFA\u8BAE\u7528 / \u5206\u9694\u5C42\u7EA7\uFF0C\u5982 factory/workshop1/temp\u3002\u7B2C\u4E00\u7EA7\u5382\u533A\u3001\u7B2C\u4E8C\u7EA7\u8F66\u95F4\u3001\u7B2C\u4E09\u7EA7\u6570\u636E\u7C7B\u578B\u2014\u2014\u6E05\u6670\u53EF\u6269\u5C55\u3002",
+      "7-11": "MQTT \u5B89\u5168\u4E09\u8981\u7D20\uFF1A\u4F20\u8F93\u5C42\u52A0\u5BC6\uFF08TLS/SSL \u9632\u7A83\u542C\uFF09\u3001\u8EAB\u4EFD\u8BA4\u8BC1\uFF08\u7528\u6237\u540D+\u5BC6\u7801\u9632\u672A\u6388\u6743\uFF09\u3001\u6D88\u606F\u7B7E\u540D\uFF08\u9632\u6570\u636E\u7BE1\u6539\uFF09\u3002\u7F3A\u4E00\u4E0D\u53EF\u3002",
+      "8-9": "AI \u6A21\u578B\u6F02\u79FB\u662F\u8F93\u5165\u6570\u636E\u5206\u5E03\u53D8\u5316\u5BFC\u81F4\u51C6\u786E\u7387\u4E0B\u964D\u3002\u89E3\u51B3\u529E\u6CD5\uFF1A\u76D1\u63A7\u7F6E\u4FE1\u5EA6\u3001\u7528\u65B0\u6570\u636E\u589E\u91CF\u8BAD\u7EC3\u3001\u5EFA\u7ACB\u81EA\u52A8\u91CD\u8BAD\u7EC3 Pipeline\u3002",
+      "8-10": "AI \u9884\u6D4B\u548C\u4EBA\u5DE5\u68C0\u67E5\u77DB\u76FE\u65F6\uFF0C\u964D\u8D1F\u8377\u8FD0\u884C+\u7B2C\u4E09\u65B9\u68C0\u6D4B\u6700\u7A33\u59A5\u3002\u4E0D\u76F2\u76EE\u4FE1 AI\uFF0C\u4E5F\u4E0D\u5B8C\u5168\u5426\u5B9A\u2014\u2014\u6298\u4E2D\u7B56\u7565\u964D\u4F4E\u98CE\u9669\u3002",
+      "8-11": "\u5DE5\u4E1A\u5143\u5B87\u5B99\uFF1AAR \u8FDC\u7A0B\u7EF4\u4FEE\u8BA9\u4E13\u5BB6\u4E0D\u7528\u5230\u73B0\u573A\uFF0C\u6570\u5B57\u5B6A\u751F\u4EFF\u771F\u6295\u4EA7\u524D\u9A8C\u8BC1\u4F18\u5316\uFF0C\u533A\u5757\u94FE\u6EAF\u6E90\u786E\u4FDD\u4EA7\u54C1\u5168\u751F\u547D\u5468\u671F\u53EF\u8FFD\u6EAF\u3002\u8FD9\u662F\u5DE5\u4E1A\u4E92\u8054\u7F51\u7684\u7EC8\u6781\u613F\u666F\u3002"
+    };
+    if (explains[task.id]) return explains[task.id];
+    if (task.type === "terminal") return `\u5382\u957F\u7B49\u7740\u4F60\u7528 ${cmd} \u5904\u7406\u95EE\u9898\u2014\u2014${cfg.prompt || "\u6839\u636E\u4E0A\u9762\u7684\u4EFB\u52A1\u63D0\u793A\uFF0C\u8F93\u5165\u6B63\u786E\u547D\u4EE4\u3002"}`;
+    if (task.type === "quiz") return `\u5382\u957F\u7A81\u7136\u95EE\uFF1A\u300C${cfg.question}\u300D\u2014\u2014\u4ED6\u5728\u8003\u4F60\uFF0C\u8F66\u95F4\u90A3\u8FB9\u5C31\u7B49\u7740\u8FD9\u4E2A\u7B54\u6848\u3002`;
+    if (task.type === "fill_blank") return `\u5382\u957F\u5728\u7EC8\u7AEF\u4E0A\u5708\u4E86\u4E00\u4E2A\u4F4D\u7F6E\uFF1A\u300C\u628A\u8FD9\u4E2A\u8865\u9F50\uFF0C\u522B\u586B\u9519\u4E86\u3002\u300D`;
+    return `\u5382\u957F\u628A\u8FD9\u4E2A\u4EFB\u52A1\u4EA4\u7ED9\u4F60\u4E86\u3002\u673A\u5668\u4E0D\u4F1A\u7B49\u2014\u2014\u8D76\u7D27\u5904\u7406\u3002`;
+  }
+  function getRandomMoodLine(mood) {
+    var pool = window.directorMoodLines[mood] || window.directorMoodLines.neutral;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function getDirectorMood(task, context) {
+    if (!context) return "neutral";
+    if (context.wrongCmdType) return "awkward";
+    if (context.errors >= 2 || context.hintUsed && context.errors >= 1) return "stern";
+    if (context.streak >= 3 && context.errors === 0) return "proud";
+    if (context.hintUsed) return "thinking";
+    if (context.firstTime) return "guide";
+    return "neutral";
+  }
+  function addDirectorBox(container, text, cb, mood, opts) {
+    const m = mood || "neutral";
+    const collapsed = !!(opts && opts.collapsed);
+    const moodLine = getRandomMoodLine(m);
+    const moodEmoji = { proud: "\u{1F60E}", stern: "\u{1F624}", awkward: "\u{1F605}", thinking: "\u{1F914}", guide: "\u{1F468}\u200D\u{1F4BC}", neutral: "\u{1F468}\u200D\u{1F4BC}" }[m];
+    const box = document.createElement("div");
+    box.className = "director-box director-mood-" + m;
+    box.innerHTML = `
+    <div class="director-portrait">${moodEmoji}</div>
+    <div class="director-bubble">
+      <div class="director-name">\u5382\u957F</div>
+      <div class="director-mood-line" style="font-size:13px;color:var(--accent);margin-bottom:4px;font-style:italic">${moodLine}</div>
+      <div class="director-text"></div>
+      <div style="margin-top:6px;font-size: 14px;color:var(--dim);cursor:pointer;display:none" class="teach-toggle">\u25B3 \u6536\u8D77\u6559\u5B66</div>
+    </div>
+  `;
+    container.prepend(box);
+    const textEl = box.querySelector(".director-text");
+    const nameEl = box.querySelector(".director-name");
+    const moodLineEl = box.querySelector(".director-mood-line");
+    const toggle = box.querySelector(".teach-toggle");
+    function setCollapsed(hidden) {
+      textEl.style.display = hidden ? "none" : "";
+      nameEl.style.display = hidden ? "none" : "";
+      if (moodLineEl) moodLineEl.style.display = hidden ? "none" : "";
+      toggle.style.display = "block";
+      toggle.textContent = hidden ? "\u{1F4D6} \u5382\u957F\u6559\u5B66 \u25BE\uFF08\u5FD8\u4E86\u70B9\u5F00\uFF09" : "\u25B3 \u6536\u8D77\u6559\u5B66";
+      toggle.style.color = hidden ? "var(--amber)" : "var(--dim)";
+      toggle.style.marginTop = hidden ? "6px" : "0";
+    }
+    function finish() {
+      toggle.style.display = "block";
+      if (collapsed) setCollapsed(true);
+      toggle.onclick = () => {
+        setCollapsed(textEl.style.display === "none" ? false : true);
+      };
+      if (cb) cb();
+    }
+    const _text = String(text || "").replace(/^厂长[:：]\s*/, "");
+    if (collapsed) {
+      textEl.textContent = _text;
+      finish();
+    } else {
+      typewrite(textEl, _text, 25, finish);
+    }
+    return box;
+  }
+  function shakeScreen() {
+    const overlay = document.getElementById("modalOverlay");
+    overlay.style.animation = "none";
+    overlay.offsetHeight;
+    overlay.style.animation = "shake 0.3s ease";
+    playSound("error");
+  }
+  function glowCorrect(el) {
+    el.classList.remove("glow-correct");
+    el.offsetHeight;
+    el.classList.add("glow-correct");
+    playSound("success");
+  }
+  function collapseTeachingBox(box) {
+    if (!box) return;
+    const toggle = box.querySelector(".teach-toggle");
+    if (!toggle) return;
+    const textEl = box.querySelector(".director-text");
+    const nameEl = box.querySelector(".director-name");
+    const moodLineEl = box.querySelector(".director-mood-line");
+    textEl.style.display = "none";
+    nameEl.style.display = "none";
+    if (moodLineEl) moodLineEl.style.display = "none";
+    toggle.textContent = "\u{1F4D6} \u5382\u957F\u6559\u5B66 \u25BE\uFF08\u5FD8\u4E86\u70B9\u5F00\uFF09";
+    toggle.style.color = "var(--amber)";
+    toggle.style.marginTop = "0";
+  }
+  function showWrongExplain(container, text, onRetry) {
+    const teachToggle = container.querySelector(".director-box .teach-toggle");
+    if (teachToggle && teachToggle.textContent.indexOf("\u6536\u8D77") >= 0) {
+      collapseTeachingBox(teachToggle.closest(".director-box"));
+    }
+    const box = document.createElement("div");
+    box.className = "director-box director-mood-thinking";
+    box.style.cssText = "margin-bottom:10px";
+    box.innerHTML = '<div class="director-portrait">\u{1F914}</div><div class="director-bubble"><div class="director-name">\u5382\u957F</div><div class="director-text" style="white-space:pre-wrap;line-height:1.7">' + escHtml(String(text || "\u60F3\u5C94\u4E86\uFF0C\u518D\u60F3\u60F3\uFF1F").replace(/^厂长[:：]\s*/, "")) + '</div><div style="margin-top:8px;text-align:right"><button class="btn btn-primary">\u77E5\u9053\u4E86\uFF0C\u518D\u8BD5\u4E00\u6B21</button></div></div>';
+    box.querySelector("button").onclick = () => {
+      box.remove();
+      if (onRetry) onRetry();
+    };
+    container.prepend(box);
+    return box;
+  }
+
+  // public/js/core/kbd.js
+  function kbdCleanup() {
+    try {
+      if (window.__kbdCleanup) {
+        window.__kbdCleanup();
+        window.__kbdCleanup = null;
+      }
+    } catch (e) {
+    }
+  }
+  function setupGlobalEnter() {
+    if (window.__globalEnterBound) return;
+    window.__globalEnterBound = true;
+    window.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        const t2 = e.target;
+        if (t2 && (t2.tagName === "INPUT" || t2.tagName === "TEXTAREA" || t2.isContentEditable)) return;
+        if (document.querySelector(".mm-overlay") || document.querySelector(".gz-overlay.show, .gr-overlay.show")) return;
+        const m = document.getElementById("modalOverlay");
+        if (m && m.classList.contains("show")) {
+          e.preventDefault();
+          window.closeTaskModal();
+        }
+        return;
+      }
+      if (e.key !== "Enter") return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      const lc = document.getElementById("levelCompleteBtn");
+      if (lc && lc.offsetParent !== null) {
+        e.preventDefault();
+        lc.click();
+        return;
+      }
+      const retry = document.querySelector(".modal-overlay.show .director-box .btn-primary");
+      if (retry) {
+        e.preventDefault();
+        retry.click();
+        return;
+      }
+      const sb = document.querySelector("#modalFoot .btn-primary, #modalFoot .btn-success");
+      if (sb) {
+        e.preventDefault();
+        sb.click();
+      }
+    });
+  }
+  function setupKbdNav(scope, selector, opts) {
+    kbdCleanup();
+    setupGlobalEnter();
+    const cfg = opts || {};
+    let idx = -1;
+    function items() {
+      return [...(scope || document).querySelectorAll(selector)];
+    }
+    function focus(i, show) {
+      idx = i;
+      const list2 = items();
+      list2.forEach((el, k) => {
+        if (el) {
+          el.classList.remove("kbd-focus");
+        }
+      });
+      if (show && list2[i]) {
+        list2[i].classList.add("kbd-focus");
+        try {
+          list2[i].scrollIntoView({ block: "nearest" });
+        } catch (e) {
+        }
+      }
+    }
+    function onKey(e) {
+      const _t = e.target;
+      if (_t && (_t.tagName === "INPUT" || _t.tagName === "TEXTAREA" || _t.tagName === "SELECT" || _t.isContentEditable)) return;
+      const list2 = items();
+      if (!list2.length) return;
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        e.preventDefault();
+        focus((idx + 1) % list2.length, true);
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        focus((idx - 1 + list2.length) % list2.length, true);
+      } else if (e.key === " ") {
+        if (idx >= 0 && list2[idx]) {
+          e.preventDefault();
+          list2[idx].click();
+        }
+      }
+    }
+    function onDocClick(e) {
+      const t = e.target;
+      if (!t || !t.closest) return;
+      const it = t.closest(selector);
+      if (it && scope && scope.contains(it)) {
+        const list2 = items();
+        const i = list2.indexOf(it);
+        if (i >= 0) focus(i, false);
+      }
+    }
+    document.addEventListener("click", onDocClick, true);
+    window.addEventListener("keydown", onKey);
+    const list = items();
+    if (list.length) {
+      focus(0, false);
+    }
+    window.__kbdCleanup = function() {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("click", onDocClick, true);
+    };
+  }
+
+  // public/js/core/cmd-annotate.js
+  var COMMAND_ZH = {
+    "apt": "\u5305\u7BA1\u7406\u5DE5\u5177",
+    "update": "\u66F4\u65B0(\u62C9\u5305\u5217\u8868)",
+    "upgrade": "\u5347\u7EA7",
+    "install": "\u5B89\u88C5",
+    "remove": "\u5378\u8F7D",
+    "&&": "\u524D\u9762\u6210\u529F\u624D\u6267\u884C\u540E\u9762",
+    "ip": "\u7F51\u7EDC\u914D\u7F6E\u547D\u4EE4",
+    "addr": "address\xB7\u67E5\u770B\u5730\u5740",
+    "ss": "\u67E5\u770B\u7AEF\u53E3/\u8FDE\u63A5",
+    "-t": "\u53EA\u770BTCP",
+    "-l": "\u53EA\u770B\u76D1\u542C",
+    "-n": "\u6570\u5B57\u663E\u793A(\u4E0D\u89E3\u6790)",
+    "grep": "\u8FC7\u6EE4\xB7\u6311\u51FA",
+    "|": "\u7BA1\u9053:\u524D\u8F93\u51FA\u7ED9\u540E",
+    "traceroute": "\u8FFD\u8E2A\u8DEF\u7531\u6BCF\u8DF3",
+    "iptables": "\u9632\u706B\u5899",
+    "-A": "\u8FFD\u52A0\u89C4\u5219",
+    "-j": "\u52A8\u4F5C",
+    "icmp": "ping\u7528\u7684\u534F\u8BAE",
+    "--icmp-type": "ICMP\u5305\u7C7B\u578B",
+    "echo-request": "\u8BF7\u6C42\u5305",
+    "DROP": "\u4E22\u5F03",
+    "ACCEPT": "\u653E\u884C",
+    "systemctl": "\u670D\u52A1\u7BA1\u7406",
+    "status": "\u67E5\u770B\u72B6\u6001",
+    "start": "\u542F\u52A8",
+    "stop": "\u505C\u6B62",
+    "restart": "\u91CD\u542F",
+    "enable": "\u542F\u7528(systemctl=\u5F00\u673A\u81EA\u542F)",
+    "ssh": "\u8FDC\u7A0B\u767B\u5F55",
+    "ls": "\u5217\u51FA\u6587\u4EF6",
+    "-la": "-l\u957F\u683C\u5F0F -a\u9690\u85CF\u6587\u4EF6",
+    "curl": "\u547D\u4EE4\u884C\u7F51\u9875\u5DE5\u5177",
+    "modpoll": "Modbus\u6D4B\u8BD5\u5DE5\u5177",
+    "-m": "\u534F\u8BAE(\u5982tcp)",
+    "-r": "\u8D77\u59CB\u5730\u5740",
+    "-1": "\u53EA\u8BFB\u4E00\u6B21",
+    "node-red": "Node-RED\u542F\u52A8",
+    "sudo": "\u7BA1\u7406\u5458\u6743\u9650",
+    "ping": "\u6D4B\u8FDE\u901A",
+    "pwd": "\u5F53\u524D\u76EE\u5F55",
+    "route": "\u8DEF\u7531\u8868",
+    "add": "\u6DFB\u52A0",
+    "default": "\u9ED8\u8BA4",
+    "via": "\u7ECF\u7531(\u7F51\u5173)",
+    "show": "\u663E\u793A",
+    "list": "\u5217\u51FA",
+    "rm": "\u5220\u9664",
+    "mkdir": "\u521B\u5EFA\u76EE\u5F55",
+    "cd": "\u5207\u6362\u76EE\u5F55",
+    "cat": "\u67E5\u770B\u6587\u4EF6",
+    "echo": "\u8F93\u51FA\u6587\u672C",
+    "bash": "\u6267\u884C\u811A\u672C",
+    "chmod": "\u6539\u6743\u9650",
+    "nslookup": "\u67E5\u57DF\u540DIP",
+    "-a": "\u663E\u793A\u5168\u90E8/\u9690\u85CF\u6587\u4EF6",
+    "-p": "\u53C2\u6570(\u968F\u547D\u4EE4:\u534F\u8BAE/\u7AEF\u53E3/\u8FDB\u7A0B)",
+    "--help": "\u5E2E\u52A9",
+    "-h": "\u5E2E\u52A9",
+    // 端口/网络工具与补充词条
+    "nc": "netcat\xB7\u7AEF\u53E3\u6D4B\u8BD5\u5DE5\u5177",
+    "netcat": "nc\u5168\u79F0\xB7\u7AEF\u53E3\u6D4B\u8BD5",
+    "-zv": "-z\u53EA\u626B+-v\u663E\u793A\u7ED3\u679C",
+    "-z": "\u53EA\u626B\u4E0D\u4F20\u6570\u636E",
+    "-v": "\u663E\u793A\u7ED3\u679C",
+    "docker": "\u5BB9\u5668\u5DE5\u5177",
+    "run": "\u8FD0\u884C\u5BB9\u5668",
+    "ps": "\u67E5\u770B\u8FDB\u7A0B",
+    "head": "\u770B\u5F00\u5934\u51E0\u884C",
+    "wc": "\u7EDF\u8BA1",
+    "uname": "\u67E5\u770B\u7CFB\u7EDF\u4FE1\u606F",
+    "hostname": "\u67E5\u770B\u4E3B\u673A\u540D",
+    "pip": "Python\u5305\u7BA1\u7406\u5668",
+    "-c": "\u6B21\u6570/\u6570\u91CF",
+    "-d": "\u6307\u5B9A\u5185\u5BB9/\u8BBE\u5907",
+    "-s": "\u5927\u5C0F\u6216\u9759\u9ED8",
+    "-E": "\u4FDD\u7559$\u4E0D\u89E3\u6790",
+    "-I": "\u53EA\u770B\u54CD\u5E94\u5934",
+    "-X": "\u6307\u5B9A\u8BF7\u6C42\u65B9\u6CD5",
+    "--version": "\u67E5\u770B\u7248\u672C",
+    "-tln": "-t TCP -l\u76D1\u542C -n\u6570\u5B57",
+    "-tlnp": "-tln+\u8FDB\u7A0B",
+    "INPUT": "\u5165\u7AD9\u94FE",
+    "OUTPUT": "\u51FA\u7AD9\u94FE",
+    "FORWARD": "\u8F6C\u53D1\u94FE",
+    "tcp": "TCP\u534F\u8BAE",
+    "mosquitto": "MQTT\u6D88\u606F\u670D\u52A1\u5668",
+    "mosquitto_pub": "MQTT\u53D1\u5E03",
+    "mosquitto_sub": "MQTT\u8BA2\u9605",
+    "mosquitto-clients": "MQTT\u5DE5\u5177\u5305",
+    "ssh-copy-id": "\u628A\u516C\u94A5\u590D\u5236\u5230\u670D\u52A1\u5668",
+    "ssh-keygen": "\u751F\u6210SSH\u5BC6\u94A5",
+    "openssh-server": "SSH\u670D\u52A1\u7AEF\u8F6F\u4EF6\u5305",
+    "sshd": "SSH\u670D\u52A1",
+    "localhost": "\u672C\u673A",
+    "openplc": "OpenPLC\u670D\u52A1",
+    "edge-service": "\u8FB9\u7F18\u670D\u52A1",
+    "nodered": "Node-RED",
+    "node": "Node.js\u8FD0\u884C\u65F6"
+  };
+  function cmdAnnotate(cmd) {
+    var tokens = String(cmd).split(/\s+/).filter(Boolean);
+    return tokens.map(function(t) {
+      var zh = COMMAND_ZH[t] || COMMAND_ZH[t.toLowerCase()];
+      var esc = String(t).replace(/</g, "&lt;");
+      var chip = '<span style="display:inline-flex;flex-direction:column;align-items:center;margin:2px 5px 2px 0;padding:3px 8px;background:#0a0e1c;border:1px solid var(--border);border-radius:4px"><b style="color:var(--green);font-size:14px;font-family:inherit">' + esc + "</b>";
+      if (zh) chip += '<i style="font-size:11px;color:var(--amber);font-style:normal;margin-top:1px">' + zh + "</i>";
+      return chip + "</span>";
+    }).join("");
+  }
+  function cmdAnnotateBox(cmd) {
+    if (!cmd) return "";
+    return '<div style="display:flex;flex-wrap:wrap;gap:2px;margin:10px 0 4px;background:rgba(0,188,212,.04);border:1px dashed rgba(0,188,212,.3);border-radius:6px;padding:8px 10px"><span style="font-size:12px;color:var(--dim);margin-right:8px;align-self:center">\u{1F4D6} \u547D\u4EE4\u62C6\u89E3\uFF1A</span>' + cmdAnnotate(cmd) + "</div>";
+  }
+
+  // public/js/interactions/install_wizard.js
+  function isPublicIPv4(ip) {
+    var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(String(ip || "").trim());
+    if (!m) return false;
+    var a = +m[1], b = +m[2];
+    if (a > 255 || +m[2] > 255 || +m[3] > 255 || +m[4] > 255) return false;
+    if (a === 127) return false;
+    if (a === 10) return false;
+    if (a === 172 && b >= 16 && b <= 31) return false;
+    if (a === 192 && b === 168) return false;
+    if (a === 0 || a === 255 || a >= 224) return false;
+    if (a === 100 && b >= 64 && b <= 127) return false;
+    return true;
+  }
+  registerInteraction("install_wizard", {
+    render(container, task) {
+      const cfg = task.config;
+      const steps = cfg.steps || [];
+      let current = 0;
+      let multiSelected = /* @__PURE__ */ new Set();
+      let cmdErrorCount = 0;
+      let cmdHintGiven = {};
+      container.innerHTML = `
+      <div id="wizardBar">
+        <div class="wizard-steps" id="wizardSteps"></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" id="wizardFill"></div></div>
+      </div>
+      <div id="wizTeach" style="margin-bottom:8px"></div>
+      <div id="wizardStage" style="margin-top:4px"></div>
+    `;
+      function updateProgress() {
+        const pct = current / steps.length * 100;
+        document.getElementById("wizardFill").style.width = pct + "%";
+        const stepsEl = document.getElementById("wizardSteps");
+        stepsEl.innerHTML = steps.map((s, i) => {
+          let cls = "wiz-dot";
+          if (i < current) cls += " done";
+          if (i === current) cls += " active";
+          return '<span class="' + cls + '" title="' + s.title + '">' + (i + 1) + "</span>";
+        }).join("");
+      }
+      function renderStep() {
+        if (current >= steps.length) {
+          var passSaved = cmdErrorCount > 0 && window.__passActive;
+          if (passSaved) window.__passActive = false;
+          var finalXP = cmdErrorCount > 0 && !passSaved ? Math.floor(taskXP(task) / 2) : taskXP(task);
+          var halfNote = cmdErrorCount > 0 ? '<div style="font-size: 13px;color:var(--amber);margin-top:6px">\u7ECF\u9A8C\u51CF\u534A \xB7 \u5B9E\u5F97 +' + finalXP + " XP</div>" : '<div style="font-size: 13px;color:var(--dim);margin-top:6px">\u5168\u5BF9\u5B8C\u6210 \xB7 \u7ECF\u9A8C\u6EE1\u989D</div>';
+          document.getElementById("wizardStage").innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:28px;margin-bottom:8px">\u{1F5A5}\uFE0F</div><div style="color:var(--green);font-size:14px">\u2705 \u5DE5\u4F4D\u642D\u5EFA\u5B8C\u6210\uFF01</div>' + halfNote + "</div>";
+          document.getElementById("modalFoot").innerHTML = `<button class="btn btn-success" onclick="window.completeTask('` + task.id + "', " + finalXP + ')">\u2713 \u9886\u53D6 XP</button>';
+          updateProgress();
+          playSound("success");
+          return;
+        }
+        updateProgress();
+        const step = steps[current];
+        kbdCleanup();
+        const stage = document.getElementById("wizardStage");
+        var _narr = String(step.narrative || "").replace(/^厂长[:：]\s*/, "");
+        var html = '<div class="wizard-narrative"><span class="wiz-narr-icon">\u{1F468}\u200D\u{1F4BC}</span> <span class="wiz-narr-label">\u5382\u957F\uFF1A</span>' + _narr.replace(/\n/g, "<br>") + "</div>";
+        html += '<div class="wizard-question">' + step.question + "</div>";
+        if (step.inputType === "number") {
+          html += '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size: 15px"><input type="number" id="wizNum" placeholder="\u8F93\u5165\u6570\u5B57" style="width:80px;background:#0a0a10;border:1px solid var(--border);color:var(--text);padding:8px;font-size:14px" min="0" max="32"><span style="color:var(--dim)">GB</span></div>';
+        } else if (step.inputType === "command") {
+          html += cmdAnnotateBox(step.correctCommand);
+          html += '<div class="term-root" style="margin-top:8px"><div class="term-header"><span class="term-dots"><span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span></span><span>\u7EC8\u7AEF</span></div><div class="term-body"><input type="text" id="wizCmd" placeholder="\u8F93\u5165\u547D\u4EE4\u2026" spellcheck="false" autocomplete="off" style="width:94%;background:transparent;border:none;color:var(--green);font:inherit;font-size: 15px;outline:none;padding:8px"></div></div>';
+        } else if (step.inputType === "ip") {
+          html += '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:15px"><input type="text" id="wizIp" placeholder="\u5982 223.5.5.5" spellcheck="false" autocomplete="off" style="width:190px;background:#0a0a10;border:1px solid var(--border);color:var(--green);padding:8px;font-size:14px"></div>';
+        } else if (step.multiSelect) {
+          html += '<div id="wizMultiOpts" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>';
+        } else if (step.options) {
+          html += '<div id="wizOpts" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>';
+        }
+        stage.innerHTML = html;
+        if (step.options && !step.multiSelect) {
+          var optsEl = document.getElementById("wizOpts");
+          step.options.forEach(function(opt, i) {
+            var div = document.createElement("div");
+            div.className = "quiz-opt";
+            div.innerHTML = '<span style="font-size: 14px;color:var(--dim);margin-right:6px">' + (opt.label || String.fromCharCode(65 + i)) + "</span>" + opt.text;
+            div.onclick = function() {
+              document.getElementById("wizOpts").querySelectorAll(".quiz-opt").forEach(function(el) {
+                el.classList.remove("selected");
+              });
+              div.classList.add("selected");
+              document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button><button class="btn btn-primary" id="wizSubmitBtn">\u2713 \u786E\u8BA4</button>';
+              document.getElementById("wizSubmitBtn").onclick = function() {
+                submitWizard(i);
+              };
+            };
+            optsEl.appendChild(div);
+          });
+          setupKbdNav(optsEl, ".quiz-opt");
+          document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button>';
+        } else if (step.multiSelect) {
+          multiSelected = /* @__PURE__ */ new Set();
+          var mOptsEl = document.getElementById("wizMultiOpts");
+          step.options.forEach(function(opt, i) {
+            var div = document.createElement("div");
+            div.className = "quiz-opt";
+            div.id = "wizMultiOpt_" + i;
+            div.innerHTML = '<span class="wiz-checkbox" style="display:inline-block;width:18px;height:18px;border:2px solid var(--border);margin-right:8px;font-size: 14px;line-height:18px;text-align:center;vertical-align:middle"></span><span>' + opt.text + "</span>";
+            div.onclick = function() {
+              if (multiSelected.has(i)) {
+                multiSelected.delete(i);
+                div.querySelector(".wiz-checkbox").textContent = "";
+                div.querySelector(".wiz-checkbox").style.borderColor = "var(--border)";
+                div.style.borderColor = "var(--border)";
+              } else {
+                window.errors++;
+                window.streak = 0;
+                multiSelected.add(i);
+                div.querySelector(".wiz-checkbox").textContent = "\u2713";
+                div.querySelector(".wiz-checkbox").style.color = "var(--green)";
+                div.querySelector(".wiz-checkbox").style.borderColor = "var(--green)";
+                div.style.borderColor = "var(--amber)";
+              }
+              var sbEmpty = multiSelected.size === 0;
+              document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button><button class="btn btn-primary" id="wizSubmitBtn"' + (sbEmpty ? " disabled" : "") + ">\u2713 \u786E\u8BA4\u9009\u62E9</button>";
+              var sb = document.getElementById("wizSubmitBtn");
+              if (sb) {
+                sb.onclick = function() {
+                  submitWizardMulti();
+                };
+              }
+            };
+            mOptsEl.appendChild(div);
+          });
+          setupKbdNav(mOptsEl, ".quiz-opt");
+          document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button>';
+        } else if (step.inputType) {
+          document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button><button class="btn btn-primary" id="wizSubmitBtn">\u2713 \u786E\u8BA4</button>';
+          document.getElementById("wizSubmitBtn").onclick = function() {
+            if (step.inputType === "number") {
+              var val = parseInt(document.getElementById("wizNum").value);
+              if (isNaN(val)) {
+                window.showToast("\u4F60\u5F97\u8F93\u5165\u4E00\u4E2A\u6570\u5B57\u673A\u5668\u624D\u8BA4", "error");
+                return;
+              }
+              submitWizard(val);
+            } else if (step.inputType === "command") {
+              var inp = document.getElementById("wizCmd");
+              if (!inp) return;
+              var val = inp.value.trim();
+              if (!val) {
+                window.showToast("\u7EC8\u7AEF\u8FD8\u7B49\u7740\u4F60\u7684\u547D\u4EE4", "error");
+                return;
+              }
+              submitWizard(val);
+            } else if (step.inputType === "ip") {
+              var inp = document.getElementById("wizIp");
+              if (!inp) return;
+              var val = inp.value.trim();
+              if (!isPublicIPv4(val)) {
+                window.showToast("\u586B\u4E00\u4E2A\u516C\u7F51 IP\uFF08\u5982 223.5.5.5\uFF0C\u4E0D\u80FD\u662F 192.168/10.x \u5185\u7F51\uFF09", "error");
+                return;
+              }
+              submitWizard(val);
+            }
+          };
+          setTimeout(function() {
+            if (step.inputType === "number") {
+              var el = document.getElementById("wizNum");
+              if (el) el.onkeydown = function(e) {
+                if (e.key === "Enter") document.getElementById("wizSubmitBtn").click();
+              };
+            } else if (step.inputType === "command") {
+              var el = document.getElementById("wizCmd");
+              if (el) {
+                el.onkeydown = function(e) {
+                  if (e.key === "Enter") document.getElementById("wizSubmitBtn").click();
+                };
+                el.focus();
+              }
+            } else if (step.inputType === "ip") {
+              var el = document.getElementById("wizIp");
+              if (el) {
+                el.onkeydown = function(e) {
+                  if (e.key === "Enter") document.getElementById("wizSubmitBtn").click();
+                };
+                el.focus();
+              }
+            }
+          }, 100);
+        }
+      }
+      window.submitWizard = function(answer) {
+        var step = steps[current];
+        if (step.inputType === "command") {
+          runTerminalSim(answer);
+          return;
+        }
+        var correct = false;
+        if (step.inputType === "number") {
+          correct = step.correctNumber.includes(answer);
+        } else if (step.inputType === "ip") {
+          correct = true;
+        } else {
+          window.errors++;
+          window.streak = 0;
+          correct = step.options[answer].correct;
+        }
+        handleStepResult(correct, step.inputType === "number" ? null : answer);
+      };
+      function runTerminalSim(cmd) {
+        var step = steps[current];
+        var normalized = cmd.toLowerCase().replace(/\s+/g, " ");
+        var commands = [step.correctCommand.toLowerCase()].concat((step.aliases || []).map(function(a) {
+          return a.toLowerCase();
+        }));
+        var ok = commands.some(function(c) {
+          return normalized === c;
+        });
+        var stage = document.getElementById("wizardStage");
+        var termRoot = stage.querySelector(".term-root");
+        document.getElementById("modalFoot").innerHTML = "";
+        if (!ok) {
+          var tries = cmdHintGiven[current] || 0;
+          var hintList = step.hints && step.hints.length ? step.hints : null;
+          var hintText;
+          if (hintList) {
+            if (tries < hintList.length) {
+              hintText = "\u{1F4A1} \u63D0\u793A " + (tries + 1) + "/" + hintList.length + ": " + String(hintList[tries]).replace(/</g, "&lt;");
+              cmdHintGiven[current] = tries + 1;
+            } else {
+              hintText = "\u{1F4D6} \u7B54\u6848\u662F: " + String(step.correctCommand).replace(/</g, "&lt;");
+              cmdErrorCount++;
+            }
+          } else {
+            if (tries === 0) {
+              hintText = "\u{1F4A1} \u63D0\u793A: " + String(step.errorHint || "\u518D\u770B\u770B\u5382\u957F\u521A\u624D\u6559\u7684\uFF0C\u547D\u4EE4\u683C\u5F0F\u8981\u5BF9").replace(/</g, "&lt;");
+              cmdHintGiven[current] = 1;
+            } else {
+              hintText = "\u{1F4D6} \u7B54\u6848\u662F: " + String(step.correctCommand).replace(/</g, "&lt;");
+              cmdErrorCount++;
+            }
+          }
+          if (termRoot) {
+            var termBody = termRoot.querySelector(".term-body");
+            var input = document.getElementById("wizCmd");
+            if (termBody && input) {
+              var box = document.createElement("div");
+              box.style.cssText = "padding:4px 0";
+              box.innerHTML = '<div style="color:var(--cyan)">$ ' + String(cmd).replace(/</g, "&lt;") + '</div><div style="color:var(--red)">bash: ' + String(cmd).split(" ")[0].replace(/</g, "&lt;") + ': \u547D\u4EE4\u672A\u627E\u5230\uFF0C\u6216\u53C2\u6570\u4E0D\u6B63\u786E</div><div style="color:var(--amber);margin-top:4px">' + hintText + "</div>";
+              termBody.insertBefore(box, input);
+              input.onkeydown = function(e) {
+                if (e.key === "Enter") {
+                  var v = input.value.trim();
+                  if (v) submitWizard(v);
+                }
+              };
+              input.focus();
+            }
+          }
+          playSound("error");
+          window.shakeScreen();
+          document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button>';
+          return;
+        }
+        if (termRoot) {
+          termRoot.innerHTML = '<div class="term-header"><span class="term-dots"><span class="term-dot red"></span><span class="term-dot yellow"></span><span class="term-dot green"></span></span><span>\u7AEF</span></div><div class="term-body" id="wizTermOut" style="padding:8px;font-size: 14px;font-family:inherit;max-height:180px;overflow-y:auto;color:var(--dim)"></div>';
+        }
+        var out = document.getElementById("wizTermOut");
+        if (!out) return;
+        var lines = step.outputLines ? [{ text: "$ " + cmd, color: "cyan", delay: 200 }].concat(step.outputLines) : [
+          { text: "$ " + cmd, color: "cyan", delay: 200 },
+          { text: "Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease", color: "", delay: 300 },
+          { text: "Get:2 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]", color: "", delay: 250 },
+          { text: "Reading package lists... Done", color: "dim", delay: 400 },
+          { text: "Building dependency tree... Done", color: "dim", delay: 300 },
+          { text: "Calculating upgrade... Done", color: "dim", delay: 300 },
+          { text: "The following packages will be upgraded:", color: "dim", delay: 200 },
+          { text: "  openssh-server libc6 systemd base-files ...", color: "dim", delay: 200 },
+          { text: "Need to get 12.3 MB of archives.", color: "dim", delay: 200 },
+          { text: "Get:1 openssh-server 1:9.6p1 [380 kB]", color: "", delay: 300 },
+          { text: "Get:2 libc6 2.39-0ubuntu9 [2.1 MB]", color: "", delay: 300 },
+          { text: "Fetched 12.3 MB in 5s (2.46 MB/s)", color: "dim", delay: 400 },
+          { text: "Preconfiguring packages ... Done", color: "dim", delay: 200 },
+          { text: "Setting up packages ... Done", color: "dim", delay: 200 },
+          { text: "Processing triggers for libc-bin ...", color: "dim", delay: 200 },
+          { text: "", color: "", delay: 100 }
+        ];
+        var i = 0;
+        function nextLine() {
+          if (i >= lines.length) {
+            setTimeout(function() {
+              var normalized2 = cmd.toLowerCase().replace(/\s+/g, " ");
+              var commands2 = [step.correctCommand.toLowerCase()].concat((step.aliases || []).map(function(a) {
+                return a.toLowerCase();
+              }));
+              var ok2 = commands2.some(function(c) {
+                return normalized2 === c;
+              });
+              if (ok2) {
+                var okDiv = document.createElement("div");
+                okDiv.textContent = step.successText || "\u2705 \u7CFB\u7EDF\u66F4\u65B0\u5B8C\u6210\uFF0C\u6240\u6709\u8F6F\u4EF6\u5305\u5DF2\u662F\u6700\u65B0\u7248\u672C\uFF01";
+                okDiv.style.color = "var(--green)";
+                okDiv.style.marginTop = "6px";
+                out.appendChild(okDiv);
+                playSound("success");
+                if (step.explain) {
+                  var ex = document.createElement("div");
+                  ex.className = "wiz-explain";
+                  ex.innerHTML = '<span style="color:var(--amber);font-weight:bold">\u5382\u957F\u89E3\u8BFB\uFF1A</span>' + String(step.explain).replace(/</g, "&lt;");
+                  out.appendChild(ex);
+                  out.scrollTop = out.scrollHeight;
+                }
+                document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button><button class="btn btn-primary" onclick="window.wizNext()">\u2713 \u786E\u8BA4\uFF0C\u4E0B\u4E00\u6B65</button>';
+                window.wizNext = function() {
+                  current++;
+                  multiSelected = /* @__PURE__ */ new Set();
+                  renderStep();
+                  stage.style.opacity = "1";
+                };
+              } else {
+                window.errors++;
+                window.streak = 0;
+                var errDiv = document.createElement("div");
+                errDiv.textContent = "\u274C \u8F93\u5165\u9519\u8BEF\u2014\u2014\u7EC8\u7AEF\u62D2\u7EDD\u4E86\u8FD9\u6761\u547D\u4EE4\u3002\u5382\u957F\u63D0\u793A\uFF1Aapt update && apt upgrade";
+                errDiv.style.color = "var(--red)";
+                errDiv.style.marginTop = "6px";
+                out.appendChild(errDiv);
+                playSound("error");
+                window.shakeScreen();
+                document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button><button class="btn btn-primary" onclick="window.wizRetry()">\u{1F504} \u91CD\u8BD5</button>';
+              }
+            }, 400);
+            return;
+          }
+          var line = lines[i];
+          var div = document.createElement("div");
+          div.textContent = line.text;
+          if (line.color === "dim") div.style.color = "var(--dim)";
+          else if (line.color === "cyan") div.style.color = "var(--cyan)";
+          else if (line.color === "green") div.style.color = "var(--green)";
+          out.appendChild(div);
+          out.scrollTop = out.scrollHeight;
+          i++;
+          setTimeout(nextLine, line.delay);
+        }
+        nextLine();
+      }
+      window.submitWizardMulti = function() {
+        var step = steps[current];
+        var selectedArr = Array.from(multiSelected);
+        var correctIndices = [];
+        step.options.forEach(function(opt, i) {
+          if (opt.correct) correctIndices.push(i);
+        });
+        var allSelectedCorrect = selectedArr.length === correctIndices.length && selectedArr.every(function(i) {
+          return step.options[i].correct;
+        });
+        handleStepResult(allSelectedCorrect);
+      };
+      function handleStepResult(correct) {
+        if (correct) {
+          playSound("success");
+          current++;
+          multiSelected = /* @__PURE__ */ new Set();
+          var stage = document.getElementById("wizardStage");
+          stage.style.transition = "opacity .2s";
+          stage.style.opacity = "0";
+          setTimeout(function() {
+            renderStep();
+            stage.style.opacity = "1";
+          }, 250);
+        } else {
+          window.errors++;
+          window.streak = 0;
+          window.shakeScreen();
+          playSound("error");
+          var step = steps[current];
+          var wrongOpt = arguments.length >= 2 && arguments[1] != null && step.options ? step.options[arguments[1]] : null;
+          var correctOpt = step.options ? step.options.find(function(o) {
+            return o.correct;
+          }) : null;
+          var _txt = wrongOpt && wrongOpt.explain ? wrongOpt.explain : correctOpt && correctOpt.hint ? correctOpt.hint : "\u6B63\u786E\u7B54\u6848\u662F\u300C" + (correctOpt ? correctOpt.text : "") + "\u300D\uFF0C\u518D\u8BD5\u8BD5\uFF1F";
+          showWrongExplain(document.getElementById("wizardStage"), "\u5382\u957F\uFF1A" + _txt, null);
+          if (step.options && !step.multiSelect) {
+            document.querySelectorAll("#wizOpts .quiz-opt").forEach(function(el, i) {
+              el.style.pointerEvents = "none";
+              if (step.options[i].correct) el.classList.add("correct");
+            });
+            setTimeout(function() {
+              document.querySelectorAll("#wizOpts .quiz-opt").forEach(function(el) {
+                el.style.pointerEvents = "";
+                el.classList.remove("correct", "selected");
+              });
+              document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button>';
+            }, 1200);
+          }
+          document.getElementById("modalFoot").innerHTML = '<button class="btn btn-wiz-cancel" onclick="window.closeModal()">\u53D6\u6D88</button><button class="btn btn-primary" onclick="window.wizRetry()">\u{1F504} \u91CD\u8BD5</button>';
+        }
+      }
+      window.wizRetry = function() {
+        renderStep();
+      };
+      const _teachEl = document.getElementById("wizTeach");
+      if (_teachEl && window.generateTeach) {
+        addDirectorBox(_teachEl, window.generateTeach(task), null, "guide", { collapsed: true });
+      }
+      renderStep();
+    }
+  });
+
+  // public/js/offline-player.js
+  window.getInteraction = getInteraction;
+  window.generateTeach = generateTeach;
+  window.addDirectorBox = addDirectorBox;
+  window.showWrongExplain = showWrongExplain;
+  window.getDirectorMood = getDirectorMood;
+  window.shakeScreen = shakeScreen;
+  window.glowCorrect = glowCorrect;
+  window.playSound = playSound;
+  window.setupKbdNav = setupKbdNav;
+  window.kbdCleanup = kbdCleanup;
+  window.escHtml = escHtml;
+  window.taskXP = taskXP;
+  var _streak = 0;
+  var _errors = 0;
+  Object.defineProperty(window, "streak", { get: () => _streak, set: (v) => {
+    _streak = v;
+  }, configurable: true });
+  Object.defineProperty(window, "errors", { get: () => _errors, set: (v) => {
+    _errors = v;
+  }, configurable: true });
+  window.currentLevelId = "1";
+  window.currentTaskId = "1-0";
+  window.__passActive = false;
+  window.directorMoodLines = {
+    guide: ["\u5148\u542C\u5382\u957F\u628A\u65B9\u6CD5\u8BB2\u6E05\u695A\uFF0C\u518D\u52A8\u624B\u4E0D\u8FDF", "\u8FD9\u4E2A\u4EFB\u52A1\u7684\u91CD\u70B9\uFF0C\u5382\u957F\u5148\u7ED9\u4F60\u5212\u51FA\u6765", "\u8DDF\u7D27\u5382\u957F\uFF0C\u4E00\u6B65\u4E00\u4E2A\u811A\u5370"],
+    thinking: ["\u5361\u4F4F\u4E86\uFF1F\u770B\u770B\u4E0A\u9762\u7684\u63D0\u793A\u680F", "\u7B2C\u4E00\u6B65\u901A\u5E38\u662F\u6700\u5173\u952E\u7684", "\u4E0D\u7528\u6025\uFF0C\u5382\u957F\u7ED9\u4F60\u7559\u7740\u706F"],
+    neutral: ["\u5382\u957F\u628A\u8FD9\u4E2A\u4EFB\u52A1\u4EA4\u7ED9\u4F60\u4E86", "\u673A\u5668\u4E0D\u4F1A\u7B49\u2014\u2014\u8D76\u7D27\u5904\u7406", "\u6309\u90E8\u5C31\u73ED\u6765\uFF0C\u7A33\u4F4F"],
+    proud: ["\u6F02\u4EAE\uFF01\u8FD9\u6CE2\u64CD\u4F5C\u6559\u79D1\u4E66\u7EA7\u522B", "\u8FD9\u624B\u901F\u3001\u8FD9\u51C6\u5EA6\uFF0C\u6709\u524D\u9014"],
+    stern: ["\u522B\u6025\uFF0C\u5148\u770B\u6E05\u63D0\u793A\u518D\u8F93", "\u57FA\u7840\u4E0D\u7262\uFF0C\u5730\u52A8\u5C71\u6447\u554A"],
+    awkward: ["\u5144\u5F1F\uFF0C\u8FD9\u662F\u88C5 SSH \u7684\u5173\u5361\u4E0D\u662F\u67E5\u76EE\u5F55\u2026"]
+  };
+  window.KNOWLEDGE_TAGS = {};
+  window.selfTeachTypes = ["install_wizard"];
+  window.completeTask = function(id, xp) {
+    try {
+      var p = JSON.parse(localStorage.getItem("offline-" + window.currentTaskId) || "{}");
+      p.done = true;
+      localStorage.setItem("offline-" + window.currentTaskId, JSON.stringify(p));
+    } catch (e) {
+    }
+    showDone("\u2705 \u4EFB\u52A1\u5B8C\u6210\uFF01+" + xp + " XP \xB7 \u8FDB\u5EA6\u5DF2\u4FDD\u5B58\u5728\u672C\u673A\u6D4F\u89C8\u5668");
+  };
+  window.closeModal = function() {
+  };
+  function showDone(msg) {
+    var d = document.createElement("div");
+    d.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;z-index:9999;color:#00e676;font-size:20px;font-weight:bold;text-align:center;padding:20px";
+    d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(function() {
+      d.remove();
+    }, 2600);
+  }
+  var TASK_CONFIG = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob("eyJzdGVwcyI6IFt7InRpdGxlIjogIuS4i+i9vSBWTXdhcmUgV29ya3N0YXRpb24iLCAibmFycmF0aXZlIjogIuWOgumVv+mAkue7meS9oOS4gOWPsCBXaW5kb3dzIOeslOiusOacrO+8muOAjOWSseS7rOS6p+e6v+eahOacjeWKoeWZqOimgei3kSBVYnVudHXvvIzlj6/kvaDmiYvkuIrlj6rmnInov5nlj7AgV2luZG93c+KAlOKAlOS4jeeUqOWGjeS5sOaWsOeUteiEke+8jOijheS4qiBWTXdhcmUgV29ya3N0YXRpb24g5bCx6KGM44CC5a6D6IO95Zyo5L2g55qEIFdpbmRvd3Mg6YeM44CO6Jma5ouf44CP5Ye65LiA5Y+w55S16ISR77yM5LiT6Zeo55So5p2l6LeRIFVidW50dSBTZXJ2ZXLjgILov5nlj7DooqvomZrmi5/lh7rmnaXnmoTnlLXohJHlj6vomZrmi5/mnLrvvIzot5/nnJ/nlLXohJHkuIDmoLfmnInoh6rlt7HnmoQgQ1BV44CB5YaF5a2Y44CB56Gs55uY44CB572R5Y2h77yM5L2g5Zyo6YeM6Z2i6ZqP5L6/5oqY6IW+77yM5byE5Z2P5LqG5Yig5o6J6YeN6KOF5bCx6KGM77yM5LiN5b2x5ZON5aSW6Z2i55qEIFdpbmRvd3PjgILlhYjlnKjmtY/op4jlmajph4zmkJwgVk13YXJlIFdvcmtzdGF0aW9uIOS4i+i9veOAguiusOS9j+KAlOKAlOW3peWOgumHjOijheeahOavj+S4gOagt+i9r+S7tumDveimgeadpea6kOW5suWHgO+8jOWumOe9keS4i+i9veacgOWPr+mdoOOAguWIq+eisOegtOino+eJiO+8jOmHjOmdoueahOacqOmprOiDveiuqeaVtOadoeS6p+e6v+eYq+aOieOAgueOsOWcqOWRiuivieaIke+8jOS9oOaJk+eul+WOu+WTquS4i+i9ve+8n+OAjSIsICJxdWVzdGlvbiI6ICLku47lk6rph4zkuIvovb0gVk13YXJlIFdvcmtzdGF0aW9u77yfIiwgIm9wdGlvbnMiOiBbeyJ0ZXh0IjogIlZNd2FyZSDlrpjnvZEgKHZtd2FyZS5jb20pIOS4i+i9veato+eJiCIsICJjb3JyZWN0IjogdHJ1ZSwgImhpbnQiOiAi5a6Y572R5piv5ZSv5LiA55qE5Y+v5L+h5p2l5rqQ77yM5bel5Y6C546v5aKD5LiN6IO956Kw5p2l5Y6G5LiN5piO55qE6L2v5Lu2In0sIHsidGV4dCI6ICLmn5DorrrlnZvnmoTjgIznoLTop6PniYgr5rOo5YaM5py644CN5LiA6ZSu5a6J6KOF5YyFIiwgImNvcnJlY3QiOiBmYWxzZSwgImhpbnQiOiAi56C06Kej54mI5bi46KKr5qSN5YWl5pyo6ams5oiW5oyW55+/56iL5bqP77yM5Lqn57q/572R57uc57uP5LiN6LW36L+Z5Liq6aOO6ZmpIn1dfSwgeyJ0aXRsZSI6ICLkuIvovb0gVWJ1bnR1IFNlcnZlciDplZzlg48iLCAibmFycmF0aXZlIjogIuWOgumVv+ivtO+8muacieS6huiZmuaLn+acuui9r+S7tu+8jOaOpeS4i+adpeaQniBVYnVudHUgU2VydmVyIOeahOezu+e7n+ebmOOAguiusOS9j++8jOacieS4pOenjeWKnuazleaQnuWIsOmVnOWDj++8muS4gOaYr+acieahjOmdouaXtueUqOa1j+iniOWZqOWOu+WumOe9keS4i+i9ve+8jOS6jOaYr+WwhuadpeWcqOayoeahjOmdoueahOacjeWKoeWZqOS4iu+8jOS4gOadoSB3Z2V0IOWRveS7pOWwseiDveaLieS4i+adpeOAguS9oOmAieS4gOS4i++8jOS7juWTquS6m+a4oOmBk+WPr+S7peiOt+WPlumVnOWDj++8nyIsICJxdWVzdGlvbiI6ICJVYnVudHUgU2VydmVyIOmVnOWDj+WPr+S7peS7juWTquiOt+WPlu+8n+mAieaJgOacieato+ehrueahO+8miIsICJtdWx0aVNlbGVjdCI6IHRydWUsICJvcHRpb25zIjogW3sidGV4dCI6ICLmtY/op4jlmajmiZPlvIAgdWJ1bnR1LmNvbS9kb3dubG9hZC9zZXJ2ZXIg5LiL6L29IElTTyIsICJjb3JyZWN0IjogdHJ1ZSwgImxhYmVsIjogIuWumOaWuea4oOmBkyJ9LCB7InRleHQiOiAi55m+5bqm572R55uY5LiK5Yir5Lq65YiG5Lqr55qEIC5pc28g5paH5Lu2IiwgImNvcnJlY3QiOiBmYWxzZSwgImxhYmVsIjogIuadpea6kOS4jeaYjiJ9LCB7InRleHQiOiAi57uI56uv5omn6KGMIHdnZXQgaHR0cHM6Ly9yZWxlYXNlcy51YnVudHUuY29tLzI0LjA0L3VidW50dS0yNC4wNC1saXZlLXNlcnZlci1hbWQ2NC5pc28iLCAiY29ycmVjdCI6IHRydWUsICJsYWJlbCI6ICLlkb3ku6TooYzkuIvovb0ifV19LCB7InRpdGxlIjogIuWIm+W7uuiZmuaLn+acui3liIbphY3lhoXlrZgiLCAibmFycmF0aXZlIjogIumVnOWDj+S4i+WlveS6huOAguWOgumVv+WHkei/h+adpe+8muaOpeS4i+adpee7meiZmuaLn+acuuWIhui1hOa6kOOAgui/meWPsCBVYnVudHUg5ZCO6Z2i6KaB6LeR5Lqn57q/55uR5o6n56iL5bqP5ZKM5LiA5Liq5pWw5o2u5bqT77yM6K6w552A4oCU4oCU57uZ5aSq5bCR6LeR5LiN5Yqo77yM57uZ5aSq5aSa5L2g6Ieq5bex55qEIFdpbmRvd3Mg5bCx5Y2h5q275LqG44CCMiDliLAgNEdCIOeahOWGheWtmOW3ruS4jeWkmuWImuWlveOAguS9oOeci+Whq+WkmuWwkeWQiOmAgu+8n+ebtOaOpeWcqOahhumHjOi+k+WFpeaVsOWtl+eEtuWQjueCueehruiupOOAgiIsICJxdWVzdGlvbiI6ICLnu5kgVWJ1bnR1IOiZmuaLn+acuuWIhuWkmuWwkeWGheWtmO+8iEdC77yJ77yf6K+36L6T5YWlIDJ+NCDkuYvpl7TnmoTmlbDlrZfvvJoiLCAiaW5wdXRUeXBlIjogIm51bWJlciIsICJjb3JyZWN0TnVtYmVyIjogWzIsIDMsIDRdfSwgeyJ0aXRsZSI6ICLpgInmi6nnvZHnu5zmqKHlvI8iLCAibmFycmF0aXZlIjogIuWOgumVv+ermei1t+i6q++8jOaMh+edgOWimeS4iueahOS6pOaNouacuuaLk+aJkeWbvu+8muaOpeS4i+adpeaYr+e9kee7nOmFjee9ru+8jOaYr+acgOWuueaYk+i4qeWdkeeahOWcsOaWueOAguS9oOeci+KAlOKAlOS9oOeahOeslOiusOacrOaPkuedgOS4gOaguee9kee6v+i/nuWIsOi9pumXtOS6pOaNouacuu+8jOS6pOaNouacuueahOWPpuS4gOi+ueaMguedgCBQTEPjgIHkvKDmhJ/lmajlkozmkYTlg4/lpLTjgILpu5jorqTmg4XlhrXkuIvkuqTmjaLmnLrlj6rnn6XpgZPkvaDnrJTorrDmnKzov5nkuIDkuKrorr7lpIfjgILkvaDnrJTorrDmnKzph4zot5HnmoQgVWJ1bnR1IOiZmuaLn+acuu+8jOS6pOaNouacuuaYr+S4jeefpemBk+eahOOAguaDs+iuqei9pumXtOmHjOeahOiuvuWkh+iDveiuv+mXruWIsCBVYnVudHXvvIzkvaDlvpforqkgVWJ1bnR1IOS7juiZmuaLn+acuumHjOi1sOWHuuadpe+8jOWDj+S4gOWPsOeLrOeri+eahOeJqeeQhuS4u+acuuS4gOagt+ermeWcqOi9pumXtOS6pOaNouacuuS4iuOAglxuXG7ov5nmnInkuInnp43nvZHnu5zmqKHlvI/vvIzlhYjorrDmuIXmpZrvvJpcbsK3IOahpeaOpe+8iEJyaWRnZWTvvInigJTigJRVYnVudHUg55u05o6l6L+e5Yiw6L2m6Ze05Lqk5o2i5py644CB5ZKMIFdpbmRvd3Mg5ZCE5ou/5LiA5Liq54us56uLIElQ77yM6L2m6Ze06K6+5aSH6IO955u05o6l5om+5Yiw5a6D77ybXG7CtyBOQVTigJTigJRVYnVudHUg5YCfIFdpbmRvd3Mg5LiK572R77yM5L2G6L2m6Ze06YeM55qEIFBMQyDnnIvkuI3liLDlroPvvJtcbsK3IOS7heS4u+acuuKAlOKAlOWPquaciSBXaW5kb3dzIOWSjCBVYnVudHUg5LqS6YCa55qE5bCB6Zet5bCP5ZyI5a2Q44CCXG5cbuS9oOimgeiuqSBQTEMg6IO95Li75Yqo6L+e5LiKIFVidW50de+8jOiHqueEtuivpemAieiDveiuqSBVYnVudHUg5pq06Zyy5Ye65p2l55qE6YKj56eN44CC5LiJ5Liq6YCJ6aG55ZCE5piv5LuA5LmI5oSP5oCd77yM5YWI5oOz5riF5qWa5YaN6YCJ44CCIiwgInF1ZXN0aW9uIjogIuWTquenjeaooeW8j+iDveiuqSBVYnVudHUg55u05o6l5pq06Zyy5Zyo6L2m6Ze05Lqk5o2i5py65LiK77yM5oul5pyJ54us56uLIElQ77yM5YOP5LiA5Y+w54us56uL55qE54mp55CG5Li75py65LiA5qC36KKr5YW25LuW6K6+5aSH6K6/6Zeu77yfIiwgIm9wdGlvbnMiOiBbeyJ0ZXh0IjogIuahpeaOpeaooeW8jyAoQnJpZGdlZCnvvJpWTSDlgJ/nrJTorrDmnKzniannkIbnvZHljaHnm7TmjqXov57kuqTmjaLmnLrjgIJVYnVudHUg5ZKMIFdpbmRvd3Mg5ZCE5pyJ5LiA5Liq54us56uLIElQ77yM6L2m6Ze06K6+5aSH6IO955u05o6lIHBpbmcg6YCaIFVidW50deOAgumAgueUqOS6juiZmuaLn+acuumcgOimgeS9nOS4uueLrOeri+acjeWKoeWZqOWvueWkluaPkOS+m+acjeWKoeeahOWcuuaZr+OAgiIsICJjb3JyZWN0IjogdHJ1ZSwgImhpbnQiOiAi5qGl5o6l5bCx5piv57uZ6Jma5ouf5py65Zyo5Lqk5o2i5py65LiK5YiG6YWN54us56uL5Zyw5Z2A77yM5ZKM5YW25LuW6K6+5aSH5Zyw5L2N5bmz562JIn0sIHsidGV4dCI6ICJOQVQg5qih5byP77ya5a6/5Li75py65YWF5b2T6Lev55Sx5Zmo5YGa572R57uc5Zyw5Z2A6L2s5o2i44CCVWJ1bnR1IOiDvemAmui/hyBXaW5kb3dzIOS4iue9keOAgeS4i+i9vei9r+S7tuWMhe+8jOS9huWklumDqOaJgOacieiuvuWkh+WPquiDveeci+WIsCBXaW5kb3dzIOeahCBJUOKAlOKAlOi9pumXtOmHjOeahCBQTEMg5rKh5Yqe5rOV5Li75Yqo5om+5YiwIFVidW50deOAgumAgueUqOS6juWPqumcgOimgeiZmuaLn+acuuiHquW3seS4iue9keOAgeS4jeWvueWkluaPkOS+m+acjeWKoeeahOWcuuaZr+OAgiIsICJjb3JyZWN0IjogZmFsc2UsICJoaW50IjogIk5BVCDmmK/ourLlnKjlrr/kuLvmnLrlkI7pnaLkuIrnvZHvvIzog73lh7rljrvkvYblpJbkurrmib7kuI3liLDlroMifSwgeyJ0ZXh0IjogIuS7heS4u+acuuaooeW8j++8muWujOWFqOmalOemu++8jOWPquacieWuv+S4u+acuiBXaW5kb3dzIOiDveWSjCBVYnVudHUg55u45LqS6YCa5L+h77yM5aSW55WM572R57uc5LiA5qaC5LiN6YCa44CC6YCC55So5LqO5pys5Zyw5byA5Y+R5rWL6K+V44CB5LiN6ZyA6KaB6IGU572R55qE5rKZ566x546v5aKD44CCIiwgImNvcnJlY3QiOiBmYWxzZSwgImhpbnQiOiAi5LuF5Li75py65qih5byP5LiLIFVidW50dSDlkozovabpl7TlrozlhajpmpTnprvvvIzpmaTkuobkvaDosIHpg73ov57kuI3kuIoifV19LCB7InRpdGxlIjogIumAieaLqeWuieijheaooeW8jyIsICJuYXJyYXRpdmUiOiAi572R57uc6LCD5aW95LqG77yMVWJ1bnR1IOWuieijheWIsOS4gOWNiuW8ueWHuuS4gOS4qumAiemhueKAlOKAlOijheS4jeijheahjOmdoiBHVUnvvJ/ljoLplb/or7TvvJrov5nmmK/kvZzkuLrmnI3liqHlmajot5Hkuqfnur/nm5HmjqfnmoTkvaDopoHmg7PmuIXmpZrnmoTjgILliKvoo4Xlm77lvaLnlYzpnaLvvIznu4Tku7botorlpJrmvI/mtJ7otorlpJrvvIzlhoXlrZjlvIDplIDov5jnv7vlgI3jgILkvaDor7TkvaDpgInlk6rnp43vvJ8iLCAicXVlc3Rpb24iOiAi5L2c5Li65LiA5Y+wIDd4MjQg5bCP5pe26LeR5Lqn57q/55uR5o6n55qE5pyN5Yqh5Zmo77yM6K+l6YCJ5ZOq56eN5a6J6KOF5qih5byP77yfIiwgIm9wdGlvbnMiOiBbeyJ0ZXh0IjogIlVidW50dSBTZXJ2ZXIgKG1pbmltaXplZCnigJTigJTku4Xlronoo4Xlkb3ku6TooYznjq/looPlkozln7rnoYDns7vnu5/lt6XlhbfvvIzkuI3ljIXlkKvmoYzpnaLjgIHmtY/op4jlmajjgIHlip7lhazova/ku7bjgILlhoXlrZjljaDnlKjnuqYgMjU2TUIg6LW35q2l77yM5peg5Zu+5b2i55WM6Z2i5oSP5ZGz552A5pu05bCR55qE6L2v5Lu25YyF44CB5pu05bCR55qE5ryP5rSe5YWl5Y+j44CB5pu05L2O55qEIENQVSDotJ/mi4XjgILmnI3liqHlmajnmoTkuLvmtYHpgInmi6njgIIiLCAiY29ycmVjdCI6IHRydWUsICJoaW50IjogIuacjeWKoeWZqOS4jemcgOimgeahjOmdou+8jOWwkeS4gOS4que7hOS7tuWwseWwkeS4gOS4quaUu+WHu+mdoiJ9LCB7InRleHQiOiAiVWJ1bnR1IFNlcnZlciB3aXRoIEdVSeKAlOKAlOW4piBHTk9NRSDmoYzpnaLnjq/looPvvIzmnInnqpflj6PnrqHnkIblmajjgIHmlofku7bmtY/op4jlmajjgIHnu4jnq6/mqKHmi5/lmajnrYnjgILnlKjmiLfkvZPpqozmjqXov5EgV2luZG93cyDmoYzpnaLniYjvvIzlhoXlrZjljaDnlKjnuqYgMUdCIOi1t+atpeOAgumineWkluWuieijheS6huaVsOeZvuS4quWbvuW9ouagiOi9r+S7tuWMhe+8jOWinuWKoOezu+e7n+WkjeadguW6puWSjOWuieWFqOmjjumZqe+8jOmAguWQiOacrOWcsOahjOmdouaTjeS9nOWcuuaZr++8iOW8gOWPkeacuuOAgeaVmeWtpueOr+Wig++8ie+8jOS4jemAguWQiOW3peS4muacjeWKoeWZqOOAgiIsICJjb3JyZWN0IjogZmFsc2UsICJoaW50IjogIuWbvuW9oueVjOmdoue7meacjeWKoeWZqOWinuWKoOS6huS4jeW/heimgeeahOi1hOa6kOi0n+aLheWSjOWuieWFqOmjjumZqSJ9XX0sIHsidGl0bGUiOiAi6aaW5qyh5pu05paw57O757ufIiwgIm5hcnJhdGl2ZSI6ICLns7vnu5/oo4Xlpb3kuobvvIzph43lkK/nmbvlvZXvvIzpu5HlupXnmb3lrZfnmoTnu4jnq6/nrYnnnYDkvaDjgILljoLplb/or7TvvJrnrKzkuIDku7bkuovkuI3mmK/lvIDlt6XigJTigJTlhYjmiorns7vnu5/ova/ku7bljIXljYfliLDmnIDmlrDniYjjgILnnIvov5nmnaHlkb3ku6TvvIzmi4blvIDorrLvvJpgYXB0YCA9IFVidW50dSDnmoTljIXnrqHnkIblt6XlhbfvvIjoo4Uv5Y24L+WNh+e6p+i9r+S7tuWFqOmdoOWug++8ie+8m2B1cGRhdGVgID0g6Iux5paH44CM5pu05paw44CN77yM6L+Z6YeM5piv5oqK5pys5py655qE6L2v5Lu25YyF5YiX6KGo5ouJ5oiQ5pyA5paw77yI5rOo5oSP77yadXBkYXRlIOabtOaWsOeahOaYr+OAjOWIl+ihqOOAje+8jOS4jeaYr+i9r+S7tuacrOi6q++8ie+8m2B1cGdyYWRlYCA9IOiLseaWh+OAjOWNh+e6p+OAje+8jOaKiuW3suijheeahOi9r+S7tuWMheWNh+WIsOacgOaWsOeJiO+8m2AmJmAgPSDjgIzogIzkuJQv5o6l552A44CN55qE5oSP5oCd77yM5YmN6Z2i5oiQ5Yqf5omN5omn6KGM5ZCO6Z2i44CC5omA5Lul5pW05p2hID0g5YWI5pu05paw5YyF5YiX6KGo77yM5YaN5Y2H57qn6L2v5Lu25YyF44CC54Wn552A5oiR5LiL6Z2i5YaZ55qE5pWy77yM5pWy5a6M5oyJ5Zue6L2m77yaYXB0IHVwZGF0ZSAmJiBhcHQgdXBncmFkZSIsICJxdWVzdGlvbiI6ICLlnKjnu4jnq6/kuK3nhafnnYDovpPlhaXlkb3ku6TvvIznhLblkI7mjInlm57ovabvvJoiLCAiaW5wdXRUeXBlIjogImNvbW1hbmQiLCAiY29ycmVjdENvbW1hbmQiOiAiYXB0IHVwZGF0ZSAmJiBhcHQgdXBncmFkZSIsICJhbGlhc2VzIjogWyJhcHQtZ2V0IHVwZGF0ZSAmJiBhcHQtZ2V0IHVwZ3JhZGUiLCAic3VkbyBhcHQgdXBkYXRlICYmIHN1ZG8gYXB0IHVwZ3JhZGUiLCAic3VkbyBhcHQtZ2V0IHVwZGF0ZSAmJiBzdWRvIGFwdC1nZXQgdXBncmFkZSJdLCAiZXJyb3JIaW50IjogIueUqCBhcHQg5pu05paw6L2v5Lu25YyF5YiX6KGo5bm25Y2H57qn77yI5YWIIHVwZGF0ZSDlho0gdXBncmFkZe+8iSIsICJvdXRwdXRMaW5lcyI6IFt7InRleHQiOiAiSGl0OjEgaHR0cDovL2FyY2hpdmUudWJ1bnR1LmNvbS91YnVudHUgbm9ibGUgSW5SZWxlYXNlIiwgImNvbG9yIjogIiIsICJkZWxheSI6IDI1MH0sIHsidGV4dCI6ICJHZXQ6MiBodHRwOi8vYXJjaGl2ZS51YnVudHUuY29tL3VidW50dSBub2JsZS11cGRhdGVzIEluUmVsZWFzZSBbMTI2IGtCXSIsICJjb2xvciI6ICIiLCAiZGVsYXkiOiAyNTB9LCB7InRleHQiOiAiUmVhZGluZyBwYWNrYWdlIGxpc3RzLi4uIERvbmUiLCAiY29sb3IiOiAiZ3JlZW4iLCAiZGVsYXkiOiA0MDB9LCB7InRleHQiOiAi5Y6C6ZW/77yadXBkYXRlIOaJp+ihjOWujOKAlOKAlFJlYWRpbmc95q2j5Zyo6K+75Y+W44CBRG9uZT3lrozmiJDvvJtHZXQvSGl0IOmDveaYr+OAjOiOt+WPluOAjeOAgueOsOWcqOi9r+S7tuWMheWIl+ihqOW3suaYr+acgOaWsOOAgiIsICJjb2xvciI6ICJhbWJlciIsICJkZWxheSI6IDQwMH0sIHsidGV4dCI6ICIkIGFwdCB1cGdyYWRlIiwgImNvbG9yIjogImN5YW4iLCAiZGVsYXkiOiAyMDB9LCB7InRleHQiOiAiUmVhZGluZyBwYWNrYWdlIGxpc3RzLi4uIERvbmUiLCAiY29sb3IiOiAiZ3JlZW4iLCAiZGVsYXkiOiAzMDB9LCB7InRleHQiOiAiQnVpbGRpbmcgZGVwZW5kZW5jeSB0cmVlLi4uIERvbmUiLCAiY29sb3IiOiAiZ3JlZW4iLCAiZGVsYXkiOiAzMDB9LCB7InRleHQiOiAiVGhlIGZvbGxvd2luZyBwYWNrYWdlcyB3aWxsIGJlIHVwZ3JhZGVkOiIsICJjb2xvciI6ICIiLCAiZGVsYXkiOiAyNTB9LCB7InRleHQiOiAiICBvcGVuc3NoLXNlcnZlciBsaWJjNiBzeXN0ZW1kIGJhc2UtZmlsZXMiLCAiY29sb3IiOiAiIiwgImRlbGF5IjogMjUwfSwgeyJ0ZXh0IjogIk5lZWQgdG8gZ2V0IDEyLjMgTUIgb2YgYXJjaGl2ZXMuIiwgImNvbG9yIjogIiIsICJkZWxheSI6IDI1MH0sIHsidGV4dCI6ICJHZXQ6MSBvcGVuc3NoLXNlcnZlciBbMzgwIGtCXSIsICJjb2xvciI6ICIiLCAiZGVsYXkiOiAyNTB9LCB7InRleHQiOiAiRmV0Y2hlZCAxMi4zIE1CIGluIDVzICgyLjQ2IE1CL3MpIiwgImNvbG9yIjogIiIsICJkZWxheSI6IDMwMH0sIHsidGV4dCI6ICJTZXR0aW5nIHVwIG9wZW5zc2gtc2VydmVyIC4uLiBEb25lIiwgImNvbG9yIjogImdyZWVuIiwgImRlbGF5IjogMjUwfSwgeyJ0ZXh0IjogIuWOgumVv++8mnVwZ3JhZGUg5omn6KGM5a6M4oCU4oCUdXBncmFkZWQ96KKr5Y2H57qn44CBRmV0Y2hlZD3lt7LkuIvovb3jgIFTZXR0aW5nIHVwPeato+WcqOmFjee9ruOAgURvbmU95a6M5oiQ44CC6L+Z5Lqb6L2v5Lu25YyF77yIb3BlbnNzaC1zZXJ2ZXIg562J77yJ6YO95bey5Y2H5Yiw5pyA5paw54mI44CCIiwgImNvbG9yIjogImFtYmVyIiwgImRlbGF5IjogNDAwfV0sICJzdWNjZXNzVGV4dCI6ICLinIUg57O757uf6L2v5Lu25YyF5bey5YWo6YOo5pu05paw5bm25Y2H57qn5Yiw5pyA5paw54mI77yBIn1dfQ=="), function(c) {
+    return c.charCodeAt(0);
+  })));
+  var TASK_TITLE = "\u5B89\u88C5VMware + Ubuntu Server";
+  function boot() {
+    const container = document.getElementById("app");
+    const task = { id: window.currentTaskId, title: TASK_TITLE, type: "install_wizard", config: TASK_CONFIG };
+    const handler = getInteraction("install_wizard");
+    if (handler) handler.render(container, task);
+    else container.innerHTML = '<div style="color:var(--red)">\u4EFB\u52A1\u7C7B\u578B\u4E0D\u652F\u6301\uFF08\u79BB\u7EBF\u64AD\u653E\u5668\uFF09</div>';
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+
+</script></body></html>
