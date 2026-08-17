@@ -361,6 +361,12 @@ function createSession(role, name) {
   return token;
 }
 
+// 单点登录：同一账号（学生）重新登录时，作废其所有旧会话（旧 token 立即失效）
+function invalidateStudentSessions(name) {
+  exec("DELETE FROM sessions WHERE role='student' AND name=?", [name]);
+  save();
+}
+
 function validateSession(token) {
   return queryOne("SELECT role, name FROM sessions WHERE token = ? AND expires_at > datetime('now')", [token]);
 }
@@ -378,7 +384,7 @@ module.exports = {
   init, save,
   findStudent, createStudent, deleteStudent, listStudents,
   updateStudentData, updateStudentStars, updateStudentMeta, updateStudentPassword, resetStudent,
-  getTeacherPassword, createSession, validateSession, cleanupExpiredSessions,
+  getTeacherPassword, createSession, validateSession, cleanupExpiredSessions, invalidateStudentSessions,
   DEFAULT_PASSWORD, isDefaultPassword, hashPassword, verifyPassword, isHashed,
   recordLogin, incrementLoginCount, awardAchievements, awardTeacherAchievements, markLoginAchNotified,
   addBugReport, listBugReports, deleteBugReport,

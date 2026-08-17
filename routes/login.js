@@ -35,6 +35,7 @@ router.post('/login', (req, res) => {
   }
 
   db.incrementLoginCount(trimmed);
+  db.invalidateStudentSessions(trimmed);   // 单点登录：同一账号旧会话作废
   const token = db.createSession('student', trimmed);
   res.json({
     ok: true, role: 'student', token,
