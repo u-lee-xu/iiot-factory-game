@@ -13,7 +13,15 @@ export const COMMAND_ZH = {
   '-m':'协议(如tcp)','-r':'起始地址','-1':'只读一次','node-red':'Node-RED启动','sudo':'管理员权限','ping':'测连通',
   'pwd':'当前目录','route':'路由表','add':'添加','default':'默认','via':'经由(网关)','show':'显示','list':'列出',
   'rm':'删除','mkdir':'创建目录','cd':'切换目录','cat':'查看文件','echo':'输出文本','bash':'执行脚本','chmod':'改权限',
-  'nslookup':'查域名IP','-a':'显示全部/隐藏文件','-p':'参数(随命令:协议/端口/进程)','--help':'帮助','-h':'帮助'
+  'nslookup':'查域名IP','-a':'显示全部/隐藏文件','-p':'参数(随命令:协议/端口/进程)','--help':'帮助','-h':'帮助',
+  // 端口/网络工具与补充词条
+  'nc':'netcat·端口测试工具','netcat':'nc全称·端口测试','-zv':'-z只扫+-v显示结果','-z':'只扫不传数据','-v':'显示结果',
+  'docker':'容器工具','run':'运行容器','ps':'查看进程','head':'看开头几行','wc':'统计','uname':'查看系统信息','hostname':'查看主机名',
+  'pip':'Python包管理器','-c':'次数/数量','-d':'指定内容/设备','-s':'大小或静默','-E':'保留$不解析','-I':'只看响应头','-X':'指定请求方法','--version':'查看版本',
+  '-tln':'-t TCP -l监听 -n数字','-tlnp':'-tln+进程','INPUT':'入站链','OUTPUT':'出站链','FORWARD':'转发链','tcp':'TCP协议',
+  'mosquitto':'MQTT消息服务器','mosquitto_pub':'MQTT发布','mosquitto_sub':'MQTT订阅','mosquitto-clients':'MQTT工具包',
+  'ssh-copy-id':'把公钥复制到服务器','ssh-keygen':'生成SSH密钥','openssh-server':'SSH服务端软件包','sshd':'SSH服务',
+  'localhost':'本机','openplc':'OpenPLC服务','edge-service':'边缘服务','nodered':'Node-RED','node':'Node.js运行时'
 };
 
 export function cmdAnnotate(cmd){
