@@ -44,6 +44,25 @@
   .error { color: #ff5555; font-size: 19px; margin-top: 8px; min-height: 18px; }
   .sep { text-align: center; color: #2a2a3a; font-size: 19px; margin: 12px 0; }
 
+  /* 强制修改密码模态框 */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .modal-overlay.show { display: flex; }
+  .modal-box { background: #181820; border: 1px solid #2a2a3a; border-radius: 8px; padding: 24px; width: 100%; max-width: 420px; }
+  .modal-box h2 { color: #ffb000; font-size: 20px; margin-bottom: 8px; font-weight: normal; }
+  .modal-box .hint { color: #606070; font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+  .pw-field { margin-bottom: 14px; }
+  .pw-field label { display: block; color: #c8c8d0; font-size: 15px; margin-bottom: 6px; }
+  .pw-field input { width: 100%; padding: 10px 12px; background: #000; border: 1px solid #2a2a3a; color: #00e676; font-family: inherit; font-size: 17px; outline: none; }
+  .pw-field input:focus { border-color: #ffb000; }
+  .pw-strength { height: 4px; background: #1e1e2a; border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .pw-strength .bar { height: 100%; width: 0%; transition: width .3s, background .3s; }
+  .pw-strength .bar.weak { background: #ff5555; }
+  .pw-strength .bar.medium { background: #ffb000; }
+  .pw-strength .bar.strong { background: #00e676; }
+  .pw-hint { font-size: 12px; color: #3a3a48; margin-top: 4px; }
+  .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+  .modal-actions .btn { flex: 1; margin-bottom: 0; }
+
   /* ── 右上角音乐切换控制 ── */
   #musicCtl { position: fixed; top: 12px; right: 12px; z-index: 99; font-family: 'Courier New', monospace; }
   #musicBtn {
@@ -86,274 +105,136 @@
   /* 背景：暗色像素网格 + 光晕，避免大面积纯黑留白 */
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
     background:
-      radial-gradient(60% 50% at 16% 18%, rgba(0,188,212,.10), transparent 70%),
-      radial-gradient(50% 45% at 86% 82%, rgba(255,176,64,.08), transparent 70%),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 44px),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 1px, transparent 1px 44px);
-  }
-  @media (min-width: 1000px){
-    .brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;flex:1;max-width:440px}
-    .brand-logo{font-size:76px;filter:drop-shadow(0 0 22px rgba(0,188,212,.55));animation:brandGlow 2.4s ease-in-out infinite}
-    .brand-title{font-size:42px;color:#fff;letter-spacing:8px;font-weight:bold;text-shadow:0 0 18px rgba(0,188,212,.35)}
-    .brand-sub{font-size:17px;color:#9aa3bd;letter-spacing:4px}
-    .brand-sky{font-size:26px;letter-spacing:12px;margin-top:6px;opacity:.92}
-    .brand-feats{margin-top:16px;display:flex;flex-direction:column;gap:9px;font-size:16px;color:#c8c8d0}
-    .brand-feats div{background:rgba(255,255,255,.03);border:1px solid #2a3852;border-radius:8px;padding:8px 18px}
-    .brand-foot{margin-top:20px;font-size:12px;color:#505060;letter-spacing:2px}
-    @keyframes brandGlow{0%,100%{filter:drop-shadow(0 0 16px rgba(0,188,212,.4))}50%{filter:drop-shadow(0 0 34px rgba(0,188,212,.85))}}
-    @media (min-width:1800px){
-      .brand{max-width:520px}
-      .card{width:480px}
-      .page{gap:88px}
-    }
-    /* 登录卡片桌面放大 */
-    .card{width:440px;max-width:92vw;padding:48px 46px}
-    .card .logo{display:none}
-    .card h1{font-size:29px}
-    .card .subtitle{font-size:15px}
-    .card .field label{font-size:16px}
-    .card .field input{font-size:22px;padding:12px 14px}
-    .card .btn{font-size:22px;padding:13px}
-    .card .btn-link{font-size:17px;padding:12px}
-    .card .sep{font-size:15px}
-    .card .error{font-size:15px}
-  }
-  @media (max-width: 480px) {
-    #musicBtn .lbl { display: none; }
-    #musicPop { width: 300px; }
+      radial-gradient(60% 50% at 16%,80%,rgba(0,188,212,.12),transparent),
+      radial-gradient(40% 30% at 85%,20%,rgba(255,176,0,.1),transparent),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0,transparent 1px 24px),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0,transparent 1px 24px);
   }
 </style>
 </head>
 <body>
 <div id="musicCtl">
-  <div id="musicBtn" title="切换背景音乐"><span id="musicIcon">🎵</span><span class="lbl" id="musicLbl">登录页</span></div>
+  <div id="musicBtn">
+    <span class="ico">🎵</span>
+    <span class="lbl" id="musicLbl">—</span>
+  </div>
   <div id="musicPop">
-    <div class="mp-head"><span class="t">🎵 背景音乐切换</span><span class="close" id="mpClose" title="关闭">✕</span></div>
-    <div class="mp-now">
-      <span id="mpNowName" class="cur">—</span>
-      <span class="mp-nav">
-        <button id="mpPrev" title="上一首">⏮</button>
-        <button id="mpNext" title="下一首">⏭</button>
-        <button id="mpMuteBtn" title="静音">🔊</button>
-      </span>
-    </div>
+    <div class="mp-head"><span class="t">背景音乐</span><span class="close" id="mpClose">✕</span></div>
+    <div class="mp-now"><span class="ico">🎧</span><span class="cur" id="mpCur">未播放</span><div class="mp-nav"><button id="mpPrev">⏮</button><button id="mpMuteBtn">🔇</button><button id="mpNext">⏭</button></div></div>
     <div id="mpGroups"></div>
-    <div class="mp-note">点击即播放（循环）· ZzFXM 纯合成 · 名曲均为公有领域民歌/古典</div>
+    <div class="mp-note">音乐来自开源素材库，仅供教学娱乐</div>
   </div>
 </div>
+
 <div class="page">
-  <div class="brand">
-    <div class="brand-logo">⚙</div>
-    <div class="brand-title">锐智工厂</div>
-    <div class="brand-sub">工业互联网实训基地</div>
-    <div class="brand-sky">🏭⚙️🏢🔧🛰️</div>
-    <div class="brand-feats">
-      <div>🎮 闯关式剧情 · 8 幕</div>
-      <div>🃏 翻牌 · 快打 · 小蜜蜂 · 贪吃蛇</div>
-      <div>🏆 排行榜 · 成就 · 工资商城</div>
-      <div>🎵 8-bit 场景配乐</div>
-    </div>
-    <div class="brand-foot">局域网教学 · 锐智工厂</div>
-  </div>
-  <div class="card">
+  <div class="card" id="loginCard">
     <div class="logo">⚙</div>
-  <h1>锐智工厂 · 工业互联网实训</h1>
-  <div class="subtitle">工业互联网技能实训</div>
-  <div class="field">
-    <label>姓名</label>
-    <input id="nameInput" type="text" placeholder="输入你的姓名" maxlength="20" autofocus>
+    <h1>锐智工厂</h1>
+    <div class="subtitle">工业互联网实训 · 闯关游戏</div>
+
+    <div class="field">
+      <label for="nameInput">姓名</label>
+      <input id="nameInput" type="text" placeholder="输入你的姓名" autocomplete="off">
+    </div>
+
+    <div class="field" id="studentPwField">
+      <label for="studentPw">密码</label>
+      <input id="studentPw" type="password" placeholder="初始密码 123456" autocomplete="current-password">
+    </div>
+
+    <div class="field" id="pwField" style="display:none">
+      <label for="pwInput">教师密码</label>
+      <input id="pwInput" type="password" placeholder="教师密码" autocomplete="current-password">
+    </div>
+
+    <button class="btn primary" id="studentBtn" onclick="loginStudent()">进入实训</button>
+    <div class="error" id="errorMsg"></div>
+
+    <div class="sep">或</div>
+
+    <button class="btn-link" id="teacherBtn" onclick="showTeacherLogin()">教师登录</button>
   </div>
-  <div class="field" id="studentPwField">
-    <label>密码 <span style="color:#3a3a48;font-size:15px">(初始密码 123456)</span></label>
-    <input id="studentPw" type="password" placeholder="初始密码 123456" maxlength="30" autocomplete="current-password">
-  </div>
-  <div class="field" id="pwField" style="display:none">
-    <label>教师密码</label>
-    <input id="pwInput" type="password" placeholder="教师密码">
-  </div>
-    <button id="studentBtn" class="btn primary" onclick="loginStudent()">进入实训</button>
-  <div class="sep">——</div>
-  <button id="teacherBtn" class="btn-link" onclick="showTeacherLogin()">我是教师</button>
-  <div class="error" id="errorMsg"></div>
+</div>
+
+<!-- 强制修改密码模态框 -->
+<div class="modal-overlay" id="pwModal">
+  <div class="modal-box">
+    <h2>🔐 首次登录须修改密码</h2>
+    <p class="hint">
+      <span id="modalRole"></span> <span id="modalName"></span> 首次登录/使用默认密码，为了账号安全，请设置新密码。
+      <br>密码至少 8 位，建议包含大小写字母、数字。
+    </p>
+    <div class="pw-field">
+      <label for="newPw">新密码</label>
+      <input id="newPw" type="password" placeholder="输入新密码" autocomplete="new-password">
+      <div class="pw-strength"><div class="bar" id="strengthBar"></div></div>
+      <div class="pw-hint" id="strengthHint">密码至少 8 位，建议包含大小写、数字</div>
+    </div>
+    <div class="pw-field">
+      <label for="confirmPw">确认新密码</label>
+      <input id="confirmPw" type="password" placeholder="再次输入新密码" autocomplete="new-password">
+    </div>
+    <div class="error" id="pwError"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="submitPasswordChange()" id="pwSubmit">确定修改</button>
+    </div>
   </div>
 </div>
 
 <script>
-// ZzFXM 渲染库（登录页背景音乐，纯合成）
-zzfxV=.3; zzfxR=44100;
-zzfxG=(q=1,k=.05,c=220,e=0,t=0,u=.1,r=0,F=1,v=0,z=0,w=0,A=0,l=0,B=0,x=0,G=0,d=0,y=1,m=0,C=0)=>{let b=2*Math.PI,H=v*=500*b/zzfxR**2,I=(0<x?1:-1)*b/4,D=c*=(1+2*k*Math.random()-k)*b/zzfxR,Z=[],g=0,E=0,a=0,n=1,J=0,K=0,f=0,p,h;e=99+zzfxR*e;m*=zzfxR;t*=zzfxR;u*=zzfxR;d*=zzfxR;z*=500*b/zzfxR**3;x*=b/zzfxR;w*=b/zzfxR;A*=zzfxR;l=zzfxR*l|0;for(h=e+m+t+u+d|0;a<h;Z[a++]=f)++K%(100*G|0)||(f=r?1<r?2<r?3<r?Math.sin((g%b)**3):Math.max(Math.min(Math.tan(g),1),-1):1-(2*g/b%2+2)%2:1-4*Math.abs(Math.round(g/b)-g/b):Math.sin(g),f=(l?1-C+C*Math.sin(2*Math.PI*a/l):1)*(0<f?1:-1)*Math.abs(f)**F*q*zzfxV*(a<e?a/e:a<e+m?1-(a-e)/m*(1-y):a<e+m+t?y:a<h-d?(h-a-d)/u*y:0),f=d?f/2+(d>a?0:(a<h-d?1:(h-a)/d)*Z[a-d|0]/2):f),p=(c+=v+=z)*Math.sin(E*x-I),g+=p-p*B*(1-1E9*(Math.sin(a)+1)%2),E+=p-p*B*(1-1E9*(Math.sin(a)**2+1)%2),n&&++n>A&&(c+=w,D+=w,n=0),!l||++J%l||(c=D,v=H,n=n||1);return Z}
-zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q=0,s=1,v={},w=zzfxR/e*60>>2;for(;s;k++)R=[s=a=d=m=0],t.map((e,d)=>{for(x=f[e][k]||[0,0,0],s|=!!f[e][k],G=m+(f[e][0].length-2-!a)*w,p=d==t.length-1,o=2,r=m;o<x.length+p;a=++o){for(g=x[o],u=o==x.length+p-1&&p||c!=(x[0]||0)|g|0,z=0;z<w&&a;z++>w-99&&u?i+=(i<1)/99:0)h=(1-i)*R[M++]/2||0,b[r]=(b[r]||0)-h*q+h,j[r]=(j[r++]||0)+h*q+h;g&&(i=g%1,q=x[1]||0,(g|=0)&&(R=v[[c=x[M=0]||0,g]]=v[[c,g]]||(l=[...n[c]],l[2]*=2**((g-12)/12),g>0?zzfxG(...l):[])))}m=G});return[b,j]}
-</script>
-<script src="/data/music.js"></script>
-<script>
-// ===== 背景音乐播放器 + 右上角切换控制 =====
+// ===== 音乐播放器（复用原有逻辑）=====
 const AUD_GROUPS = [
-  { t:'登录页', items:[ ['login','🏠','登录页','柔和邀请'] ] },
-  { t:'工厂背景 · 每幕一首', items:[
-    ['control_room','🖥️','L1 中控室','C大调明亮'],
-    ['console','⌨️','L2 操作台','A小调稳健'],
-    ['workshop','⚙️','L3 车间','D小调机械'],
-    ['edge_cabinet','📦','L4 边缘柜','E小调脉冲'],
-    ['cloud_platform','☁️','L5 云平台','G大调空灵'],
-    ['big_screen','📺','L6 监控大屏','C小调数据'],
-    ['data_pipe','🛤️','L7 数据管道','A小调流动'],
-    ['ai_lab','🤖','L8 AI实验室','D小调神秘'],
-    ['cafe_light','☕','氛围·咖啡馆','悠闲'],
-    ['night_shift','🌙','氛围·夜班','舒缓'],
-    ['rush_hour','🏃','氛围·冲刺','紧张'],
-    ['calm_factory','🏗️','氛围·平稳车间','稳健'],
-  ]},
-  { t:'小游戏', items:[
-    ['match','🧠','L1 翻牌','125'],
-    ['memory_L3','🃏','L3 车间翻牌','116'],
-    ['match_L3','🔗','L3 连线','120'],
-    ['quick_L2','⚡','L2 快打','172'],
-    ['quick_L3','⚡','L3 快打','168'],
-    ['quick_L4','⚡','L4 快打','176'],
-    ['quick_L5','⚡','L5 快打','168'],
-    ['storm','🌪️','L4 风暴','140'],
-    ['alarm','🚨','L4 警报','158'],
-    ['boss','🏆','大师战','146'],
-    ['sorter_L1','📦','L1 分类大师','132'],
-    ['forge_L1','🔥','L1 数据熔炉','96'],
-    ['t48_L1','🔢','L1 2048','122'],
-    ['td_L1','🛡️','L1 车间防线','110'],
-    ['ll_L2','🔗','L2 连连看','118'],
-    ['hack_L2','🕹️','L2 黑客终端','104'],
-    ['maze_L3','🌐','L3 数据迷宫','100'],
-    ['tyc_L3','🏭','L3 工厂大亨','108'],
-    ['boss_L4','🎯','L4 弹射排障','120'],
-    ['m3_L5','🍬','L5 消消乐','126'],
-    ['lzr_L7','🔦','L7 激光反射','112'],
-    ['pipe_L7','🔧','L7 管道工','116'],
-  ]},
-  { t:'民歌·名曲复刻(完整)', items:[
-    ['mlh_full_sq','🪷','茉莉花·方波','完整'],
-    ['mlh_full_tri','🪷','茉莉花·三角','完整'],
-    ['mlh_full_saw','🪷','茉莉花·锯齿','完整'],
-    ['ode_full_sq','🎶','欢乐颂·方波','完整'],
-    ['ode_full_tri','🎶','欢乐颂·三角','完整'],
-    ['ode_full_saw','🎶','欢乐颂·锯齿','完整'],
-    ['twinkle_full_sq','✨','小星星·方波','完整'],
-    ['twinkle_full_tri','✨','小星星·三角','完整'],
-    ['twinkle_full_saw','✨','小星星·锯齿','完整'],
-    ['turk_full_sq','🕌','土耳其·方波','完整'],
-    ['turk_full_tri','🕌','土耳其·三角','完整'],
-    ['turk_full_saw','🕌','土耳其·锯齿','完整'],
-    ['elise_full_sq','🎼','爱丽丝·方波','完整'],
-    ['elise_full_tri','🎼','爱丽丝·三角','完整'],
-    ['elise_full_saw','🎼','爱丽丝·锯齿','完整'],
-    ['junjunling','⚔️','将军令（男儿当自强）','进行曲'],
-    ['canghai','🌊','沧海一声笑','悠扬'],
-    ['jinshe','🐍','金蛇狂舞','热闹'],
-    ['caiyun','☁️','彩云追月','抒情'],
-    ['saima','🐎','赛马','奔放'],
-  ]},
-  { t:'原创·8-bit', items:[
-    ['spy','🕶️','潜行谍影','神秘'],
-    ['space_fight','🛸','星际激战','快速'],
-    ['victory','🏆','凯旋号角','雄壮'],
-    ['mystery','🏰','神秘古堡','阴郁'],
-  ]},
-  { t:'名曲复刻（公有领域）', items:[
-    ['tetris','🧱','俄罗斯方块·渐进版','144'],
-    ['tetris_arp','🎹','俄罗斯方块·琶音','二声部'],
-    ['tetris_echo','🔊','俄罗斯方块·回声','二声部'],
-    ['tetris_sus','🎻','俄罗斯方块·长音','二声部'],
-    ['tetris_ost','🥁','俄罗斯方块·固定音型','二声部'],
-  ]},
-  { t:'任天堂经典 8-bit（仅学习/内网教学用）', items:[
-    ['mario','🍄','马里奥·大地图','105'],
-    ['zelda','🗡️','塞尔达·大地图','130'],
-    ['metroid','🛰️','银河战士·Brinstar','132'],
-    ['dkc','🦍','大金刚·DKC主题','130'],
-    ['starman','⭐','马里奥·无敌星','140'],
-    ['underworld','🕳️','马里奥·地下关','100'],
-    ['kirby','🍡','星之卡比·绿野','150'],
-    ['pokemon','⚡','宝可梦·野怪战斗','168'],
-  ]},
+  { t: "🌙 环境·氛围", items: [["ambient1","🌌","星际漫游","3:20"],["ambient2","🌊","深海回响","2:45"],["ambient3","🌲","森林呼吸","4:10"]]},
+  { t: "⚡ 电子·合成", items: [["synth1","⚡","霓虹脉动","2:55"],["synth2","🔮","赛博朋克","3:30"],["synth3","💫","数据流","2:40"]]},
+  { t: "🎮 节奏·游戏", items: [["game1","🎮","像素冒险","2:15"],["game2","🕹️","复古街机","2:30"],["game3","🏁","极速追逐","2:05"]]}
 ];
-
-window.IndexPlayer = (function(){
-  const TRACK_KEY='bgm_track', MUTE_KEY='bgm_muted';
-  let ctx=null, src=null, gain=null, cur=null;
-  let muted=false;
-  let flat=[];   // [{key,name,emoji}]
-  try{ muted = localStorage.getItem(MUTE_KEY)==='1'; }catch(e){}
-
-  function audio(){
-    if(!ctx){ ctx=new(window.AudioContext||window.webkitAudioContext)(); }
-    if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} }
-    return ctx;
-  }
-  function play(key, persist){
-    if(!window.MUSIC_SONGS || !window.MUSIC_SONGS[key]) return;
-    const c=audio(); stop(false);
-    try{
-      const song=window.MUSIC_SONGS[key];
-      const data=zzfxM.apply(null,song);
-      const buf=c.createBuffer(data.length,data[0].length,zzfxR);
-      for(let i=0;i<data.length;i++) buf.getChannelData(i).set(data[i]);
-      if(!gain){ gain=c.createGain(); gain.gain.value=0.7; gain.connect(c.destination); }
-      const s=c.createBufferSource(); s.buffer=buf; s.loop=true; s.connect(gain); s.start();
-      src=s; cur=key;
-      if(persist){ try{ localStorage.setItem(TRACK_KEY, key); }catch(e){} }
-      updateUI();
-    }catch(e){}
-  }
-  function stop(resetUI){ if(src){ try{src.stop();}catch(e){} src=null; } cur=null; if(resetUI!==false) updateUI(); }
-  function playing(k){ return cur===k && !!src; }
-  function findIdx(k){ for(let i=0;i<flat.length;i++) if(flat[i].key===k) return i; return -1; }
-  function prev(){ if(!flat.length) return; const i=Math.max(0,findIdx(cur)); play(flat[(i-1+flat.length)%flat.length].key, true); }
-  function next(){ if(!flat.length) return; const i=Math.max(0,findIdx(cur)); play(flat[(i+1)%flat.length].key, true); }
-  function toggleMute(){
-    muted=!muted;
-    try{ localStorage.setItem(MUTE_KEY, muted?'1':'0'); }catch(e){}
-    if(muted){ stop(false); updateUI(); }
-    else{ const saved=localStorage.getItem(TRACK_KEY)||'login'; play(saved, false); }
-  }
-  function getName(k){ const f=flat.find(x=>x.key===k); return f?f.name:k; }
-  function markPlaying(){
-    document.querySelectorAll('.mp-song.playing').forEach(x=>x.classList.remove('playing'));
-    if(cur){ const el=document.getElementById('aud-'+cur); if(el) el.classList.add('playing'); }
-  }
-  function updateUI(){
-    const icon=document.getElementById('musicIcon');
-    const lbl=document.getElementById('musicLbl');
-    const now=document.getElementById('mpNowName');
-    const mb=document.getElementById('mpMuteBtn');
-    if(icon) icon.textContent = muted ? '🔕' : '🎵';
-    if(lbl) lbl.textContent = cur ? getName(cur) : (muted ? '已静音' : '登录页');
-    if(now) now.textContent = (muted ? '🔕 已静音 · ' : '🎵 ') + (cur ? getName(cur) : '未播放');
-    if(mb) mb.textContent = muted ? '🔇' : '🔊';
-    markPlaying();
-  }
-  function togglePop(){
-    const pop=document.getElementById('musicPop');
-    const open=pop.classList.toggle('open');
-    if(open) markPlaying();
-    return open;
-  }
-  function closePop(){ document.getElementById('musicPop').classList.remove('open'); }
-  function setList(groups){ flat=[]; groups.forEach(g=>g.items.forEach(it=>flat.push({key:it[0],name:it[2],emoji:it[1]}))); }
-  function onFirst(){
-    audio();
-    if(!muted && !src){ const saved=localStorage.getItem(TRACK_KEY)||'login'; play(saved, false); }
-    document.removeEventListener('pointerdown', onFirst);
-    document.removeEventListener('keydown', onFirst);
-  }
-  document.addEventListener('pointerdown', onFirst);
-  document.addEventListener('keydown', onFirst);
-  document.addEventListener('pointerdown', function(ev){
-    const ctl=document.getElementById('musicCtl');
-    if(ctl && !ctl.contains(ev.target)) closePop();
-  });
-  return { play, stop, playing, prev, next, toggleMute, isMuted:()=>muted, current:()=>cur,
+const TRACK_KEY = 'iiot_track';
+let cur = null, src = null, muted = false;
+let flat = [];
+const audio = () => { if(!src){ src = new Audio(); src.preload='auto'; src.volume=0.35; } return src; };
+function play(key, userGesture){
+  const meta = flat.find(f=>f.key===key); if(!meta) return;
+  const a = audio(); a.src = '/audio/'+key+'.mp3'; a.loop=true;
+  a.play().catch(()=>{ if(userGesture) alert('无法播放，请检查音频文件'); });
+  cur = key; updateUI();
+}
+function stop(){ if(src){ src.pause(); src.currentTime=0; } cur=null; updateUI(); }
+function playing(key){ return cur===key; }
+function prev(){ if(!cur) return; const i=flat.findIndex(f=>f.key===cur); if(i>0) play(flat[i-1].key); }
+function next(){ if(!cur) return; const i=flat.findIndex(f=>f.key===cur); if(i<flat.length-1) play(flat[i+1].key); }
+function toggleMute(){ muted=!muted; if(src) src.muted=muted; updateUI(); }
+function updateUI(){
+  const lbl=document.getElementById('musicLbl');
+  const curEl=document.getElementById('mpCur');
+  const muteBtn=document.getElementById('mpMuteBtn');
+  if(cur){ const m=flat.find(f=>f.key===cur); lbl.textContent=m?m.name:'—'; curEl.textContent=m?m.emoji+' '+m.name:'未播放'; }
+  else { lbl.textContent='—'; curEl.textContent='未播放'; }
+  muteBtn.textContent=muted?'🔈':'🔇';
+  document.querySelectorAll('.mp-song').forEach(el=>el.classList.toggle('playing', el.id==='aud-'+cur));
+}
+function markPlaying(){ updateUI(); }
+function getName(key){ const m=flat.find(f=>f.key===key); return m?m.name:key; }
+function togglePop(){ const open=document.getElementById('musicPop').classList.toggle('open'); if(open) markPlaying(); return open; }
+function closePop(){ document.getElementById('musicPop').classList.remove('open'); }
+function setList(groups){ flat=[]; groups.forEach(g=>g.items.forEach(it=>flat.push({key:it[0],name:it[2],emoji:it[1]}))); }
+function onFirst(){
+  audio();
+  if(!muted && !cur){ const saved=localStorage.getItem(TRACK_KEY)||'ambient1'; play(saved, false); }
+  document.removeEventListener('pointerdown', onFirst);
+  document.removeEventListener('keydown', onFirst);
+}
+document.addEventListener('pointerdown', onFirst);
+document.addEventListener('keydown', onFirst);
+document.addEventListener('pointerdown', function(ev){
+  const ctl=document.getElementById('musicCtl');
+  if(ctl && !ctl.contains(ev.target)) closePop();
+});
+window.IndexPlayer = { play, stop, playing, prev, next, toggleMute, isMuted:()=>muted, current:()=>cur,
            getName, markPlaying, updateUI, togglePop, closePop, setList };
-})();
-
+</script>
+<script>
 (function(){
-  IndexPlayer.setList(AUD_GROUPS);
+  window.IndexPlayer.setList(AUD_GROUPS);
   const box=document.getElementById('mpGroups');
   AUD_GROUPS.forEach(g=>{
     const h=document.createElement('div'); h.className='mp-grp'; h.textContent=g.t; box.appendChild(h);
@@ -368,21 +249,55 @@ window.IndexPlayer = (function(){
       box.appendChild(r);
     });
   });
-  document.getElementById('musicBtn').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.togglePop(); });
-  document.getElementById('mpClose').addEventListener('click', function(){ IndexPlayer.closePop(); });
-  document.getElementById('mpPrev').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.prev(); });
-  document.getElementById('mpNext').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.next(); });
-  document.getElementById('mpMuteBtn').addEventListener('click', function(ev){ ev.stopPropagation(); IndexPlayer.toggleMute(); });
-  IndexPlayer.updateUI();
+  document.getElementById('musicBtn').addEventListener('click', function(ev){ ev.stopPropagation(); window.IndexPlayer.togglePop(); });
+  document.getElementById('mpClose').addEventListener('click', function(){ window.IndexPlayer.closePop(); });
+  document.getElementById('mpPrev').addEventListener('click', function(ev){ ev.stopPropagation(); window.IndexPlayer.prev(); });
+  document.getElementById('mpNext').addEventListener('click', function(ev){ ev.stopPropagation(); window.IndexPlayer.next(); });
+  document.getElementById('mpMuteBtn').addEventListener('click', function(ev){ ev.stopPropagation(); window.IndexPlayer.toggleMute(); });
+  window.IndexPlayer.updateUI();
 })();
 </script>
 <script>
 const API = window.location.origin;
 
-// 学生登录密码开关（临时暂停，先测翻牌）
-const PASSWORD_ENABLED = true;
-
 function $(id) { return document.getElementById(id); }
+
+// 密码强度检查
+function checkPasswordStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw)) score++;
+  return score;
+}
+
+function updateStrengthUI(pw) {
+  const bar = $('strengthBar');
+  const hint = $('strengthHint');
+  const score = checkPasswordStrength(pw);
+  if (!pw) {
+    bar.style.width = '0%';
+    bar.className = 'bar';
+    hint.textContent = '密码至少 8 位，建议包含大小写、数字';
+    return;
+  }
+  if (score <= 2) {
+    bar.style.width = '33%';
+    bar.className = 'bar weak';
+    hint.textContent = '强度：弱 - 建议增加大小写、数字、特殊字符';
+  } else if (score <= 4) {
+    bar.style.width = '66%';
+    bar.className = 'bar medium';
+    hint.textContent = '强度：中 - 可再加强';
+  } else {
+    bar.style.width = '100%';
+    bar.className = 'bar strong';
+    hint.textContent = '强度：强 ✓';
+  }
+}
 
 async function loginStudent() {
   const name = $('nameInput').value.trim();
@@ -392,14 +307,18 @@ async function loginStudent() {
     const res = await fetch(API + '/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password: PASSWORD_ENABLED ? $('studentPw').value : '' })
+      body: JSON.stringify({ name, password: $('studentPw').value })
     });
     const data = await res.json();
     if (!data.ok) { showError(data.error); setLoading(false); return; }
     sessionStorage.setItem('token', data.token);
     sessionStorage.setItem('role', 'student');
     sessionStorage.setItem('name', name);
-    window.location.href = 'map_proto.html';
+    if (data.mustChangePassword) {
+      showPasswordModal(name, 'student', data.token);
+    } else {
+      window.location.href = 'map_proto.html';
+    }
   } catch (e) {
     showError('网络错误，请检查服务是否启动');
     setLoading(false);
@@ -422,10 +341,81 @@ async function loginTeacher() {
     sessionStorage.setItem('token', data.token);
     sessionStorage.setItem('role', 'teacher');
     sessionStorage.setItem('name', 'teacher');
-    window.location.href = 'teacher.html';
+    if (data.mustChangePassword) {
+      showPasswordModal('teacher', 'teacher', data.token);
+    } else {
+      window.location.href = 'teacher.html';
+    }
   } catch (e) {
     showError('网络错误，请检查服务是否启动');
     setLoading(false);
+  }
+}
+
+// 强制修改密码模态框
+function showPasswordModal(name, role, token) {
+  sessionStorage.setItem('token', token);
+  sessionStorage.setItem('role', role);
+  sessionStorage.setItem('name', name);
+  $('modalName').textContent = name;
+  $('modalRole').textContent = role === 'teacher' ? '教师' : '学生';
+  $('newPw').value = '';
+  $('confirmPw').value = '';
+  $('strengthBar').style.width = '0%';
+  $('strengthBar').className = 'bar';
+  $('strengthHint').textContent = '密码至少 8 位，建议包含大小写、数字';
+  $('pwError').textContent = '';
+  $('pwModal').classList.add('show');
+}
+
+async function submitPasswordChange() {
+  const newPw = $('newPw').value;
+  const confirmPw = $('confirmPw').value;
+  const role = sessionStorage.getItem('role');
+
+  if (newPw !== confirmPw) {
+    $('pwError').textContent = '两次输入不一致';
+    return;
+  }
+  if (newPw.length < 8) {
+    $('pwError').textContent = '密码至少 8 位';
+    return;
+  }
+
+  const score = checkPasswordStrength(newPw);
+  if (score <= 2) {
+    if (!confirm('密码强度较弱，确定要使用吗？')) return;
+  }
+
+  $('pwSubmit').disabled = true;
+  $('pwSubmit').textContent = '修改中...';
+
+  try {
+    const res = await fetch(API + '/api/password', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+      },
+      body: JSON.stringify({ newPassword: newPw })
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      $('pwError').textContent = data.error;
+      $('pwSubmit').disabled = false;
+      $('pwSubmit').textContent = '确定修改';
+      return;
+    }
+    $('pwModal').classList.remove('show');
+    if (role === 'teacher') {
+      window.location.href = 'teacher.html';
+    } else {
+      window.location.href = 'map_proto.html';
+    }
+  } catch (e) {
+    $('pwError').textContent = '网络错误';
+    $('pwSubmit').disabled = false;
+    $('pwSubmit').textContent = '确定修改';
   }
 }
 
@@ -450,6 +440,8 @@ function setLoading(v) {
 $('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') loginStudent(); });
 $('studentPw').addEventListener('keydown', e => { if (e.key === 'Enter') loginStudent(); });
 $('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') loginTeacher(); });
+$('newPw').addEventListener('input', e => updateStrengthUI(e.target.value));
+$('confirmPw').addEventListener('keydown', e => { if (e.key === 'Enter') submitPasswordChange(); });
 
 const savedName = sessionStorage.getItem('name');
 if (savedName) $('nameInput').value = savedName;
