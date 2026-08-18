@@ -126,12 +126,24 @@ export function openShooter(cfg, onComplete) {
     formX = 50; formY = 44; formDir = 1;   // 每波都从原点出发
     var _esCol = window.equippedEnemySkin();
     skin = _esCol ? { col: _esCol } : ENEMY_SKINS[(wave - 1) % ENEMY_SKINS.length];   // 装备的敌人皮肤优先，否则每波轮换
-    // 进阶版：每波只出随机一种名词的敌人（固定，不随武器变）；普通版保持多种名词
-    const waveTerm = advanced ? terms[Math.floor(Math.random() * terms.length)] : null;
-    for(let r=0;r<ROWS;r++){
-      for(let c=0;c<COLS;c++){
-        enemies.push({ r, c, x: formX + c*XSP, y: formY + r*ROW_PITCH, w: EW, h: 26,
-          term: advanced ? waveTerm : terms[(r*COLS+c) % terms.length], active:true, hp:3, maxHp:3, flash:0 });
+    if (advanced) {
+      // 进阶版：随机选几个坑位放「一种名词」的敌人，其余空白/隐藏；打完这批自动出下一批
+      const waveTerm = terms[Math.floor(Math.random() * terms.length)];
+      const total = ROWS * COLS;
+      const count = Math.max(2, Math.min(4, Math.ceil(total / 3)));   // 每批显示几个
+      const idx = [];
+      for (let i = 0; i < total; i++) idx.push(i);
+      for (let i = total - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+      for (let i = 0; i < total; i++) {
+        const r = Math.floor(i / COLS), c = i % COLS;
+        const on = i < count;
+        enemies.push({ r, c, x: formX + c * XSP, y: formY + r * ROW_PITCH, w: EW, h: 26,
+          term: on ? waveTerm : null, active: on, hp: 3, maxHp: 3, flash: 0 });
+      }
+    } else {
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+        enemies.push({ r, c, x: formX + c * XSP, y: formY + r * ROW_PITCH, w: EW, h: 26,
+          term: terms[(r * COLS + c) % terms.length], active: true, hp: 3, maxHp: 3, flash: 0 });
       }
     }
     if (advanced) {
