@@ -151,9 +151,14 @@ export function openMemoryMatch(cfg, onComplete) {
     cardSize = size;
     grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + size + 'px)';
     grid.style.gridTemplateRows = 'repeat(' + rows + ', ' + size + 'px)';
-    // 文字字号随牌面自适应（约 16% 牌宽），保证清晰可读又不溢出
-    const fs = Math.max(12, Math.round(size * 0.16));
-    grid.querySelectorAll('.mm-text').forEach(function(t){ t.style.fontSize = fs + 'px'; });
+    // 文字字号随牌面自适应（约 16% 牌宽）；长文字适当缩小，配合 3 行换行保证完整显示不截断
+    grid.querySelectorAll('.mm-text').forEach(function(t){
+      const len = (t.textContent || '').length;
+      let f = Math.max(12, Math.round(size * 0.16));
+      if (len > 12) f = Math.max(12, Math.round(size * 0.12));
+      if (len > 20) f = Math.max(11, Math.round(size * 0.10));
+      t.style.fontSize = f + 'px';
+    });
   }
   fitCard();
   requestAnimationFrame(fitCard);
