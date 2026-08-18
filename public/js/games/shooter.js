@@ -451,15 +451,16 @@ export function openShooter(cfg, onComplete) {
     enemies.forEach(e => {
       if (!e.active) return;
       const match = e.term === targetTerm;
-      if (advanced) {
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = skin.col;
-        ctx.strokeStyle = 'rgba(0,0,0,.6)';
-        ctx.lineWidth = 1;
-        ctx.fillRect(e.x, e.y, e.w, e.h);
-        ctx.strokeRect(e.x, e.y, e.w, e.h);
+      if (!match) ctx.globalAlpha = 0.4;
+      ctx.fillStyle = match ? '#ffb000' : skin.col;
+      ctx.strokeStyle = match ? '#fff' : 'rgba(0,0,0,.6)';
+      ctx.lineWidth = match ? 2 : 1;
+      ctx.fillRect(e.x, e.y, e.w, e.h);
+      ctx.strokeRect(e.x, e.y, e.w, e.h);
+      if (match) {
+        // 只显示当前目标(targetTerm)对应的名词+血量——与飞机上的解释成对；其它敌人不显示名词(半透明)
         const label = e.term;
-        const fs = Math.max(8, Math.min(13, Math.floor(86 / Math.max(1, label.length) * 1.5)));
+        const fs = Math.max(9, Math.min(14, Math.floor(90 / Math.max(1, label.length) * 1.5)));
         ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
         ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
         ctx.fillStyle = 'rgba(0,0,0,.6)';
@@ -471,22 +472,6 @@ export function openShooter(cfg, onComplete) {
           const on = i < e.hp;
           ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
           ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
-        }
-      } else {
-        if (!match) ctx.globalAlpha = 0.4;
-        ctx.fillStyle = match ? '#ffb000' : skin.col;
-        ctx.strokeStyle = match ? '#fff' : 'rgba(0,0,0,.6)';
-        ctx.lineWidth = match ? 2 : 1;
-        ctx.fillRect(e.x, e.y, e.w, e.h);
-        ctx.strokeRect(e.x, e.y, e.w, e.h);
-        if (match) {
-          // 敌人上方不再画小字（顶部已清晰显示目标名词），保留血量条
-          const pw = 40, px = e.x + e.w/2 - pw/2, py = e.y + e.h - 7;
-          for (let i=0;i<e.maxHp;i++) {
-            const on = i < e.hp;
-            ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
-            ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
-          }
         }
       }
       // 命中闪白
@@ -529,7 +514,8 @@ export function openShooter(cfg, onComplete) {
     }
     // 进阶：飞机炮口标签（当前装载的名词，要主动匹配敌人）显示在机头上方
     if (advanced && targetTerm) {
-      const tag = '🎯 ' + targetTerm;
+      // 进阶：炮口装载的是「名词对应的解释」（与敌人名词成对），玩家据此选武器打对应名词
+      const tag = '🧩 ' + (hintOf[targetTerm] || targetTerm);
       ctx.font = 'bold ' + Math.round(12/sf) + 'px "Courier New", monospace';
       const tw = ctx.measureText(tag).width + 14;
       const ty = H - 64;
