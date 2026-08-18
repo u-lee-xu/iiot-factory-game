@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>锐智工厂 · 工业互联网实训</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -41,6 +42,9 @@
     transition: all .2s;
   }
   .btn-link:hover { border-color: #00bcd4; color: #00bcd4; }
+  .tools-link { display: block; text-align: center; margin-top: 14px; color: #606070;
+    font-size: 14px; text-decoration: none; transition: color .2s; }
+  .tools-link:hover { color: #00bcd4; }
   .error { color: #ff5555; font-size: 19px; margin-top: 8px; min-height: 18px; }
   .sep { text-align: center; color: #2a2a3a; font-size: 19px; margin: 12px 0; }
 
@@ -153,6 +157,8 @@
     <div class="sep">或</div>
 
     <button class="btn-link" id="teacherBtn" onclick="showTeacherLogin()">教师登录</button>
+
+    <a class="tools-link" href="/tools/tracker/" target="_blank" rel="noopener">🎵 音乐工坊（自制 BGM）</a>
   </div>
 </div>
 
@@ -182,27 +188,51 @@
 </div>
 
 <script>
-// ===== 音乐播放器（复用原有逻辑）=====
+//! ZzFXM (v2.0.3) | (C) Keith Clark | MIT | https://github.com/keithclark/ZzFXM
+// 与 student/map_proto 同源引擎：登录页音乐也用 8-bit 合成，无需 mp3 资源
+zzfxV=.3
+zzfxR=44100
+zzfxG=(q=1,k=.05,c=220,e=0,t=0,u=.1,r=0,F=1,v=0,z=0,w=0,A=0,l=0,B=0,x=0,G=0,d=0,y=1,m=0,C=0)=>{let b=2*Math.PI,H=v*=500*b/zzfxR**2,I=(0<x?1:-1)*b/4,D=c*=(1+2*k*Math.random()-k)*b/zzfxR,Z=[],g=0,E=0,a=0,n=1,J=0,K=0,f=0,p,h;e=99+zzfxR*e;m*=zzfxR;t*=zzfxR;u*=zzfxR;d*=zzfxR;z*=500*b/zzfxR**3;x*=b/zzfxR;w*=b/zzfxR;A*=zzfxR;l=zzfxR*l|0;for(h=e+m+t+u+d|0;a<h;Z[a++]=f)++K%(100*G|0)||(f=r?1<r?2<r?3<r?Math.sin((g%b)**3):Math.max(Math.min(Math.tan(g),1),-1):1-(2*g/b%2+2)%2:1-4*Math.abs(Math.round(g/b)-g/b):Math.sin(g),f=(l?1-C+C*Math.sin(2*Math.PI*a/l):1)*(0<f?1:-1)*Math.abs(f)**F*q*zzfxV*(a<e?a/e:a<e+m?1-(a-e)/m*(1-y):a<e+m+t?y:a<h-d?(h-a-d)/u*y:0),f=d?f/2+(d>a?0:(a<h-d?1:(h-a)/d)*Z[a-d|0]/2):f),p=(c+=v+=z)*Math.sin(E*x-I),g+=p-p*B*(1-1E9*(Math.sin(a)+1)%2),E+=p-p*B*(1-1E9*(Math.sin(a)**2+1)%2),n&&++n>A&&(c+=w,D+=w,n=0),!l||++J%l||(c=D,v=H,n=n||1);return Z}
+zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q=0,s=1,v={},w=zzfxR/e*60>>2;for(;s;k++)R=[s=a=d=m=0],t.map((e,d)=>{for(x=f[e][k]||[0,0,0],s|=!!f[e][k],G=m+(f[e][0].length-2-!a)*w,p=d==t.length-1,o=2,r=m;o<x.length+p;a=++o){for(g=x[o],u=o==x.length+p-1&&p||c!=(x[0]||0)|g|0,z=0;z<w&&a;z++>w-99&&u?i+=(i<1)/99:0)h=(1-i)*R[M++]/2||0,b[r]=(b[r]||0)-h*q+h,j[r]=(j[r++]||0)+h*q+h;g&&(i=g%1,q=x[1]||0,(g|=0)&&(R=v[[c=x[M=0]||0,g]]=v[[c,g]]||(l=[...n[c]],l[2]*=2**((g-12)/12),g>0?zzfxG(...l):[])))}m=G});return[b,j]}
+</script>
+<script src="/data/music.js"></script>
+<script>
+// ===== 音乐播放器（ZzFXM 8-bit 合成，与全站同源，无需 mp3 文件）=====
 const AUD_GROUPS = [
-  { t: "🌙 环境·氛围", items: [["ambient1","🌌","星际漫游","3:20"],["ambient2","🌊","深海回响","2:45"],["ambient3","🌲","森林呼吸","4:10"]]},
-  { t: "⚡ 电子·合成", items: [["synth1","⚡","霓虹脉动","2:55"],["synth2","🔮","赛博朋克","3:30"],["synth3","💫","数据流","2:40"]]},
-  { t: "🎮 节奏·游戏", items: [["game1","🎮","像素冒险","2:15"],["game2","🕹️","复古街机","2:30"],["game3","🏁","极速追逐","2:05"]]}
+  { t: "🌙 环境·氛围", items: [["cafe_light","☕","咖啡时光","8-bit"],["night_shift","🌙","夜班巡逻","8-bit"],["calm_factory","🏭","静夜工厂","8-bit"]]},
+  { t: "⚡ 电子·合成", items: [["hub","⚙️","中枢脉动","8-bit"],["control_room","🔧","控制室","8-bit"],["console","🖥️","控制台","8-bit"]]},
+  { t: "🎮 节奏·游戏", items: [["rush_hour","🏁","高峰冲刺","8-bit"],["data_pipe","📊","数据管道","8-bit"],["ai_lab","🧪","AI 实验室","8-bit"]]}
 ];
 const TRACK_KEY = 'iiot_track';
-let cur = null, src = null, muted = false;
+let cur = null, src = null, muted = false, ctx = null, gain = null;
 let flat = [];
-const audio = () => { if(!src){ src = new Audio(); src.preload='auto'; src.volume=0.35; } return src; };
+function audioCtx(){
+  if(!ctx){ ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+  if(ctx.state === 'suspended'){ try{ ctx.resume(); }catch(e){} }
+  return ctx;
+}
 function play(key, userGesture){
   const meta = flat.find(f=>f.key===key); if(!meta) return;
-  const a = audio(); a.src = '/audio/'+key+'.mp3'; a.loop=true;
-  a.play().catch(()=>{ if(userGesture) alert('无法播放，请检查音频文件'); });
-  cur = key; updateUI();
+  const song = window.MUSIC_SONGS && window.MUSIC_SONGS[key];
+  if(!song){ console.warn('曲目不存在: ' + key); return; }
+  try{
+    const c = audioCtx();
+    if(src){ try{ src.stop(); }catch(e){} src = null; }
+    const data = zzfxM.apply(null, song);
+    const buf = c.createBuffer(data.length, data[0].length, zzfxR);
+    for(let i = 0; i < data.length; i++) buf.getChannelData(i).set(data[i]);
+    if(!gain){ gain = c.createGain(); gain.gain.value = muted ? 0 : 0.5; gain.connect(c.destination); }
+    const s = c.createBufferSource();
+    s.buffer = buf; s.loop = true; s.connect(gain); s.start();
+    src = s; cur = key; updateUI();
+    try{ localStorage.setItem(TRACK_KEY, key); }catch(e){}
+  }catch(e){ console.warn('音乐渲染失败:', e); }
 }
-function stop(){ if(src){ src.pause(); src.currentTime=0; } cur=null; updateUI(); }
+function stop(){ if(src){ try{ src.stop(); }catch(e){} src = null; } cur = null; updateUI(); }
 function playing(key){ return cur===key; }
 function prev(){ if(!cur) return; const i=flat.findIndex(f=>f.key===cur); if(i>0) play(flat[i-1].key); }
 function next(){ if(!cur) return; const i=flat.findIndex(f=>f.key===cur); if(i<flat.length-1) play(flat[i+1].key); }
-function toggleMute(){ muted=!muted; if(src) src.muted=muted; updateUI(); }
+function toggleMute(){ muted=!muted; if(gain) gain.gain.value = muted?0:0.5; if(!muted && cur && !src) play(cur, false); updateUI(); }
 function updateUI(){
   const lbl=document.getElementById('musicLbl');
   const curEl=document.getElementById('mpCur');
@@ -218,8 +248,7 @@ function togglePop(){ const open=document.getElementById('musicPop').classList.t
 function closePop(){ document.getElementById('musicPop').classList.remove('open'); }
 function setList(groups){ flat=[]; groups.forEach(g=>g.items.forEach(it=>flat.push({key:it[0],name:it[2],emoji:it[1]}))); }
 function onFirst(){
-  audio();
-  if(!muted && !cur){ const saved=localStorage.getItem(TRACK_KEY)||'ambient1'; play(saved, false); }
+  if(!muted && !cur){ const saved=localStorage.getItem(TRACK_KEY)||'hub'; play(saved, false); }
   document.removeEventListener('pointerdown', onFirst);
   document.removeEventListener('keydown', onFirst);
 }
