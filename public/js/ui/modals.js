@@ -8,8 +8,8 @@ export function checkLevelUp() {
   const xp = window.calcTotalXP();
   const rank = window.getRank(xp);
   if (window.prevRank && window.prevRank.title !== rank.title) {
-    playSound('levelup');
-    showLevelUp(rank);
+    // 方案A：先记录本次升段，待关卡结算窗关闭后再弹升段庆祝，避免与结算窗叠加
+    window.__pendingLevelUp = rank;
   }
   window.prevRank = rank;
 }
@@ -151,15 +151,26 @@ export function showLevelComplete(lv, done) {
     playSound('success');
   });
   
+  // 方案A：结算窗关闭后，若本次升段则先弹升段庆祝，再流转（回厂区 / 完成回调）
+  const closeAndFlow = (next) => {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity .3s';
+    setTimeout(() => {
+      overlay.remove();
+      if (window.__pendingLevelUp) {
+        playSound('levelup');
+        showLevelUp(window.__pendingLevelUp);
+        window.__pendingLevelUp = null;
+        setTimeout(next, 3200);   // 升段庆祝展示完再流转
+      } else {
+        next();
+      }
+    }, 300);
+  };
   if (sessionStorage.getItem('mapFlow') === '1') {
     btn.textContent = '🗺️ 回厂区继续';
-    btn.onclick = () => { playSound('click'); window.goMap(); };
+    btn.onclick = () => { playSound('click'); closeAndFlow(() => window.goMap()); };
   } else {
-    btn.onclick = () => {
-      overlay.style.opacity = '0';
-      overlay.style.transition = 'opacity .3s';
-      setTimeout(() => { overlay.remove(); if (done) setTimeout(done, 50); }, 300);
-      playSound('click');
-    };
+    btn.onclick = () => { playSound('click'); closeAndFlow(() => { if (done) setTimeout(done, 50); }); };
   }
 }

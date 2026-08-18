@@ -156,7 +156,8 @@ export function evaluateAchievements(showPopups) {
   if (newly.length) {
     renderAchBar();
     window.saveState();
-    setSeenAch(window.gameState.achievements);
+    // 合并写 seen：保留教师发放/登录签到成就的"已看"标记，避免被系统成就覆盖丢失导致重复弹
+    setSeenAch(Object.assign({}, getSeenAch(), window.gameState.achievements));
     if (showPopups) {
       window.achQueue = window.achQueue.concat(newly);
       drainAchQueue();

@@ -424,15 +424,17 @@ export function finishTaskFlow(taskId, xp) {
   window.checkLevelUp();
   // 地图流程：本层全部打完 → 弹通关庆祝；整层未完 → 点击领取后立即显示"正在返回"过渡
   // 盖住弹窗关闭后露出的空白任务页壳子，再延迟 goMap（XP toast 仍可见，过渡期间不闪空白）
+  // 点2：本层全部完成 → 立即弹结算窗（无论从哪进，不再依赖 pendingLevelComplete 延迟到下次进页面）
+  const lv = window.content.levels.find(l => l.tasks.some(t => t.id === taskId));
+  if (lv && window.levelProgress(lv.id).completed) {
+    window.showLevelComplete(lv, null);
+    return;
+  }
+  // 地图流程：整层未完 → 点击领取后立即显示"正在返回"过渡
   if (sessionStorage.getItem('mapFlow') === '1') {
-    const lv = window.content.levels.find(l => l.tasks.some(t => t.id === taskId));
-    if (lv && window.levelProgress(lv.id).completed) {
-      window.showLevelComplete(lv, null);
-    } else {
-      const _t = document.getElementById('transit');
-      if (_t) { const _e = document.getElementById('trText'); if (_e) _e.innerHTML = '正在返回 <b>房间</b>…'; _t.classList.add('show'); }
-      setTimeout(function(){ window.goMap(); }, 900);
-    }
+    const _t = document.getElementById('transit');
+    if (_t) { const _e = document.getElementById('trText'); if (_e) _e.innerHTML = '正在返回 <b>房间</b>…'; _t.classList.add('show'); }
+    setTimeout(function(){ window.goMap(); }, 900);
   }
 }
 

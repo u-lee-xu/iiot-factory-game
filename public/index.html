@@ -299,6 +299,47 @@ function updateStrengthUI(pw) {
   }
 }
 
+// ===== 登录即弹服务端成就（教师发放 + 登录签到）：登录成功那一刻弹，逐个串行，弹完再继续流转 =====
+async function loginThenShowAch(next) {
+  try {
+    const seen = JSON.parse(localStorage.getItem('ach_seen_v1') || '{}');
+    let fresh = [];
+    const res = await fetch(API + '/api/student/me', { headers: { Authorization: 'Bearer ' + sessionStorage.getItem('token') } });
+    const j = await res.json();
+    const data = (j && j.data) || {};
+    const teacherAwards = data.teacherAwards || {};
+    const newlyLogin = data.newlyAwardedLogin || [];
+    Object.keys(teacherAwards).forEach(id => { if (!seen[id]) fresh.push(id); });
+    (newlyLogin || []).forEach(id => { if (!seen[id]) fresh.push(id); });
+    // 快照（含教师发放），避免 student.html(app.js) 重复弹
+    const snap = Object.assign({}, data.achievements || {}, teacherAwards);
+    localStorage.setItem('ach_seen_v1', JSON.stringify(snap));
+    if (!fresh.length) { next(); return; }
+    const meta = window.ACHIEVEMENTS || [];
+    let i = 0;
+    const run = () => {
+      if (i >= fresh.length) { next(); return; }
+      const a = meta.find(x => x.id === fresh[i]); i++;
+      showAchModal(a, run);
+    };
+    run();
+  } catch (e) { next(); }
+}
+function showAchModal(ach, done) {
+  if (!ach) { done(); return; }
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:10001;display:flex;align-items:center;justify-content:center';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#12121a;border:2px solid #ffd27d;border-radius:14px;padding:34px 48px;max-width:430px;width:90%;text-align:center;box-shadow:0 0 80px rgba(255,176,0,.28);position:relative;color:#eee';
+  box.innerHTML = '<div style="font-size:64px;line-height:1">' + ach.emoji + '</div>' +
+    '<div style="font-size:13px;color:#ffd27d;margin:14px 0 6px;letter-spacing:2px;font-weight:bold">🎁 老师发放的成就</div>' +
+    '<div style="font-size:24px;font-weight:bold">' + ach.name + '</div>' +
+    '<div style="font-size:13px;color:#999;margin-top:8px;line-height:1.6">' + ach.desc + '</div>';
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+  setTimeout(() => { ov.style.opacity = '0'; ov.style.transition = 'opacity .3s'; setTimeout(() => { ov.remove(); done(); }, 300); }, 2600);
+}
+
 async function loginStudent() {
   const name = $('nameInput').value.trim();
   if (!name) { showError('请输入姓名'); return; }
@@ -314,11 +355,14 @@ async function loginStudent() {
     sessionStorage.setItem('token', data.token);
     sessionStorage.setItem('role', 'student');
     sessionStorage.setItem('name', name);
-    if (data.mustChangePassword) {
-      showPasswordModal(name, 'student', data.token);
-    } else {
-      window.location.href = 'map_proto.html';
-    }
+    // 登录即弹服务端成就（教师发放/登录签到），串行弹完再改密或进厂区
+    loginThenShowAch(() => {
+      if (data.mustChangePassword) {
+        showPasswordModal(name, 'student', data.token);
+      } else {
+        window.location.href = 'map_proto.html';
+      }
+    });
   } catch (e) {
     showError('网络错误，请检查服务是否启动');
     setLoading(false);
@@ -446,5 +490,6 @@ $('confirmPw').addEventListener('keydown', e => { if (e.key === 'Enter') submitP
 const savedName = sessionStorage.getItem('name');
 if (savedName) $('nameInput').value = savedName;
 </script>
+<script src="/js/achievements-meta.js"></script>
 </body>
 </html>

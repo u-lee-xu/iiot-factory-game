@@ -17,7 +17,7 @@ registerInteraction('fill_blank', {
         <p>${question.replace(/____/g, '<span class="highlight">____</span>')}</p>
         <div style="margin-top:12px">
           <select id="fillSelect">
-            <option value="">请选择…</option>
+            <option value="" style="color:var(--dim)">请选择…</option>
             ${cfg.options.map((o, i) => `<option value="${i}">${o}</option>`).join('')}
           </select>
         </div>

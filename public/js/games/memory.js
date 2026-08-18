@@ -142,12 +142,18 @@ export function openMemoryMatch(cfg, onComplete) {
   const cols = Math.ceil(Math.sqrt(cards.length));
   const rows = Math.ceil(cards.length / cols);
   const gap = 10;
+  let cardSize = 0;
   function fitCard(){
     const aw = grid.clientWidth - (cols - 1) * gap;
     const ah = grid.clientHeight - (rows - 1) * gap;
-    const size = Math.max(36, Math.floor(Math.min(aw / cols, ah / rows)));
+    // 牌面适中：下限 56 保证可点，上限 132 避免过大溢出/挤压
+    const size = Math.max(56, Math.min(132, Math.floor(Math.min(aw / cols, ah / rows))));
+    cardSize = size;
     grid.style.gridTemplateColumns = 'repeat(' + cols + ', ' + size + 'px)';
     grid.style.gridTemplateRows = 'repeat(' + rows + ', ' + size + 'px)';
+    // 文字字号随牌面自适应（约 16% 牌宽），保证清晰可读又不溢出
+    const fs = Math.max(12, Math.round(size * 0.16));
+    grid.querySelectorAll('.mm-text').forEach(function(t){ t.style.fontSize = fs + 'px'; });
   }
   fitCard();
   requestAnimationFrame(fitCard);
@@ -312,11 +318,8 @@ export function openMemoryMatch(cfg, onComplete) {
     card.className = 'mm-card';
     card.dataset.idx = idx;
     card.innerHTML = '<div class="mm-inner"><div class="mm-face mm-back"><span>❔</span></div><div class="mm-face mm-front"><div class="mm-emoji">' + c.emoji + '</div><div class="mm-text">' + escHtml(c.text) + '</div></div></div>';
-    // 长文字自适应字号：让 2-3 行内显示更多内容，避免截断显示不全
-    var _len = String(c.text||'').length;
-    if (_len > 20) card.querySelector('.mm-text').style.fontSize = '8px';
-    else if (_len > 14) card.querySelector('.mm-text').style.fontSize = '9px';
-    else if (_len > 8) card.querySelector('.mm-text').style.fontSize = '10px';
+    // 字号由 fitCard 按牌面自适应统一设置（避免 8px 级过小、与牌面不成比例）
+    card.querySelector('.mm-text').style.fontSize = '14px';   // 初始占位，fitCard 会按 cardSize 重算
     card.addEventListener('click', () => flipCard(card));
     grid.appendChild(card);
   });
