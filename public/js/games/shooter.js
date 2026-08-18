@@ -136,8 +136,8 @@ export function openShooter(cfg, onComplete) {
       const set = new Set();
       enemies.forEach(e => set.add(e.term));
       termList = Array.from(set);
-      termIdx = 0;
-      targetTerm = termList.length ? termList[0] : null;
+      // 武器 TAG 保持玩家手动选择，不随新 wave 自动改变（初次无目标时才给一个）
+      if (!targetTerm) { targetTerm = termList.length ? termList[0] : null; }
       if (termEl) termEl.textContent = targetTerm || '—';
     } else {
       targetTerm = pickNextTarget();
@@ -183,8 +183,15 @@ export function openShooter(cfg, onComplete) {
     e.active = false;
     spawnDrop(e);
     if (!enemies.some(x => x.active && x.term === targetTerm)) {
-      // 进阶版：武器 TAG 不自动跟随敌人，由玩家手动 ↑/↓ 选择，不匹配则不生效；普通版自动找下一个目标
-      if (!advanced) {
+      if (advanced) {
+        // 进阶版：打完当前武器匹配的一种敌人 → 自动清场出下一波新敌人；武器仍由玩家手动切换
+        if (wave >= WAVES && !cfg._endless) { endGame(true); return; }
+        wave++; waveEl.textContent = wave;
+        enemies = [];
+        makeWave();
+        window.showToast('🌊 第 ' + wave + ' 波编队来袭！', 'success');
+        playSound('click');
+      } else {
         targetTerm = pickNextTarget();
       }
     }
