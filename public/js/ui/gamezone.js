@@ -266,6 +266,8 @@ export function refreshGameZone() {
 
 export function gzAfter(win, msg) {
   if (win) window.showToast(msg, 'success');
+  // 游戏完成即时评估成就（解锁+保存），避免游戏成就(游戏开张/第一桶金等)累积到下次登录/刷新才批量弹
+  try { if (typeof window.evaluateAchievements === 'function') window.evaluateAchievements(true); } catch (e) {}
   refreshGameZone();
   try {
     // 关卡页里嵌的小游戏行（复习翻牌等）也要即时更新「已通关」标记
