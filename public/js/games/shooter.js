@@ -430,6 +430,23 @@ export function openShooter(cfg, onComplete) {
     ctx.lineWidth = 1;
     for(let i=0;i<W;i+=40){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,H); ctx.stroke(); }
     for(let j=0;j<H;j+=40){ ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(W,j); ctx.stroke(); }
+    // 顶部目标名词：清晰显示当前要打 / 炮口匹配的名词（大字号+背景板），供玩家据此选火炮
+    ctx.save();
+    ctx.globalAlpha = 1;
+    const _tl = targetTerm || '—';
+    ctx.font = 'bold ' + Math.max(14, Math.round(20 / sf)) + 'px "Courier New", monospace';
+    const _tw = ctx.measureText('🎯 ' + _tl).width;
+    const _pad = 16, _bh = Math.max(26, Math.round(26 / sf));
+    ctx.fillStyle = 'rgba(0,0,0,.72)';
+    ctx.fillRect(W / 2 - _tw / 2 - _pad, 6, _tw + _pad * 2, _bh);
+    ctx.strokeStyle = 'rgba(126,232,250,.65)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(W / 2 - _tw / 2 - _pad, 6, _tw + _pad * 2, _bh);
+    ctx.fillStyle = '#7ee8fa';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🎯 ' + _tl, W / 2, 6 + _bh / 2);
+    ctx.restore();
+
     // 敌人（名词）：进阶模式全部显示名词标签+血量，靠玩家主动匹配炮口；基础模式只高亮配对目标
     enemies.forEach(e => {
       if (!e.active) return;
@@ -463,14 +480,7 @@ export function openShooter(cfg, onComplete) {
         ctx.fillRect(e.x, e.y, e.w, e.h);
         ctx.strokeRect(e.x, e.y, e.w, e.h);
         if (match) {
-          const label = e.term;
-          const fs = Math.max(8, Math.min(13, Math.floor(86 / Math.max(1, label.length) * 1.5)));
-          ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-          ctx.fillStyle = 'rgba(0,0,0,.6)';
-          ctx.fillText(label, e.x + e.w/2 + 1, e.y - 9 + 1);
-          ctx.fillStyle = '#fff7d6';
-          ctx.fillText(label, e.x + e.w/2, e.y - 9);
+          // 敌人上方不再画小字（顶部已清晰显示目标名词），保留血量条
           const pw = 40, px = e.x + e.w/2 - pw/2, py = e.y + e.h - 7;
           for (let i=0;i<e.maxHp;i++) {
             const on = i < e.hp;
