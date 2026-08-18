@@ -127,18 +127,18 @@ export function openShooter(cfg, onComplete) {
     var _esCol = window.equippedEnemySkin();
     skin = _esCol ? { col: _esCol } : ENEMY_SKINS[(wave - 1) % ENEMY_SKINS.length];   // 装备的敌人皮肤优先，否则每波轮换
     if (advanced) {
-      // 进阶版：随机选几个坑位放「一种名词」的敌人，其余空白/隐藏；打完这批自动出下一批
+      // 进阶版：所有坑位都有敌人(外观同基础版)，只随机激活 count 个显示TAG(可打)，其余敌人存在但无TAG(不可打)
       const waveTerm = terms[Math.floor(Math.random() * terms.length)];
       const total = ROWS * COLS;
-      const count = Math.max(2, Math.min(4, Math.ceil(total / 3)));   // 每批显示几个
+      const count = 4;
       const idx = [];
       for (let i = 0; i < total; i++) idx.push(i);
       for (let i = total - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+      const activeSet = new Set(idx.slice(0, count));
       for (let i = 0; i < total; i++) {
         const r = Math.floor(i / COLS), c = i % COLS;
-        const on = i < count;
         enemies.push({ r, c, x: formX + c * XSP, y: formY + r * ROW_PITCH, w: EW, h: 26,
-          term: on ? waveTerm : null, active: on, hp: 3, maxHp: 3, flash: 0 });
+          term: activeSet.has(i) ? waveTerm : null, active: true, hp: 3, maxHp: 3, flash: 0 });
       }
     } else {
       for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
@@ -196,13 +196,23 @@ export function openShooter(cfg, onComplete) {
     spawnDrop(e);
     if (!enemies.some(x => x.active && x.term === targetTerm)) {
       if (advanced) {
-        // 进阶版：打完当前武器匹配的一种敌人 → 自动清场出下一波新敌人；武器仍由玩家手动切换
-        if (wave >= WAVES && !cfg._endless) { endGame(true); return; }
-        wave++; waveEl.textContent = wave;
-        enemies = [];
-        makeWave();
-        window.showToast('🌊 第 ' + wave + ' 波编队来袭！', 'success');
-        playSound('click');
+        // 打完当前激活批次：从剩余普通敌人(term=null)里再激活下一批(新TAG)；没有则出新一波
+        const remain = enemies.filter(x => x.active && x.term === null);
+        if (remain.length > 0) {
+          const cnt = Math.min(4, remain.length);
+          const nt = terms[Math.floor(Math.random() * terms.length)];
+          for (let i = remain.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [remain[i], remain[j]] = [remain[j], remain[i]]; }
+          remain.slice(0, cnt).forEach(function(x){ x.term = nt; });
+          window.showToast('🎯 新目标：' + nt, 'info');
+          playSound('click');
+        } else {
+          if (wave >= WAVES && !cfg._endless) { endGame(true); return; }
+          wave++; waveEl.textContent = wave;
+          enemies = [];
+          makeWave();
+          window.showToast('🌊 第 ' + wave + ' 波编队来袭！', 'success');
+          playSound('click');
+        }
       } else {
         targetTerm = pickNextTarget();
       }
@@ -463,26 +473,28 @@ export function openShooter(cfg, onComplete) {
       if (!e.active) return;
       const match = e.term === targetTerm;
       if (advanced) {
-        // 进阶版：所有敌人固定显示自己的名词（不随武器匹配变化），玩家手动切武器匹配
+        // 进阶版：所有坑位都有敌人(外观同基础版)，只有带TAG(term非空)的显示标签+血量
         ctx.globalAlpha = 1;
         ctx.fillStyle = skin.col;
         ctx.strokeStyle = 'rgba(0,0,0,.6)';
         ctx.lineWidth = 1;
         ctx.fillRect(e.x, e.y, e.w, e.h);
         ctx.strokeRect(e.x, e.y, e.w, e.h);
-        const label = e.term;
-        const fs = Math.max(9, Math.min(14, Math.floor(90 / Math.max(1, label.length) * 1.5)));
-        ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-        ctx.fillStyle = 'rgba(0,0,0,.6)';
-        ctx.fillText(label, e.x + e.w/2 + 1, e.y - 9 + 1);
-        ctx.fillStyle = '#fff7d6';
-        ctx.fillText(label, e.x + e.w/2, e.y - 9);
-        const pw = 40, px = e.x + e.w/2 - pw/2, py = e.y + e.h - 7;
-        for (let i=0;i<e.maxHp;i++) {
-          const on = i < e.hp;
-          ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
-          ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
+        if (e.term) {
+          const label = e.term;
+          const fs = Math.max(9, Math.min(14, Math.floor(90 / Math.max(1, label.length) * 1.5)));
+          ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+          ctx.fillStyle = 'rgba(0,0,0,.6)';
+          ctx.fillText(label, e.x + e.w/2 + 1, e.y - 9 + 1);
+          ctx.fillStyle = '#fff7d6';
+          ctx.fillText(label, e.x + e.w/2, e.y - 9);
+          const pw = 40, px = e.x + e.w/2 - pw/2, py = e.y + e.h - 7;
+          for (let i=0;i<e.maxHp;i++) {
+            const on = i < e.hp;
+            ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
+            ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
+          }
         }
       } else {
         if (!match) ctx.globalAlpha = 0.4;
