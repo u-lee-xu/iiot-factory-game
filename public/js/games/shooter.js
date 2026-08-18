@@ -126,17 +126,17 @@ export function openShooter(cfg, onComplete) {
     formX = 50; formY = 44; formDir = 1;   // 每波都从原点出发
     var _esCol = window.equippedEnemySkin();
     skin = _esCol ? { col: _esCol } : ENEMY_SKINS[(wave - 1) % ENEMY_SKINS.length];   // 装备的敌人皮肤优先，否则每波轮换
+    // 进阶版：每波只出随机一种名词的敌人（固定，不随武器变）；普通版保持多种名词
+    const waveTerm = advanced ? terms[Math.floor(Math.random() * terms.length)] : null;
     for(let r=0;r<ROWS;r++){
       for(let c=0;c<COLS;c++){
         enemies.push({ r, c, x: formX + c*XSP, y: formY + r*ROW_PITCH, w: EW, h: 26,
-          term: terms[(r*COLS+c) % terms.length], active:true, hp:3, maxHp:3, flash:0 });
+          term: advanced ? waveTerm : terms[(r*COLS+c) % terms.length], active:true, hp:3, maxHp:3, flash:0 });
       }
     }
     if (advanced) {
-      const set = new Set();
-      enemies.forEach(e => set.add(e.term));
-      termList = Array.from(set);
-      // 武器 TAG 保持玩家手动选择，不随新 wave 自动改变（初次无目标时才给一个）
+      // 武器可在全部名词中手动切换（不限于当前波的敌人名词），匹配当前波敌人即可打
+      termList = terms.slice();
       if (!targetTerm) { targetTerm = termList.length ? termList[0] : null; }
       if (termEl) termEl.textContent = targetTerm || '—';
     } else {
@@ -450,14 +450,14 @@ export function openShooter(cfg, onComplete) {
     enemies.forEach(e => {
       if (!e.active) return;
       const match = e.term === targetTerm;
-      if (!match) ctx.globalAlpha = 0.4;
-      ctx.fillStyle = match ? '#ffb000' : skin.col;
-      ctx.strokeStyle = match ? '#fff' : 'rgba(0,0,0,.6)';
-      ctx.lineWidth = match ? 2 : 1;
-      ctx.fillRect(e.x, e.y, e.w, e.h);
-      ctx.strokeRect(e.x, e.y, e.w, e.h);
-      if (match) {
-        // 只显示当前目标(targetTerm)对应的名词+血量——与飞机上的解释成对；其它敌人不显示名词(半透明)
+      if (advanced) {
+        // 进阶版：所有敌人固定显示自己的名词（不随武器匹配变化），玩家手动切武器匹配
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = skin.col;
+        ctx.strokeStyle = 'rgba(0,0,0,.6)';
+        ctx.lineWidth = 1;
+        ctx.fillRect(e.x, e.y, e.w, e.h);
+        ctx.strokeRect(e.x, e.y, e.w, e.h);
         const label = e.term;
         const fs = Math.max(9, Math.min(14, Math.floor(90 / Math.max(1, label.length) * 1.5)));
         ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
@@ -471,6 +471,29 @@ export function openShooter(cfg, onComplete) {
           const on = i < e.hp;
           ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
           ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
+        }
+      } else {
+        if (!match) ctx.globalAlpha = 0.4;
+        ctx.fillStyle = match ? '#ffb000' : skin.col;
+        ctx.strokeStyle = match ? '#fff' : 'rgba(0,0,0,.6)';
+        ctx.lineWidth = match ? 2 : 1;
+        ctx.fillRect(e.x, e.y, e.w, e.h);
+        ctx.strokeRect(e.x, e.y, e.w, e.h);
+        if (match) {
+          const label = e.term;
+          const fs = Math.max(9, Math.min(14, Math.floor(90 / Math.max(1, label.length) * 1.5)));
+          ctx.font = 'bold ' + Math.round(fs/sf) + 'px "Courier New", monospace';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+          ctx.fillStyle = 'rgba(0,0,0,.6)';
+          ctx.fillText(label, e.x + e.w/2 + 1, e.y - 9 + 1);
+          ctx.fillStyle = '#fff7d6';
+          ctx.fillText(label, e.x + e.w/2, e.y - 9);
+          const pw = 40, px = e.x + e.w/2 - pw/2, py = e.y + e.h - 7;
+          for (let i=0;i<e.maxHp;i++) {
+            const on = i < e.hp;
+            ctx.fillStyle = on ? (e.hp === 1 ? '#ff5f57' : '#ffd27d') : 'rgba(255,255,255,.12)';
+            ctx.fillRect(px + i*(pw/e.maxHp + 3), py, pw/e.maxHp, 4);
+          }
         }
       }
       // 命中闪白
