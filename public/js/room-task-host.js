@@ -12,6 +12,7 @@ import { setupKbdNav, kbdCleanup, setupGlobalEnter } from './core/kbd.js';
 import { renderTypeTerminal } from './ui/main.js';
 
 // 注册全部任务类型（import 副作用触发 registerInteraction）
+import './interactions/terminal.js';
 import './interactions/quiz.js';
 import './interactions/chain_quiz.js';
 import './interactions/fill_blank.js';
@@ -23,6 +24,7 @@ import './interactions/ethics.js';
 import './interactions/diagnosis_tree.js';
 import './interactions/code_review.js';
 import './interactions/boss_fight.js';
+import './interactions/config_debug.js';
 import './interactions/progress_bar.js';
 import './interactions/log_forensics.js';
 import './interactions/default.js';

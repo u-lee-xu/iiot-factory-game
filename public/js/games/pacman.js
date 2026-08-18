@@ -65,12 +65,13 @@ export function openPacman(cfg, onComplete) {
   const cv=document.getElementById('pcCanvas'), ctx=cv.getContext('2d');
   const cw=cv.clientWidth||W; const sf=Math.max(0.6,cw/W);
   const livesEl=document.getElementById('pcLives'), scoreEl=document.getElementById('pcScore'), levelEl=document.getElementById('pcLevel'), termEl=document.getElementById('pcCmd');
-  document.addEventListener('keydown', e=>{
+  function onKey(e){
     const k=e.key; e.preventDefault();
     if(k==='ArrowUp'||k==='w')nextDir={x:0,y:-1}; else if(k==='ArrowDown'||k==='s')nextDir={x:0,y:1};
     else if(k==='ArrowLeft'||k==='a')nextDir={x:-1,y:0}; else if(k==='ArrowRight'||k==='d')nextDir={x:1,y:0};
     else if(k==='Escape')closeGame(false);
-  });
+  }
+  document.addEventListener('keydown', onKey);
   let sw=null;
   const swipeDist=22;   // 滑动判定阈值（px）
   cv.addEventListener('pointerdown',e=>{ sw={x:e.clientX,y:e.clientY}; try{ cv.setPointerCapture&&cv.setPointerCapture(e.pointerId); }catch(_){ } });
@@ -103,7 +104,7 @@ export function openPacman(cfg, onComplete) {
       specials=specials.filter(function(x){return x!==sp;});
       if(sp.kind==='cmd'){ currentCmd=sp.cmd; score+=5; scoreEl.textContent=score; if(termEl)termEl.textContent=sp.label; playSound('click'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'带命令：'+sp.label,t:0,col:'#2196f3'}); }
       else {
-        if(currentCmd && hintOf[currentCmd]===sp.label){ paired++; score+=25; scoreEl.textContent=score; currentCmd=''; if(termEl)termEl.textContent='—'; playSound('success'); addParticles(px*cell+cell/2,py*cell+cell/2,'#00e676'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'✅ '+hintOf[currentCmd===sp.cmd?sp.cmd:currentCmd]+' 配对成功',t:0,col:'#00e676'}); if(paired>=pairs.length){ power=6; playSound('levelup'); } }
+        if(currentCmd && hintOf[currentCmd]===sp.label){ paired++; score+=25; scoreEl.textContent=score; const pairedCmd=currentCmd; currentCmd=''; if(termEl)termEl.textContent='—'; playSound('success'); addParticles(px*cell+cell/2,py*cell+cell/2,'#00e676'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'✅ '+hintOf[pairedCmd]+' 配对成功',t:0,col:'#00e676'}); if(paired>=pairs.length){ power=6; playSound('levelup'); } }
         else { score=Math.max(0,score-5); scoreEl.textContent=score; currentCmd=''; if(termEl)termEl.textContent='—'; playSound('error'); floats.push({x:px*cell+cell/2,y:py*cell+cell/2,txt:'❌ 命令不匹配',t:0,col:'#ff5252'}); }
       }
     }
@@ -181,16 +182,17 @@ export function openPacman(cfg, onComplete) {
     ctx.globalAlpha=1; floats=floats.filter(f=>f.t<1.3);
   }
   function endGame(isWin){
-    if(ended)return; ended=true;
+    if(ended)return; ended=true; cancelAnimationFrame(raf);
     if(isWin){ window.recordGameWin('pacman'); window.miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">👾</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(isWin?'镜像全部回收！':'被清理进程回收了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 <b style="color:var(--amber)">'+level+'</b> 关</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.pcAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.pcDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
-  window.pcAgain=()=>{ overlay.remove(); openPacman(cfg,onComplete); };
-  window.pcDone=()=>{ if(onComplete)onComplete(isWin); overlay.remove(); window.playAreaMusic(); };
-  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
+  function teardown(){ cancelAnimationFrame(raf); document.removeEventListener('keydown', onKey); }
+  window.pcAgain=()=>{ teardown(); overlay.remove(); openPacman(cfg,onComplete); };
+  window.pcDone=()=>{ teardown(); if(onComplete)onComplete(isWin); overlay.remove(); window.playAreaMusic(); };
+  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); teardown(); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
   let last=performance.now(), dt=0;
   function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
   let raf; raf=requestAnimationFrame(loop);

@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../db');
 const { requireAuth } = require('../auth');
 const { getContent } = require('./game');
+const { PASSWORD_ENABLED } = require('./login');
 
 // ===== 商城目录（服务端统一定价，前端展示用 /shop 拉取） =====
 const SHOP_ITEMS = {
@@ -50,73 +51,7 @@ function levelCompleted(check, level) {
   return total > 0 && done >= total;
 }
 
-// 学生提交进度
-router.post('/progress', requireAuth, async (req, res) => {
-  if (req.session.role !== 'student') {
-    return res.status(403).json({ ok: false, error: '仅学生可操作' });
-  }
-  const { check, stars, achievements } = req.body || {};
-  const student = db.findStudent(req.session.name);
-  if (!student) return res.status(404).json({ ok: false, error: '账号不存在' });
-
-  const contentRes = getContent();
-  const validLevels = new Set();
-  if (contentRes.ok && contentRes.data && contentRes.data.levels) {
-    contentRes.data.levels.forEach(lv => validLevels.add(String(lv.id)));
-  }
-
-  let currentCheck = check || {};
-  if (typeof currentCheck === 'object' && !Array.isArray(currentCheck)) {
-    const filtered = {};
-    Object.keys(currentCheck).forEach(k => {
-      if (validLevels.has(String(k))) {
-        const v = currentCheck[k];
-        filtered[k] = (v && v.half) ? { half: true } : true;
-      }
-    });
-    if (Object.keys(filtered).length > 0 || Object.keys(currentCheck).length === 0) {
-      currentCheck = filtered;
-    }
-  }
-
-  let currentStars = {};
-  if (stars && typeof stars === 'object' && !Array.isArray(stars)) {
-    Object.keys(stars).forEach(k => {
-      if (validLevels.has(String(k))) {
-        const s2 = stars[k] || {};
-        currentStars[k] = {
-          self: Math.max(0, Number(s2.self) || 0),
-          peer: Math.max(0, Number(s2.peer) || 0),
-          teacher: Math.max(0, Number(s2.teacher) || 0)
-        };
-      }
-    });
-  }
-
-  const oldCheck = JSON.parse(student.check_data || '{}');
-
-  db.updateStudentData(req.session.name, currentCheck, currentStars);
-
-  const patch = {};
-  if (achievements) patch.achievements = achievements;
-
-  // 检测新完成关卡，记录首次完成时间（用于先锋判定）
-  if (contentRes.ok && contentRes.data && contentRes.data.levels) {
-    const finishTimes = JSON.parse(student.level_finish_times || '{}');
-    let changed = false;
-    contentRes.data.levels.forEach(lv => {
-      if (finishTimes[lv.id]) return;
-      if (!levelCompleted(oldCheck, lv) && levelCompleted(currentCheck, lv)) {
-        finishTimes[lv.id] = new Date().toISOString();
-        changed = true;
-      }
-    });
-    if (changed) patch.levelFinishTimes = finishTimes;
-  }
-
-  if (Object.keys(patch).length) db.updateStudentMeta(req.session.name, patch);
-  res.json({ ok: true });
-});
+// 学生提交进度（前端使用 PUT /me；此接口已删除，避免与 /me 重复逻辑与 validLevels 未定义 bug）
 
 // 学生反馈 Bug（抓虫有奖）
 router.post('/bug-report', requireAuth, (req, res) => {
@@ -207,7 +142,15 @@ router.get('/me', requireAuth, async (req, res) => {
   if (req.session.role !== 'student') return res.status(403).json({ ok: false, error: '仅学生可操作' });
   const student = db.findStudent(req.session.name);
   if (!student) return res.status(404).json({ ok: false, error: '账号不存在' });
-  const wallet = db.getWallet(req.session.name) || {};
+
+  // 自动领取今日工资（幂等：当天已领则不加），供登录 toast 与钱包页展示
+  const cr = getContent();
+  const xp = (cr.ok && cr.data) ? db.calcStudentXP(student, cr.data) : 0;
+  const before = db.getWallet(req.session.name) || {};
+  const after = db.claimSalary(req.session.name, xp) || before;
+  const gained = (after.coins || 0) - (before.coins || 0);
+
+  const wallet = after;
   const pw = student.password || '';
   res.json({ ok: true, data: {
     name: student.name,
@@ -215,6 +158,17 @@ router.get('/me', requireAuth, async (req, res) => {
     stars: JSON.parse(student.stars_data || '{}'),
     achievements: JSON.parse(student.achievements || '{}'),
     teacherAwards: JSON.parse(student.teacher_awards || '{}'),
+    newlyAwardedLogin: db.newlyAwardedLoginIds(student),
+    salaryInfo: {
+      xp,
+      rate: db.salaryRate(xp),
+      monthTotal: wallet.monthSalaryTotal || 0,
+      claimedToday: (wallet.lastSalaryDate || '') === db.localDateString(),
+      justClaimed: gained > 0,
+      gained,
+      coins: wallet.coins || 0
+    },
+    passwordEnabled: PASSWORD_ENABLED,
     levelFinishTimes: JSON.parse(student.level_finish_times || '{}'),
     loginCount: student.login_count || 0,
     lastLoginDate: student.last_login_date || '',
@@ -225,6 +179,16 @@ router.get('/me', requireAuth, async (req, res) => {
     hasPassword: !!pw && !(await db.isDefaultPassword(pw)),
     mustChangePassword: student.must_change_password === 1 || (await db.isDefaultPassword(pw))
   }});
+});
+
+// 前端弹完登录签到成就后标记"已提示"（防换设备/清缓存重复弹）
+router.post('/notify-login-ach', requireAuth, (req, res) => {
+  if (req.session.role !== 'student') {
+    return res.status(403).json({ ok: false, error: '仅学生可操作' });
+  }
+  const { ids } = req.body || {};
+  if (Array.isArray(ids) && ids.length) db.markLoginAchNotified(req.session.name, ids.slice(0, 50));
+  res.json({ ok: true });
 });
 
 // 存档进度（前端用 PUT /me；逻辑与 /progress 一致）
@@ -247,7 +211,7 @@ router.put('/me', requireAuth, async (req, res) => {
   let currentStars = JSON.parse(student.stars_data || '{}');
   if (stars && typeof stars === 'object' && !Array.isArray(stars)) {
     const f2 = {};
-    Object.keys(stars).forEach(k => { if (validLevels.has(String(k))) { const s2 = stars[k] || {}; f2[k] = { self: Math.max(0, Number(s2.self) || 0), peer: Math.max(0, Number(s2.peer) || 0), teacher: Math.max(0, Number(s2.teacher) || 0) }; } });
+    Object.keys(stars).forEach(k => { if (validLevels.has(String(k))) { const s2 = stars[k] || {}; f2[k] = { self: Math.max(0, Math.min(5, Number(s2.self) || 0)), peer: Math.max(0, Math.min(5, Number(s2.peer) || 0)), teacher: 0 }; } });
     currentStars = f2;
   }
   const oldCheck = JSON.parse(student.check_data || '{}');

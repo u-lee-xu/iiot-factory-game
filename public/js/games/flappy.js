@@ -41,8 +41,10 @@ export function openFlappy(cfg, onComplete) {
   const cw=cv.clientWidth||W; const sf=Math.max(0.6,cw/W);
   const livesEl=document.getElementById('fpLives'), scoreEl=document.getElementById('fpScore'), speedEl=document.getElementById('fpSpeed');
   function flap(){ vy=-170; playSound('type'); }
-  document.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='ArrowUp'||e.key==='w'){e.preventDefault();flap();} else if(e.key==='Escape')closeGame(false); });
-  cv.addEventListener('pointerdown', e=>{ e.preventDefault(); flap(); });
+  function onKey(e){ if(e.key===' '||e.key==='ArrowUp'||e.key==='w'){e.preventDefault();flap();} else if(e.key==='Escape')closeGame(false); }
+  document.addEventListener('keydown', onKey);
+  function onPointerDown(e){ e.preventDefault(); flap(); }
+  cv.addEventListener('pointerdown', onPointerDown);
   function addParticles(x,y,c){ for(let i=0;i<8;i++)particles.push({x,y,vx:(Math.random()-.5)*100,vy:(Math.random()-.5)*100,t:0,color:c}); }
   function spawnPipe(){
     const q=questions[Math.floor(Math.random()*questions.length)];
@@ -108,16 +110,17 @@ export function openFlappy(cfg, onComplete) {
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
   }
   function endGame(isWin){
-    if(ended)return; ended=true;
+    if(ended)return; ended=true; cancelAnimationFrame(raf);
     if(isWin){ window.recordGameWin('flappy'); window.miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🦅</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">掉进断线黑洞了</div><div style="font-size:15px;color:var(--dim);margin-top:6px">穿过 <b style="color:var(--amber)">'+score/10+'</b> 道命令题</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.fpAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.fpDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
-  window.fpAgain=()=>{ overlay.remove(); openFlappy(cfg,onComplete); };
-  window.fpDone=()=>{ if(onComplete)onComplete(score>=50); overlay.remove(); window.playAreaMusic(); };
-  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
+  function teardown(){ cancelAnimationFrame(raf); document.removeEventListener('keydown', onKey); }
+  window.fpAgain=()=>{ teardown(); overlay.remove(); openFlappy(cfg,onComplete); };
+  window.fpDone=()=>{ teardown(); if(onComplete)onComplete(score>=50); overlay.remove(); window.playAreaMusic(); };
+  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); teardown(); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
   let last=performance.now(), dt=0;
   function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
   let raf; raf=requestAnimationFrame(loop);

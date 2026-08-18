@@ -172,7 +172,7 @@ export function openDataRacing(cfg, onComplete) {
 
   function endGame(isWin){
     if (ended) return;
-    ended = true;
+    ended = true; cancelAnimationFrame(raf);
     if (isWin) { window.recordGameWin('racing'); window.miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(() => {
       const res = document.createElement('div');
@@ -191,11 +191,12 @@ export function openDataRacing(cfg, onComplete) {
       overlay.appendChild(res);
     }, 300);
   }
-  window.rrAgain = () => { overlay.remove(); openDataRacing(cfg, onComplete); };
-  window.rrDone = () => { if (onComplete) onComplete(ended && survived>=45 ? true : false); overlay.remove(); window.playAreaMusic(); };
+  function teardown(){ cancelAnimationFrame(raf); document.removeEventListener('keydown', kd); document.removeEventListener('keyup', ku); }
+  window.rrAgain = () => { teardown(); overlay.remove(); openDataRacing(cfg, onComplete); };
+  window.rrDone = () => { teardown(); if (onComplete) onComplete(ended && survived>=45 ? true : false); overlay.remove(); window.playAreaMusic(); };
   function closeGame(manual){
     if (ended) return;
-    ended=true; cancelAnimationFrame(raf);
+    ended=true; cancelAnimationFrame(raf); teardown();
     overlay.remove();
     if (manual){ if(onComplete) onComplete(false); window.playAreaMusic(); }
   }

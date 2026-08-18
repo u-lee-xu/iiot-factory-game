@@ -41,11 +41,13 @@ export function openTank(cfg, onComplete) {
   const cw=cv.clientWidth||W; const sf=Math.max(0.6,cw/W);
   const livesEl=document.getElementById('tkLives'), baseEl=document.getElementById('tkBase'), scoreEl=document.getElementById('tkScore'), waveEl=document.getElementById('tkWave');
   const keys={};
-  document.addEventListener('keydown', e=>{ keys[e.key]=true;
+  function onKeyDown(e){ keys[e.key]=true;
     if(e.key==='ArrowUp'||e.key==='w'){ topicIdx=(topicIdx+1)%topics.length; cannonTopic=topics[topicIdx]; var _t=document.getElementById('tkTopic'); if(_t)_t.textContent=cannonTopic; playSound('click'); }
     else if(e.key==='ArrowDown'||e.key==='s'){ topicIdx=(topicIdx+topics.length-1)%topics.length; cannonTopic=topics[topicIdx]; var _t2=document.getElementById('tkTopic'); if(_t2)_t2.textContent=cannonTopic; playSound('click'); }
-    else if(e.key==='Escape')closeGame(false); });
-  document.addEventListener('keyup', e=>{ keys[e.key]=false; });
+    else if(e.key==='Escape')closeGame(false); }
+  function onKeyUp(e){ keys[e.key]=false; }
+  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('keyup', onKeyUp);
   let joystick=null;
   cv.addEventListener('pointerdown',e=>{ joystick={x:e.clientX,y:e.clientY}; });
   cv.addEventListener('pointermove',e=>{ if(!joystick)return; const dx=e.clientX-joystick.x, dy=e.clientY-joystick.y; if(Math.abs(dx)>Math.abs(dy)) dir={x:Math.sign(dx),y:0}; else if(dy!==0) dir={x:0,y:Math.sign(dy)}; joystick.x=e.clientX; joystick.y=e.clientY; });
@@ -97,14 +99,15 @@ export function openTank(cfg, onComplete) {
     particles.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
   }
-  function endGame(isWin){ if(ended)return; ended=true; if(isWin){window.recordGameWin('tank');window.miniMarkClear(cfg.id);playSound('fanfare');}
+  function endGame(isWin){ if(ended)return; ended=true; cancelAnimationFrame(raf); if(isWin){window.recordGameWin('tank');window.miniMarkClear(cfg.id);playSound('fanfare');}
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🎯</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(base>0?'Broker 守住了！':'Broker 被攻破了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">守到第 <b style="color:var(--amber)">'+wave+'</b> 波 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.tkAgain()">🔁 再战</button><button class="mm-btn primary" onclick="window.tkDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300); }
-  window.tkAgain=()=>{ overlay.remove(); openTank(cfg,onComplete); };
-  window.tkDone=()=>{ if(onComplete)onComplete(base>0); overlay.remove(); window.playAreaMusic(); };
-  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
+  function teardown(){ cancelAnimationFrame(raf); document.removeEventListener('keydown', onKeyDown); document.removeEventListener('keyup', onKeyUp); }
+  window.tkAgain=()=>{ teardown(); overlay.remove(); openTank(cfg,onComplete); };
+  window.tkDone=()=>{ teardown(); if(onComplete)onComplete(base>0); overlay.remove(); window.playAreaMusic(); };
+  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); teardown(); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
   let last=performance.now(), dt=0;
   function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
   let raf; raf=requestAnimationFrame(loop);

@@ -544,7 +544,7 @@ export function openSnake(cfg, onComplete) {
 
   // ================= 结算 =================
   function endGame(isWin){
-    if(ended) return; ended=true;
+    if(ended) return; ended=true; cancelAnimationFrame(raf);
     if(isWin){ window.recordGameWin('snake'); window.miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(function(){
       const res=document.createElement('div'); res.className='ty-result';
@@ -553,7 +553,7 @@ export function openSnake(cfg, onComplete) {
       overlay.innerHTML=''; overlay.appendChild(res);
     },300);
   }
-  function cleanup(){ document.removeEventListener('keydown', kd); }
+  function cleanup(){ cancelAnimationFrame(raf); document.removeEventListener('keydown', kd); }
   window.snAgain=function(){ cleanup(); overlay.remove(); openSnake(cfg,onComplete); };
   window.snDone=function(){ cleanup(); if(onComplete)onComplete(paired>=WIN); overlay.remove(); window.playAreaMusic(); };
   function closeGame(manual){ if(ended) return; ended=true; cancelAnimationFrame(raf); cleanup(); overlay.remove(); if(manual){ if(onComplete)onComplete(false); window.playAreaMusic(); } }

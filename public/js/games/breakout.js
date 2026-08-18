@@ -51,9 +51,12 @@ export function openBreakout(cfg, onComplete) {
   }
   build();
   function addParticles(x,y,c){ for(let i=0;i<14;i++)particles.push({x,y,vx:(Math.random()-.5)*260,vy:(Math.random()-.5)*260,t:0,color:c}); }
-  document.addEventListener('keydown', e=>{ if(e.key==='ArrowLeft'||e.key==='a'){px-=28;} else if(e.key==='ArrowRight'||e.key==='d'){px+=28;} else if(e.key==='Escape')closeGame(false); });
-  cv.addEventListener('pointermove', e=>{ const r=cv.getBoundingClientRect(); px=Math.max(pw/2,Math.min(W-pw/2,(e.clientX-r.left)/sf)); });
-  cv.addEventListener('pointerdown', e=>{ if(onPaddle){ onPaddle=false; } });
+  function onKey(e){ if(e.key==='ArrowLeft'||e.key==='a'){px-=28;} else if(e.key==='ArrowRight'||e.key==='d'){px+=28;} else if(e.key==='Escape')closeGame(false); }
+  document.addEventListener('keydown', onKey);
+  function onPointerMove(e){ const r=cv.getBoundingClientRect(); px=Math.max(pw/2,Math.min(W-pw/2,(e.clientX-r.left)/sf)); }
+  function onPointerDown(){ if(onPaddle){ onPaddle=false; } }
+  cv.addEventListener('pointermove', onPointerMove);
+  cv.addEventListener('pointerdown', onPointerDown);
   function update(dt){
     if(ended)return;
     // 板
@@ -91,14 +94,15 @@ export function openBreakout(cfg, onComplete) {
     particles.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; ctx.globalAlpha=Math.max(0,1-p.t/0.5); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,5,5); });
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
   }
-  function endGame(isWin){ if(ended)return; ended=true; if(isWin){window.recordGameWin('breakout');window.miniMarkClear(cfg.id);playSound('fanfare');}
+  function endGame(isWin){ if(ended)return; ended=true; cancelAnimationFrame(raf); if(isWin){window.recordGameWin('breakout');window.miniMarkClear(cfg.id);playSound('fanfare');}
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🧱</div><div style="font-size:20px;font-weight:bold;color:var(--amber);margin-top:8px">'+(isWin?'故障全消！':'AI 决策失误，球漏了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">得分 <b style="color:var(--amber)">'+score+'</b> · 到第 <b style="color:var(--amber)">'+level+'</b> 关</div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.brAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.brDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300); }
-  window.brAgain=()=>{ overlay.remove(); openBreakout(cfg,onComplete); };
-  window.brDone=()=>{ if(onComplete)onComplete(score>=50); overlay.remove(); window.playAreaMusic(); };
-  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
+  function teardown(){ cancelAnimationFrame(raf); document.removeEventListener('keydown', onKey); }
+  window.brAgain=()=>{ teardown(); overlay.remove(); openBreakout(cfg,onComplete); };
+  window.brDone=()=>{ teardown(); if(onComplete)onComplete(score>=50); overlay.remove(); window.playAreaMusic(); };
+  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); teardown(); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
   let last=performance.now(), dt=0;
   function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
   let raf; raf=requestAnimationFrame(loop);

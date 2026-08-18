@@ -105,16 +105,17 @@ export function openMole(cfg, onComplete) {
     ctx.globalAlpha=1; particles=particles.filter(p=>p.t<0.5);
   }
   function endGame(isWin){
-    if(ended)return; ended=true;
+    if(ended)return; ended=true; cancelAnimationFrame(raf);
     if(isWin){ window.recordGameWin('mole'); window.miniMarkClear(cfg.id); playSound('fanfare'); }
     setTimeout(()=>{ const res=document.createElement('div'); res.className='ty-result';
       window.focusResultPrimary(overlay);
       res.innerHTML='<div style="font-size:46px;line-height:1">🔨</div><div style="font-size:20px;font-weight:bold;color:'+(isWin?'var(--green)':'var(--red)')+';margin-top:8px">'+(isWin?'边缘过滤完成！':'被正常数据骗了')+'</div><div style="font-size:15px;color:var(--dim);margin-top:6px">点掉异常 <b style="color:var(--amber)">'+killed+'</b> 个 · 得分 <b style="color:var(--amber)">'+score+'</b></div><div style="display:flex;gap:10px;justify-content:center;margin-top:16px"><button class="mm-btn" onclick="window.moAgain()">🔁 再来</button><button class="mm-btn primary" onclick="window.moDone()">收下奖励</button></div>';
       overlay.innerHTML=''; overlay.appendChild(res); },300);
   }
-  window.moAgain=()=>{ overlay.remove(); openMole(cfg,onComplete); };
-  window.moDone=()=>{ if(onComplete)onComplete(killed>=20); overlay.remove(); window.playAreaMusic(); };
-  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
+  function teardown(){ cancelAnimationFrame(raf); }
+  window.moAgain=()=>{ teardown(); overlay.remove(); openMole(cfg,onComplete); };
+  window.moDone=()=>{ teardown(); if(onComplete)onComplete(killed>=20); overlay.remove(); window.playAreaMusic(); };
+  function closeGame(manual){ if(ended)return; ended=true; cancelAnimationFrame(raf); teardown(); overlay.remove(); if(manual){if(onComplete)onComplete(false);window.playAreaMusic();} }
   let last=performance.now(), dt=0;
   function loop(now){ dt=Math.min(0.05,(now-last)/1000); last=now; update(dt); draw(); raf=requestAnimationFrame(loop); }
   let raf; raf=requestAnimationFrame(loop);
