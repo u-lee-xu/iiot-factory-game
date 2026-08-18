@@ -9,22 +9,27 @@
   th.sortable:hover{color:var(--cyan)}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Courier New', monospace; background: #0f0f14; color: #c8c8d0; min-height: 100vh; }
-.header { background: #181820; border-bottom: 1px solid #2a2a3a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+.header { background: #181820; border-bottom: 1px solid #2a2a3a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .header .logo { font-size: 20px; color: #00bcd4; display: flex; align-items: center; gap: 10px; }
 .header .logo span { color: #c8c8d0; }
 .logout-btn { background: none; border: 1px solid #2a2a3a; color: #606070; padding: 6px 16px; font-family: inherit; font-size: 17px; cursor: pointer; transition: all .2s; }
 .logout-btn:hover { border-color: #ff5555; color: #ff5555; }
-main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+main { max-width: 1400px; margin: 0 auto; padding: 24px; }
 .controls { margin-bottom: 20px; }
-.controls h2 { font-size: 19px; font-weight: normal; color: #00bcd4; margin-bottom: 12px; }
-.batch-add { display: flex; gap: 8px; }
-.batch-add input { flex: 1; padding: 10px 12px; background: #000; border: 1px solid #2a2a3a; color: #00e676; font-family: inherit; font-size: 17px; outline: none; }
+.controls h2 { font-size: 19px; font-weight: normal; color: #00bcd4; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.batch-add { display: flex; gap: 8px; flex-wrap: wrap; }
+.batch-add input { flex: 1; min-width: 200px; padding: 10px 12px; background: #000; border: 1px solid #2a2a3a; color: #00e676; font-family: inherit; font-size: 17px; outline: none; }
 .batch-add input:focus { border-color: #ffb000; }
 .batch-add input::placeholder { color: #3a3a48; }
 .btn { padding: 10px 18px; background: #2a2a3a; border: none; color: #c8c8d0; font-family: inherit; font-size: 17px; cursor: pointer; transition: all .2s; white-space: nowrap; }
 .btn:hover { background: #3a3a4a; }
 .btn.primary { background: #ffb000; color: #000; font-weight: bold; }
 .btn.primary:hover { background: #ffc030; }
+.btn.secondary { background: #00bcd4; color: #000; font-weight: bold; }
+.btn.secondary:hover { background: #00d4e6; }
+.btn.danger { background: #ff5555; color: #fff; }
+.btn.danger:hover { background: #ff7777; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .table-wrap { overflow-x: auto; border: 1px solid #2a2a3a; background: #181820; }
 table { width: 100%; border-collapse: collapse; font-size: 17px; }
 thead th { background: #12121a; color: #606070; font-weight: normal; font-size: 19px; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2a3a; white-space: nowrap; }
@@ -45,10 +50,49 @@ tbody tr:last-child td { border-bottom: none; }
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #181820; border: 1px solid #2a2a3a; color: #c8c8d0; padding: 10px 20px; font-size: 17px; z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none; }
 .toast.show { opacity: 1; }
 .toast.success { border-color: #00e676; } .toast.error { border-color: #ff5555; }
+
+/* 仪表盘卡片 */
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.dash-card { background: #181820; border: 1px solid #2a2a3a; padding: 20px; border-radius: 8px; }
+.dash-card .label { font-size: 15px; color: #606070; margin-bottom: 8px; }
+.dash-card .value { font-size: 36px; color: #00e676; font-weight: bold; }
+.dash-card .sub { font-size: 14px; color: #3a3a48; margin-top: 4px; }
+.dash-card.warn .value { color: #ffb000; }
+.dash-card.danger .value { color: #ff5555; }
+
+/* 图表容器 */
+.chart-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.chart-box { background: #181820; border: 1px solid #2a2a3a; padding: 16px; border-radius: 8px; }
+.chart-box h3 { font-size: 17px; color: #00bcd4; margin-bottom: 12px; font-weight: normal; }
+.chart-bars { display: flex; flex-direction: column; gap: 8px; }
+.chart-bar { display: flex; align-items: center; gap: 12px; }
+.chart-bar .label { width: 100px; font-size: 14px; color: #606070; flex-shrink: 0; text-align: right; }
+.chart-bar .track { flex: 1; height: 18px; background: #1e1e2a; border-radius: 9px; overflow: hidden; position: relative; }
+.chart-bar .fill { height: 100%; border-radius: 9px; transition: width .5s; }
+.chart-bar .fill.xp { background: linear-gradient(90deg, #00bcd4, #00e676); }
+.chart-bar .fill.login { background: linear-gradient(90deg, #ffb000, #ff5555); }
+.chart-bar .value { width: 60px; text-align: right; font-size: 14px; color: #c8c8d0; flex-shrink: 0; }
+
+/* 登录统计表 */
+.login-stats-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.login-stats-table th, .login-stats-table td { padding: 8px 12px; border-bottom: 1px solid #1e1e2a; text-align: center; }
+.login-stats-table th { background: #12121a; color: #606070; font-weight: normal; }
+.login-stats-table .success { color: #00e676; }
+.login-stats-table .fail { color: #ff5555; }
+
+/* 导入模态框 */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: #181820; border: 1px solid #2a2a3a; border-radius: 8px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow: auto; }
+.modal-box h3 { color: #00bcd4; margin-bottom: 16px; font-weight: normal; }
+.modal-box textarea { width: 100%; min-height: 200px; background: #000; border: 1px solid #2a2a3a; color: #00e676; font-family: inherit; font-size: 15px; padding: 12px; resize: vertical; outline: none; }
+.modal-box textarea:focus { border-color: #ffb000; }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; }
 @media (max-width: 640px) {
   main { padding: 12px; }
   .batch-add { flex-direction: column; }
-  .header { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+  .batch-add input { min-width: 100%; }
+  .chart-row { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -58,10 +102,42 @@ tbody tr:last-child td { border-bottom: none; }
   <button class="logout-btn" onclick="logout()">退出</button>
 </header>
 <main>
+  <!-- 班级仪表盘 -->
+  <section class="controls" id="dashboardSection" style="display:none">
+    <h2>📊 班级仪表盘</h2>
+    <div class="dashboard-grid" id="dashSummary"></div>
+    
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>XP 分布</h3>
+        <div class="chart-bars" id="xpChart"></div>
+      </div>
+      <div class="chart-box">
+        <h3>关卡完成率</h3>
+        <div class="chart-bars" id="levelChart"></div>
+      </div>
+    </div>
+
+    <div class="chart-box" style="margin-bottom:24px">
+      <h3>最近 7 天登录统计</h3>
+      <table class="login-stats-table">
+        <thead><tr><th>日期</th><th>学生-成功</th><th>学生-失败</th><th>教师-成功</th><th>教师-失败</th></tr></thead>
+        <tbody id="loginStatsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 学生管理 -->
   <section class="controls">
-    <h2>学生管理</h2>
+    <h2>
+      学生管理
+      <button class="btn secondary" onclick="toggleDashboard()">📊 仪表盘</button>
+      <button class="btn" onclick="exportProgress()">📥 导出进度 CSV</button>
+      <button class="btn" onclick="exportAudit()">📥 导出登录审计</button>
+      <button class="btn" onclick="openImportModal()">📤 CSV 批量导入</button>
+    </h2>
     <div class="batch-add">
-      <input id="namesInput" type="text" placeholder="输入姓名，用逗号分隔（初始密码 123456）" onkeydown="if(event.key==='Enter')addStudents()">
+      <input id="namesInput" type="text" placeholder="输入姓名，用逗号/换行/空格分隔（初始密码 123456）" onkeydown="if(event.key==='Enter')addStudents()">
       <button class="btn primary" onclick="addStudents()">批量添加</button>
     </div>
     <div id="batchResult" style="font-size: 19px;color:#606070;margin-top:6px;min-height:18px"></div>
@@ -70,98 +146,136 @@ tbody tr:last-child td { border-bottom: none; }
     <div class="loading" id="loadingIndicator">加载中...</div>
   </section>
 
+  <!-- Bug 反馈 -->
   <section class="controls" style="margin-top:28px">
-    <h2 style="margin-bottom:10px">🐛 Bug 反馈 · 抓虫有奖</h2>
+    <h2>🐛 Bug 反馈 · 抓虫有奖</h2>
     <div id="bugList"><div class="loading">加载中...</div></div>
   </section>
 </main>
+
+<!-- 导入模态框 -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal-box">
+    <h3>📤 CSV 批量导入学生</h3>
+    <p style="color:#606070;font-size:15px;margin-bottom:12px">格式：第一行为表头（name 或 姓名），后续每行一个学生。示例：</p>
+    <pre style="background:#000;border:1px solid #2a2a3a;padding:10px;font-size:13px;color:#606070;overflow:auto">name
+张三
+李四
+王五</pre>
+    <textarea id="csvInput" placeholder="粘贴 CSV 内容..."></textarea>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeImportModal()">取消</button>
+      <button class="btn primary" onclick="submitImport()">导入</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const API = window.location.origin;
-const RANKS = [
-  { min: 0, max: 999, name: '实习生', cls: 'rank-intern' },
-  { min: 1000, max: 2499, name: '学徒', cls: 'rank-apprentice' },
-  { min: 2500, max: 4499, name: '技工', cls: 'rank-worker' },
-  { min: 4500, max: 6999, name: '工程师', cls: 'rank-engineer' },
-  { min: 7000, max: Infinity, name: '专家', cls: 'rank-expert' }
-];
-let students = [];
-let sortKey='login', sortAsc=false;   // 默认按登录次数从高到低
-const DEFAULT_ASC={name:true, xp:false, pct:false, login:false};   // 姓名升序，数值类默认降序
-let content = null;
+const API = window.location.origin + '/api';
+let allStudents = [];
+let sortKey = 'name';
+let sortAsc = true;
+const DEFAULT_ASC = { name: true, xp: false, pct: false, login: false };
 
-function $(id){ return document.getElementById(id); }
-function getToken(){ return sessionStorage.getItem('token'); }
-function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-function showToast(msg, type){
-  const el=$('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:'');
-  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'), 3000);
-}
-function rankForXP(xp){ for(const r of RANKS){ if(xp>=r.min && xp<=r.max) return r; } return RANKS[0]; }
-function taskXP(t){
-  if (t.hidden) return 300;
-  if (t.type === 'quiz' && t.xp <= 50) return 50;
-  if (t.xp === 0) return 0;
-  return t.xp || 100;
-}
-function studentStats(s){
-  const check = s.check || {};
-  let xp=0, done=0, total=0;
-  (content.levels||[]).forEach(lv=>{
-    (lv.tasks||[]).forEach(t=>{
-      if(t.auto) return;
-      total++;
-      const c=check[''+t.id];
-      if(c){ done++; xp += (c&&c.half)? Math.floor(taskXP(t)/2) : taskXP(t); }
-    });
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'''}[c])); }
+function getToken() { return sessionStorage.getItem('token'); }
+async function api(path, opts={}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken(), ...(opts.headers||{}) }
   });
-  return { xp, done, total, pct: total? Math.round(done/total*100):0 };
+  if (res.status === 401) { sessionStorage.clear(); window.location.href = 'index.html'; return null; }
+  return res.json();
+}
+function showToast(msg, type='') {
+  const t=$('toast'); t.textContent=msg; t.className='toast show '+(type||'');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+function rankForXP(xp) {
+  if(xp>=2000) return {name:'专家',cls:'rank-expert'};
+  if(xp>=1000) return {name:'工程师',cls:'rank-engineer'};
+  if(xp>=500) return {name:'技工',cls:'rank-worker'};
+  if(xp>=100) return {name:'学徒',cls:'rank-apprentice'};
+  return {name:'实习生',cls:'rank-intern'};
+}
+function studentStats(s) {
+  const check = JSON.parse(s.check || '{}');
+  let xp=0, done=0, total=0;
+  // 简化：直接用已计算好的 xp
+  xp = s.xp || 0;
+  const pct = s.completion || 0;
+  return { xp, pct };
 }
 
-async function api(path, opt={}){
-  const token=getToken();
-  const headers=Object.assign({}, opt.headers||{});
-  if(token) headers['Authorization']='Bearer '+token;
-  if(opt.body) headers['Content-Type']='application/json';
-  try{
-    const res=await fetch(API+path, Object.assign({}, opt, {headers}));
-    if(res.status===401){ sessionStorage.clear(); window.location.href='index.html'; return null; }
-    const data=await res.json();
-    if(!data.ok) throw new Error(data.error||'请求失败');
-    return data;
-  }catch(e){
-    showToast(e.message||'请求失败','error');
-    return null;
-  }
+// ===== 仪表盘 =====
+async function loadDashboard() {
+  const data = await api('/teacher/dashboard');
+  if (!data) return;
+  const d = data.data;
+
+  // 摘要卡片
+  const s = d.summary;
+  $('dashSummary').innerHTML = `
+    <div class="dash-card"><div class="label">总学生数</div><div class="value">${s.totalStudents}</div></div>
+    <div class="dash-card"><div class="label">今日活跃</div><div class="value">${s.activeToday}</div><div class="sub">本周活跃 ${s.activeThisWeek}</div></div>
+    <div class="dash-card"><div class="label">平均 XP</div><div class="value">${s.avgXP}</div></div>
+    <div class="dash-card"><div class="label">平均完成度</div><div class="value">${s.avgCompletion}%</div></div>
+  `;
+
+  // XP 分布图
+  const xpDist = d.xpDistribution;
+  const xpMax = Math.max(...Object.values(xpDist), 1);
+  $('xpChart').innerHTML = Object.entries(xpDist).map(([k, v]) => `
+    <div class="chart-bar">
+      <span class="label">${k}</span>
+      <div class="track"><div class="fill xp" style="width:${v/xpMax*100}%"></div></div>
+      <span class="value">${v}</span>
+    </div>
+  `).join('');
+
+  // 关卡完成率图
+  const levelMax = Math.max(...d.levelStats.map(l => l.total), 1);
+  $('levelChart').innerHTML = d.levelStats.map(l => `
+    <div class="chart-bar">
+      <span class="label" title="${esc(l.name)}">${esc(l.name).slice(0,8)}</span>
+      <div class="track"><div class="fill xp" style="width:${l.rate}%"></div></div>
+      <span class="value">${l.rate}%</span>
+    </div>
+  `).join('');
+
+  // 登录统计表
+  const loginStats = d.loginStats;
+  const days = Object.keys(loginStats).sort().reverse();
+  $('loginStatsBody').innerHTML = days.map(day => {
+    const s = loginStats[day];
+    return `<tr>
+      <td>${day}</td>
+      <td class="success">${s.student.success}</td>
+      <td class="fail">${s.student.fail}</td>
+      <td class="success">${s.teacher.success}</td>
+      <td class="fail">${s.teacher.fail}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" style="color:#606070">暂无数据</td></tr>';
 }
 
-async function loadContent(){
-  const c=await api('/api/game/content');
-  if(c) content=c.data;
+function toggleDashboard() {
+  const sec = $('dashboardSection');
+  const isHidden = sec.style.display === 'none';
+  sec.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) loadDashboard();
 }
-async function loadStudents(){
-  const container=$('tableContainer');
-  container.innerHTML='<div class="loading">加载中...</div>';
-  const data=await api('/api/teacher/students');
-  if(!data) return;
-  students=data.data||[];
-  renderTable();
-}
-function renderTable(){
-  const container=$('tableContainer');
-  if(!content){ container.innerHTML='<div class="loading">加载内容中...</div>'; return; }
-  if(students.length===0){
-    container.innerHTML='<div class="empty">暂无学生数据，请在上方添加学生</div>';
-    return;
-  }
-  // 按当前排序键排序（默认登录次数从高到低）
-  const sorted=[...students].sort((a,b)=>{
-    const sa=studentStats(a), sb=studentStats(b);
+
+// ===== 学生列表 =====
+function renderTable() {
+  const container = $('tableContainer');
+  const sorted = [...allStudents].sort((a,b)=>{
     if(sortKey==='name'){ const d=a.name.localeCompare(b.name,'zh'); return sortAsc? d : -d; }
     let va,vb;
-    if(sortKey==='xp'){ va=sa.xp; vb=sb.xp; }
-    else if(sortKey==='pct'){ va=sa.pct; vb=sb.pct; }
+    if(sortKey==='xp'){ va=studentStats(a).xp; vb=studentStats(b).xp; }
+    else if(sortKey==='pct'){ va=studentStats(a).pct; vb=studentStats(b).pct; }
     else { va=a.loginCount||0; vb=b.loginCount||0; }
     const d=va-vb;
     return sortAsc? d : -d;
@@ -177,11 +291,12 @@ function renderTable(){
     const rank=rankForXP(st.xp);
     const pct=st.pct;
     const barCls= pct>=80?'high': pct>=40?'mid':'';
+    const pwDisplay = s.hasPassword
+      ? '<span title="已设置个人密码" style="color:#00e676;cursor:help">🔒</span>'
+      : '<span title="初始密码 123456" style="color:#ffb000;cursor:help">初始</span>';
     html+='<tr>'+
       '<td>'+esc(s.name)+'</td>'+
-      '<td>'+(s.hasPassword
-        ? '<span title="已设置个人密码" style="color:#00e676;cursor:help">🔒</span>'
-        : '<span title="初始密码 123456" style="color:#ffb000;cursor:help">初始</span>')+'</td>'+
+      '<td>'+pwDisplay+'</td>'+
       '<td class="'+rank.cls+'">'+rank.name+'</td>'+
       '<td style="color:#00e676">'+st.xp+'</td>'+
       '<td><div class="progress-mini"><div class="bar '+barCls+'" style="width:'+pct+'%"></div></div>'+pct+'%</td>'+
@@ -193,11 +308,11 @@ function renderTable(){
   });
   html+='</tbody></table>';
   container.innerHTML=html;
-  // 绑定表头点击排序：再点同列切换升/降序
   container.querySelectorAll('th.sortable').forEach(th=>{
     th.onclick=()=>{ const k=th.dataset.sort; if(sortKey===k){ sortAsc=!sortAsc; } else { sortKey=k; sortAsc=!!DEFAULT_ASC[k]; } renderTable(); };
   });
 }
+
 function openDetail(nameEnc){ location.href='student_detail.html?name='+nameEnc; }
 
 async function addStudents(){
@@ -205,27 +320,65 @@ async function addStudents(){
   if(!raw){ showToast('请输入学生姓名','error'); return; }
   const names=raw.split(/[,，、\s]+/).filter(Boolean);
   if(names.length===0){ showToast('请输入有效姓名','error'); return; }
-  const data=await api('/api/teacher/students',{method:'POST', body:JSON.stringify({names})});
+  const data=await api('/teacher/students',{method:'POST', body:JSON.stringify({names})});
   if(!data) return;
   $('namesInput').value='';
   const parts=[];
   if(data.added&&data.added.length) parts.push('新增 '+data.added.length+' 人：'+data.added.join('、'));
   if(data.exists&&data.exists.length) parts.push('已存在 '+data.exists.length+' 人');
+  if(data.errors&&data.errors.length) parts.push('错误 '+data.errors.length+' 个');
   $('batchResult').textContent=parts.join(' | ');
-  showToast('添加完成（初始密码 123456）','success');
+  showToast('添加完成','success');
   loadStudents();
 }
+
 async function deleteStudent(nameEnc){
   const name=decodeURIComponent(nameEnc);
   if(!confirm('确认删除学生「'+name+'」？此操作不可撤销。')) return;
-  const data=await api('/api/teacher/student/'+nameEnc,{method:'DELETE'});
+  const data=await api('/teacher/student/'+nameEnc,{method:'DELETE'});
   if(!data) return;
   showToast('已删除 '+name,'success');
   loadStudents();
 }
+
+async function loadStudents(){
+  $('loadingIndicator').style.display='block';
+  const data=await api('/teacher/students');
+  if(!data){ $('loadingIndicator').style.display='none'; return; }
+  allStudents = data.data;
+  $('loadingIndicator').style.display='none';
+  renderTable();
+}
+
+// ===== CSV 导入 =====
+function openImportModal(){ $('importModal').classList.add('show'); }
+function closeImportModal(){ $('importModal').classList.remove('show'); $('csvInput').value=''; }
+async function submitImport(){
+  const csv = $('csvInput').value.trim();
+  if(!csv){ showToast('请粘贴 CSV 内容','error'); return; }
+  const data = await api('/teacher/students/import', {method:'POST', body:JSON.stringify({csv})});
+  if(!data) return;
+  closeImportModal();
+  const parts=[];
+  if(data.added&&data.added.length) parts.push('新增 '+data.added.length+' 人');
+  if(data.exists&&data.exists.length) parts.push('已存在 '+data.exists.length+' 人');
+  if(data.errors&&data.errors.length) parts.push('错误 '+data.errors.length+' 个');
+  showToast(parts.join(' | '), data.errors?.length ? 'error' : 'success');
+  loadStudents();
+}
+
+// ===== 导出 =====
+function exportProgress() {
+  window.open(API + '/teacher/export/progress', '_blank');
+}
+function exportAudit() {
+  window.open(API + '/teacher/export/audit?days=30', '_blank');
+}
+
+// ===== Bug 反馈 =====
 async function loadBugReports(){
   const box=$('bugList');
-  const data=await api('/api/teacher/bug-reports');
+  const data=await api('/teacher/bug-reports');
   if(!data){ return; }
   const list=data.data||[];
   if(!list.length){ box.innerHTML='<div class="empty">暂无 Bug 反馈。学生会在右下角「🐛 反馈 Bug · 抓虫有奖」入口提交。</div>'; return; }
@@ -246,7 +399,7 @@ async function loadBugReports(){
 }
 async function delBug(id){
   if(!confirm('删除这条 Bug 反馈？')) return;
-  const data=await api('/api/teacher/bug-reports/'+id,{method:'DELETE'});
+  const data=await api('/teacher/bug-reports/'+id,{method:'DELETE'});
   if(!data) return;
   loadBugReports();
 }
@@ -257,7 +410,6 @@ function logout(){ sessionStorage.clear(); window.location.href='index.html'; }
   const token=getToken();
   const role=sessionStorage.getItem('role');
   if(!token || role!=='teacher'){ window.location.href='index.html'; return; }
-  await loadContent();
   await loadStudents();
   loadBugReports();
 })();

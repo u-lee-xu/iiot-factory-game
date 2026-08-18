@@ -211,8 +211,8 @@ function popupShownToday(t){ try{ return localStorage.getItem('popup_day_'+t)===
 // =========================================================================
 const API = location.origin;
 
-// 学生密码开关（临时暂停，先测翻牌）
-const PASSWORD_ENABLED = true;
+// 学生密码开关（后端 PASSWORD_ENABLED 环境变量；/api/student/me 返回后联动覆盖）
+let PASSWORD_ENABLED = true;
 const token = sessionStorage.getItem('token');
 const role = sessionStorage.getItem('role');
 const myName = sessionStorage.getItem('name');
@@ -812,7 +812,6 @@ Object.assign(window, {
   API,
   BG_TRACKS,
   ENEMY_SKIN_COLORS,
-  PASSWORD_ENABLED,
   PLANE_SKINS,
   RANKS,
   SNAKE_SKINS,
@@ -1003,6 +1002,7 @@ Object.assign(window, {
   walletRank
 });
 
+Object.defineProperty(window, 'PASSWORD_ENABLED', { get: () => PASSWORD_ENABLED, set: v => { PASSWORD_ENABLED = !!v; }, configurable: true });
 Object.defineProperty(window, 'SHOP_CACHE', { get: () => SHOP_CACHE, set: v => { SHOP_CACHE = v; }, configurable: true });
 Object.defineProperty(window, '_mapFlowFeature', { get: () => _mapFlowFeature, set: v => { _mapFlowFeature = v; }, configurable: true });
 Object.defineProperty(window, '_shooterSkipLoadout', { get: () => _shooterSkipLoadout, set: v => { _shooterSkipLoadout = v; }, configurable: true });

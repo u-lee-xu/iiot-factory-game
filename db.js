@@ -392,6 +392,35 @@ function recordLogin(name) {
   return { firstTime, streak, alreadyToday, lastLoginDate: today };
 }
 
+// ===== 登录签到成就（与前端 achievements-meta.js 的 login_* 对应） =====
+const LOGIN_ACH_MILESTONES = [
+  { id: 'login_first', min: 1, firstOnly: true },
+  { id: 'login_3', min: 3 },
+  { id: 'login_7', min: 7 },
+  { id: 'login_14', min: 14 },
+  { id: 'login_30', min: 30 }
+];
+
+// 按连续登录天数算出应发放的登录成就 id（发放本身走 awardAchievements，幂等）
+function loginAchievementIds(streak, firstTime) {
+  const ids = [];
+  LOGIN_ACH_MILESTONES.forEach(m => {
+    if (m.firstOnly) { if (firstTime) ids.push(m.id); }
+    else if (streak >= m.min) ids.push(m.id);
+  });
+  return ids;
+}
+
+// 已发放但尚未提示过（login_ach_notified 中无记录）的登录成就
+// 前端弹完签到成就后会调 POST /api/student/notify-login-ach 标记，避免换设备/清缓存重复弹
+function newlyAwardedLoginIds(student) {
+  if (!student) return [];
+  let ach = {}, notified = {};
+  try { ach = JSON.parse(student.achievements || '{}'); } catch (e) {}
+  try { notified = JSON.parse(student.login_ach_notified || '{}'); } catch (e) {}
+  return Object.keys(ach).filter(id => id.indexOf('login_') === 0 && !notified[id]);
+}
+
 // ===== 工资 & 商城（钱包） =====
 const SALARY_TABLE = [
   { min: 0,    rate: 100 },
@@ -555,14 +584,14 @@ function cleanupExpiredSessions() {
 }
 
 module.exports = {
-  init, save,
+  init, save, queryAll,
   findStudent, createStudent, deleteStudent, listStudents,
   updateStudentData, updateStudentStars, updateStudentMeta, updateStudentPassword, resetStudent,
   getTeacherPassword, checkTeacherMustChangePassword, setTeacherPassword,
   createSession, validateSession, cleanupExpiredSessions, invalidateStudentSessions, updateSessionActivity,
   DEFAULT_PASSWORD, TEACHER_DEFAULT_PASSWORD, isDefaultPassword, hashPassword, verifyPassword, isHashed, validatePasswordStrength,
   recordLoginAudit, incrementLoginCount, awardAchievements, awardTeacherAchievements, markLoginAchNotified,
-  addBugReport, listBugReports, deleteBugReport, recordLogin,
+  addBugReport, listBugReports, deleteBugReport, recordLogin, loginAchievementIds, newlyAwardedLoginIds,
   // 工资 & 商城
   localDateString, salaryRate, calcStudentXP, getWallet, claimSalary, addInventory, consumeInventory, setCoins
 };

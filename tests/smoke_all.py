@@ -55,7 +55,7 @@ def main():
         page.goto(SERVER+"/index.html")
         page.fill("#nameInput", USER); page.fill("#studentPw", PW); page.click("#studentBtn")
         page.wait_for_load_state("networkidle"); page.wait_for_timeout(1500)
-        page.goto(SERVER+"/student.html?level=5")
+        page.goto(SERVER+"/student.html?open=game")
         page.wait_for_load_state("networkidle"); page.wait_for_timeout(1500)
         for _ in range(8):
             try: page.click("text=知道了", timeout=600); page.wait_for_timeout(200)
@@ -92,7 +92,7 @@ def main():
             del all_errs[:]
             close_all(page); page.wait_for_timeout(200)
             # 每测完一个游戏强制刷新页面，彻底清除 rAF/setInterval 残留（避免交叉污染）
-            page.goto(SERVER+"/student.html?level=5")
+            page.goto(SERVER+"/student.html?open=game")
             page.wait_for_load_state("networkidle"); page.wait_for_timeout(300)
         b.close()
     print(f"\n===== 结果: {len(passed)} 通过 / {len(failed)} 失败 =====")

@@ -25,7 +25,11 @@ export async function savePassword() {
   const pw1 = document.getElementById('pwNew').value;
   const pw2 = document.getElementById('pwNew2').value;
   const err = document.getElementById('pwErr');
-  if (!pw1 || pw1.length < 4) { err.textContent = '新密码至少 4 位'; return; }
+  if (!pw1 || pw1.length < 8) { err.textContent = '新密码至少 8 位'; return; }
+  if (!/[A-Z]/.test(pw1) || !/[a-z]/.test(pw1) || !/\d/.test(pw1)) {
+    err.textContent = '新密码需同时包含大写字母、小写字母和数字';
+    return;
+  }
   if (pw1 !== pw2) { err.textContent = '两次输入的新密码不一致'; return; }
   const btn = document.getElementById('pwSaveBtn');
   btn.disabled = true; btn.textContent = '保存中…';

@@ -48,6 +48,7 @@ export async function loadState() {
     window.gameState.coins = res.data.coins || 0;
     window.gameState.inventory = res.data.inventory || {};
     window.gameState.salaryInfo = res.data.salaryInfo || {};
+    if (res.data.passwordEnabled !== undefined) window.PASSWORD_ENABLED = !!res.data.passwordEnabled;
     if (res.data.salaryInfo && res.data.salaryInfo.justClaimed) {
       setTimeout(() => window.showToast('💰 上班打卡 +' + res.data.salaryInfo.rate + ' 金币（今日工资）', 'success'), 1200);
     }

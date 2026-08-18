@@ -28,7 +28,7 @@ def main():
         page.goto(SERVER+"/index.html")
         page.fill("#nameInput", USER); page.fill("#studentPw", PW); page.click("#studentBtn")
         page.wait_for_load_state("networkidle"); page.wait_for_timeout(1500)
-        page.goto(SERVER+"/student.html?level=5")
+        page.goto(SERVER+"/student.html?open=game")
         page.wait_for_load_state("networkidle"); page.wait_for_timeout(1500)
         for _ in range(8):
             try: page.click("text=知道了", timeout=600); page.wait_for_timeout(200)
@@ -52,7 +52,7 @@ def main():
             else: failed.append((g, info, errs[:1]))
             page.evaluate("()=>{ document.querySelectorAll('.mm-overlay').forEach(o=>o.remove()); }")
             page.wait_for_timeout(200)
-            page.goto(SERVER+"/student.html?level=5")
+            page.goto(SERVER+"/student.html?open=game")
             page.wait_for_load_state("networkidle"); page.wait_for_timeout(300)
         b.close()
     print(f"\n===== 移动端检查: {len(passed)} 通过 / {len(failed)} 失败 =====")
