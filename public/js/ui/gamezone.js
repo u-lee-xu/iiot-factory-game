@@ -259,7 +259,8 @@ export function refreshGameZone() {
   const ov = document.getElementById('gzOverlay');
   const body = document.getElementById('gzBody');
   if (ov && body && ov.classList.contains('show')) {
-    renderGameZone(body);
+    // 保留当前类型筛选：从游戏房按类型进入时只显示该类游戏，避免通关后重绘成"全部游戏"
+    renderGameZone(body, window._grType || undefined);
   }
 }
 
