@@ -183,16 +183,8 @@ export function openShooter(cfg, onComplete) {
     e.active = false;
     spawnDrop(e);
     if (!enemies.some(x => x.active && x.term === targetTerm)) {
-      if (advanced) {
-        const nt = nextActiveTerm();
-        if (nt) {
-          targetTerm = nt;
-          termIdx = Math.max(0, termList.indexOf(nt));
-          if (termEl) termEl.textContent = nt;
-          window.showToast('🎯 炮口已切换 → ' + nt, 'info');
-          playSound('click');
-        }
-      } else {
+      // 进阶版：武器 TAG 不自动跟随敌人，由玩家手动 ↑/↓ 选择，不匹配则不生效；普通版自动找下一个目标
+      if (!advanced) {
         targetTerm = pickNextTarget();
       }
     }
