@@ -68,7 +68,14 @@
   .modal-actions .btn { flex: 1; margin-bottom: 0; }
 
   /* ── 右上角音乐切换控制 ── */
-  #musicCtl { position: fixed; top: 12px; right: 12px; z-index: 99; font-family: 'Courier New', monospace; }
+  #musicCtl { position: fixed; top: 12px; right: 12px; z-index: 99; font-family: 'Courier New', monospace; display: flex; align-items: center; gap: 8px; }
+  #textbookBtn {
+    display: flex; align-items: center; gap: 6px;
+    background: #181820; border: 1px solid #2a2a3a; color: #c8c8d0;
+    padding: 6px 11px; border-radius: 6px; cursor: pointer; font-size: 16px;
+    opacity: .8; user-select: none; text-decoration: none; line-height: 1;
+  }
+  #textbookBtn:hover { opacity: 1; border-color: #00bcd4; color: #00bcd4; }
   #musicBtn {
     display: flex; align-items: center; gap: 6px;
     background: #181820; border: 1px solid #2a2a3a; color: #c8c8d0;
@@ -118,6 +125,7 @@
 </head>
 <body>
 <div id="musicCtl">
+  <a id="textbookBtn" href="/textbook/" target="_blank" rel="noopener" title="电子教材">📖</a>
   <div id="musicBtn">
     <span class="ico">🎵</span>
     <span class="lbl" id="musicLbl">—</span>
