@@ -21,3 +21,6 @@ data/game.db.bak*
 # Python 测试缓存
 __pycache__/
 *.pyc
+
+# 电子教材站部署产物（源在 /home/lee/教材编写/，仅本地部署用，不纳入版本控制）
+public/textbook/
