@@ -775,7 +775,22 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
   <header>
     <div class="brand">🏭 锐智工厂<small>工业互联网实训 · 厂区地图</small></div>
     <div style="display:flex;align-items:center;gap:8px">
-      <button id="musicBtn" title="背景音乐" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">♫ 开</button>
+      <a href="/textbook/" target="_blank" rel="noopener" title="电子教材" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;text-decoration:none;font-family:inherit">📖 电子教材</a>
+      <div id="mpWrap" style="position:relative">
+        <button id="mpToggle" title="音乐播放器" style="background:none;border:1px solid var(--border);color:var(--dim);font-size:14px;padding:4px 10px;border-radius:3px;cursor:pointer;font-family:inherit">🎵</button>
+        <div id="mpPanel" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:#0a0e1c;border:1px solid var(--border);border-radius:8px;padding:10px;min-width:210px;box-shadow:0 8px 24px rgba(0,0,0,.55);font-family:'Courier New',monospace;user-select:none;z-index:13000">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span id="mpTrack" style="color:#7ee8fa;font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
+            <span id="mpMode" style="font-size:10px;padding:1px 6px;border-radius:8px;background:#123;color:#ffd27d">跟随场景</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button id="mpPrev" title="上一首" style="flex:1;background:#181820;border:1px solid var(--border);color:#c8c8d0;border-radius:4px;padding:3px 0;font-size:14px;cursor:pointer">⏮</button>
+            <button id="mpPlay" title="播放/暂停" style="flex:1;background:#181820;border:1px solid var(--border);color:#c8c8d0;border-radius:4px;padding:3px 0;font-size:14px;cursor:pointer">⏯</button>
+            <button id="mpNext" title="下一首" style="flex:1;background:#181820;border:1px solid var(--border);color:#c8c8d0;border-radius:4px;padding:3px 0;font-size:14px;cursor:pointer">⏭</button>
+            <button id="mpFollow" title="跟随场景/手动锁定" style="flex:1;background:#181820;border:1px solid var(--border);color:#ffd27d;border-radius:4px;padding:3px 0;font-size:14px;cursor:pointer">🎵</button>
+          </div>
+        </div>
+      </div>
       <button class="back" onclick="doLogout()" title="退出登录">🚪 退出</button>
     </div>
   </header>
@@ -1654,6 +1669,7 @@ async function autoLogin(){
 }
 autoLogin();
 </script>
+<script src="/js/core/music-director.js"></script>
 <script src="/data/music.js"></script>
 <script>
 zzfxV=.3; zzfxR=44100;
@@ -1662,8 +1678,9 @@ zzfxM=(n,f,t,e=125)=>{let l,o,z,r,g,h,x,a,u,c,d,i,m,p,G,M=0,R=[],b=[],j=[],k=0,q
 const MUSIC_KEYS=['hub','control_room','console','workshop','edge_cabinet','cloud_platform','big_screen','data_pipe','ai_lab','tetris','mario','dkc','kirby','pokemon'];
 let musCtx=null,musSrc=null,musGain=null,musOn=true,musIdx=0;
 function musAudio(){ if(!musCtx){musCtx=new(window.AudioContext||window.webkitAudioContext)();} if(musCtx.state==='suspended')musCtx.resume(); return musCtx; }
-function musPlay(k){
+function musPlay(k, force){
   if(!window.MUSIC_SONGS||!window.MUSIC_SONGS[k])return;
+  if(!force && window.MusicDirector && !window.MusicDirector.shouldPlayAuto(k)) return;
   try{
     const c=musAudio();
     if(musSrc){try{musSrc.stop();}catch(e){} musSrc=null;}
@@ -1672,17 +1689,38 @@ function musPlay(k){
     for(let i=0;i<data.length;i++)buf.getChannelData(i).set(data[i]);
     if(!musGain){musGain=c.createGain();musGain.gain.value=.5;musGain.connect(c.destination);}
     const src=c.createBufferSource();src.buffer=buf;src.loop=true;src.connect(musGain);src.start();musSrc=src;
+    window._curMusKey=k; if(window.updateMusicPlayer)window.updateMusicPlayer();
   }catch(e){}
 }
-function musNext(){ musIdx=(musIdx+1)%MUSIC_KEYS.length; musPlay(MUSIC_KEYS[musIdx]); }
+function musPrev(){ musIdx=(musIdx-1+MUSIC_KEYS.length)%MUSIC_KEYS.length; const k=MUSIC_KEYS[musIdx]; if(window.MusicDirector)window.MusicDirector.playManual(k); musPlay(k,true); }
+function musNext(){ musIdx=(musIdx+1)%MUSIC_KEYS.length; const k=MUSIC_KEYS[musIdx]; if(window.MusicDirector)window.MusicDirector.playManual(k); musPlay(k,true); }
 function musToggle(){
   musOn=!musOn;
-  const btn=document.getElementById('musicBtn');
-  if(musOn){ musPlay(MUSIC_KEYS[musIdx]); btn.textContent='♫ 开'; }
-  else { if(musSrc){try{musSrc.stop();}catch(e){}} musSrc=null; btn.textContent='♪ 关'; }
+  if(musOn){ musPlay(MUSIC_KEYS[musIdx],true); }
+  else { if(musSrc){try{musSrc.stop();}catch(e){}} musSrc=null; }
+  window.updateMusicPlayer&&window.updateMusicPlayer();
 }
-function musStart(){ if(musOn){ try{musAudio(); musPlay(MUSIC_KEYS[musIdx]);}catch(e){} } }
-document.getElementById('musicBtn').addEventListener('click',musToggle);
+function musStart(){ if(musOn){ try{musAudio(); const rt=window.MusicDirector&&window.MusicDirector.manualTrackToRestore(); if(rt){musPlay(rt,true);} else {musPlay(MUSIC_KEYS[musIdx]);} }catch(e){} } }
+
+// —— 音乐播放器（header 右上角展开式；双模式：跟随场景 / 手动选曲）——
+var _mpPanel=document.getElementById('mpPanel'), _mpOpen=false;
+document.getElementById('mpToggle').addEventListener('click',function(ev){ ev.stopPropagation(); _mpOpen=!_mpOpen; _mpPanel.style.display=_mpOpen?'block':'none'; });
+document.addEventListener('click',function(){ if(_mpOpen){ _mpOpen=false; _mpPanel.style.display='none'; } });
+window.updateMusicPlayer=function(){
+  var tr=document.getElementById('mpTrack'), mo=document.getElementById('mpMode');
+  if(tr) tr.textContent=window._curMusKey||MUSIC_KEYS[musIdx];
+  if(mo){ var auto=!window.MusicDirector||window.MusicDirector.isAuto(); mo.textContent=auto?'跟随场景':'手动选曲'; mo.style.background=auto?'#123':'#2a1010'; mo.style.color=auto?'#ffd27d':'#ff9d9d'; }
+};
+document.getElementById('mpPrev').addEventListener('click',musPrev);
+document.getElementById('mpPlay').addEventListener('click',musToggle);
+document.getElementById('mpNext').addEventListener('click',musNext);
+document.getElementById('mpFollow').addEventListener('click',function(){
+  if(!window.MusicDirector)return;
+  if(window.MusicDirector.isAuto()){ window.MusicDirector.playManual(window._curMusKey||MUSIC_KEYS[musIdx]); }
+  else { window.MusicDirector.followScene(); musPlay(window._curMusKey||'hub',true); }
+  window.updateMusicPlayer();
+});
+window.updateMusicPlayer();
 </script>
 </body>
 </html>

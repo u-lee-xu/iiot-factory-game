@@ -14,8 +14,7 @@
 
 - 后端：`server.js`（helmet CSP + 限流 120/min + 静态 public + /api 路由）、`db.js`（sql.js + bcrypt，真实文件 `data/game.db`，写后原子落盘；init 自动建表+旧库迁移）、`auth.js`（Bearer 中间件，24h；学生单点登录）、`routes/`（login/student/teacher/game）
 - 前端页面：`index.html`（登录，跳 **map_proto.html** 或 teacher.html）、`map_proto.html`（厂区地图，内联 JS）、`room.html`（俯视 RPG 房间 + `js/room-task-host.js` 任务宿主）、`student.html`（**跳转壳**：无参→map_proto、?level=X→room.html?room=X、?task/?open=→app.js 弹任务）、`teacher.html`、`student_detail.html`（教师看学生详情）
-- 前端 JS（ES Module，无打包器）：`js/app.js`（唯一宿主入口：状态+常量+**window 挂载**+init）、`js/core/`（api/state/fx/sound/utils/kbd/cmd-annotate/interactions）、`js/interactions/`（16 个任务类型）、`js/ui/`（10 模块）、`js/games/`（26 款小游戏）
-- `data/game-content.json`（8 关 117 任务，**mtime 缓存热更新，编辑免重启**）、`public/data/`（term-cards.json、music.js、knowledge-tags.json——**前端加载的是 public/data 这份**，根 data/ 那份是另一份）
+- 前端 JS（ES Module，无打包器）：`js/app.js`（唯一宿主入口：状态+常量+**window 挂载**+init）、`js/core/`（api/state/fx/sound/utils/kbd/cmd-annotate/interactions）、`js/interactions/`（16 个任务类型）、`js/ui/`（10 模块）、`js/games/`（26 款小游戏）- `data/game-content.json`（8 关 117 任务，**mtime 缓存热更新，编辑免重启**）、`public/data/`（term-cards.json、music.js、knowledge-tags.json——**前端加载的是 public/data 这份**，根 data/ 那份是另一份）
 - `tests/`（playwright smoke）、`tools/make_offline.py`（离线任务打包，仅 install_wizard）、`docs/`、`public/offline/`
 
 ## 关键约定
@@ -28,6 +27,7 @@
 - 星级 `stars_data`：`{ [levelId]: { self, peer, teacher } }`，师评 0-5（routes/teacher.js 校验）；`check_data` 为任务勾选（半完成 `{half:true}` 记一半 XP）
 - XP 规则（前后端一致）：hidden 任务=300；quiz 且 xp≤50=50；xp=0=0；其余默认 100
 - **数据库写操作一律走 db.js 导出函数**（自动 save）；db.js 未导出 `get/all/run/transaction`（旧文档写法已失效）；底层只有 `exec/queryOne/queryAll` 且未导出
+- **背景音乐双模式**（2026-08-19）：`js/core/music-director.js`（普通 script，挂 `window.MusicDirector`，`localStorage` 记忆）统一调度——**跟随场景(auto)** 进房间/开游戏自动切对应曲；**手动选曲(manual)** 用户切歌/播放器选曲后锁定，场景切换不再切走；`followScene()` 一键恢复。`sound.js` 的 `playMusic`（场景触发，manual 时拦截）、`playManualTrack`/`followScene`（手动）；map_proto/room 内联 `musPlay(k,force)` 同规则 + 浮动播放器(`#musicPlayer`：⏮/⏯/⏭/🎵)。新增音乐相关入口须经 MusicDirector 判断，勿绕过双模式。
 - 排行榜排除 `张三`（routes/game.js:9，教师演示号）——测试/演示排行注意
 
 ## 已知问题（核对发现，改 bug 前先看）

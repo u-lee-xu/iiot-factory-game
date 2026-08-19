@@ -35,7 +35,9 @@ export function getMusicSong(name) {
   if (window.MUSIC_SONGS && window.MUSIC_SONGS[name]) return window.MUSIC_SONGS[name];
   return (window.MUSIC_SONGS && window.MUSIC_SONGS.hub) || null;
 }
-export function playMusic(name) {
+function md() { return (typeof window !== 'undefined') ? (window.MusicDirector || null) : null; }
+// 真实播放（不受双模式拦截）；由 playMusic(场景) / playManualTrack(手动) 复用
+function _play(name) {
   const song = getMusicSong(name);
   if (!song) return;
   if (currentTrack === name && musicSrc) return;
@@ -64,6 +66,22 @@ export function playMusic(name) {
     src.start();
   } catch(e) { /* music not critical */ }
 }
+// 场景触发：manual 模式下拦截（不切走用户手动选的歌）
+export function playMusic(name) {
+  if (md() && !md().shouldPlayAuto(name)) return;
+  _play(name);
+}
+// 用户手动选曲：锁定 manual + 立即播放
+export function playManualTrack(name) {
+  if (md()) md().playManual(name);
+  _play(name);
+}
+// 恢复跟随场景：立即按最近场景曲播放
+export function followScene() {
+  if (md()) md().followScene();
+  const t = md() ? md().lastSceneTrack() : null;
+  if (t) _play(t);
+}
 export function toggleMusic() {
   musicEnabled = !musicEnabled;
   try { localStorage.setItem('music_enabled', musicEnabled ? '1' : '0'); } catch(e){}
@@ -87,7 +105,7 @@ export function nextMusic() {
   i = (i + 1) % avail.length;
   bgIdx = i;
   const t = avail[i];
-  playMusic(t);
+  playManualTrack(t);
   window.showToast('🎵 背景曲：' + t, 'info');
 }
 
@@ -293,5 +311,8 @@ export function playSound(type, opt) {
 // 2b. TYPEWRITER EFFECT
 // =========================================================================
 // 供 app.js init 调用的便捷入口
-export function loadMusicPref(){ try{ if (localStorage.getItem('music_enabled') === '0') musicEnabled = false; } catch(e){} }
-export function ensureMusicPlayback(){ if (musicEnabled && currentTrack && !musicSrc) playMusic(currentTrack); }
+export function loadMusicPref(){ try{ if (localStorage.getItem('music_enabled') === '0') musicEnabled = false; } catch(e){}
+  // manual 模式：跨页恢复用户手动选的曲（预置 currentTrack，供 ensureMusicPlayback 播放）
+  const d = md(); if (d) { const rt = d.manualTrackToRestore(); if (rt) currentTrack = rt; }
+}
+export function ensureMusicPlayback(){ if (musicEnabled && currentTrack && !musicSrc) playManualTrack(currentTrack); }

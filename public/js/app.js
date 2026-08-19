@@ -144,7 +144,7 @@ import './interactions/boss_fight.js';
 import './interactions/config_debug.js';
 import './interactions/log_forensics.js';
 import './interactions/default.js';
-import { getAudioCtx, toggleSound, getMusicSong, playMusic, toggleMusic, nextMusic, playSound, loadMusicPref, ensureMusicPlayback, BG_TRACKS, bgIdx, soundEnabled, audioCtx, musicEnabled, currentTrack, musicGainNode, musicSrc } from './core/sound.js';
+import { getAudioCtx, toggleSound, getMusicSong, playMusic, playManualTrack, followScene, toggleMusic, nextMusic, playSound, loadMusicPref, ensureMusicPlayback, BG_TRACKS, bgIdx, soundEnabled, audioCtx, musicEnabled, currentTrack, musicGainNode, musicSrc } from './core/sound.js';
 import { openPacman } from './games/pacman.js';
 import { openHacknet } from './games/hack.js';
 import { openTycoon } from './games/tyc.js';
@@ -901,6 +901,8 @@ Object.assign(window, {
   miniTierBadge,
   myName,
   nextMusic,
+  playManualTrack,
+  followScene,
   openAchievements,
   openAlarmRush,
   openBoss,
