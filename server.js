@@ -29,6 +29,14 @@ app.use(helmet({
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
 
+// ===== 教材站（/textbook/）CSP 放宽 =====
+// VitePress/Vue 运行时需要 unsafe-eval，此处仅对教材站放宽，游戏站保持原安全策略
+app.use('/textbook', (req, res, next) => {
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self';base-uri 'self';font-src 'self' data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob:;object-src 'none';script-src 'self' 'unsafe-inline' 'unsafe-eval';script-src-attr 'unsafe-inline';style-src 'self' 'unsafe-inline';connect-src 'self'");
+  next();
+});
+
 // 请求体大小限制（防止大包攻击）
 app.use(express.json({ limit: '100kb' }));
 

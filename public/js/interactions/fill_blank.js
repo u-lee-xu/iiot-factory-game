@@ -11,7 +11,7 @@ registerInteraction('fill_blank', {
   render(container, task) {
     const cfg = task.config;
     const teachText = window.generateTeach(task);
-    const question = cfg.prompt.replace(/.*?[：:]/,'').replace(/[「」""【】]/g,'');
+    const question = cfg.prompt.replace(/[「」""【】]/g,'');
     container.innerHTML = `
       <div class="fill-blank" id="fillBlankArea" style="margin-top:0">
         <p>${question.replace(/____/g, '<span class="highlight">____</span>')}</p>
@@ -27,7 +27,6 @@ registerInteraction('fill_blank', {
     window.addDirectorBox(container, teachText, () => {
       document.getElementById('fillBlankArea').style.opacity = '1';
     }, initialMood, { collapsed: true });
-    document.getElementById('fillBlankArea').style.opacity = '0.3';
     document.getElementById('fillBlankArea').style.transition = 'opacity .5s';
 
     document.getElementById('modalFoot').innerHTML = `

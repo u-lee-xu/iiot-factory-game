@@ -77,7 +77,7 @@ export function generateTeach(task) {
     '5-1': 'docker run hello-world 是 Docker 的入门命令。它会从 Docker Hub 下载 hello-world 镜像，创建容器并运行。看到 Hello from Docker 的欢迎信息，就说明 Docker 安装成功了。',
     '5-2': 'docker run -d --name mynginx -p 8080:80 nginx 命令用 Nginx 镜像启动一个 Web 服务器。-d 后台运行，--name 指定容器名，-p 8080:80 把主机的 8080 端口映射到容器的 80 端口。',
     '5-3': 'Docker 常用命令不多：docker ps 看运行中的容器，docker stop 停掉容器，docker rm 删除容器，docker pull 下载镜像。记住这四个就能上手了。',
-    '5-4': '用 Docker 运行 Node-RED 可以避免与原生版本的端口冲突。Docker 版的 Node-RED 使用 1881 端口（区别于原生的 1880），这样两个版本可以同时运行对比。',
+    '5-4': '为什么跑两个 Node-RED？第 3 章原生装的（1880）是产线主力，现在用 Docker 再部署一个——这是教材 5.6 的「对比实验」：同一个应用，原生 vs 容器，让你亲眼验证容器化的优势：秒级启停、环境隔离、删除即净化（docker stop && docker rm 用完即删，不留垃圾）。注意：容器里跑的还是 1880，只是宿主机映射到 1881，两个版本才不打架。命令 -p 宿主机:容器 别写反。',
     '5-5': 'Docker 和虚拟机的核心区别：Docker 共享宿主机内核（轻量），虚拟机有独立内核（重量）。所以 Docker 启动秒级、磁盘 MB 级；虚拟机启动分钟级、磁盘 GB 级。',
     '5-6': 'Docker 容器删了就全没了——这是设计哲学不是bug。想让数据活过容器生命周期，得用Docker提供的数据卷挂载——宿主机上留一块独立区域，容器重启数据还在。',
     '5-hidden': '同时运行原生 Node-RED 和 Docker 版 Node-RED，对比它们的安装方式、隔离性、数据持久化。这是理解 Docker 价值的最佳实践。',
