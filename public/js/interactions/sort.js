@@ -31,54 +31,73 @@ registerInteraction('sort', {
     }catch(e){}
 
     const area = document.getElementById('sortArea');
-    let dragSrc = null;
 
     shuffled.forEach(text => {
       const div = document.createElement('div');
       div.className = 'sort-item';
       div.textContent = text;
-      div.draggable = true;
-
-      div.addEventListener('dragstart', e => {
-        dragSrc = div;
-        div.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-      });
-
-      div.addEventListener('dragend', () => {
-        div.classList.remove('dragging');
-        dragSrc = null;
-      });
-
-      div.addEventListener('dragover', e => {
-        e.preventDefault();
-        div.classList.add('drag-over');
-      });
-
-      div.addEventListener('dragleave', () => {
-        div.classList.remove('drag-over');
-      });
-
-      div.addEventListener('drop', e => {
-        e.preventDefault();
-        div.classList.remove('drag-over');
-        if (dragSrc && dragSrc !== div) {
-          const parent = area;
-          const idx1 = Array.from(parent.children).indexOf(dragSrc);
-          const idx2 = Array.from(parent.children).indexOf(div);
-          if (idx1 < idx2) {
-            parent.insertBefore(dragSrc, div.nextSibling);
-          } else {
-      window.errors++;
-      window.streak = 0;
-            parent.insertBefore(dragSrc, div);
-          }
-        }
-      });
-
       area.appendChild(div);
     });
+    // 移动端(Pointer Events)拖放排序：兼容 iOS Safari / 微信 WebView。长按→吸附高亮→拖动→放置；桌面鼠标同样适用
+    makeSortable(area);
 
+    function makeSortable(area) {
+      const items = () => [...area.querySelectorAll('.sort-item')];
+      let dragEl = null, startX = 0, startY = 0, timer = null, dragging = false;
+      const LONG = 200, THRESH = 8;
+      function endDrag(place) {
+        clearTimeout(timer);
+        if (!dragEl) return;
+        if (dragging && place) {
+          const rect = dragEl.getBoundingClientRect();
+          const cy = rect.top + rect.height / 2;
+          const list = items().filter(it => it !== dragEl);
+          let inserted = false;
+          for (const it of list) {
+            const r = it.getBoundingClientRect();
+            if (cy < r.top + r.height / 2) { area.insertBefore(dragEl, it); inserted = true; break; }
+          }
+          if (!inserted) area.appendChild(dragEl);
+          list.forEach(it => it.classList.remove('drag-over'));
+        }
+        if (dragEl) { dragEl.classList.remove('dragging'); dragEl.style.transform = ''; dragEl.style.zIndex = ''; }
+        dragEl = null; dragging = false;
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
+      }
+      function onMove(e) {
+        if (!dragEl) return;
+        if (!dragging) {
+          if (Math.hypot(e.clientX - startX, e.clientY - startY) > THRESH) clearTimeout(timer);
+          return;
+        }
+        e.preventDefault();
+        dragEl.style.transform = 'translate(' + (e.clientX - startX) + 'px,' + (e.clientY - startY) + 'px)';
+        const rect = dragEl.getBoundingClientRect();
+        const cy = rect.top + rect.height / 2;
+        const list = items().filter(it => it !== dragEl);
+        let target = null;
+        for (const it of list) {
+          const r = it.getBoundingClientRect();
+          if (cy < r.top + r.height / 2) { target = it; break; }
+        }
+        list.forEach(it => it.classList.remove('drag-over'));
+        if (target) target.classList.add('drag-over');
+      }
+      function onDown(e) {
+        const el = e.target.closest('.sort-item');
+        if (!el) return;
+        e.preventDefault();
+        dragEl = el; startX = e.clientX; startY = e.clientY; dragging = false;
+        timer = setTimeout(() => { dragging = true; el.classList.add('dragging'); el.style.zIndex = '50'; }, LONG);
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
+      }
+      function onUp() { endDrag(true); }
+      items().forEach(el => el.addEventListener('pointerdown', onDown));
+    }
     // 键盘重排：空格拿起/放下，↑/↓ 移动（无选中时移动光标）
     function setupSortKbd(area){
       kbdCleanup();

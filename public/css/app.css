@@ -256,10 +256,11 @@ body {
 .sort-item {
   padding: 6px 10px; border: 1px solid var(--border); background: #0e0e16;
   cursor: grab; font-size: 16px; transition: all .2s;
-  user-select: none;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  touch-action: none;   /* 移动端拖放：阻止拖动时页面滚动/缩放 */
 }
 .sort-item:hover { border-color: var(--cyan); }
-.sort-item.dragging { opacity: .5; }
+.sort-item.dragging { opacity: .6; position: relative; z-index: 50; transition: none; box-shadow: 0 6px 18px rgba(0,0,0,.4); }
 .sort-item.drag-over { border-top: 2px solid var(--amber); }
 
 /* ===== Interaction: Progress Bar ===== */
@@ -599,12 +600,17 @@ body {
 .classify-area { display: flex; gap: 12px; }
 .classify-pool { flex: 1; }
 .classify-pool h4, .classify-cats h4 { font-size: 16px; color: var(--dim); margin-bottom: 6px; }
+.classify-item, .placed-item {
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  touch-action: none;
+}
 .classify-item {
   padding: 5px 8px; border: 1px solid var(--border); margin-bottom: 3px;
   font-size: 16px; cursor: grab; transition: all .2s; text-align: center;
 }
 .classify-item:hover { border-color: var(--cyan); }
 .classify-item.placed { opacity: .3; pointer-events: none; }
+.classify-cat.drag-over { border-color: var(--amber); background: rgba(255,176,0,.1); }
 .classify-cats { flex: 1; }
 .classify-cat {
   border: 1px dashed var(--border); padding: 6px; min-height: 40px; margin-bottom: 4px;

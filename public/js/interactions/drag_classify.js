@@ -42,34 +42,74 @@ registerInteraction('drag_classify', {
     const pool = document.getElementById('classifyPool');
     const cats = document.getElementById('classifyCats');
 
-    // 待分类区支持拖回：已放置的项可拖回此处取消放置，重新分类
-    pool.addEventListener('dragover', e => e.preventDefault());
-    pool.addEventListener('drop', e => {
-      e.preventDefault();
-      const name = e.dataTransfer.getData('text/plain');
-      if (name && placed[name]) {
-        delete placed[name];
-        renderClassify();
-      }
-    });
+
 
     cfg.categories.forEach(catName => {
       const catDiv = document.createElement('div');
       catDiv.className = 'classify-cat';
       catDiv.dataset.cat = catName;
       catDiv.innerHTML = `<span class="cat-label">${catName}</span>`;
-      catDiv.addEventListener('dragover', e => e.preventDefault());
-      catDiv.addEventListener('drop', e => {
-        e.preventDefault();
-        const name = e.dataTransfer.getData('text/plain');
-        if (!name) return;
-        placed[name] = catName;
-        renderClassify();
-      });
       catDiv.onclick = () => { if (kbdPicked) { placed[kbdPicked] = catName; kbdPicked = null; renderClassify(); } };
       cats.appendChild(catDiv);
     });
 
+    // 移动端(Pointer Events)拖放：兼容 iOS/微信。长按→拖动跟随→放置(hit-test 落到分类/待分类池)
+    let dItem = null, dName = null, dStartX = 0, dStartY = 0, dTimer = null, dDragging = false, dGhost = null, dLastX = 0, dLastY = 0;
+    function attachDrag(el, name) {
+      el.style.touchAction = 'none';
+      el.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        dItem = el; dName = name; dStartX = e.clientX; dStartY = e.clientY; dDragging = false; dLastX = e.clientX; dLastY = e.clientY;
+        dTimer = setTimeout(function () {
+          dDragging = true;
+          dGhost = el.cloneNode(true);
+          dGhost.style.position = 'fixed'; dGhost.style.pointerEvents = 'none'; dGhost.style.zIndex = '9999';
+          dGhost.style.margin = '0'; dGhost.style.background = '#1a1a26';
+          document.body.appendChild(dGhost);
+          moveGhost(e.clientX, e.clientY);
+        }, 200);
+        window.addEventListener('pointermove', onDragMove);
+        window.addEventListener('pointerup', onDragUp);
+        window.addEventListener('pointercancel', onDragUp);
+      });
+    }
+    function moveGhost(x, y) {
+      if (dGhost && dItem) { const r = dItem.getBoundingClientRect(); dGhost.style.left = (x - r.width / 2) + 'px'; dGhost.style.top = (y - r.height / 2) + 'px'; }
+      highlightTarget(x, y);
+    }
+    function highlightTarget(x, y) {
+      cats.querySelectorAll('.classify-cat').forEach(function (c) { c.classList.remove('drag-over'); });
+      pool.classList.remove('drag-over');
+      const el = document.elementFromPoint(x, y);
+      const cat = el && el.closest('.classify-cat');
+      if (cat) cat.classList.add('drag-over');
+      else if (el && el.closest('#classifyPool')) pool.classList.add('drag-over');
+    }
+    function onDragMove(e) {
+      if (!dItem) return;
+      if (!dDragging) { if (Math.hypot(e.clientX - dStartX, e.clientY - dStartY) > 8) clearTimeout(dTimer); return; }
+      e.preventDefault();
+      dLastX = e.clientX; dLastY = e.clientY;
+      moveGhost(e.clientX, e.clientY);
+    }
+    function onDragUp() {
+      clearTimeout(dTimer);
+      if (dGhost && dGhost.parentNode) dGhost.parentNode.removeChild(dGhost);
+      dGhost = null;
+      cats.querySelectorAll('.classify-cat').forEach(function (c) { c.classList.remove('drag-over'); });
+      pool.classList.remove('drag-over');
+      if (dDragging && dName) {
+        const el = document.elementFromPoint(dLastX, dLastY);
+        const cat = el && el.closest('.classify-cat');
+        const inPool = el && el.closest('#classifyPool');
+        if (cat) { placed[dName] = cat.dataset.cat; renderClassify(); }
+        else if (inPool) { delete placed[dName]; renderClassify(); }
+      }
+      dItem = null; dDragging = false; dName = null;
+      window.removeEventListener('pointermove', onDragMove);
+      window.removeEventListener('pointerup', onDragUp);
+      window.removeEventListener('pointercancel', onDragUp);
+    }
     function renderClassify() {
       pool.innerHTML = '';
       shuffled.forEach(name => {
@@ -77,11 +117,7 @@ registerInteraction('drag_classify', {
         const div = document.createElement('div');
         div.className = 'classify-item' + (kbdPicked === name ? ' picked' : '');
         div.textContent = name;
-        div.draggable = true;
-        div.addEventListener('dragstart', e => {
-          e.dataTransfer.setData('text/plain', name);
-          e.dataTransfer.effectAllowed = 'move';
-        });
+        attachDrag(div, name);
         div.onclick = () => { kbdPicked = (kbdPicked === name) ? null : name; renderClassify(); };
         pool.appendChild(div);
       });
@@ -95,13 +131,7 @@ registerInteraction('drag_classify', {
             const span = document.createElement('span');
             span.className = 'placed-item';
             span.textContent = name;
-            span.draggable = true;
-            span.addEventListener('dragstart', e => {
-              e.dataTransfer.setData('text/plain', name);
-              e.dataTransfer.effectAllowed = 'move';
-              span.style.opacity = '0.4';
-            });
-            span.addEventListener('dragend', () => { span.style.opacity = ''; });
+            attachDrag(span, name);
             span.onclick = () => { delete placed[name]; renderClassify(); };
             catDiv.appendChild(span);
           }
